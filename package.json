@@ -1,0 +1,24 @@
+{
+  "dependencies": {
+    "es-module-loader": "^2.3.0",
+    "es6-module-loader": "^0.17.11",
+    "three": "^0.180.0"
+  },
+  "devDependencies": {
+    "@types/three": "^0.180.0",
+    "terser-webpack-plugin": "^5.3.14",
+    "ts-loader": "^9.5.4",
+    "typescript": "^5.9.3",
+    "vite": "^7.1.9",
+    "webpack": "^5.102.1",
+    "webpack-cli": "^6.0.1",
+    "webpack-merge": "^6.0.1"
+  },
+  "name": "fg",
+  "version": "1.0.0",
+  "main": "main.js",
+  "keywords": [],
+  "author": "WangXiaoFeng",
+  "license": "ISC",
+  "description": ""
+}
