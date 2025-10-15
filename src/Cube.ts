@@ -1,81 +1,155 @@
 import * as THREE from 'three';
 import * as WEBGPU from 'three/src/three.WebGPU';
 
-export class Cube{
-  public constructor(){
-  // 创建一个场景
-  const scene = new THREE.Scene();
-  //通过scene.add(元素)添加元素
-  // 创建一个透视相机
-  const camera = new THREE.PerspectiveCamera(
-    75, // 视场角（FOV）
-    window.innerWidth / window.innerHeight, // 宽高比
-    0.1, // 近裁剪面
-    3000 // 远裁剪面
-  );
+export class Cube {
+  public constructor() {
+    // 创建一个场景
+    const scene = new THREE.Scene();
+    //通过scene.add(元素)添加元素
+    // 创建一个透视相机
+    const camera = new THREE.PerspectiveCamera(
+      75, // 视场角（FOV）
+      window.innerWidth / window.innerHeight, // 宽高比
+      0.1, // 近裁剪面
+      3000 // 远裁剪面
+    );
 
-  //设置相机位置
-  // camera.position.set(100, 100, 100); 
+    // 设置相机位置
+    camera.position.z = 5;
 
-  // 创建一个立方体几何体
-  const geometry0 = new THREE.BoxGeometry(1, 1, 1);
-  // 创建一个球体
-  const geometry1 = new THREE.SphereGeometry(1);
-  //创建一个圆柱体
-  const geometry2 = new THREE.CylinderGeometry(1,1,2.5);
+    // 创建一个立方体几何体
+    const geometry0 = new THREE.BoxGeometry(1, 1, 1);
+    // 创建一个球体
+    const geometry1 = new THREE.SphereGeometry(1);
+    //创建一个圆柱体
+    const geometry2 = new THREE.CylinderGeometry(1, 1, 2.5);
 
-  // 创建一个基础材质
-  const material0 = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-
-  // 基础材质（可配置颜色、贴图等）
-  const material1 = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+    // 创建一个基础材质
+    const material0 = new THREE.MeshBasicMaterial({ color: THREE.Color.NAMES.red });
 
     // 基础材质（可配置颜色、贴图等）
-  const material2 = new THREE.MeshBasicMaterial({ color: 0x0000ff });
+    const material1 = new THREE.MeshBasicMaterial({ color: THREE.Color.NAMES.green });
 
-  // 创建网格对象
-  const mesh0 = new THREE.Mesh(geometry0, material0);
-  mesh0.position.x = -2;
-  scene.add(mesh0);
+    // 基础材质（可配置颜色、贴图等）
+    const material2 = new THREE.MeshBasicMaterial({ color: THREE.Color.NAMES.blue });
 
-  const mesh1 = new THREE.Mesh(geometry1, material1);
-  mesh1.position.x = 0;
-  scene.add(mesh1);
+    // 创建网格对象
+    const mesh0 = new THREE.Mesh(geometry0, material0);
+    mesh0.position.x = -2;
+    scene.add(mesh0);
 
-  const mesh2 = new THREE.Mesh(geometry2, material2);
-  mesh2.position.x = 3;
-  scene.add(mesh2);
+    const mesh1 = new THREE.Mesh(geometry1, material1);
+    mesh1.position.x = 0;
+    scene.add(mesh1);
 
-  // 设置相机位置
-  camera.position.z = 5;
+    const mesh2 = new THREE.Mesh(geometry2, material2);
+    mesh2.position.x = 3;
+    scene.add(mesh2);
 
-  // 创建一个 WebGL 渲染器
-  // const renderer = new THREE.WebGLRenderer();
-  const renderer = new WEBGPU.WebGPURenderer({ antialias: false});
-  renderer.setClearColor(0x000000);
-  renderer.samples = 4;
-  
-  // 设置渲染器的大小
-  renderer.setSize(window.innerWidth - 20, window.innerHeight - 20);
-  // 将渲染器的 DOM 元素添加到页面中
-  document.body.appendChild(renderer.domElement);
-  // 动画循环
-  function animate():void {
-    // 定时刷新
-    requestAnimationFrame(animate);
-    // 旋转立方体
-    mesh0.rotation.x += 0.01;
-    mesh0.rotation.y += 0.01;
-    // 旋转立球体
-    mesh1.rotation.x += 0.01;
-    mesh1.rotation.y += 0.01;
-    // 旋转圆柱体
-    mesh2.rotation.x += 0.01;
-    mesh2.rotation.y += 0.01;    
-    //重新渲染
-    renderer.render(scene, camera);
+    // 创建坐标轴辅助器
+    const axesHelper = new THREE.AxesHelper(100000);
+    axesHelper.setColors(THREE.Color.NAMES.red, THREE.Color.NAMES.green, THREE.Color.NAMES.blue);
+    scene.add(axesHelper);
+
+    // 创建一个 WebGL 渲染器
+    // const renderer = new THREE.WebGLRenderer();
+    const renderer = new WEBGPU.WebGPURenderer({ antialias: false });
+    renderer.setClearColor(0x000000);
+    renderer.samples = 4;
+
+    // 设置渲染器的大小
+    renderer.setSize(window.innerWidth - 20, window.innerHeight - 20);
+    // 将渲染器的 DOM 元素添加到页面中
+    document.body.appendChild(renderer.domElement);
+    // 动画循环
+    function animate(): void {
+      // 定时刷新
+      requestAnimationFrame(animate);
+      // 旋转立方体
+      mesh0.rotation.x += 0.01;
+      mesh0.rotation.y += 0.01;
+      // 旋转立球体
+      mesh1.rotation.x += 0.01;
+      mesh1.rotation.y += 0.01;
+      // 旋转圆柱体
+      mesh2.rotation.x += 0.01;
+      mesh2.rotation.y += 0.01;
+      //重新渲染
+      renderer.render(scene, camera);
+    }
+    // 执行动画
+    animate();
+
+
+    document.addEventListener('contextmenu', function (event) {
+      event.preventDefault();
+    });
+
+    window.addEventListener("resize", (event) => {
+      renderer.setSize(window.innerWidth - 20, window.innerHeight - 20);
+      camera.aspect = window.innerWidth / window.innerHeight; // 宽高比
+    });
+
+    window.addEventListener("wheel", (event) => {
+      const min = 5;
+      const max = 120;
+      const step = 5;
+      if (event.deltaY > 0 && camera.fov < max) { camera.fov += step; }
+      if (event.deltaY < 0 && camera.fov > min) { camera.fov -= step; }
+      if (camera.fov < min) { camera.fov = min; }
+      if (camera.fov > max) { camera.fov = max; }
+      camera.updateProjectionMatrix();
+    });
+
+    let MouseLeftDown: Boolean = false;
+    let MouseMiddleDown: Boolean = false;
+    let MouseRightDown: Boolean = false;
+    window.addEventListener("mousedown", (event: MouseEvent) => {
+      if (event.button == 0) { MouseLeftDown = true; }
+      if (event.button == 1) { MouseMiddleDown = true; }
+      if (event.button == 2) { MouseRightDown = true; }
+    });
+
+    window.addEventListener("mouseup", (event: MouseEvent) => {
+      if (event.button == 0) { MouseLeftDown = false; }
+      if (event.button == 1) { MouseMiddleDown = false; }
+      if (event.button == 2) { MouseRightDown = false; }
+    });
+
+    window.addEventListener("mousemove", (event: MouseEvent) => {
+      if (MouseRightDown) {
+        let eular = camera.rotation;
+        eular.z += THREE.MathUtils.degToRad(event.movementX * 0.1);
+        eular.x += THREE.MathUtils.degToRad(event.movementY * 0.1);
+        camera.setRotationFromEuler(eular);
+        camera.updateProjectionMatrix();
+      }
+    });
+
+    window.addEventListener("keydown", (event: KeyboardEvent) => {
+      switch (event.code) {
+        case "KeyW":
+          camera.position.z -= 0.1;
+          break;
+        case "KeyS":
+          camera.position.z += 0.1;
+          break;
+        case "KeyA":
+          camera.position.x -= 0.1;
+          break;
+        case "KeyD":
+          camera.position.x += 0.1;
+          break;
+        case "KeyE":
+          camera.position.y += 0.1;
+          break;
+        case "KeyQ":
+          camera.position.y -= 0.1;
+          break;
+      }
+      camera.updateMatrix();
+    });
+
+
   }
-   // 执行动画
-  animate();
-  }  
 }
