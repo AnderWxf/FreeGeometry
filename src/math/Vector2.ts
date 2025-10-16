@@ -1,8 +1,7 @@
-export class Point3 {
+export class Vector2 {
     public x: number;
     public y: number;
-    public z: number;
-    public constructor(x?: number, y?: number, z?: number) {
+    public constructor(x?: number, y?: number) {
         if (x != undefined) {
             this.x = x;
         } else {
@@ -12,11 +11,6 @@ export class Point3 {
             this.y = y;
         } else {
             this.y = 0;
-        }
-        if (z != undefined) {
-            this.z = z;
-        } else {
-            this.z = 0;
         }
     }
 }
