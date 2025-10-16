@@ -1,10 +1,12 @@
 {
   "dependencies": {
+    "dat.gui": "^0.7.9",
     "es-module-loader": "^2.3.0",
     "es6-module-loader": "^0.17.11",
     "three": "^0.180.0"
   },
   "devDependencies": {
+    "@types/dat.gui": "^0.7.13",
     "@types/three": "^0.180.0",
     "terser-webpack-plugin": "^5.3.14",
     "ts-loader": "^9.5.4",

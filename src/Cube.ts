@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import * as WEBGPU from 'three/src/three.WebGPU';
+import * as GUI from "dat.gui";
 
 export class Cube {
   public constructor() {
@@ -36,14 +37,17 @@ export class Cube {
     // 创建网格对象
     const mesh0 = new THREE.Mesh(geometry0, material0);
     mesh0.position.x = -2;
+    mesh0.name = "Box";
     scene.add(mesh0);
 
     const mesh1 = new THREE.Mesh(geometry1, material1);
     mesh1.position.x = 0;
+    mesh1.name = "sphere";
     scene.add(mesh1);
 
     const mesh2 = new THREE.Mesh(geometry2, material2);
     mesh2.position.x = 3;
+    mesh2.name = "cylinder";
     scene.add(mesh2);
 
     // 创建坐标轴辅助器
@@ -149,7 +153,9 @@ export class Cube {
       }
       camera.updateMatrix();
     });
-
-
+    const gui = new GUI.GUI();
+    // 添加滑动条控件
+    let n = gui.add(mesh0, 'name').name('名称');
+    let con = gui.add(mesh0.position, 'x').name('位置控制');
   }
 }
