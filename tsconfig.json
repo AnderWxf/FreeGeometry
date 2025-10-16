@@ -35,12 +35,14 @@
     // "noPropertyAccessFromIndexSignature": true,
 
     // Recommended Options
-    "strict": true,
+    "strict": false,
     "jsx": "react-jsx",
+    "strictFunctionTypes":true,
+    "noImplicitAny": true,
     "esModuleInterop": true,
     "inlineSources": true,
-    // "verbatimModuleSyntax": true,
-    // "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
     "skipLibCheck": true,
