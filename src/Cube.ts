@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import * as WEBGPU from 'three/src/three.WebGPU';
 import * as GUI from "dat.gui";
-import * as V2 from "./math/Vector2"
+import { Vector2 } from "./math/Math"
 
 export class Cube {
   public constructor() {
@@ -158,6 +158,6 @@ export class Cube {
     // 添加滑动条控件
     let n = gui.add(mesh0, 'name').name('名称');
     let con = gui.add(mesh0.position, 'x').name('位置控制');
-    let v2 = new V2.Vector2();
+    let v2 = new Vector2();
   }
 }

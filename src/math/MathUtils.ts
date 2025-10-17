@@ -1,5 +1,3 @@
-import type { Quaternion } from "./Quaternion";
-
 const _lut = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '0a', '0b', '0c', '0d', '0e', '0f', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '1a', '1b', '1c', '1d', '1e', '1f', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '2a', '2b', '2c', '2d', '2e', '2f', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '3a', '3b', '3c', '3d', '3e', '3f', '40', '41', '42', '43', '44', '45', '46', '47', '48', '49', '4a', '4b', '4c', '4d', '4e', '4f', '50', '51', '52', '53', '54', '55', '56', '57', '58', '59', '5a', '5b', '5c', '5d', '5e', '5f', '60', '61', '62', '63', '64', '65', '66', '67', '68', '69', '6a', '6b', '6c', '6d', '6e', '6f', '70', '71', '72', '73', '74', '75', '76', '77', '78', '79', '7a', '7b', '7c', '7d', '7e', '7f', '80', '81', '82', '83', '84', '85', '86', '87', '88', '89', '8a', '8b', '8c', '8d', '8e', '8f', '90', '91', '92', '93', '94', '95', '96', '97', '98', '99', '9a', '9b', '9c', '9d', '9e', '9f', 'a0', 'a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7', 'a8', 'a9', 'aa', 'ab', 'ac', 'ad', 'ae', 'af', 'b0', 'b1', 'b2', 'b3', 'b4', 'b5', 'b6', 'b7', 'b8', 'b9', 'ba', 'bb', 'bc', 'bd', 'be', 'bf', 'c0', 'c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7', 'c8', 'c9', 'ca', 'cb', 'cc', 'cd', 'ce', 'cf', 'd0', 'd1', 'd2', 'd3', 'd4', 'd5', 'd6', 'd7', 'd8', 'd9', 'da', 'db', 'dc', 'dd', 'de', 'df', 'e0', 'e1', 'e2', 'e3', 'e4', 'e5', 'e6', 'e7', 'e8', 'e9', 'ea', 'eb', 'ec', 'ed', 'ee', 'ef', 'f0', 'f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8', 'f9', 'fa', 'fb', 'fc', 'fd', 'fe', 'ff'];
 
 let _seed = 1234567;
@@ -316,69 +314,6 @@ function floorPowerOfTwo(value: number) {
 }
 
 /**
- * Sets the given quaternion from the [Intrinsic Proper Euler Angles]{@link https://en.wikipedia.org/wiki/Euler_angles}
- * defined by the given angles and order.
- *
- * Rotations are applied to the axes in the order specified by order:
- * rotation by angle `a` is applied first, then by angle `b`, then by angle `c`.
- *
- * @param {Quaternion} q - The quaternion to set.
- * @param {number} a - The rotation applied to the first axis, in radians.
- * @param {number} b - The rotation applied to the second axis, in radians.
- * @param {number} c - The rotation applied to the third axis, in radians.
- * @param {('XYX'|'XZX'|'YXY'|'YZY'|'ZXZ'|'ZYZ')} order - A string specifying the axes order.
- */
-function setQuaternionFromProperEuler(q: Quaternion, a: number, b: number, c: number, order: string) {
-
-    const cos = Math.cos;
-    const sin = Math.sin;
-
-    const c2 = cos(b / 2);
-    const s2 = sin(b / 2);
-
-    const c13 = cos((a + c) / 2);
-    const s13 = sin((a + c) / 2);
-
-    const c1_3 = cos((a - c) / 2);
-    const s1_3 = sin((a - c) / 2);
-
-    const c3_1 = cos((c - a) / 2);
-    const s3_1 = sin((c - a) / 2);
-
-    switch (order) {
-
-        case 'XYX':
-            q.set(c2 * s13, s2 * c1_3, s2 * s1_3, c2 * c13);
-            break;
-
-        case 'YZY':
-            q.set(s2 * s1_3, c2 * s13, s2 * c1_3, c2 * c13);
-            break;
-
-        case 'ZXZ':
-            q.set(s2 * c1_3, s2 * s1_3, c2 * s13, c2 * c13);
-            break;
-
-        case 'XZX':
-            q.set(c2 * s13, s2 * s3_1, s2 * c3_1, c2 * c13);
-            break;
-
-        case 'YXY':
-            q.set(s2 * c3_1, c2 * s13, s2 * s3_1, c2 * c13);
-            break;
-
-        case 'ZYZ':
-            q.set(s2 * s3_1, s2 * c3_1, c2 * s13, c2 * c13);
-            break;
-
-        default:
-            console.warn('THREE.MathUtils: .setQuaternionFromProperEuler() encountered an unknown order: ' + order);
-
-    }
-
-}
-
-/**
  * Denormalizes the given value according to the given typed array.
  *
  * @param {number} value - The value to denormalize.
@@ -684,22 +619,7 @@ const MathUtils = {
      * @return {number} The largest power of two that is less than or equal to the given number.
      */
     floorPowerOfTwo: floorPowerOfTwo,
-    /**
-     * Sets the given quaternion from the [Intrinsic Proper Euler Angles]{@link https://en.wikipedia.org/wiki/Euler_angles}
-     * defined by the given angles and order.
-     *
-     * Rotations are applied to the axes in the order specified by order:
-     * rotation by angle `a` is applied first, then by angle `b`, then by angle `c`.
-     *
-     * @static
-     * @method
-     * @param {Quaternion} q - The quaternion to set.
-     * @param {number} a - The rotation applied to the first axis, in radians.
-     * @param {number} b - The rotation applied to the second axis, in radians.
-     * @param {number} c - The rotation applied to the third axis, in radians.
-     * @param {('XYX'|'XZX'|'YXY'|'YZY'|'ZXZ'|'ZYZ')} order - A string specifying the axes order.
-     */
-    setQuaternionFromProperEuler: setQuaternionFromProperEuler,
+
     /**
      * Normalizes the given value according to the given typed array.
      *
@@ -744,7 +664,6 @@ export {
     isPowerOfTwo,
     ceilPowerOfTwo,
     floorPowerOfTwo,
-    setQuaternionFromProperEuler,
     normalize,
     denormalize,
     MathUtils
