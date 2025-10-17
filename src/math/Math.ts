@@ -55,14 +55,6 @@ class Vector2 {
 	 * @type {number}
 	 */
 	public y: number;
-	/**
-	 * This flag can be used for type testing.
-	 *
-	 * @type {boolean}
-	 * @readonly
-	 * @default true
-	 */
-	public static isVector2: boolean = true;
 
 	/**
 	 * Constructs a new 2D vector.

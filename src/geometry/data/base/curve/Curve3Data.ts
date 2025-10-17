@@ -1,10 +1,10 @@
-import { Transform3 } from "./Transform3";
-
+import { CurveData } from "../CurveData";
+import { Transform3 } from "../Transform3";
 /**
- * surface data struct.
+ * 3D curvr data struct.
  *
  */
-class SurfaceData {
+class Curve3Data extends CurveData {
     /**
      * The transform value of this Curve3Data.
      *
@@ -20,8 +20,9 @@ class SurfaceData {
      * @param {number} [scale=1] - The rotation value of this Transfrom.
      */
     constructor(transform = new Transform3()) {
+        super();
         this.transform = transform;
     }
 }
 
-export { SurfaceData };
+export { Curve3Data };

@@ -1,16 +1,16 @@
-import { Transform3 } from "./Transform3";
-
+import { CurveData } from "../CurveData";
+import { Transform2 } from "../Transform2";
 /**
- * surface data struct.
+ * 2D curvr data struct.
  *
  */
-class SurfaceData {
+class Curve2Data extends CurveData {
     /**
-     * The transform value of this Curve3Data.
+     * The transform value of this Curve2Data.
      *
-     * @type {Transform3}
+     * @type {Transform2}
      */
-    public transform: Transform3;
+    public transform: Transform2;
 
     /**
      * Constructs a new 3D Transfrom.
@@ -19,9 +19,10 @@ class SurfaceData {
      * @param {rotation} [rotation=(0,0,0)] - The rotation value of this Transfrom.
      * @param {number} [scale=1] - The rotation value of this Transfrom.
      */
-    constructor(transform = new Transform3()) {
+    constructor(transform = new Transform2()) {
+        super();
         this.transform = transform;
     }
 }
 
-export { SurfaceData };
+export { Curve2Data };
