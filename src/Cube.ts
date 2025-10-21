@@ -2,6 +2,10 @@ import * as THREE from 'three';
 import * as WEBGPU from 'three/src/three.WebGPU';
 import * as GUI from "dat.gui";
 import { Vector2 } from "./math/Math"
+import { Line2Data } from './geometry/data/base/curve/curve2/Line2Data';
+import { Line2Algo } from './geometry/algorithm/base/curve/curve2/Line2Algo';
+import { CameraController } from './helper/CameraController';
+import { Grid } from './helper/Grid';
 
 export class Cube {
   public constructor() {
@@ -18,6 +22,10 @@ export class Cube {
 
     // 设置相机位置
     camera.position.z = 5;
+    camera.updateMatrix();
+
+    const controller = new CameraController(camera);
+    controller.bind(window);
 
     // 创建一个立方体几何体
     const geometry0 = new THREE.BoxGeometry(1, 1, 1);
@@ -35,7 +43,12 @@ export class Cube {
     // 基础材质（可配置颜色、贴图等）
     const material2 = new THREE.MeshBasicMaterial({ color: THREE.Color.NAMES.blue });
 
-    // 创建网格对象
+    // 创建XZ平面的网格提
+    const grid = new THREE.LineSegments(new Grid());
+    grid.name = "Grid";
+    (grid.material as THREE.LineBasicMaterial).vertexColors = true;
+    scene.add(grid);
+
     const mesh0 = new THREE.Mesh(geometry0, material0);
     mesh0.position.x = -2;
     mesh0.name = "Box";
@@ -53,7 +66,7 @@ export class Cube {
 
     // 创建坐标轴辅助器
     const axesHelper = new THREE.AxesHelper(100000);
-    axesHelper.setColors(THREE.Color.NAMES.red, THREE.Color.NAMES.green, THREE.Color.NAMES.blue);
+    axesHelper.setColors(THREE.Color.NAMES.red, THREE.Color.NAMES.lime, THREE.Color.NAMES.blue);
     scene.add(axesHelper);
 
     // 创建一个 WebGL 渲染器
@@ -95,69 +108,12 @@ export class Cube {
       camera.aspect = window.innerWidth / window.innerHeight; // 宽高比
     });
 
-    window.addEventListener("wheel", (event) => {
-      const min = 5;
-      const max = 120;
-      const step = 5;
-      if (event.deltaY > 0 && camera.fov < max) { camera.fov += step; }
-      if (event.deltaY < 0 && camera.fov > min) { camera.fov -= step; }
-      if (camera.fov < min) { camera.fov = min; }
-      if (camera.fov > max) { camera.fov = max; }
-      camera.updateProjectionMatrix();
-    });
-
-    let MouseLeftDown: Boolean = false;
-    let MouseMiddleDown: Boolean = false;
-    let MouseRightDown: Boolean = false;
-    window.addEventListener("mousedown", (event: MouseEvent) => {
-      if (event.button == 0) { MouseLeftDown = true; }
-      if (event.button == 1) { MouseMiddleDown = true; }
-      if (event.button == 2) { MouseRightDown = true; }
-    });
-
-    window.addEventListener("mouseup", (event: MouseEvent) => {
-      if (event.button == 0) { MouseLeftDown = false; }
-      if (event.button == 1) { MouseMiddleDown = false; }
-      if (event.button == 2) { MouseRightDown = false; }
-    });
-
-    window.addEventListener("mousemove", (event: MouseEvent) => {
-      if (MouseRightDown) {
-        let eular = camera.rotation;
-        eular.z += THREE.MathUtils.degToRad(event.movementX * 0.1);
-        eular.x += THREE.MathUtils.degToRad(event.movementY * 0.1);
-        camera.setRotationFromEuler(eular);
-        camera.updateProjectionMatrix();
-      }
-    });
-
-    window.addEventListener("keydown", (event: KeyboardEvent) => {
-      switch (event.code) {
-        case "KeyW":
-          camera.position.z -= 0.1;
-          break;
-        case "KeyS":
-          camera.position.z += 0.1;
-          break;
-        case "KeyA":
-          camera.position.x -= 0.1;
-          break;
-        case "KeyD":
-          camera.position.x += 0.1;
-          break;
-        case "KeyE":
-          camera.position.y += 0.1;
-          break;
-        case "KeyQ":
-          camera.position.y -= 0.1;
-          break;
-      }
-      camera.updateMatrix();
-    });
     const gui = new GUI.GUI();
     // 添加滑动条控件
     let n = gui.add(mesh0, 'name').name('名称');
     let con = gui.add(mesh0.position, 'x').name('位置控制');
     let v2 = new Vector2();
+    let line = new Line2Data();
+    let lineAlg = new Line2Algo(line);
   }
 }

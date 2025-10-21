@@ -3,6 +3,9 @@
  *
  */
 class CurveData {
+    constructor() {
+
+    }
 }
 
 export { CurveData };
