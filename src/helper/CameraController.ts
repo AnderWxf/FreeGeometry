@@ -16,18 +16,27 @@ class CameraController {
     private right: THREE.Vector3;
     private back: THREE.Vector3;
 
-    private pos: THREE.Vector3;
+    private pos: THREE.Vector3 = new THREE.Vector3(5, 0, 5);
+    private yaw: number = -45;
+    private pitch: number = 0;
 
     private KeyShiftDown: Boolean = false;
     private KeyCtrlDown: Boolean = false;
+    private KeyWDown: Boolean = false;
+    private KeySDown: Boolean = false;
+    private KeyADown: Boolean = false;
+    private KeyDDown: Boolean = false;
+    private KeyEDown: Boolean = false;
+    private KeyQDown: Boolean = false;
+
+
     private MouseLeftDown: Boolean = false;
     private MouseMiddleDown: Boolean = false;
     private MouseRightDown: Boolean = false;
 
-    private yaw: number = 0;
-    private pitch: number = 0;
 
-    private MoveSpeed: number = 0.1;
+
+    private MoveSpeed: number = 10;
 
     /**
      * Constructs a CameraController.
@@ -37,12 +46,9 @@ class CameraController {
     constructor(camera: THREE.Camera) {
         this.camera = camera;
         this.up = camera.up;
-        let m = camera.matrix;
-        let position = new THREE.Vector3();
-        let quaternion = new THREE.Quaternion();
-        let scale = new THREE.Vector3();
-        m.decompose(position, quaternion, scale);
-        this.pos = position;
+        this.pos = camera.position;
+        let quaternion = camera.quaternion;
+
         this.up = new THREE.Vector3(0, 1, 0);
         this.right = new THREE.Vector3(1, 0, 0);
         this.back = new THREE.Vector3(0, 0, 1);
@@ -52,44 +58,55 @@ class CameraController {
 
     }
     onKeyDown = (event: KeyboardEvent) => {
-        let speed = 1.0;
-        if (event.shiftKey) {
-            speed = 0.1;
-        }
-        speed *= this.MoveSpeed;
-        let off = new THREE.Vector3();
         switch (event.code) {
             case "KeyW":
-                off.add(this.back.clone().multiplyScalar(-speed));
+                this.KeyWDown = true;
                 break;
             case "KeyS":
-                off.add(this.back.clone().multiplyScalar(speed));
+                this.KeySDown = true;
                 break;
             case "KeyA":
-                off.add(this.right.clone().multiplyScalar(-speed));
+                this.KeyADown = true;
                 break;
             case "KeyD":
-                off.add(this.right.clone().multiplyScalar(speed));
+                this.KeyDDown = true;
                 break;
             case "KeyE":
-                off.add(this.up.clone().multiplyScalar(speed));
+                this.KeyEDown = true;
                 break;
             case "KeyQ":
-                off.add(this.up.clone().multiplyScalar(-speed));
+                this.KeyQDown = true;
+                break;
+            case "ShiftLeft":
+                this.KeyShiftDown = true;
                 break;
         }
-        this.pos.add(off);
-        this.camera.position.copy(this.pos);
-        this.camera.updateMatrix();
     }
     onKeyUp = (event: KeyboardEvent) => {
         switch (event.code) {
+            case "KeyW":
+                this.KeyWDown = false;
+                break;
+            case "KeyS":
+                this.KeySDown = false;
+                break;
+            case "KeyA":
+                this.KeyADown = false;
+                break;
+            case "KeyD":
+                this.KeyDDown = false;
+                break;
+            case "KeyE":
+                this.KeyEDown = false;
+                break;
+            case "KeyQ":
+                this.KeyQDown = false;
+                break;
             case "ControlLeft":
-                if (this.MoveSpeed == 0.1) {
-                    this.MoveSpeed = 1.0
-                } else if (this.MoveSpeed == 1.0) {
-                    this.MoveSpeed = 0.1;
-                }
+                this.KeyCtrlDown = !this.KeyCtrlDown;
+                break;
+            case "ShiftLeft":
+                this.KeyShiftDown = false;
                 break;
         }
     }
@@ -122,20 +139,42 @@ class CameraController {
         if (this.MouseRightDown && this.camera instanceof THREE.PerspectiveCamera) {
             this.pitch -= event.movementY * 0.1;
             this.pitch = THREE.MathUtils.clamp(this.pitch, -89, +89);
-
-            this.yaw += THREE.MathUtils.degToRad(event.movementX * 0.1);
-
-            this.right.set(Math.cos(this.yaw), 0, Math.sin(this.yaw));
-            this.back.set(Math.cos(this.yaw + Math.PI * 0.5), 0, Math.sin(this.yaw + Math.PI * 0.5));
-            this.up.set(0, 1, 0);
-            this.up.applyAxisAngle(this.right, THREE.MathUtils.degToRad(this.pitch));
-            this.back.applyAxisAngle(this.right, THREE.MathUtils.degToRad(this.pitch));
-            let m = new THREE.Matrix4;
-            m.makeBasis(this.right, this.up, this.back);
-            this.camera.setRotationFromMatrix(m);
-            this.camera.updateProjectionMatrix();
+            this.yaw += event.movementX * 0.1;
         }
     };
+    onFrame(time: number) {
+        let keyScale = 1.0;
+        if (this.KeyShiftDown) {
+            keyScale = 0.1;
+        } else if (this.KeyCtrlDown) {
+            keyScale = 10;
+        }
+        let distance = this.MoveSpeed * keyScale * time;
+        let off = new THREE.Vector3();
+        if (this.KeyWDown) { off.add(this.back.clone().multiplyScalar(-distance)); }
+        if (this.KeySDown) { off.add(this.back.clone().multiplyScalar(distance)); }
+        if (this.KeyADown) { off.add(this.right.clone().multiplyScalar(-distance)); }
+        if (this.KeyDDown) { off.add(this.right.clone().multiplyScalar(distance)); }
+        if (this.KeyEDown) { off.add(this.up.clone().multiplyScalar(distance)); }
+        if (this.KeyQDown) { off.add(this.up.clone().multiplyScalar(-distance)); }
+
+
+        let yaw = THREE.MathUtils.degToRad(this.yaw);
+        let pitch = THREE.MathUtils.degToRad(this.pitch);
+
+        this.right.set(Math.cos(yaw), 0, Math.sin(yaw));
+        this.back.set(Math.cos(yaw + Math.PI * 0.5), 0, Math.sin(yaw + Math.PI * 0.5));
+        this.up.set(0, 1, 0);
+        this.up.applyAxisAngle(this.right, pitch);
+        this.back.applyAxisAngle(this.right, pitch);
+        let m = new THREE.Matrix4;
+        m.makeBasis(this.right, this.up, this.back);
+        this.camera.setRotationFromMatrix(m);
+        this.pos.add(off);
+        this.camera.position.copy(this.pos);
+        this.camera.updateMatrix();
+
+    }
     bind(window: Window) {
         window.addEventListener("keydown", this.onKeyDown);
         window.addEventListener("keyup", this.onKeyUp);

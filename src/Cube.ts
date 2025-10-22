@@ -6,7 +6,6 @@ import { Line2Data } from './geometry/data/base/curve/curve2/Line2Data';
 import { Line2Algo } from './geometry/algorithm/base/curve/curve2/Line2Algo';
 import { CameraController } from './helper/CameraController';
 import { Grid } from './helper/Grid';
-
 export class Cube {
   public constructor() {
     // 创建一个场景
@@ -21,9 +20,8 @@ export class Cube {
     );
 
     // 设置相机位置
-    camera.position.z = 5;
-    camera.updateMatrix();
-
+    camera.position.set(5, 0, 5);
+    camera.lookAt(new THREE.Vector3());
     const controller = new CameraController(camera);
     controller.bind(window);
 
@@ -44,7 +42,7 @@ export class Cube {
     const material2 = new THREE.MeshBasicMaterial({ color: THREE.Color.NAMES.blue });
 
     // 创建XZ平面的网格提
-    const grid = new THREE.LineSegments(new Grid());
+    const grid = new THREE.LineSegments(new Grid(100));
     grid.name = "Grid";
     (grid.material as THREE.LineBasicMaterial).vertexColors = true;
     scene.add(grid);
@@ -65,7 +63,7 @@ export class Cube {
     scene.add(mesh2);
 
     // 创建坐标轴辅助器
-    const axesHelper = new THREE.AxesHelper(100000);
+    const axesHelper = new THREE.AxesHelper(100);
     axesHelper.setColors(THREE.Color.NAMES.red, THREE.Color.NAMES.lime, THREE.Color.NAMES.blue);
     scene.add(axesHelper);
 
@@ -79,8 +77,14 @@ export class Cube {
     renderer.setSize(window.innerWidth - 20, window.innerHeight - 20);
     // 将渲染器的 DOM 元素添加到页面中
     document.body.appendChild(renderer.domElement);
+
+    // 创建一个 Clock 对象
+    const clock = new THREE.Clock();
     // 动画循环
     function animate(): void {
+      let delta = clock.getDelta();
+      let fps = Math.round(1 / delta);
+
       // 定时刷新
       requestAnimationFrame(animate);
       // 旋转立方体
@@ -92,6 +96,8 @@ export class Cube {
       // 旋转圆柱体
       mesh2.rotation.x += 0.01;
       mesh2.rotation.y += 0.01;
+
+      controller.onFrame(delta);
       //重新渲染
       renderer.render(scene, camera);
     }
@@ -108,10 +114,11 @@ export class Cube {
       camera.aspect = window.innerWidth / window.innerHeight; // 宽高比
     });
 
-    const gui = new GUI.GUI();
     // 添加滑动条控件
-    let n = gui.add(mesh0, 'name').name('名称');
-    let con = gui.add(mesh0.position, 'x').name('位置控制');
+    // const gui = new GUI.GUI();
+    // let n = gui.add(mesh0, 'name').name('名称');
+    // let con = gui.add(mesh0.position, 'x').name('位置控制');
+
     let v2 = new Vector2();
     let line = new Line2Data();
     let lineAlg = new Line2Algo(line);

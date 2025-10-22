@@ -14,42 +14,38 @@ class Grid extends THREE.WireframeGeometry {
      * @param {number} [step0=100] - The big step of grid.
      * @param {number} [step1=10] - The small step of grid.
      */
-    constructor(min: number = -100, max: number = 100, step0: number = 5, step1: number = 1, plane = "xz") {
+    constructor(radius: number = 100, step0: number = 5, step1: number = 1, plane = "xz") {
         super();
 
+        let min: number = -radius;
+        let max: number = radius;
         let position = Array<THREE.Vector3>();
         let indices = Array<number>();
         let color = Array<THREE.Color>();
-        let bcolor = 0.5;
-        let scolor = 0.1;
+        let bcolor = 0.20;
+        let scolor = 0.07;
         for (let i = min; i <= max; i += step1) {
             if (i == 0) {
-                switch (plane) {
-                    case 'xz':
-                        // x 
-                        position.push(new THREE.Vector3(min, 0, i));
-                        position.push(new THREE.Vector3(0, 0, i));
-                        // z 
-                        position.push(new THREE.Vector3(i, 0, min));
-                        position.push(new THREE.Vector3(i, 0, 0));
-                        break;
-                    case 'xy':
-                        // x 
-                        position.push(new THREE.Vector3(min, i, 0));
-                        position.push(new THREE.Vector3(0, i, 0));
-                        // y 
-                        position.push(new THREE.Vector3(i, min, 0));
-                        position.push(new THREE.Vector3(i, 0, 0));
-                        break;
-                    case 'yz':
-                        // y 
-                        position.push(new THREE.Vector3(0, min, i));
-                        position.push(new THREE.Vector3(0, 0, i));
-                        // z 
-                        position.push(new THREE.Vector3(0, i, min));
-                        position.push(new THREE.Vector3(0, i, 0));
-                        break;
-                }
+                // x 
+                position.push(new THREE.Vector3(min, 0, i));
+                position.push(new THREE.Vector3(0, 0, i));
+
+                position.push(new THREE.Vector3(0, 0, i));
+                position.push(new THREE.Vector3(max, 0, i));
+
+                // y 
+                position.push(new THREE.Vector3(i, min, 0));
+                position.push(new THREE.Vector3(i, 0, 0));
+
+                position.push(new THREE.Vector3(i, 0, 0));
+                position.push(new THREE.Vector3(i, max, 0));
+
+                // z 
+                position.push(new THREE.Vector3(i, 0, min));
+                position.push(new THREE.Vector3(i, 0, 0));
+
+                position.push(new THREE.Vector3(i, 0, 0));
+                position.push(new THREE.Vector3(i, 0, max));
             } else {
                 switch (plane) {
                     case 'xz':
@@ -79,34 +75,22 @@ class Grid extends THREE.WireframeGeometry {
                 }
             }
 
-
-            if (i == 0) {
-                switch (plane) {
-                    case 'xz':
-                        // x 
-                        color.push(new THREE.Color(scolor, 0, 0));
-                        color.push(new THREE.Color(scolor, 0, 0));
-                        // z 
-                        color.push(new THREE.Color(0, 0, scolor));
-                        color.push(new THREE.Color(0, 0, scolor));
-                        break;
-                    case 'xy':
-                        // x 
-                        color.push(new THREE.Color(scolor, 0, 0));
-                        color.push(new THREE.Color(scolor, 0, 0));
-                        // y 
-                        color.push(new THREE.Color(0, scolor, 0));
-                        color.push(new THREE.Color(0, scolor, 0));
-                        break;
-                    case 'yz':
-                        // y 
-                        color.push(new THREE.Color(0, scolor, 0));
-                        color.push(new THREE.Color(0, scolor, 0));
-                        // z 
-                        color.push(new THREE.Color(0, 0, scolor));
-                        color.push(new THREE.Color(0, 0, scolor));
-                        break;
-                }
+            if (i == 0) { // 坐标轴逆方向的颜色
+                // x 
+                color.push(new THREE.Color(bcolor, 0, bcolor));
+                color.push(new THREE.Color(bcolor, 0, bcolor));
+                color.push(new THREE.Color(bcolor * 3, 0, 0));
+                color.push(new THREE.Color(bcolor * 3, 0, 0));
+                // y 
+                color.push(new THREE.Color(bcolor, bcolor, 0));
+                color.push(new THREE.Color(bcolor, bcolor, 0));
+                color.push(new THREE.Color(0, bcolor * 3, 0));
+                color.push(new THREE.Color(0, bcolor * 3, 0));
+                // z 
+                color.push(new THREE.Color(0, bcolor, bcolor));
+                color.push(new THREE.Color(0, bcolor, scolor));
+                color.push(new THREE.Color(0, 0, bcolor * 3));
+                color.push(new THREE.Color(0, 0, bcolor * 3));
             }
             else if (i % step0 == 0) {
                 color.push(new THREE.Color(bcolor, bcolor, bcolor));
@@ -139,8 +123,6 @@ class Grid extends THREE.WireframeGeometry {
         this.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
         this.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
     }
-
-
 }
 
 export { Grid };

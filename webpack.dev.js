@@ -10,9 +10,19 @@ module.exports = {
   // devtool: 'inline-source-map', // 将 source map 内联在 bundle 中
   entry: './src/main.ts',
   module: {
-    rules: [
-      {
+    rules: [{
         test: /\.ts$/,
+        use: {
+          loader: 'ts-loader',
+          options: {
+            transpileOnly: false, // 加快编译速度，类型检查交给其他工具
+            configFile: 'tsconfig.json'
+          }
+        },
+        exclude: /node_modules/,
+      },
+      {
+        test: /\.tsx$/,
         use: {
           loader: 'ts-loader',
           options: {
@@ -25,7 +35,7 @@ module.exports = {
     ],
   },
   resolve: {
-    extensions: ['.ts', '.js'],
+    extensions: ['.ts', '.tsx', '.js'],
     alias: {
       '@': path.resolve(__dirname, 'src') // 路径别名，方便调试时定位
     }
@@ -42,13 +52,13 @@ module.exports = {
   experiments: {
     outputModule: true, // 启用 ES 模块输出
   },
-  
+
   // 优化配置
   optimization: {
     minimize: false, // 开发环境不压缩，便于调试
     usedExports: true, // 标记未使用的导出
   },
-  
+
   // 缓存配置，加快重建速度
   cache: {
     type: 'filesystem',
