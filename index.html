@@ -4,18 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <title>FreeGeometry</title>
-    <style>
-        canvas {
-            width: 95%;
-            height: 95%
-        }
-    </style>
     <link rel="shortcut icon" href="#" />
 </head>
 
-<body>
+<body style='overflow-y:hidden;overflow-x:hidden'>
     <script type="module" src="./dist/bundle.js"></script>
-    <div id="root" />
+    <div id="gpu" style="position: absolute; z-index: 0; top: 0px; left: 0px" />
+    <div id="ui" style="position: absolute; z-index: 1000;top: 0px; left: 0px" />
 </body>
 
 </html>

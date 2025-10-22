@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import ReactDOM from 'react-dom/client';
 import { Button, Flex } from 'antd';
 
 const ToolBar: React.FC = () => (
@@ -19,11 +19,10 @@ const element = (
     </div>
 );
 export default ToolBar;
-ReactDOM.createPortal(
-    // element,
-    <ToolBar />,
-    document.body
-    // <ToolBar></ToolBar>,
-    // document.getElementById('root')
+const root = ReactDOM.createRoot(document.getElementById('ui'));
+root.render(
+    <React.StrictMode>
+        <ToolBar />
+    </React.StrictMode>
 );
 

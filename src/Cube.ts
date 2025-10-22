@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import * as WEBGPU from 'three/src/three.WebGPU';
-import * as GUI from "dat.gui";
 import { Vector2 } from "./math/Math"
 import { Line2Data } from './geometry/data/base/curve/curve2/Line2Data';
 import { Line2Algo } from './geometry/algorithm/base/curve/curve2/Line2Algo';
@@ -74,9 +73,9 @@ export class Cube {
     renderer.samples = 4;
 
     // 设置渲染器的大小
-    renderer.setSize(window.innerWidth - 20, window.innerHeight - 20);
+    renderer.setSize(window.innerWidth, window.innerHeight);
     // 将渲染器的 DOM 元素添加到页面中
-    document.body.appendChild(renderer.domElement);
+    document.getElementById('gpu').appendChild(renderer.domElement)
 
     // 创建一个 Clock 对象
     const clock = new THREE.Clock();
@@ -110,14 +109,9 @@ export class Cube {
     });
 
     window.addEventListener("resize", (event) => {
-      renderer.setSize(window.innerWidth - 20, window.innerHeight - 20);
+      renderer.setSize(window.innerWidth, window.innerHeight);
       camera.aspect = window.innerWidth / window.innerHeight; // 宽高比
     });
-
-    // 添加滑动条控件
-    // const gui = new GUI.GUI();
-    // let n = gui.add(mesh0, 'name').name('名称');
-    // let con = gui.add(mesh0.position, 'x').name('位置控制');
 
     let v2 = new Vector2();
     let line = new Line2Data();
