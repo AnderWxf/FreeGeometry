@@ -1,16 +1,12 @@
 import * as THREE from 'three';
 
 /**
- * Camera.
+ * Perspective controller.
  *
  */
-class CameraController {
-    /**
-     * The three camera.
-     *
-     * @type {THREE.Camera}
-     */
-    private camera: THREE.Camera;
+class PerspectiveController {
+
+    private _camera: THREE.PerspectiveCamera;
 
     private up: THREE.Vector3;
     private right: THREE.Vector3;
@@ -28,27 +24,33 @@ class CameraController {
     private KeyDDown: Boolean = false;
     private KeyEDown: Boolean = false;
     private KeyQDown: Boolean = false;
+    private KeySpaceDown: Boolean = false;
 
 
     private MouseLeftDown: Boolean = false;
     private MouseMiddleDown: Boolean = false;
     private MouseRightDown: Boolean = false;
-
-
-
     private MoveSpeed: number = 10;
 
-    /**
-     * Constructs a CameraController.
-     *
-     * @param {THREE.Camera} [camera=THREE.Camera]
-     */
-    constructor(camera: THREE.Camera) {
-        this.camera = camera;
-        this.up = camera.up;
-        this.pos = camera.position;
-        let quaternion = camera.quaternion;
+    private _isActive: boolean = false;
 
+    /**
+     * Constructs a Perspective controller.
+     *
+     */
+    constructor() {
+        // 创建一个透视相机
+        const camera = new THREE.PerspectiveCamera(
+            75, // 视场角（FOV）
+            window.innerWidth / window.innerHeight, // 宽高比
+            0.1, // 近裁剪面
+            3000 // 远裁剪面
+        );
+        this._camera = camera;
+        this.up = camera.up;
+        camera.position.set(this.pos.x, this.pos.y, this.pos.z);
+        camera.lookAt(new THREE.Vector3());
+        let quaternion = camera.quaternion;
         this.up = new THREE.Vector3(0, 1, 0);
         this.right = new THREE.Vector3(1, 0, 0);
         this.back = new THREE.Vector3(0, 0, 1);
@@ -57,6 +59,14 @@ class CameraController {
         this.back.applyQuaternion(quaternion);
 
     }
+
+    get camera(): THREE.PerspectiveCamera {
+        return this._camera;
+    }
+    get isActive(): boolean {
+        return this._isActive;
+    }
+
     onKeyDown = (event: KeyboardEvent) => {
         switch (event.code) {
             case "KeyW":
@@ -76,6 +86,9 @@ class CameraController {
                 break;
             case "KeyQ":
                 this.KeyQDown = true;
+                break;
+            case "Space":
+                this.KeySpaceDown = true;
                 break;
             case "ShiftLeft":
                 this.KeyShiftDown = true;
@@ -102,6 +115,9 @@ class CameraController {
             case "KeyQ":
                 this.KeyQDown = false;
                 break;
+            case "Space":
+                this.KeySpaceDown = false;
+                break;
             case "ControlLeft":
                 this.KeyCtrlDown = !this.KeyCtrlDown;
                 break;
@@ -111,17 +127,16 @@ class CameraController {
         }
     }
     onWheel = (event: WheelEvent) => {
-        if (this.camera instanceof THREE.PerspectiveCamera) {
-            let camera = this.camera;
-            const min = 5;
-            const max = 120;
-            const step = 5;
-            if (event.deltaY > 0 && camera.fov < max) { camera.fov += step; }
-            if (event.deltaY < 0 && camera.fov > min) { camera.fov -= step; }
-            if (camera.fov < min) { camera.fov = min; }
-            if (camera.fov > max) { camera.fov = max; }
-            camera.updateProjectionMatrix();
-        }
+
+        let _camera = this._camera;
+        const min = 5;
+        const max = 120;
+        const step = 5;
+        if (event.deltaY > 0 && _camera.fov < max) { _camera.fov += step; }
+        if (event.deltaY < 0 && _camera.fov > min) { _camera.fov -= step; }
+        if (_camera.fov < min) { _camera.fov = min; }
+        if (_camera.fov > max) { _camera.fov = max; }
+        _camera.updateProjectionMatrix();
     }
     onMouseDown = (event: MouseEvent) => {
         if (event.button == 0) { this.MouseLeftDown = true; }
@@ -136,13 +151,37 @@ class CameraController {
     };
 
     onMouseMove = (event: MouseEvent) => {
-        if (this.MouseRightDown && this.camera instanceof THREE.PerspectiveCamera) {
+        if (this.MouseRightDown) {
             this.pitch -= event.movementY * 0.1;
             this.pitch = THREE.MathUtils.clamp(this.pitch, -89, +89);
             this.yaw += event.movementX * 0.1;
+        } else if (this.MouseLeftDown && this.KeySpaceDown) {
+            let keyScale = 1.0;
+            if (this.KeyShiftDown) {
+                keyScale = 0.1;
+            } else if (this.KeyCtrlDown) {
+                keyScale = 10;
+            }
+            let off = new THREE.Vector3();
+            off.add(this.right.clone().multiplyScalar(event.movementX * keyScale * -0.025));
+            off.add(this.up.clone().multiplyScalar(event.movementY * keyScale * 0.025));
+            this.pos.add(off);
+        }
+        else if (this.MouseMiddleDown) {
+            let keyScale = 1.0;
+            if (this.KeyShiftDown) {
+                keyScale = 0.1;
+            } else if (this.KeyCtrlDown) {
+                keyScale = 10;
+            }
+            let off = new THREE.Vector3();
+            let distance = Math.abs(event.movementX) > Math.abs(event.movementY) ? event.movementX : event.movementY;
+            off.add(this.back.clone().multiplyScalar(distance * keyScale * -0.025));
+            this.pos.add(off);
         }
     };
     onFrame(time: number) {
+        if (!this._isActive) { return; }
         let keyScale = 1.0;
         if (this.KeyShiftDown) {
             keyScale = 0.1;
@@ -169,13 +208,14 @@ class CameraController {
         this.back.applyAxisAngle(this.right, pitch);
         let m = new THREE.Matrix4;
         m.makeBasis(this.right, this.up, this.back);
-        this.camera.setRotationFromMatrix(m);
+        this._camera.setRotationFromMatrix(m);
         this.pos.add(off);
-        this.camera.position.copy(this.pos);
-        this.camera.updateMatrix();
+        this._camera.position.copy(this.pos);
+        this._camera.updateMatrix();
 
     }
     bind(window: Window) {
+        this._isActive = true;
         window.addEventListener("keydown", this.onKeyDown);
         window.addEventListener("keyup", this.onKeyUp);
         window.addEventListener("wheel", this.onWheel);
@@ -183,7 +223,16 @@ class CameraController {
         window.addEventListener("mouseup", this.onMouseUp);
         window.addEventListener("mousemove", this.onMouseMove);
     }
+    unbind(window: Window) {
+        this._isActive = false;
+        window.removeEventListener("keydown", this.onKeyDown);
+        window.removeEventListener("keyup", this.onKeyUp);
+        window.removeEventListener("wheel", this.onWheel);
+        window.removeEventListener("mousedown", this.onMouseDown);
+        window.removeEventListener("mouseup", this.onMouseUp);
+        window.removeEventListener("mousemove", this.onMouseMove);
+    }
 
 }
 
-export { CameraController };
+export { PerspectiveController };

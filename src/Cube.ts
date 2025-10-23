@@ -3,26 +3,20 @@ import * as WEBGPU from 'three/src/three.WebGPU';
 import { Vector2 } from "./math/Math"
 import { Line2Data } from './geometry/data/base/curve/curve2/Line2Data';
 import { Line2Algo } from './geometry/algorithm/base/curve/curve2/Line2Algo';
-import { CameraController } from './helper/CameraController';
-import { Grid } from './helper/Grid';
+import CamToolBar from "./ui/CamToolBar";
+
 export class Cube {
   public constructor() {
     // 创建一个场景
     const scene = new THREE.Scene();
     //通过scene.add(元素)添加元素
-    // 创建一个透视相机
-    const camera = new THREE.PerspectiveCamera(
-      75, // 视场角（FOV）
-      window.innerWidth / window.innerHeight, // 宽高比
-      0.1, // 近裁剪面
-      3000 // 远裁剪面
-    );
 
-    // 设置相机位置
-    camera.position.set(5, 0, 5);
-    camera.lookAt(new THREE.Vector3());
-    const controller = new CameraController(camera);
-    controller.bind(window);
+    const cam = CamToolBar;
+    // 创建XZ平面的网格提
+    scene.add(cam.grid_xz);
+    scene.add(cam.grid_xy);
+    scene.add(cam.grid_yz);
+
 
     // 创建一个立方体几何体
     const geometry0 = new THREE.BoxGeometry(1, 1, 1);
@@ -40,11 +34,6 @@ export class Cube {
     // 基础材质（可配置颜色、贴图等）
     const material2 = new THREE.MeshBasicMaterial({ color: THREE.Color.NAMES.blue });
 
-    // 创建XZ平面的网格提
-    const grid = new THREE.LineSegments(new Grid(100));
-    grid.name = "Grid";
-    (grid.material as THREE.LineBasicMaterial).vertexColors = true;
-    scene.add(grid);
 
     const mesh0 = new THREE.Mesh(geometry0, material0);
     mesh0.position.x = -2;
@@ -61,13 +50,7 @@ export class Cube {
     mesh2.name = "cylinder";
     scene.add(mesh2);
 
-    // 创建坐标轴辅助器
-    const axesHelper = new THREE.AxesHelper(100);
-    axesHelper.setColors(THREE.Color.NAMES.red, THREE.Color.NAMES.lime, THREE.Color.NAMES.blue);
-    scene.add(axesHelper);
-
-    // 创建一个 WebGL 渲染器
-    // const renderer = new THREE.WebGLRenderer();
+    // 创建一个 WebGPU 渲染器
     const renderer = new WEBGPU.WebGPURenderer({ antialias: false });
     renderer.setClearColor(0x000000);
     renderer.samples = 4;
@@ -95,10 +78,14 @@ export class Cube {
       // 旋转圆柱体
       mesh2.rotation.x += 0.01;
       mesh2.rotation.y += 0.01;
-
-      controller.onFrame(delta);
-      //重新渲染
-      renderer.render(scene, camera);
+      if (cam.perspective.isActive) {
+        cam.perspective.onFrame(delta);
+        renderer.render(scene, cam.perspective.camera);
+      }
+      if (cam.orthographic.isActive) {
+        cam.orthographic.onFrame(delta);
+        renderer.render(scene, cam.orthographic.camera);
+      }
     }
     // 执行动画
     animate();
@@ -110,7 +97,9 @@ export class Cube {
 
     window.addEventListener("resize", (event) => {
       renderer.setSize(window.innerWidth, window.innerHeight);
-      camera.aspect = window.innerWidth / window.innerHeight; // 宽高比
+      if (cam.perspective.isActive) {
+        cam.perspective.camera.aspect = window.innerWidth / window.innerHeight; // 宽高比
+      }
     });
 
     let v2 = new Vector2();
