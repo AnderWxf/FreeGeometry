@@ -13,11 +13,9 @@ class SurfaceData {
     public transform: Transform3;
 
     /**
-     * Constructs a new 3D Transfrom.
+     * Constructs a surface.
      *
-     * @param {Vector3} [position=(0,0,0)] - The position value of this Transfrom.
-     * @param {rotation} [rotation=(0,0,0)] - The rotation value of this Transfrom.
-     * @param {number} [scale=1] - The rotation value of this Transfrom.
+     * @param {Transform3} [transform] - The base transfrom of surface.
      */
     constructor(transform = new Transform3()) {
         this.transform = transform;

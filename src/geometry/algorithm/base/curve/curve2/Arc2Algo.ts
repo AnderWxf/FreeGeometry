@@ -34,7 +34,7 @@ class Arc2Algo extends Curve2Algo {
                 {
                     let m = this.dat.transform.makeLocalMatrix();
                     let u = t * Math.PI * 2;
-                    let ret = new Vector2(this.dat.radius0 * Math.cos(u), this.dat.radius1 * Math.sin(u));
+                    let ret = new Vector2(this.dat.radius.x * Math.cos(u), this.dat.radius.y * Math.sin(u));
                     ret.applyMatrix3(m);
                     return ret;
                 }
@@ -42,7 +42,7 @@ class Arc2Algo extends Curve2Algo {
                 {
                     let m = this.dat.transform.makeLocalMatrix();
                     let u = t * Math.PI * 2;
-                    let ret = new Vector2(-this.dat.radius0 * Math.sin(u), this.dat.radius1 * Math.cos(u));
+                    let ret = new Vector2(-this.dat.radius.x * Math.sin(u), this.dat.radius.y * Math.cos(u));
                     ret.applyMatrix3(m);
                     return ret;
                 }
@@ -50,7 +50,7 @@ class Arc2Algo extends Curve2Algo {
                 {
                     let m = this.dat.transform.makeLocalMatrix();
                     let u = t * Math.PI * 2;
-                    let ret = new Vector2(-this.dat.radius0 * Math.cos(u), -this.dat.radius1 * Math.sin(u));
+                    let ret = new Vector2(-this.dat.radius.x * Math.cos(u), -this.dat.radius.y * Math.sin(u));
                     ret.applyMatrix3(m);
                     return ret;
                 }
@@ -58,7 +58,7 @@ class Arc2Algo extends Curve2Algo {
                 {
                     let m = this.dat.transform.makeLocalMatrix();
                     let u = t * Math.PI * 2;
-                    let ret = new Vector2(this.dat.radius0 * Math.sin(u), -this.dat.radius1 * Math.cos(u));
+                    let ret = new Vector2(this.dat.radius.x * Math.sin(u), -this.dat.radius.y * Math.cos(u));
                     ret.applyMatrix3(m);
                     return ret;
                 }
