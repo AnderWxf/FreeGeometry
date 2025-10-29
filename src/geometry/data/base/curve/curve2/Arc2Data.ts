@@ -4,7 +4,7 @@ import { Curve2Data } from "../Curve2Data";
  * 2D arc data struct.
  *
  */
-class EllipseArc2Data extends Curve2Data {
+class Arc2Data extends Curve2Data {
     /**
      * The radius0 value of this EllipseArc2Data.
      *
@@ -51,4 +51,4 @@ class EllipseArc2Data extends Curve2Data {
     }
 }
 
-export { EllipseArc2Data };
+export { Arc2Data };

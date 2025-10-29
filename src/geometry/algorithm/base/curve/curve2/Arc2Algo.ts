@@ -1,24 +1,24 @@
 import { Vector2 } from "../../../../../math/Math";
-import { CircleArc2Data } from "../../../../data/base/curve/curve2/CircleArc2Data";
+import { Arc2Data } from "../../../../data/base/curve/curve2/Arc2Data";
 import { Curve2Algo } from "../Curve2Algo";
 /**
- * 2D circle arc algorithm.
+ * 2D arc algorithm.
  *
  */
-class CircleArc2Algo extends Curve2Algo {
+class Arc2Algo extends Curve2Algo {
     /**
-     * The data struct of this 2D circle arc algorithm.
+     * The data struct of this 2D ellipse arc algorithm.
      *
-     * @type {CircleArc2Data}
+     * @type {Arc2Data}
      */
-    public override dat: CircleArc2Data;
+    public override dat: Arc2Data;
 
     /**
-     * Constructs a 2D circle arc algorithm.
+     * Constructs a 2D ellipse arc algorithm.
      *
-     * @param {Curve2Data} [dat=CircleArc2Data] - The data struct of this 2D circle arc algorithm.
+     * @param {Curve2Data} [dat=Arc2Data] - The data struct of this 2D ellipse arc algorithm.
      */
-    constructor(dat = new CircleArc2Data()) {
+    constructor(dat = new Arc2Data()) {
         super(dat);
         this.dat = dat;
     }
@@ -34,7 +34,7 @@ class CircleArc2Algo extends Curve2Algo {
                 {
                     let m = this.dat.transform.makeLocalMatrix();
                     let u = t * Math.PI * 2;
-                    let ret = new Vector2(this.dat.radius * Math.cos(u), this.dat.radius * Math.sin(u));
+                    let ret = new Vector2(this.dat.radius0 * Math.cos(u), this.dat.radius1 * Math.sin(u));
                     ret.applyMatrix3(m);
                     return ret;
                 }
@@ -42,7 +42,7 @@ class CircleArc2Algo extends Curve2Algo {
                 {
                     let m = this.dat.transform.makeLocalMatrix();
                     let u = t * Math.PI * 2;
-                    let ret = new Vector2(-this.dat.radius * Math.sin(u), this.dat.radius * Math.cos(u));
+                    let ret = new Vector2(-this.dat.radius0 * Math.sin(u), this.dat.radius1 * Math.cos(u));
                     ret.applyMatrix3(m);
                     return ret;
                 }
@@ -50,7 +50,7 @@ class CircleArc2Algo extends Curve2Algo {
                 {
                     let m = this.dat.transform.makeLocalMatrix();
                     let u = t * Math.PI * 2;
-                    let ret = new Vector2(-this.dat.radius * Math.cos(u), -this.dat.radius * Math.sin(u));
+                    let ret = new Vector2(-this.dat.radius0 * Math.cos(u), -this.dat.radius1 * Math.sin(u));
                     ret.applyMatrix3(m);
                     return ret;
                 }
@@ -58,7 +58,7 @@ class CircleArc2Algo extends Curve2Algo {
                 {
                     let m = this.dat.transform.makeLocalMatrix();
                     let u = t * Math.PI * 2;
-                    let ret = new Vector2(this.dat.radius * Math.sin(u), -this.dat.radius * Math.cos(u));
+                    let ret = new Vector2(this.dat.radius0 * Math.sin(u), -this.dat.radius1 * Math.cos(u));
                     ret.applyMatrix3(m);
                     return ret;
                 }
@@ -66,4 +66,4 @@ class CircleArc2Algo extends Curve2Algo {
     }
 }
 
-export { CircleArc2Algo };
+export { Arc2Algo as EllipseArc2Algo };

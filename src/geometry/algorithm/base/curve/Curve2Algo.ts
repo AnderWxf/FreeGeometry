@@ -44,11 +44,21 @@ class Curve2Algo extends CurveAlgo {
 
     /**
      * get t point.
-     * @param {number} [t∈[0,1]] - The data struct of this 2D curvr algorithm.
+     * @param {number} [t∈[0,1]] - Get position on this 2D curvr with t parameter algorithm.
      * @retun {Vector2}
      */
     point(t: number): Vector2 {
         return this.derivative(t, 0);
+    }
+
+    /**
+     * get t parameter.
+     * @param {Vector2} [point] - Get t parameter on this 2D curvr with position algorithm.
+     * @retun {number}
+     */
+    t(point: Vector2): number {
+        debugger;
+        return null;
     }
 
     /**

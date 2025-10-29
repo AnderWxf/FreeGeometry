@@ -19,7 +19,6 @@ class CurveAlgo {
      */
     constructor(dat = new CurveData()) {
         this.dat = dat;
-        this.dat = dat;
     }
 }
 
