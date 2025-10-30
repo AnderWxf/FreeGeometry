@@ -1,4 +1,4 @@
-import { Matrix2, Matrix3, Vector2 } from "../../../math/Math";
+import { Matrix2, Vector2 } from "../../../math/Math";
 import { Curve2Data } from "../../data/base/Curve2Data";
 
 /**
@@ -19,36 +19,36 @@ class Curve2Algo {
      *
      * @param {Curve2Data} [dat=Curve2Data] - The data struct of this 2D curvr algorithm.
      */
-    constructor(dat = new Curve2Data()) {
+    constructor(dat: Curve2Data) {
         this.dat = dat;
     }
 
     /**
-     * the P(poinit) function return a position at t parameter.
-     * @param {number} [t∈[0,1]] - the t parameter of curve.
+     * the P(poinit) function return a position at u parameter.
+     * @param {number} [u∈[0,1]] - the u parameter of curve.
      * @retun {Vector2}
      */
-    p(t: number): Vector2 {
-        return this.d(t, 0);
+    p(u: number): Vector2 {
+        return this.d(u, 0);
     }
 
     /**
-     * the T function return t parameter at a position .
+     * the U function return u parameter at a position .
      * @param {Vector2} [point] - the point on curve.
      * @retun {number}
      */
-    t(point: Vector2): number {
+    u(point: Vector2): number {
         debugger;
         return null;
     }
 
     /**
-     * the D(derivative) function return r-order derivative vector at t parameter.
-     * @param {number} [t∈[0,1]] - the t parameter of curve.
-     * @param {r} [t∈[0,1,2...]] - r-order.
+     * the D(derivative) function return r-order derivative vector at u parameter.
+     * @param {number} [u∈[0,1]] - the u parameter of curve.
+     * @param {number} [r∈[0,1,2...]] - r-order.
      * @retun {Vector2}
      */
-    d(t: number, r: number = 0): Vector2 {
+    d(u: number, r: number = 0): Vector2 {
         debugger;
         return null;
     }
@@ -56,7 +56,7 @@ class Curve2Algo {
     /**
      * the G(general) function return the value of the general equation for the curve.
      * if point on curve then the return value is zero.
-     * f(x,y,z) = 0
+     * f(x,y) = 0
      * 
      * @param {Vector2} [point] - the point baout curve. 
      * @retun {number}
@@ -67,43 +67,43 @@ class Curve2Algo {
     }
 
     /**
-     * the TG(tangent) function return 1-order derivative normalize vector at t parameter.
+     * the TG(tangent) function return 1-order derivative normalize vector at u parameter.
      *
      * @retun {Vector2}
      */
-    tg(t: number): Vector2 {
-        return this.d(t, 1).normalize();
+    tg(u: number): Vector2 {
+        return this.d(u, 1).normalize();
     }
 
 
     /**
-     * the N(normal) function return 2-order derivative vector at t parameter.
+     * the N(normal) function return 2-order derivative vector at u parameter.
      *
      * @retun {Vector2}
      */
-    n(t: number): Vector2 {
-        return this.d(t, 2);
+    n(u: number): Vector2 {
+        return this.d(u, 2);
     }
 
     /**
-     * the K function return curvature at t parameter.
+     * the K function return curvature at u parameter.
      *
      * @retun {number}
      */
-    k(t: number): number {
-        let tg = this.tg(t);
-        let n = this.n(t);
+    k(u: number): number {
+        let tg = this.tg(u);
+        let n = this.n(u);
         let k = tg.length() / n.lengthSq();
         return k;
     }
 
     /**
-     * the R function return radius of curvature at t parameter.
+     * the R function return radius of curvature at u parameter.
      *
      * @retun {number}
      */
-    r(t: number): number {
-        let k = this.k(t);
+    r(u: number): number {
+        let k = this.k(u);
         if (k == 0) {
             return Infinity;
         }
@@ -111,13 +111,13 @@ class Curve2Algo {
     }
 
     /**
-     * the TN(tn rotation matrix) function return tbn matrix at t parameter.
+     * the TN(tn rotation matrix) function return tbn matrix at u parameter.
      *
      * @retun {Matrix2}
      */
-    tn(t: number): Matrix2 {
-        let tg = this.tg(t).normalize();
-        let n = this.n(t).normalize();
+    tn(u: number): Matrix2 {
+        let tg = this.tg(u).normalize();
+        let n = this.n(u).normalize();
         let m = new Matrix2();
         m.extractBasis(tg, n);
         return m;
@@ -158,11 +158,6 @@ class Curve2Algo {
     getEndTangent(): Vector2 {
         return this.tg(1);
     }
-
-
-
-
-
 }
 
 export { Curve2Algo };

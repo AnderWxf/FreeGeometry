@@ -52,18 +52,15 @@ class Brep3Builder {
     }
 
     /**
-     * build face from cures that one by one closed.
+     * build generaled face from cures that one by one closed.
      *
      * @param {Transform3} [trans] - - The base transfrom of face.
      * @param {Array<Curve2Data>} [cures] - The cures of face.
      */
-    static BuildFace(trans = new Transform3(), cures: Array<Curve2Data>): Face3 {
+    static BuildGeneraledFace(trans = new Transform3(), cures: Array<Curve2Data>): Face3 {
         debugger;
         return null;
     }
-
-
-
 
 
     /**

@@ -122,6 +122,11 @@ class Face2 {
     border: Loop2;
 
     /**
+     * holes of Face.
+     */
+    holes: Array<Loop2>;
+
+    /**
      * Constructs a Face.
      *
      */

@@ -124,6 +124,11 @@ class Face3 {
     border: Loop3;
 
     /**
+     * holes of Face.
+     */
+    holes: Array<Loop3>;
+
+    /**
      * surface of Face.
      */
     surface: SurfaceData;

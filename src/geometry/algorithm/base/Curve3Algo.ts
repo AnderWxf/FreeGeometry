@@ -19,36 +19,36 @@ class Curve3Algo {
      *
      * @param {Curve3Data} [dat=Curve3Data] - The data struct of this 3D curvr algorithm.
      */
-    constructor(dat = new Curve3Data()) {
+    constructor(dat: Curve3Data) {
         this.dat = dat;
     }
 
     /**
-     * the P function return a point at t parameter.
-     * @param {number} [t∈[0,1]] - the t parameter of curve.
+     * the P function return a point at u parameter.
+     * @param {number} [t∈[0,1]] - the u parameter of curve.
      * @retun {Vector3}
      */
-    p(t: number): Vector3 {
-        return this.d(t, 0);
+    p(u: number): Vector3 {
+        return this.d(u, 0);
     }
 
     /**
-     * the T function return t parameter at a point on curve.
+     * the U function return u parameter at a point on curve.
      * @param {Vector3} [point] - the point on curve.
      * @retun {number}
      */
-    t(point: Vector3): number {
+    u(point: Vector3): number {
         debugger;
         return null;
     }
 
     /**
-     * the D function return r-order derivative vector at t parameter.
-     * @param {number} [t∈[0,1]] - the t parameter of curve.
-     * @param {r} [t∈[0,1,3...]] - r-order.
+     * the D function return r-order derivative vector at u parameter.
+     * @param {number} [u∈[0,1]] - the u parameter of curve.
+     * @param {number} [r∈[0,1,3...]] - r-order.
      * @retun {Vector3}
      */
-    d(t: number, r: number = 0): Vector3 {
+    d(u: number, r: number = 0): Vector3 {
         debugger;
         return null;
     }
@@ -70,53 +70,53 @@ class Curve3Algo {
     }
 
     /**
-     * the TG function return 1-order derivative vector at t parameter.
+     * the TG function return 1-order derivative vector at u parameter.
      *
      * @retun {Vector3}
      */
-    tg(t: number): Vector3 {
-        return this.d(t, 1);
+    tg(u: number): Vector3 {
+        return this.d(u, 1);
     }
 
     /**
-     * the N(normal) function return 2-order derivative vector at t parameter.
+     * the N(normal) function return 2-order derivative vector at u parameter.
      *
      * @retun {Vector2}
      */
-    n(t: number): Vector3 {
-        return this.d(t, 2);
+    n(u: number): Vector3 {
+        return this.d(u, 2);
     }
 
     /**
-     * the BN(bin normal) function return bin vector at t parameter.
+     * the BN(bin normal) function return bin vector at u parameter.
      *
      * @retun {Vector2}
      */
-    bn(t: number): Vector3 {
-        let tg = this.tg(t);
-        let n = this.n(t);
+    bn(u: number): Vector3 {
+        let tg = this.tg(u);
+        let n = this.n(u);
         return tg.cross(n);
     }
 
     /**
-     * the K function return curvature at t parameter.
+     * the K function return curvature at u parameter.
      *
      * @retun {number}
      */
-    k(t: number): number {
-        let tg = this.tg(t);
-        let n = this.n(t);
+    k(u: number): number {
+        let tg = this.tg(u);
+        let n = this.n(u);
         let k = tg.length() / n.lengthSq();
         return k;
     }
 
     /**
-     * the R function return radius of curvature at t parameter.
+     * the R function return radius of curvature at u parameter.
      *
      * @retun {number}
      */
-    r(t: number): number {
-        let k = this.k(t);
+    r(u: number): number {
+        let k = this.k(u);
         if (k == 0) {
             return Infinity;
         }
@@ -124,13 +124,13 @@ class Curve3Algo {
     }
 
     /**
-     * the TBN(tbn rotation matrix) function return tbn matrix at t parameter.
+     * the TBN(tbn rotation matrix) function return tbn matrix at u parameter.
      *
      * @retun {Matrix3}
      */
-    tbn(t: number): Matrix3 {
-        let tg = this.tg(t).normalize();
-        let n = this.n(t).normalize();
+    tbn(u: number): Matrix3 {
+        let tg = this.tg(u).normalize();
+        let n = this.n(u).normalize();
         let bn = tg.clone().cross(n).normalize();
         let m = new Matrix3();
         m.extractBasis(tg, n, bn);
@@ -172,7 +172,6 @@ class Curve3Algo {
     getEndTangent(): Vector3 {
         return this.tg(1);
     }
-
 }
 
 export { Curve3Algo };
