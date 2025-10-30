@@ -1,5 +1,7 @@
 import { Matrix3, Vector2, Vector3 } from "../../../math/Math";
+import type { Curve3Data } from "../../data/base/Curve3Data";
 import { SurfaceData } from "../../data/base/SurfaceData";
+import { Curve3Algo } from "./Curve3Algo";
 
 /**
  * surface algorithm.
@@ -69,52 +71,126 @@ class SurfaceAlgo {
     }
 
     /**
-     * the TG function return 1-order derivative vector at uv parameter.
+     * the N(normal) function return unit normal vector at uv parameter.
      *
+     * @param {Vector2} [uv∈[(0,0),(1,1)]] - the uv parameter of surface.
      * @retun {Vector3}
      */
-    tg(uv: Vector2): Vector3 {
-        return this.d(uv, 1);
+    n(uv: Vector2): Vector3 {
+        let uc = this.ucurve(uv.v);
+        let vc = this.vcurve(uv.u);
+        let ut = new Curve3Algo(uc).tg(uv.u);
+        let vt = new Curve3Algo(vc).tg(uv.v);
+        let n = new Vector3();
+        n.crossVectors(ut, vt);
+        return n;
     }
 
     /**
-     * the N(normal) function return 2-order derivative vector at uv parameter.
+     * the curve at v parameter.
      *
-     * @retun {Vector2}
+     * @retun {Curve3Data}
      */
-    n(uv: Vector2): Vector3 {
-        return this.d(uv, 2);
+    ucurve(v: number): Curve3Data {
+        debugger;
+        return null;
+    }
+    /**
+     * the curve at u parameter.
+     *
+     * @retun {Curve3Data}
+     */
+    vcurve(u: number): Curve3Data {
+        debugger;
+        return null;
+    }
+
+
+    /**
+     * the TG function return 1-order direction derivative vector at uv parameter.
+     *
+     * @param {Vector2} [uv∈[(0,0),(1,1)]] - the uv parameter of surface.
+     * @param {Vector2} [dir∈[(-1,-1),(1,1)]] - the uv parameter of surface.
+     * @retun {Vector3}
+     */
+    tg(uv: Vector2, dir: Vector2): Vector3 {
+        return this.d(uv, 1);
     }
 
     /**
      * the BN(bin normal) function return bin vector at uv parameter.
      *
+     * @param {Vector2} [uv∈[(0,0),(1,1)]] - the uv parameter of surface.
      * @retun {Vector2}
      */
     bn(uv: Vector2): Vector3 {
-        let tg = this.tg(uv);
-        let n = this.n(uv);
-        return tg.cross(n);
+        let uc = this.ucurve(uv.v);
+        let vc = this.vcurve(uv.u);
+        let ut = new Curve3Algo(uc).tg(uv.u);
+        let vt = new Curve3Algo(vc).tg(uv.v);
+
+        let n = new Vector3();
+        n.crossVectors(ut, vt).normalize();
+        let bn = new Vector3();
+        bn.crossVectors(n, ut);
+        return bn;
     }
 
     /**
-     * the K function return curvature at uv parameter.
+     * the K1 function return max main curvature at uv parameter.
      *
+     * @param {Vector2} [uv∈[(0,0),(1,1)]] - the uv parameter of surface.
+     * @retun {number}
+     */
+    k1(uv: Vector2): number {
+        debugger;
+        return null;
+    }
+
+    /**
+     * the K2 function return min maincurvature at uv parameter.
+     *
+     * @param {Vector2} [uv∈[(0,0),(1,1)]] - the uv parameter of surface.
+     * @retun {number}
+     */
+    k2(uv: Vector2): number {
+        debugger;
+        return null;
+    }
+
+    /**
+     * the K function return gaussian curvature at uv parameter.
+     *
+     * @param {Vector2} [uv∈[(0,0),(1,1)]] - the uv parameter of surface.
      * @retun {number}
      */
     k(uv: Vector2): number {
-        let tg = this.tg(uv);
-        let n = this.n(uv);
-        let k = tg.length() / n.lengthSq();
+        let k1 = this.k1(uv);
+        let k2 = this.k2(uv);
+        let k = k1 * k2;
         return k;
     }
 
     /**
-     * the R function return radius of curvature at uv parameter.
+     * the H function return mean curvature at uv parameter.
      *
+     * @param {Vector2} [uv∈[(0,0),(1,1)]] - the uv parameter of surface.
      * @retun {number}
      */
-    r(uv: Vector2): number {
+    h(uv: Vector2): number {
+        let k1 = this.k1(uv);
+        let k2 = this.k2(uv);
+        let h = (k1 + k2) * 0.5;
+        return h;
+    }
+
+    /**
+     * the RK function return radius of gaussian curvature at uv parameter.
+     *
+     * @param {Vector2} [uv∈[(0,0),(1,1)]] - the uv parameter of surface.
+     * @retun {number}
+     */
+    rk(uv: Vector2): number {
         let k = this.k(uv);
         if (k == 0) {
             return Infinity;
@@ -123,16 +199,37 @@ class SurfaceAlgo {
     }
 
     /**
+     * the RH function return radius of mean curvature at uv parameter.
+     *
+     * @param {Vector2} [uv∈[(0,0),(1,1)]] - the uv parameter of surface.
+     * @retun {number}
+     */
+    rh(uv: Vector2): number {
+        let h = this.h(uv);
+        if (h == 0) {
+            return Infinity;
+        }
+        return 1.0 / h;
+    }
+
+    /**
      * the TBN(tbn rotation matrix) function return tbn matrix at uv parameter.
      *
+     * @param {Vector2} [uv∈[(0,0),(1,1)]] - the uv parameter of surface.
      * @retun {Matrix3}
      */
     tbn(uv: Vector2): Matrix3 {
-        let tg = this.tg(uv).normalize();
-        let n = this.n(uv).normalize();
-        let bn = tg.clone().cross(n).normalize();
+        let uc = this.ucurve(uv.v);
+        let vc = this.vcurve(uv.u);
+        let ut = new Curve3Algo(uc).tg(uv.u);
+        let vt = new Curve3Algo(vc).tg(uv.v);
+
+        let n = new Vector3();
+        n.crossVectors(ut, vt).normalize();
+        let bn = new Vector3();
+        bn.crossVectors(n, ut).normalize();
         let m = new Matrix3();
-        m.extractBasis(tg, n, bn);
+        m.extractBasis(ut, bn, n);
         return m;
     }
 }

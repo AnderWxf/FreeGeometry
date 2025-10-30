@@ -69,6 +69,7 @@ class Curve2Algo {
     /**
      * the TG(tangent) function return 1-order derivative normalize vector at u parameter.
      *
+     * @param {number} [u∈[0,1]] - the u parameter of curve.
      * @retun {Vector2}
      */
     tg(u: number): Vector2 {
@@ -79,6 +80,7 @@ class Curve2Algo {
     /**
      * the N(normal) function return 2-order derivative vector at u parameter.
      *
+     * @param {number} [u∈[0,1]] - the u parameter of curve.
      * @retun {Vector2}
      */
     n(u: number): Vector2 {
@@ -88,6 +90,7 @@ class Curve2Algo {
     /**
      * the K function return curvature at u parameter.
      *
+     * @param {number} [u∈[0,1]] - the u parameter of curve.
      * @retun {number}
      */
     k(u: number): number {
@@ -100,6 +103,7 @@ class Curve2Algo {
     /**
      * the R function return radius of curvature at u parameter.
      *
+     * @param {number} [u∈[0,1]] - the u parameter of curve.
      * @retun {number}
      */
     r(u: number): number {
@@ -113,6 +117,7 @@ class Curve2Algo {
     /**
      * the TN(tn rotation matrix) function return tbn matrix at u parameter.
      *
+     * @param {number} [u∈[0,1]] - the u parameter of curve.
      * @retun {Matrix2}
      */
     tn(u: number): Matrix2 {

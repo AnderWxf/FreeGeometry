@@ -72,6 +72,7 @@ class Curve3Algo {
     /**
      * the TG function return 1-order derivative vector at u parameter.
      *
+     * @param {number} [u∈[0,1]] - the u parameter of curve.
      * @retun {Vector3}
      */
     tg(u: number): Vector3 {
@@ -81,6 +82,7 @@ class Curve3Algo {
     /**
      * the N(normal) function return 2-order derivative vector at u parameter.
      *
+     * @param {number} [u∈[0,1]] - the u parameter of curve.
      * @retun {Vector2}
      */
     n(u: number): Vector3 {
@@ -90,6 +92,7 @@ class Curve3Algo {
     /**
      * the BN(bin normal) function return bin vector at u parameter.
      *
+     * @param {number} [u∈[0,1]] - the u parameter of curve.
      * @retun {Vector2}
      */
     bn(u: number): Vector3 {
@@ -101,6 +104,7 @@ class Curve3Algo {
     /**
      * the K function return curvature at u parameter.
      *
+     * @param {number} [u∈[0,1]] - the u parameter of curve.
      * @retun {number}
      */
     k(u: number): number {
@@ -113,6 +117,7 @@ class Curve3Algo {
     /**
      * the R function return radius of curvature at u parameter.
      *
+     * @param {number} [u∈[0,1]] - the u parameter of curve.
      * @retun {number}
      */
     r(u: number): number {
@@ -126,14 +131,16 @@ class Curve3Algo {
     /**
      * the TBN(tbn rotation matrix) function return tbn matrix at u parameter.
      *
+     * @param {number} [u∈[0,1]] - the u parameter of curve.
      * @retun {Matrix3}
      */
     tbn(u: number): Matrix3 {
-        let tg = this.tg(u).normalize();
+        let t = this.tg(u).normalize();
         let n = this.n(u).normalize();
-        let bn = tg.clone().cross(n).normalize();
+        let b = t.clone().cross(n).normalize();
+        n = b.clone().cross(t).normalize();
         let m = new Matrix3();
-        m.extractBasis(tg, n, bn);
+        m.extractBasis(t, n, b);
         return m;
     }
 

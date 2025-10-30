@@ -48,13 +48,14 @@ class Vector2 {
 	 * @type {number}
 	 */
 	public x: number;
-
+	get u(): number { return this.x; }
 	/**
 	 * The y value of this vector.
 	 *
 	 * @type {number}
 	 */
 	public y: number;
+	get v(): number { return this.y; }
 
 	/**
 	 * Constructs a new 2D vector.
