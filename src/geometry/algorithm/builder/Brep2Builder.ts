@@ -1,5 +1,5 @@
 import type { Vector2, Vector3 } from "../../../math/Math";
-import type { Curve2Data } from "../../data/base/curve/Curve2Data";
+import type { Curve2Data } from "../../data/base/Curve2Data";
 import type { Face2 } from "../../data/brep/Brep2";
 
 /**
@@ -50,7 +50,7 @@ class Brep2Builder {
     }
 
     /**
-     * build face from centers that one by one closed.
+     * build face from cures that one by one closed.
      *
      * @param {Array<Curve2Data>} [cures] - The cures of face.
      */

@@ -6,19 +6,19 @@ import { Transform3 } from "./Transform3";
  */
 class SurfaceData {
     /**
-     * The transform value of this Curve3Data.
+     * The transfrom value of this Curve3Data.
      *
      * @type {Transform3}
      */
-    public transform: Transform3;
+    public trans: Transform3;
 
     /**
      * Constructs a surface.
      *
-     * @param {Transform3} [transform] - The base transfrom of surface.
+     * @param {Transform3} [trans] - The base transfrom of surface.
      */
-    constructor(transform = new Transform3()) {
-        this.transform = transform;
+    constructor(trans = new Transform3()) {
+        this.trans = trans;
     }
 }
 

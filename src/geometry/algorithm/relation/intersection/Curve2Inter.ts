@@ -1,8 +1,8 @@
 import type { Vector2 } from "../../../../math/Math";
-import type { Arc2Data } from "../../../data/base/curve/curve2/Arc2Data";
-import type { Line2Data } from "../../../data/base/curve/curve2/Line2Data";
-import type { Nurbs2Data } from "../../../data/base/curve/curve2/Nurbs2Data";
-import type { Curve2Data } from "../../../data/base/curve/Curve2Data";
+import type { Arc2Data } from "../../../data/base/curve2/Arc2Data";
+import type { Line2Data } from "../../../data/base/curve2/Line2Data";
+import type { Nurbs2Data } from "../../../data/base/curve2/Nurbs2Data";
+import type { Curve2Data } from "../../../data/base/Curve2Data";
 
 /**
  * compute curve intersection point utility.

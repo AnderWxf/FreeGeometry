@@ -1,16 +1,16 @@
-import { CurveData } from "../CurveData";
-import { Transform3 } from "../Transform3";
+import { Transform3 } from "./Transform3";
+
 /**
  * 3D curvr data struct.
  *
  */
-class Curve3Data extends CurveData {
+class Curve3Data {
     /**
-     * The transform value of this Curve3Data.
+     * The transfrom value of this Curve3Data.
      *
      * @type {Transform3}
      */
-    public transform: Transform3;
+    public trans: Transform3;
 
     /**
      * Constructs a new 3D Transfrom.
@@ -19,9 +19,8 @@ class Curve3Data extends CurveData {
      * @param {rotation} [rotation=(0,0,0)] - The rotation value of this Transfrom.
      * @param {number} [scale=1] - The rotation value of this Transfrom.
      */
-    constructor(transform = new Transform3()) {
-        super();
-        this.transform = transform;
+    constructor(trans = new Transform3()) {
+        this.trans = trans;
     }
 }
 

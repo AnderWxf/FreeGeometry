@@ -1,10 +1,10 @@
 import type { Vector2, Vector3 } from "../../../math/Math";
-import type { Arc2Data } from "../../data/base/curve/curve2/Arc2Data";
-import type { Line2Data } from "../../data/base/curve/curve2/Line2Data";
-import type { Nurbs2Data } from "../../data/base/curve/curve2/Nurbs2Data";
-import type { Arc3Data } from "../../data/base/curve/curve3/Arc3Data";
-import type { Line3Data } from "../../data/base/curve/curve3/Line3Data";
-import type { Nurbs3Data } from "../../data/base/curve/curve3/Nurbs3Data";
+import type { Arc2Data } from "../../data/base/curve2/Arc2Data";
+import type { Line2Data } from "../../data/base/curve2/Line2Data";
+import type { Nurbs2Data } from "../../data/base/curve2/Nurbs2Data";
+import type { Arc3Data } from "../../data/base/curve3/Arc3Data";
+import type { Line3Data } from "../../data/base/curve3/Line3Data";
+import type { Nurbs3Data } from "../../data/base/curve3/Nurbs3Data";
 
 /**
  * curvr builder.

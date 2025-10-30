@@ -1,6 +1,7 @@
 import { Matrix3, Vector2 } from "../../../math/Math";
+
 /**
- * 2D translation transform class.
+ * 2D translation transfrom =.
  *
  */
 class Transform2 {
@@ -55,7 +56,7 @@ class Transform2 {
         this.parent = parent;
     }
     /**
-     * comput local matrix as a 2D translation transform.
+     * comput local matrix as a 2D translation trans.
      *
      * @return {Matrix3} A reference to this matrix.
      */
@@ -74,7 +75,7 @@ class Transform2 {
         return ret;
     }
     /**
-     * comput world matrix as a 2D translation transform.
+     * comput world matrix as a 2D translation trans.
      *
      * @return {Matrix3} A reference to this matrix.
      */

@@ -1,5 +1,5 @@
 import type { Vector3 } from "../../../math/Math";
-import type { Curve3Data } from "../base/curve/Curve3Data";
+import type { Curve3Data } from "../base/Curve3Data";
 import type { SurfaceData } from "../base/SurfaceData";
 
 /**

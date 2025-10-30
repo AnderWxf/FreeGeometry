@@ -1,5 +1,5 @@
 import type { Vector2 } from "../../../math/Math";
-import type { Curve2Data } from "../base/curve/Curve2Data";
+import type { Curve2Data } from "../base/Curve2Data";
 /**
  * Brep data on xy space;
  *

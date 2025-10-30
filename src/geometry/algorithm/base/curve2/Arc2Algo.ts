@@ -1,5 +1,5 @@
-import { Vector2 } from "../../../../../math/Math";
-import { Arc2Data } from "../../../../data/base/curve/curve2/Arc2Data";
+import { Vector2 } from "../../../../math/Math";
+import { Arc2Data } from "../../../data/base/curve2/Arc2Data";
 import { Curve2Algo } from "../Curve2Algo";
 /**
  * 2D arc algorithm.
@@ -28,11 +28,11 @@ class Arc2Algo extends Curve2Algo {
      *
      * @retun {Vector2}
      */
-    override derivative(t: number, r: number = 0): Vector2 {
+    override d(t: number, r: number = 0): Vector2 {
         switch (r % 4) {
             case 0:
                 {
-                    let m = this.dat.transform.makeLocalMatrix();
+                    let m = this.dat.trans.makeLocalMatrix();
                     let u = t * Math.PI * 2;
                     let ret = new Vector2(this.dat.radius.x * Math.cos(u), this.dat.radius.y * Math.sin(u));
                     ret.applyMatrix3(m);
@@ -40,7 +40,7 @@ class Arc2Algo extends Curve2Algo {
                 }
             case 1:
                 {
-                    let m = this.dat.transform.makeLocalMatrix();
+                    let m = this.dat.trans.makeLocalMatrix();
                     let u = t * Math.PI * 2;
                     let ret = new Vector2(-this.dat.radius.x * Math.sin(u), this.dat.radius.y * Math.cos(u));
                     ret.applyMatrix3(m);
@@ -48,7 +48,7 @@ class Arc2Algo extends Curve2Algo {
                 }
             case 2:
                 {
-                    let m = this.dat.transform.makeLocalMatrix();
+                    let m = this.dat.trans.makeLocalMatrix();
                     let u = t * Math.PI * 2;
                     let ret = new Vector2(-this.dat.radius.x * Math.cos(u), -this.dat.radius.y * Math.sin(u));
                     ret.applyMatrix3(m);
@@ -56,7 +56,7 @@ class Arc2Algo extends Curve2Algo {
                 }
             case 3:
                 {
-                    let m = this.dat.transform.makeLocalMatrix();
+                    let m = this.dat.trans.makeLocalMatrix();
                     let u = t * Math.PI * 2;
                     let ret = new Vector2(this.dat.radius.x * Math.sin(u), -this.dat.radius.y * Math.cos(u));
                     ret.applyMatrix3(m);

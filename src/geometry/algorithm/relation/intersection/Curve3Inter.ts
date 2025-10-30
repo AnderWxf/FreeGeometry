@@ -1,8 +1,8 @@
 import type { Vector3 } from "../../../../math/Math";
-import type { Arc3Data } from "../../../data/base/curve/curve3/Arc3Data";
-import type { Line3Data } from "../../../data/base/curve/curve3/Line3Data";
-import type { Nurbs3Data } from "../../../data/base/curve/curve3/Nurbs3Data";
-import type { Curve3Data } from "../../../data/base/curve/Curve3Data";
+import type { Arc3Data } from "../../../data/base/curve3/Arc3Data";
+import type { Line3Data } from "../../../data/base/curve3/Line3Data";
+import type { Nurbs3Data } from "../../../data/base/curve3/Nurbs3Data";
+import type { Curve3Data } from "../../../data/base/Curve3Data";
 
 /**
  * compute curve intersection point utility.

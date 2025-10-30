@@ -1,5 +1,5 @@
-import { Vector2 } from "../../../../../math/Math";
-import { Line2Data } from "../../../../data/base/curve/curve2/Line2Data";
+import { Vector2 } from "../../../../math/Math";
+import { Line2Data } from "../../../data/base/curve2/Line2Data";
 import { Curve2Algo } from "../Curve2Algo";
 /**
  * 2D line algorithm.
@@ -28,9 +28,9 @@ class Line2Algo extends Curve2Algo {
      *
      * @retun {Vector2}
      */
-    override derivative(t: number, r: number = 0): Vector2 {
+    override d(t: number, r: number = 0): Vector2 {
         if (r == 0) {
-            let m = this.dat.transform.makeLocalMatrix();
+            let m = this.dat.trans.makeLocalMatrix();
             let u = t * this.dat.length;
             m.scale(u, u);
             let ret = new Vector2(1, 0);

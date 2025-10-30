@@ -1,5 +1,5 @@
-import { Vector2 } from "../../../../../math/Math";
-import { Transform2 } from "../../Transform2";
+import { Vector2 } from "../../../../math/Math";
+import { Transform2 } from "../Transform2";
 import { Curve2Data } from "../Curve2Data";
 /**
  * 2D arc data struct.
@@ -39,12 +39,12 @@ class Arc2Data extends Curve2Data {
     /**
      * Constructs a new 2D Transfrom.
      *
-     * @param {Transform2} [transform={position=(0,0),rotation=0}]- The transform value of this arc.
+     * @param {Transform2} [trans={position=(0,0),rotation=0}]- The transfrom value of this arc.
      * @param {Vector2} [radius=(1,1)] - The radius value of this arc.
      * @param {number} [radian1=2π] - The end angle value of this arc.
      */
-    constructor(transform = new Transform2(), radius = new Vector2(1, 1), radian0 = 0, radian1 = Math.PI * 2) {
-        super(transform);
+    constructor(trans = new Transform2(), radius = new Vector2(1, 1), radian0 = 0, radian1 = Math.PI * 2) {
+        super(trans);
         this.radius = radius;
         this.radian0 = radian0;
         this.radian1 = radian1;

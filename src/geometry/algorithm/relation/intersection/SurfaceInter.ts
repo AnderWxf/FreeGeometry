@@ -1,4 +1,4 @@
-import type { Curve3Data } from "../../../data/base/curve/Curve3Data";
+import type { Curve3Data } from "../../../data/base/Curve3Data";
 import type { PlaneSurfaceData } from "../../../data/base/surface/PlaneSurfaceData";
 
 class SurfaceInter {

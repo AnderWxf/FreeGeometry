@@ -1,4 +1,4 @@
-import { Transform2 } from "../../Transform2";
+import { Transform2 } from "../Transform2";
 import { Curve2Data } from "../Curve2Data";
 /**
  * 2D line data struct.
@@ -15,11 +15,11 @@ class Line2Data extends Curve2Data {
     /**
      * Constructs a new 2D Transfrom.
      *
-     * @param {Transform2} [transform={position=(0,0),rotation=0}]- The transform value of this line curve.
+     * @param {Transform2} [trans={position=(0,0),rotation=0}]- The transfrom value of this line curve.
      * @param {number} [length=1] - The length value of this line curve.
      */
-    constructor(transform = new Transform2(), length = 1) {
-        super(transform);
+    constructor(trans = new Transform2(), length = 1) {
+        super(trans);
         this.length = length;
     }
 }

@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 import * as WEBGPU from 'three/src/three.WebGPU';
 import { Vector2 } from "./math/Math"
-import { Line2Data } from './geometry/data/base/curve/curve2/Line2Data';
-import { Line2Algo } from './geometry/algorithm/base/curve/curve2/Line2Algo';
+import { Line2Data } from './geometry/data/base/curve2/Line2Data';
+import { Line2Algo } from './geometry/algorithm/base/curve2/Line2Algo';
 import CamToolBar from "./ui/CamToolBar";
 
 export class Cube {

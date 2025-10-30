@@ -1,6 +1,7 @@
 import { Euler, Matrix4, Vector3 } from "../../../math/Math";
+
 /**
- * 3D translation transform class.
+ * 3D translation transfrom =.
  *
  */
 class Transform3 {
@@ -55,7 +56,7 @@ class Transform3 {
         this.parent = parent;
     }
     /**
-     * Sets matrix as a 3D translation transform.
+     * Sets matrix as a 3D translation trans.
      *
      * @return {Matrix4} A reference to this matrix.
      */
@@ -69,7 +70,7 @@ class Transform3 {
     }
 
     /**
-     * comput world matrix as a 3D translation transform.
+     * comput world matrix as a 3D translation trans.
      *
      * @return {Matrix3} A reference to this matrix.
      */

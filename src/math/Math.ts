@@ -4655,7 +4655,7 @@ class Matrix2 {
 	 * @param {number} [n21] - 2-1 matrix element.
 	 * @param {number} [n22] - 2-2 matrix element.
 	 */
-	constructor(n11: number, n12: number, n21: number, n22: number) {
+	constructor(n11?: number, n12: number = 0, n21: number = 0, n22: number = 0) {
 
 		/**
 		 * This flag can be used for type testing.
@@ -4740,6 +4740,21 @@ class Matrix2 {
 
 	}
 
+	/**
+	 * Sets the given basis vectors to this matrix.
+	 *
+	 * @param {Vector2} xAxis - The basis's x axis.
+	 * @param {Vector2} yAxis - The basis's y axis.
+	 * @return {Matrix2} A reference to this matrix.
+	 */
+	extractBasis(xAxis: Vector2, yAxis: Vector2) {
+
+		this.set(
+			xAxis.x, yAxis.x,
+			xAxis.y, yAxis.y,
+		);
+		return this;
+	}
 }
 
 /**
@@ -4911,6 +4926,24 @@ class Matrix3 {
 
 	}
 
+	/**
+	 * Sets the given basis vectors to this matrix.
+	 *
+	 * @param {Vector2} xAxis - The basis's x axis.
+	 * @param {Vector2} yAxis - The basis's y axis.
+	 * @return {Matrix3} A reference to this matrix.
+	 */
+	makeBasis(xAxis: Vector2, yAxis: Vector2) {
+
+		this.set(
+			xAxis.x, yAxis.x, 0,
+			xAxis.y, yAxis.y, 0,
+			0, 0, 1,
+		);
+
+		return this;
+
+	}
 	/**
 	 * Set this matrix to the upper 3x3 matrix of the given 4x4 matrix.
 	 *
