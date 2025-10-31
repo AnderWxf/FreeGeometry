@@ -39,12 +39,13 @@ class OrthographicController {
      *
      */
     constructor() {
+        const s = window.innerHeight / window.innerWidth;
         // 创建一个透视相机
         const _camera = new THREE.OrthographicCamera(
             -this._size,
             this._size,
-            this._size,
-            -this._size,
+            this._size * s,
+            -this._size * s,
             0.1, // 近裁剪面
             3000 // 远裁剪面
         );
