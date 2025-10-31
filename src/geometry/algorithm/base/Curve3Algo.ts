@@ -3,7 +3,14 @@ import { Curve3Data } from "../../data/base/Curve3Data";
 
 /**
  * 3D curvr algorithm.
- *
+ * u parameter is general parameters.
+ * u ∈ [0,a], the a is diffent for curve type : 
+ * in case line, a = distance to o.
+ * in case arc, a = 2π-1/Infinity.
+ * in case conic, u ∈ R.
+ * in case nurbs, a = 1 , when u < 0 or u > 1 curve extend with 1-order derivative vector.
+ * in case uvcurve, a = uvcurve.curve.a.
+ * 
  */
 class Curve3Algo {
 
@@ -17,7 +24,7 @@ class Curve3Algo {
     /**
      * Constructs a 3D curvr algorithm.
      *
-     * @param {Curve3Data} [dat=Curve3Data] - The data struct of this 3D curvr algorithm.
+     * @param {Curve3Data} [dat = Curve3Data] - The data struct of this 3D curvr algorithm.
      */
     constructor(dat: Curve3Data) {
         this.dat = dat;
@@ -25,7 +32,7 @@ class Curve3Algo {
 
     /**
      * the P function return a point at u parameter.
-     * @param {number} [t∈[0,1]] - the u parameter of curve.
+     * @param {number} [u ∈ [0,a]] - the u parameter of curve.
      * @retun {Vector3}
      */
     p(u: number): Vector3 {
@@ -44,8 +51,8 @@ class Curve3Algo {
 
     /**
      * the D function return r-order derivative vector at u parameter.
-     * @param {number} [u∈[0,1]] - the u parameter of curve.
-     * @param {number} [r∈[0,1,3...]] - r-order.
+     * @param {number} [u ∈ [0,a]] - the u parameter of curve.
+     * @param {number} [r ∈ [0,1,3...]] - r-order.
      * @retun {Vector3}
      */
     d(u: number, r: number = 0): Vector3 {
@@ -70,19 +77,19 @@ class Curve3Algo {
     }
 
     /**
-     * the TG function return 1-order derivative vector at u parameter.
+     * the T function return 1-order derivative vector at u parameter.
      *
-     * @param {number} [u∈[0,1]] - the u parameter of curve.
+     * @param {number} [u ∈ [0,a]] - the u parameter of curve.
      * @retun {Vector3}
      */
-    tg(u: number): Vector3 {
+    t(u: number): Vector3 {
         return this.d(u, 1);
     }
 
     /**
      * the N(normal) function return 2-order derivative vector at u parameter.
      *
-     * @param {number} [u∈[0,1]] - the u parameter of curve.
+     * @param {number} [u ∈ [0,a]] - the u parameter of curve.
      * @retun {Vector2}
      */
     n(u: number): Vector3 {
@@ -92,32 +99,32 @@ class Curve3Algo {
     /**
      * the BN(bin normal) function return bin vector at u parameter.
      *
-     * @param {number} [u∈[0,1]] - the u parameter of curve.
+     * @param {number} [u ∈ [0,a]] - the u parameter of curve.
      * @retun {Vector2}
      */
     bn(u: number): Vector3 {
-        let tg = this.tg(u);
+        let t = this.t(u);
         let n = this.n(u);
-        return tg.cross(n);
+        return t.cross(n);
     }
 
     /**
      * the K function return curvature at u parameter.
      *
-     * @param {number} [u∈[0,1]] - the u parameter of curve.
+     * @param {number} [u ∈ [0,a]] - the u parameter of curve.
      * @retun {number}
      */
     k(u: number): number {
-        let tg = this.tg(u);
+        let t = this.t(u);
         let n = this.n(u);
-        let k = tg.length() / n.lengthSq();
+        let k = t.length() / n.lengthSq();
         return k;
     }
 
     /**
      * the R function return radius of curvature at u parameter.
      *
-     * @param {number} [u∈[0,1]] - the u parameter of curve.
+     * @param {number} [u ∈ [0,a]] - the u parameter of curve.
      * @retun {number}
      */
     r(u: number): number {
@@ -131,53 +138,17 @@ class Curve3Algo {
     /**
      * the TBN(tbn rotation matrix) function return tbn matrix at u parameter.
      *
-     * @param {number} [u∈[0,1]] - the u parameter of curve.
+     * @param {number} [u ∈ [0,a]] - the u parameter of curve.
      * @retun {Matrix3}
      */
     tbn(u: number): Matrix3 {
-        let t = this.tg(u).normalize();
+        let t = this.t(u).normalize();
         let n = this.n(u).normalize();
         let b = t.clone().cross(n).normalize();
         n = b.clone().cross(t).normalize();
         let m = new Matrix3();
         m.extractBasis(t, n, b);
         return m;
-    }
-
-    /**
-     * get begin point.
-     *
-     * @retun {Vector3}
-     */
-    getBeginPoint(): Vector3 {
-        return this.p(0);
-    }
-
-    /**
-     * get end point.
-     *
-     * @retun {Vector3}
-     */
-    getEndPoint(): Vector3 {
-        return this.p(1);
-    }
-
-    /**
-     * get begin tangent.
-     *
-     * @retun {Vector3}
-     */
-    getBeginTangent(): Vector3 {
-        return this.tg(0);
-    }
-
-    /**
-     * get end tangent.
-     *
-     * @retun {Vector3}
-     */
-    getEndTangent(): Vector3 {
-        return this.tg(1);
     }
 }
 

@@ -2,12 +2,12 @@ import { SurfaceData } from "../SurfaceData";
 import { Transform3 } from "../Transform3";
 
 /**
- * Sweep surface data struct.
+ * Sphere surface data struct.
  *
  */
-class SweepSurfaceData extends SurfaceData {
+class SphereSurfaceData extends SurfaceData {
     /**
-     * The radius value of this Sweep surface.
+     * The radius value of this Sphere surface.
      *
      * @type {number}
      */
@@ -17,7 +17,7 @@ class SweepSurfaceData extends SurfaceData {
      * Constructs a plane surface.
      *
      * @param {Transform3} [trans] - The base transfrom of surface.
-     * @param {number} [radius = 1] - The radius value of this Sweep surface.
+     * @param {number} [radius = 1] - The radius value of this Sphere surface.
      */
     constructor(trans = new Transform3(), radius: number = 1) {
         super(trans);
@@ -25,4 +25,4 @@ class SweepSurfaceData extends SurfaceData {
     }
 }
 
-export { SweepSurfaceData };
+export { SphereSurfaceData };

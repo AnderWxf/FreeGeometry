@@ -4,6 +4,9 @@ import { Vector2 } from "./math/Math"
 import { Line2Data } from './geometry/data/base/curve2/Line2Data';
 import { Line2Algo } from './geometry/algorithm/base/curve2/Line2Algo';
 import CamToolBar from "./ui/CamToolBar";
+import { CurveBuilder } from './geometry/algorithm/builder/CurveBuilder';
+import { SurfaceBulder } from './geometry/algorithm/builder/SurfaceBulder';
+import { PlaneSurfaceData } from './geometry/data/base/surface/PlaneSurfaceData';
 
 export class Cube {
   public constructor() {
@@ -104,6 +107,8 @@ export class Cube {
 
     let v2 = new Vector2();
     let line = new Line2Data();
-    let lineAlg = new Line2Algo(line);
+    let plane = new PlaneSurfaceData();
+    let lineAlg = CurveBuilder.BuildCurve2AlgorithmByData(line);
+    let planeAlg = SurfaceBulder.BuildSurfaceAlgorithmByData(plane);
   }
 }

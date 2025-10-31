@@ -2,7 +2,8 @@ import { Transform3 } from "./Transform3";
 
 /**
  * surface data struct.
- *
+ * surface has not border.
+ * 
  */
 class SurfaceData {
     /**

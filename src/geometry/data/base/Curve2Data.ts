@@ -2,7 +2,8 @@ import { Transform2 } from "./Transform2";
 
 /**
  * 2D curvr data struct.
- *
+ * curvr has not endpoint.
+ * 
  */
 class Curve2Data {
     /**

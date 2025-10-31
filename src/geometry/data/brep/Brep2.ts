@@ -2,6 +2,8 @@ import type { Vector2 } from "../../../math/Math";
 import type { Curve2Data } from "../base/Curve2Data";
 /**
  * Brep data on xy space;
+ * face's border is loop.
+ * edge's border is vertice.
  *
  */
 
@@ -55,6 +57,15 @@ class Edge2 {
      */
     curve: Curve2Data;
 
+
+
+    /**
+     * u parameter interval of curve of Edge.
+     * t parameter is normalize parameters.
+     * t ∈ [0,1], t = u / a
+     */
+    u: Vector2;
+
     /**
      * Forward coedge of Edge.
      *
@@ -101,7 +112,7 @@ class Loop2 {
     /**
      * Coedges of Loop.
      */
-    coedges: Array<Coedge2>;
+    coedges: Array<Edge2>;
 
     /**
      * Constructs a Loop.

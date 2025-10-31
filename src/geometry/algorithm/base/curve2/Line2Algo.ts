@@ -24,16 +24,15 @@ class Line2Algo extends Curve2Algo {
     }
 
     /**
-     * get r-order derivative at t of curve.
-     *
+     * the D(derivative) function return r-order derivative vector at u parameter.
+     * @param {number} [u ∈ [0,a]] - the u parameter of curve.
+     * @param {number} [r ∈ [0,1,2...]] - r-order.
      * @retun {Vector2}
      */
-    override d(t: number, r: number = 0): Vector2 {
+    override d(u: number, r: number = 0): Vector2 {
         if (r == 0) {
             let m = this.dat.trans.makeLocalMatrix();
-            let u = t * this.dat.length;
-            m.scale(u, u);
-            let ret = new Vector2(1, 0);
+            let ret = new Vector2(u, 0);
             ret.applyMatrix3(m);
             return ret;
         } else {

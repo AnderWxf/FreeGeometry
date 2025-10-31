@@ -1,28 +1,28 @@
 import { Vector2, Vector3 } from "../../../../math/Math";
 import { Curve3Data } from "../../../data/base/Curve3Data";
-import { ConicalSurfaceData } from "../../../data/base/surface/ConicalSurfaceData";
+import { LoftingSurfaceData } from "../../../data/base/surface/LoftingSurfaceData";
 import { SurfaceAlgo } from "../SurfaceAlgo";
 
 /**
- * Conical surface algorithm.
+ * Lofting surface algorithm.
  * u parameter is general parameters.
  * 
  */
-class ConicalSurfaceAlgo extends SurfaceAlgo {
+class LoftingSurfaceAlgo extends SurfaceAlgo {
 
     /**
      * The data struct of this surface algorithm.
      *
-     * @type {ConicalSurfaceData}
+     * @type {LoftingSurfaceData}
      */
-    public dat: ConicalSurfaceData;
+    public dat: LoftingSurfaceData;
 
     /**
      * Constructs a surface algorithm.
      *
-     * @param {ConicalSurfaceData} [dat = ConicalSurfaceData] - The data struct of this surface algorithm.
+     * @param {LoftingSurfaceData} [dat = LoftingSurfaceData] - The data struct of this surface algorithm.
      */
-    constructor(dat: ConicalSurfaceData) {
+    constructor(dat: LoftingSurfaceData) {
         super(dat);
         this.dat = dat;
     }
@@ -105,4 +105,4 @@ class ConicalSurfaceAlgo extends SurfaceAlgo {
     }
 }
 
-export { ConicalSurfaceAlgo };
+export { LoftingSurfaceAlgo };

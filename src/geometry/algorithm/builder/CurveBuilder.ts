@@ -1,10 +1,24 @@
 import type { Vector2, Vector3 } from "../../../math/Math";
-import type { Arc2Data } from "../../data/base/curve2/Arc2Data";
-import type { Line2Data } from "../../data/base/curve2/Line2Data";
-import type { Nurbs2Data } from "../../data/base/curve2/Nurbs2Data";
-import type { Arc3Data } from "../../data/base/curve3/Arc3Data";
-import type { Line3Data } from "../../data/base/curve3/Line3Data";
-import type { Nurbs3Data } from "../../data/base/curve3/Nurbs3Data";
+import { Arc2Data } from "../../data/base/curve2/Arc2Data";
+import { Conic2Data } from "../../data/base/curve2/Conic2Data";
+import { Line2Data } from "../../data/base/curve2/Line2Data";
+import { Nurbs2Data } from "../../data/base/curve2/Nurbs2Data";
+import type { Curve2Data } from "../../data/base/Curve2Data";
+import { Arc3Data } from "../../data/base/curve3/Arc3Data";
+import { Conic3Data } from "../../data/base/curve3/Conic3Data";
+import { Line3Data } from "../../data/base/curve3/Line3Data";
+import { Nurbs3Data } from "../../data/base/curve3/Nurbs3Data";
+import type { Curve3Data } from "../../data/base/Curve3Data";
+import { Arc2Algo } from "../base/curve2/Arc2Algo";
+import { Conic2Algo } from "../base/curve2/Conic2Algo";
+import { Line2Algo } from "../base/curve2/Line2Algo";
+import { Nurbs2Algo } from "../base/curve2/Nurbs2Algo";
+import type { Curve2Algo } from "../base/Curve2Algo";
+import { Arc3Algo } from "../base/curve3/Arc3Algo";
+import { Conic3Algo } from "../base/curve3/Conic3Algo";
+import { Line3Algo } from "../base/curve3/Line3Algo";
+import { Nurbs3Algo } from "../base/curve3/Nurbs3Algo";
+import type { Curve3Algo } from "../base/Curve3Algo";
 
 /**
  * curvr builder.
@@ -123,6 +137,40 @@ class CurveBuilder {
         return null;
     }
 
+
+    static BuildCurve2AlgorithmByData(dat: Curve2Data): Curve2Algo {
+        if (dat instanceof Arc2Data) {
+            return new Arc2Algo(dat);
+        }
+        else if (dat instanceof Conic2Data) {
+            return new Conic2Algo(dat);
+        }
+        else if (dat instanceof Line2Data) {
+            return new Line2Algo(dat);
+        }
+        else if (dat instanceof Nurbs2Data) {
+            return new Nurbs2Algo(dat);
+        }
+        debugger;
+        return null;
+    }
+
+    static BuildCurve3AlgorithmByData(dat: Curve3Data): Curve3Algo {
+        if (dat instanceof Arc3Data) {
+            return new Arc3Algo(dat);
+        }
+        else if (dat instanceof Conic3Data) {
+            return new Conic3Algo(dat);
+        }
+        else if (dat instanceof Line3Data) {
+            return new Line3Algo(dat);
+        }
+        else if (dat instanceof Nurbs3Data) {
+            return new Nurbs3Algo(dat);
+        }
+        debugger;
+        return null;
+    }
 }
 
 export { CurveBuilder };

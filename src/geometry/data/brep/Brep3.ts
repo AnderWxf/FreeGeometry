@@ -4,7 +4,10 @@ import type { SurfaceData } from "../base/SurfaceData";
 
 /**
  * Brep data on xyz space;
- *
+ * lump's border is face.
+ * face's border is coedge.
+ * edge's border is vertice.
+ * 
  */
 
 

@@ -2,7 +2,8 @@ import { Transform3 } from "./Transform3";
 
 /**
  * 3D curvr data struct.
- *
+ * curvr has not endpoint.
+ * 
  */
 class Curve3Data {
     /**

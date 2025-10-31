@@ -9,6 +9,7 @@ import { SurfaceData } from "../SurfaceData";
 class UvCurveData extends Curve3Data {
     /**
      * The 2d curve of this UvCurveData.
+     * 2D curve in uv space of surface.
      *
      * @type {Curve2Data}
      */
@@ -16,6 +17,7 @@ class UvCurveData extends Curve3Data {
 
     /**
      * The surface of this UvCurveData.
+     * this is base surface in xyz space.
      *
      * @type {SurfaceData}
      */

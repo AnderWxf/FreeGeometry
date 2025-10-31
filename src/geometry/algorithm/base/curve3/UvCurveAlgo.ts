@@ -1,24 +1,24 @@
 import { Vector3 } from "../../../../math/Math";
-import { Nurbs3Data } from "../../../data/base/curve3/Nurbs3Data";
+import { UvCurveData } from "../../../data/base/curve3/UvCurveData";
 import { Curve3Algo } from "../Curve3Algo";
 /**
- * nurbs algorithm.
+ * uv curve algorithm.
  *
  */
-class Nurbs3Algo extends Curve3Algo {
+class UvCurveAlgo extends Curve3Algo {
     /**
-     * The data struct of this nurbs algorithm.
+     * The data struct of this 3D ellipse arc algorithm.
      *
-     * @type {Nurbs3Data}
+     * @type {UvCurveData}
      */
-    public override dat: Nurbs3Data;
+    public override dat: UvCurveData;
 
     /**
-     * Constructs a nurbs algorithm.
+     * Constructs a 3D ellipse arc algorithm.
      *
-     * @param {Curve3Data} [dat=Nurbs3Data] - The data struct of this nurbs algorithm.
+     * @param {Curve3Data} [dat=UvCurveData] - The data struct of this 3D ellipse arc algorithm.
      */
-    constructor(dat: Nurbs3Data) {
+    constructor(dat: UvCurveData) {
         super(dat);
         this.dat = dat;
     }
@@ -35,4 +35,4 @@ class Nurbs3Algo extends Curve3Algo {
     }
 }
 
-export { Nurbs3Algo };
+export { UvCurveAlgo };
