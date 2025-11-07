@@ -32,8 +32,11 @@ class CurveBuilder {
      * @param {Vector2} [e] - The end point.
      */
     static BuildLine2FromBeginEndPoint(b: Vector2, e: Vector2): Line2Data {
-        debugger;
-        return null;
+        let ret = new Line2Data();
+        ret.trans.position = b;
+        let r = e.clone().sub(b).normalize();
+        ret.trans.rotation = r.angle();
+        return ret;
     }
 
     /**

@@ -7,6 +7,8 @@ import CamToolBar from "./ui/CamToolBar";
 import { CurveBuilder } from './geometry/algorithm/builder/CurveBuilder';
 import { SurfaceBulder } from './geometry/algorithm/builder/SurfaceBulder';
 import { PlaneSurfaceData } from './geometry/data/base/surface/PlaneSurfaceData';
+import { Brep2Builder } from './geometry/algorithm/builder/Brep2Builder';
+import { BrepMeshBuilder } from './helper/Mesh';
 
 export class Cube {
   public constructor() {
@@ -19,6 +21,16 @@ export class Cube {
     scene.add(cam.grid_xz);
     scene.add(cam.grid_xy);
     scene.add(cam.grid_yz);
+
+
+
+    let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(new Vector2(0, 0), new Vector2(2, 2));
+    let geoEdge = BrepMeshBuilder.BuildEdge2Mesh(edge);
+    // 创建一个基础材质
+    const materialline = new THREE.MeshBasicMaterial({ color: THREE.Color.NAMES.red });
+    let meshline = new THREE.Mesh(geoEdge, materialline);
+    meshline.name = "Line2";
+    scene.add(meshline);
 
 
     // 创建一个立方体几何体
@@ -41,17 +53,17 @@ export class Cube {
     const mesh0 = new THREE.Mesh(geometry0, material0);
     mesh0.position.x = -2;
     mesh0.name = "Box";
-    scene.add(mesh0);
+    // scene.add(mesh0);
 
     const mesh1 = new THREE.Mesh(geometry1, material1);
     mesh1.position.x = 0;
     mesh1.name = "sphere";
-    scene.add(mesh1);
+    // scene.add(mesh1);
 
     const mesh2 = new THREE.Mesh(geometry2, material2);
     mesh2.position.x = 3;
     mesh2.name = "cylinder";
-    scene.add(mesh2);
+    // scene.add(mesh2);
 
     // 创建一个 WebGPU 渲染器
     const renderer = new WEBGPU.WebGPURenderer({ antialias: false });
@@ -102,6 +114,10 @@ export class Cube {
       renderer.setSize(window.innerWidth, window.innerHeight);
       if (cam.perspective.isActive) {
         cam.perspective.camera.aspect = window.innerWidth / window.innerHeight; // 宽高比
+      }
+      if (cam.orthographic.isActive) {
+        cam.orthographic.camera.top = cam.orthographic.camera.right * window.innerHeight / window.innerWidth; // 宽高比
+        cam.orthographic.camera.bottom = cam.orthographic.camera.left * window.innerHeight / window.innerWidth; // 宽高比
       }
     });
 

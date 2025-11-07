@@ -57,12 +57,11 @@ class Edge2 {
      */
     curve: Curve2Data;
 
-
-
     /**
      * u parameter interval of curve of Edge.
-     * t parameter is normalize parameters.
-     * t ∈ [0,1], t = u / a
+     * u.x is begin parameter on the curve.
+     * u.y is end parameter on the curve.
+     * 
      */
     u: Vector2;
 
@@ -71,6 +70,7 @@ class Edge2 {
      *
      */
     c0: Coedge2;
+
     /**
      * Back coedge of Edge.
      *

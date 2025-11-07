@@ -1,4 +1,4 @@
-import type { Vector3 } from "../../../math/Math";
+import type { Vector2, Vector3, Vector4 } from "../../../math/Math";
 import type { Curve3Data } from "../base/Curve3Data";
 import type { SurfaceData } from "../base/SurfaceData";
 
@@ -59,7 +59,13 @@ class Edge3 {
      *
      */
     curve: Curve3Data;
-
+    /**
+     * u parameter interval of curve of Edge.
+     * u.x is begin parameter on the curve.
+     * u.y is end parameter on the curve.
+     * 
+     */
+    u: Vector2;
     /**
      * Forward coedge of Edge.
      *
@@ -135,6 +141,14 @@ class Face3 {
      * surface of Face.
      */
     surface: SurfaceData;
+
+    /**
+     * u parameter interval of surface of face.
+     * u.xy is begin parameter surface the face.
+     * u.zw is end parameter surface the face.
+     * 
+     */
+    uv: Vector4;
 
     /**
      * Constructs a Face.
