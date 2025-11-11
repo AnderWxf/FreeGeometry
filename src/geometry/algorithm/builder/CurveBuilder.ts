@@ -46,18 +46,40 @@ class CurveBuilder {
      * @param {number} [r] - radius.
      */
     static BuildCircle2FromCenterRadius(c: Vector2, r: number): Arc2Data {
-        debugger;
-        return null;
+        let ret = new Arc2Data();
+        ret.trans.position = c;
+        ret.radius.set(r, r);
+        return ret;
     }
 
     /**
      * build circle from bengin center end point.
-     *
-     * @param {Vector2} [b] - The bengin point.
+     * 
      * @param {Vector2} [c] - The center point.
+     * @param {Vector2} [b] - The bengin point.
+     */
+    static BuildCircle2FromCenterBeginEndPoint(c: Vector2, b: Vector2): Arc2Data {
+        let ret = new Arc2Data();
+        let r = c.distanceTo(b);
+        ret.trans.position = c;
+        ret.radius.set(r, r);
+        return ret;
+    }
+
+    /**
+     * build circle from bengin center end point.
+     * 
+     * d1 = x2*x2 - x1*x1 + y2*y2 - y1*y1
+     * d2 = x3*x3 - x1*x1 + y3*y3 - y1*y1
+     * 
+     * (x2 - x1) * x + (y2 - y1) = d1/2
+     * (x3 - x1) * x + (y3 - y1) = d2/2
+     * 
+     * @param {Vector2} [b] - The bengin point.
+     * @param {Vector2} [m] - The middle point.
      * @param {Vector2} [e] - The end point.
      */
-    static BuildCircle2FromBeginCenterEndPoint(b: Vector2, c: Vector2, e: Vector2): Arc2Data {
+    static BuildCircle2FromBeginMiddleEndPoint(b: Vector2, m: Vector2, e: Vector2): Arc2Data {
         debugger;
         return null;
     }
@@ -141,7 +163,7 @@ class CurveBuilder {
     }
 
 
-    static BuildCurve2AlgorithmByData(dat: Curve2Data): Curve2Algo {
+    static Algorithm2ByData(dat: Curve2Data): Curve2Algo {
         if (dat instanceof Arc2Data) {
             return new Arc2Algo(dat);
         }
@@ -158,7 +180,7 @@ class CurveBuilder {
         return null;
     }
 
-    static BuildCurve3AlgorithmByData(dat: Curve3Data): Curve3Algo {
+    static Algorithm3ByData(dat: Curve3Data): Curve3Algo {
         if (dat instanceof Arc3Data) {
             return new Arc3Algo(dat);
         }

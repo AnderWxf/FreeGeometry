@@ -8,7 +8,7 @@ import { CurveBuilder } from './geometry/algorithm/builder/CurveBuilder';
 import { SurfaceBulder } from './geometry/algorithm/builder/SurfaceBulder';
 import { PlaneSurfaceData } from './geometry/data/base/surface/PlaneSurfaceData';
 import { Brep2Builder } from './geometry/algorithm/builder/Brep2Builder';
-import { BrepMeshBuilder } from './helper/Mesh';
+import { BrepMeshBuilder } from './helper/MeshBuilder';
 
 export class Cube {
   public constructor() {
@@ -23,15 +23,23 @@ export class Cube {
     scene.add(cam.grid_yz);
 
 
+    // 创建一个直线段
+    let lineEdge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(new Vector2(0, 0), new Vector2(20, 20));
+    let geoLineEdgeEdge = BrepMeshBuilder.BuildEdge2Mesh(lineEdge, THREE.Color.NAMES.red, 1);
+    geoLineEdgeEdge.name = "Line2";
+    scene.add(geoLineEdgeEdge);
 
-    let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(new Vector2(0, 0), new Vector2(2, 2));
-    let geoEdge = BrepMeshBuilder.BuildEdge2Mesh(edge);
-    // 创建一个基础材质
-    const materialline = new THREE.MeshBasicMaterial({ color: THREE.Color.NAMES.red });
-    let meshline = new THREE.Mesh(geoEdge, materialline);
-    meshline.name = "Line2";
-    scene.add(meshline);
+    // 创建一个圆
+    let circleEdge = Brep2Builder.BuildCircleEdge2FromCenterRadius(new Vector2(0, 0), 10);
+    let geoCircleEdgeEdge = BrepMeshBuilder.BuildEdge2Mesh(circleEdge, THREE.Color.NAMES.green, 64);
+    geoCircleEdgeEdge.name = "Circle2";
+    scene.add(geoCircleEdgeEdge);
 
+    // 创建一个圆弧
+    let arcEdge = Brep2Builder.BuildCircleEdge2FromCenterBeginEndPoin(new Vector2(0, 0), new Vector2(15, 15), new Vector2(0, 15));
+    let geoArcEdgeEdge = BrepMeshBuilder.BuildEdge2Mesh(arcEdge, THREE.Color.NAMES.blue, 16);
+    geoArcEdgeEdge.name = "Arc2";
+    scene.add(geoArcEdgeEdge);
 
     // 创建一个立方体几何体
     const geometry0 = new THREE.BoxGeometry(1, 1, 1);
@@ -124,7 +132,7 @@ export class Cube {
     let v2 = new Vector2();
     let line = new Line2Data();
     let plane = new PlaneSurfaceData();
-    let lineAlg = CurveBuilder.BuildCurve2AlgorithmByData(line);
+    let lineAlg = CurveBuilder.Algorithm2ByData(line);
     let planeAlg = SurfaceBulder.BuildSurfaceAlgorithmByData(plane);
   }
 }

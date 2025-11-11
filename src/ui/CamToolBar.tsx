@@ -97,7 +97,7 @@ let CamToolBarOnChange = (value: string) => {
 const CamToolBar: React.FC = () => (
     <Space wrap>
         <Select
-            defaultValue="透"
+            defaultValue="前"
             style={{ width: 50 }}
             onChange={(value: string) => {
                 if (CamToolBarOnChange) {
@@ -116,7 +116,8 @@ const CamToolBar: React.FC = () => (
         />
     </Space>
 );
-export default { perspective, orthographic, grid_xz, grid_xy, grid_yz };
+CamToolBarOnChange('前');
+export default { perspective, orthographic, grid_xz, grid_xy, grid_yz, CamToolBarOnChange };
 
 const root = ReactDOM.createRoot(document.getElementById('ui'));
 root.render(

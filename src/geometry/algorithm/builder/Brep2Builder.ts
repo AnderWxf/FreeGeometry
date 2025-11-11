@@ -1,6 +1,7 @@
 import { Vector2, type Vector3 } from "../../../math/Math";
 import type { Curve2Data } from "../../data/base/Curve2Data";
 import { Edge2, type Face2 } from "../../data/brep/Brep2";
+import { Curve2Algo } from "../base/Curve2Algo";
 import { CurveBuilder } from "./CurveBuilder";
 
 /**
@@ -30,20 +31,27 @@ class Brep2Builder {
      * @param {number} [r] - radius.
      */
     static BuildCircleEdge2FromCenterRadius(c: Vector2, r: number): Edge2 {
-        debugger;
-        return null;
+        let ret = new Edge2();
+        ret.u = new Vector2(0, Math.PI * 2);
+        let curve = CurveBuilder.BuildCircle2FromCenterRadius(c, r);
+        ret.curve = curve;
+        return ret;
     }
 
     /**
      * build circle edge2 from bengin center end point.
      *
-     * @param {Vector2} [b] - The bengin point.
      * @param {Vector2} [c] - The center point.
+     * @param {Vector2} [b] - The bengin point.
      * @param {Vector2} [e] - The end point.
      */
-    static BuildCircleEdge2FromBeginCenterEndPoint(b: Vector2, c: Vector2, e: Vector2): Edge2 {
-        debugger;
-        return null;
+    static BuildCircleEdge2FromCenterBeginEndPoin(c: Vector2, b: Vector2, e: Vector2): Edge2 {
+        let ret = new Edge2();
+        let curve = CurveBuilder.BuildCircle2FromCenterBeginEndPoint(c, b);
+        let algor = CurveBuilder.Algorithm2ByData(curve);
+        ret.u = new Vector2(algor.u(b), algor.u(e));
+        ret.curve = curve;
+        return ret;
     }
 
     /**

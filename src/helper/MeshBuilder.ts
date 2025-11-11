@@ -13,20 +13,24 @@ class BrepMeshBuilder {
      *
      * @param {Edge2} [edge] - The edge2 object.
      */
-    static BuildEdge2Mesh(edge: Edge2): THREE.WireframeGeometry {
-        let algor = CurveBuilder.BuildCurve2AlgorithmByData(edge.curve);
-        let step = (edge.u.y - edge.u.x) / 32.0;
+    static BuildEdge2Mesh(edge: Edge2, color: number, segment: number = 32): THREE.Line {
+        let algor = CurveBuilder.Algorithm2ByData(edge.curve);
+        let step = (edge.u.y - edge.u.x) / segment;
         let vertices = new Array<number>;
         let indices = Array<number>();
-        for (let i = edge.u.x, index = 0; i <= edge.u.y; i += step, index++) {
+        for (let i = edge.u.x, index = 0; index <= segment; i += step, index++) {
             let p = algor.p(i);
             vertices.push(p.x);
             vertices.push(p.y);
             indices.push(index);
         }
-        let ret = new THREE.WireframeGeometry()
-        ret.setIndex(indices);
-        ret.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 2));
+        let buff = new THREE.BufferGeometry()
+        buff.setIndex(indices);
+        buff.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 2));
+
+        const materialline = new THREE.MeshBasicMaterial({ color: color });
+        let ret = new THREE.Line(buff, materialline);
+
         return ret;
     }
 
@@ -36,7 +40,7 @@ class BrepMeshBuilder {
      * @param {Edge3} [edge] - The edge2 object.
      */
     static BuildEdge3Mesh(edge: Edge3): THREE.WireframeGeometry {
-        let algor = CurveBuilder.BuildCurve3AlgorithmByData(edge.curve);
+        let algor = CurveBuilder.Algorithm3ByData(edge.curve);
         let step = (edge.u.y - edge.u.x) / 32.0;
         let vertices = new Array<number>;
         let indices = Array<number>();

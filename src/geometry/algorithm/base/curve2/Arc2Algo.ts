@@ -1,4 +1,5 @@
 import { Vector2 } from "../../../../math/Math";
+import { MathUtils } from "../../../../math/MathUtils";
 import { Arc2Data } from "../../../data/base/curve2/Arc2Data";
 import { Curve2Algo } from "../Curve2Algo";
 /**
@@ -21,6 +22,23 @@ class Arc2Algo extends Curve2Algo {
     constructor(dat = new Arc2Data()) {
         super(dat);
         this.dat = dat;
+    }
+
+    /**
+     * the U function return u parameter at a position .
+     * @param {Vector2} [point] - the point on curve.
+     * @retun {number}
+     */
+    u(point: Vector2): number {
+        let v = point.clone();
+        v.applyMatrix3(this.dat.trans.makeWorldMatrix().invert());
+        let a = Math.acos(MathUtils.clamp(v.x / this.dat.radius.x, -1, 1));
+        let b = Math.asin(MathUtils.clamp(v.y / this.dat.radius.y, -1, 1));
+        if (b >= 0) {
+            return a;
+        } else {
+            return Math.PI * 2 - a;
+        }
     }
 
     /**
