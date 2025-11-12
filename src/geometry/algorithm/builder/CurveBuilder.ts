@@ -1,4 +1,4 @@
-import type { Vector2, Vector3 } from "../../../math/Math";
+import { Vector2, type Vector3 } from "../../../math/Math";
 import { Arc2Data } from "../../data/base/curve2/Arc2Data";
 import { Conic2Data } from "../../data/base/curve2/Conic2Data";
 import { Line2Data } from "../../data/base/curve2/Line2Data";
@@ -9,6 +9,7 @@ import { Conic3Data } from "../../data/base/curve3/Conic3Data";
 import { Line3Data } from "../../data/base/curve3/Line3Data";
 import { Nurbs3Data } from "../../data/base/curve3/Nurbs3Data";
 import type { Curve3Data } from "../../data/base/Curve3Data";
+import { Transform2 } from "../../data/base/Transform2";
 import { Arc2Algo } from "../base/curve2/Arc2Algo";
 import { Conic2Algo } from "../base/curve2/Conic2Algo";
 import { Line2Algo } from "../base/curve2/Line2Algo";
@@ -67,33 +68,53 @@ class CurveBuilder {
     }
 
     /**
-     * build circle from bengin center end point.
+     * build circle from bengin middle end point.
+     * bengin middle end point on citcle.
      * 
-     * d1 = x2*x2 - x1*x1 + y2*y2 - y1*y1
-     * d2 = x3*x3 - x1*x1 + y3*y3 - y1*y1
-     * 
-     * (x2 - x1) * x + (y2 - y1) = d1/2
-     * (x3 - x1) * x + (y3 - y1) = d2/2
+     * D = 2 * (x1 * (y2 - y3) + x2 * (y3 - y1) + x3 * (y1 - y2));
+     * Ux = [(x1^2 + y1^2)(y2-y3) + (x2^2 + y2^2)(y3-y1) + (x3^2 + y3^2)(y1-y2)]/D
+     * Uy = [(x1^2 + y1^2)(x3-x2) + (x2^2 + y2^2)(x1-x3) + (x3^2 + y3^2)(x2-x1)]/D
      * 
      * @param {Vector2} [b] - The bengin point.
      * @param {Vector2} [m] - The middle point.
      * @param {Vector2} [e] - The end point.
      */
     static BuildCircle2FromBeginMiddleEndPoint(b: Vector2, m: Vector2, e: Vector2): Arc2Data {
-        debugger;
-        return null;
+        let x1 = b.x, y1 = b.y, x2 = m.x, y2 = m.y, x3 = e.x, y3 = e.y;
+        let D = 2 * (x1 * (y2 - y3) + x2 * (y3 - y1) + x3 * (y1 - y2));
+        if (D == 0) {
+            return null;
+        }
+        let sqrt1 = b.lengthSq();
+        let sqrt2 = m.lengthSq();
+        let sqrt3 = e.lengthSq();
+        let Ux = (sqrt1 * (y2 - y3) + sqrt2 * (y3 - y2) + sqrt3 * (y1 - y2)) / D;
+        let Uy = (sqrt1 * (x3 - x2) + sqrt2 * (x1 - x3) + sqrt3 * (x2 - x1)) / D;
+        let center = new Vector2(Ux, Uy);
+        let r = center.distanceTo(b);
+        return new Arc2Data(new Transform2(center), new Vector2(r, r));
     }
 
     /**
-     * build arc from bengin center end point.
-     *
-     * @param {Vector2} [b] - The bengin point.
+     * build ellipse from bengin center end point.
+     * center point is center of ellipse.
+     * vector center to begin is major of radius.
+     * the distance of end point project to major radius of ellipse is minor radius size of ellipse.
+     * 
      * @param {Vector2} [c] - The center point.
+     * @param {Vector2} [b] - The bengin point.
      * @param {Vector2} [e] - The end point.
      */
-    static BuildArc2FromBeginCenterEndPoint(b: Vector2, c: Vector2, e: Vector2): Arc2Data {
-        debugger;
-        return null;
+    static BuildEllipse2FromCenterBeginEndPoint(c: Vector2, b: Vector2, e: Vector2): Arc2Data {
+        let major = b.clone().sub(c);
+        let radius = new Vector2();
+        radius.x = major.length();
+        major.normalize();
+        let rotation = Math.atan2(major.y, major.x);
+        major.multiplyScalar(e.clone().dot(major));
+        radius.y = e.distanceTo(major);
+        let tr = new Transform2(c, rotation);
+        return new Arc2Data(tr, radius);
     }
 
     /**

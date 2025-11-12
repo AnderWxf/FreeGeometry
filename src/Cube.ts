@@ -9,6 +9,7 @@ import { SurfaceBulder } from './geometry/algorithm/builder/SurfaceBulder';
 import { PlaneSurfaceData } from './geometry/data/base/surface/PlaneSurfaceData';
 import { Brep2Builder } from './geometry/algorithm/builder/Brep2Builder';
 import { BrepMeshBuilder } from './helper/MeshBuilder';
+import { MathUtils } from './math/MathUtils';
 
 export class Cube {
   public constructor() {
@@ -25,21 +26,33 @@ export class Cube {
 
     // 创建一个直线段
     let lineEdge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(new Vector2(0, 0), new Vector2(20, 20));
-    let geoLineEdgeEdge = BrepMeshBuilder.BuildEdge2Mesh(lineEdge, THREE.Color.NAMES.red, 1);
+    let geoLineEdgeEdge = BrepMeshBuilder.BuildEdge2Mesh(lineEdge, THREE.Color.NAMES.red);
     geoLineEdgeEdge.name = "Line2";
     scene.add(geoLineEdgeEdge);
 
     // 创建一个圆
     let circleEdge = Brep2Builder.BuildCircleEdge2FromCenterRadius(new Vector2(0, 0), 10);
-    let geoCircleEdgeEdge = BrepMeshBuilder.BuildEdge2Mesh(circleEdge, THREE.Color.NAMES.green, 64);
+    let geoCircleEdgeEdge = BrepMeshBuilder.BuildEdge2Mesh(circleEdge, THREE.Color.NAMES.green);
     geoCircleEdgeEdge.name = "Circle2";
     scene.add(geoCircleEdgeEdge);
 
+    // 三点创建一个圆
+    let circle1Edge = Brep2Builder.BuildCircleFromBeginMiddleEndPoint(new Vector2(0, 0), new Vector2(15, 15), new Vector2(0, 25));
+    let geoCircle1EdgeEdge = BrepMeshBuilder.BuildEdge2Mesh(circle1Edge, THREE.Color.NAMES.yellow);
+    geoCircle1EdgeEdge.name = "Circle2_Three_Point";
+    scene.add(geoCircle1EdgeEdge);
+
     // 创建一个圆弧
-    let arcEdge = Brep2Builder.BuildCircleEdge2FromCenterBeginEndPoin(new Vector2(0, 0), new Vector2(15, 15), new Vector2(0, 15));
-    let geoArcEdgeEdge = BrepMeshBuilder.BuildEdge2Mesh(arcEdge, THREE.Color.NAMES.blue, 16);
+    let arcEdge = Brep2Builder.BuildCircleArcEdge2FromCenterBeginEndPoin(new Vector2(0, 0), new Vector2(15, 15), new Vector2(0, 15));
+    let geoArcEdgeEdge = BrepMeshBuilder.BuildEdge2Mesh(arcEdge, THREE.Color.NAMES.blue);
     geoArcEdgeEdge.name = "Arc2";
     scene.add(geoArcEdgeEdge);
+
+    // 根据三点创建一个椭圆
+    let ellipseEdge = Brep2Builder.BuildEllipseEdge2FromCenterBeginEndPoint(new Vector2(0, 0), new Vector2(15, 15), new Vector2(0, 10));
+    let geoEllipseEdge = BrepMeshBuilder.BuildEdge2Mesh(ellipseEdge, THREE.Color.NAMES.blueviolet);
+    geoEllipseEdge.name = "Ellipse2_Three_Point";
+    scene.add(geoEllipseEdge);
 
     // 创建一个立方体几何体
     const geometry0 = new THREE.BoxGeometry(1, 1, 1);

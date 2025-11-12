@@ -2,6 +2,9 @@ import * as THREE from 'three';
 import type { Edge2, Face2 } from '../geometry/data/brep/Brep2';
 import type { Edge3, Face3 } from '../geometry/data/brep/Brep3';
 import { CurveBuilder } from '../geometry/algorithm/builder/CurveBuilder';
+import { MathUtils } from '../math/MathUtils';
+import { Brep2Builder } from '../geometry/algorithm/builder/Brep2Builder';
+import { Line2Data } from '../geometry/data/base/curve2/Line2Data';
 
 /**
  * brep mesh builder.
@@ -13,7 +16,15 @@ class BrepMeshBuilder {
      *
      * @param {Edge2} [edge] - The edge2 object.
      */
-    static BuildEdge2Mesh(edge: Edge2, color: number, segment: number = 32): THREE.Line {
+    static BuildEdge2Mesh(edge: Edge2, color: number, segment?: number): THREE.Line {
+        if (segment == undefined) {
+            if (edge.curve instanceof Line2Data) {
+                segment = 1;
+            } else {
+                segment = Math.ceil(MathUtils.clamp(Brep2Builder.Length(edge), 32, 256));
+            }
+        }
+
         let algor = CurveBuilder.Algorithm2ByData(edge.curve);
         let step = (edge.u.y - edge.u.x) / segment;
         let vertices = new Array<number>;
