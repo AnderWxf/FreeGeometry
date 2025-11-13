@@ -135,17 +135,6 @@ class Curve2Algo {
         m.extractBasis(t, n);
         return m;
     }
-
-    /**
-     * the L function return legnth if this curve.
-     *
-     * @param {number} [u ∈ [0,a]] - the u parameter of curve.
-     * @retun {Matrix2}
-     */
-    l(): number {
-        debugger
-        return 0;
-    }
 }
 
 export { Curve2Algo };

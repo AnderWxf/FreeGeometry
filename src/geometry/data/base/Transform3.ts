@@ -10,14 +10,14 @@ class Transform3 {
      *
      * @type {Vector3}
      */
-    public position: Vector3;
+    public pos: Vector3;
 
     /**
      * The rotation value of this Transform3.
      *
      * @type {Euler}
      */
-    public rotation: Euler;
+    public rot: Euler;
 
     /**
      * The parent transfrom of this Transform3.
@@ -39,14 +39,14 @@ class Transform3 {
          *
          * @type {Vector3}
          */
-        this.position = position;
+        this.pos = position;
 
         /**
          * The rotation value of this Transform3.
          *
          * @type {Euler}
          */
-        this.rotation = rotation;
+        this.rot = rotation;
 
         /**
          * The parent transfrom of this Transform3.
@@ -62,10 +62,10 @@ class Transform3 {
      */
     makeLocalMatrix() {
         let ret = new Matrix4();
-        ret.makeRotationFromEuler(this.rotation);
-        ret.elements[3] = this.position.x;
-        ret.elements[7] = this.position.y;
-        ret.elements[11] = this.position.z;
+        ret.makeRotationFromEuler(this.rot);
+        ret.elements[3] = this.pos.x;
+        ret.elements[7] = this.pos.y;
+        ret.elements[11] = this.pos.z;
         return ret;
     }
 

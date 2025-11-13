@@ -34,9 +34,9 @@ class CurveBuilder {
      */
     static BuildLine2FromBeginEndPoint(b: Vector2, e: Vector2): Line2Data {
         let ret = new Line2Data();
-        ret.trans.position = b;
+        ret.trans.pos = b;
         let r = e.clone().sub(b).normalize();
-        ret.trans.rotation = r.angle();
+        ret.trans.rot = r.angle();
         return ret;
     }
 
@@ -48,7 +48,7 @@ class CurveBuilder {
      */
     static BuildCircle2FromCenterRadius(c: Vector2, r: number): Arc2Data {
         let ret = new Arc2Data();
-        ret.trans.position = c;
+        ret.trans.pos = c;
         ret.radius.set(r, r);
         return ret;
     }
@@ -62,7 +62,7 @@ class CurveBuilder {
     static BuildCircle2FromCenterBeginEndPoint(c: Vector2, b: Vector2): Arc2Data {
         let ret = new Arc2Data();
         let r = c.distanceTo(b);
-        ret.trans.position = c;
+        ret.trans.pos = c;
         ret.radius.set(r, r);
         return ret;
     }

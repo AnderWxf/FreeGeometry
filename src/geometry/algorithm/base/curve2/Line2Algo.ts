@@ -30,13 +30,16 @@ class Line2Algo extends Curve2Algo {
      * @retun {Vector2}
      */
     override d(u: number, r: number = 0): Vector2 {
-        if (r == 0) {
-            let m = this.dat.trans.makeLocalMatrix();
-            let ret = new Vector2(u, 0);
-            ret.applyMatrix3(m);
-            return ret;
-        } else {
-            return new Vector2(0, 0);
+        switch (r) {
+            case 0:
+                let m = this.dat.trans.makeLocalMatrix();
+                let ret = new Vector2(u, 0);
+                ret.applyMatrix3(m);
+                return ret;
+            case 1:
+                return new Vector2(Math.cos(this.dat.trans.rot), Math.sin(this.dat.trans.rot));
+            default:
+                return new Vector2(0, 0);
         }
     }
 }

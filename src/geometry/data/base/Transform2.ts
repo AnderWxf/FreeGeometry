@@ -10,14 +10,14 @@ class Transform2 {
      *
      * @type {Vector2}
      */
-    public position: Vector2;
+    public pos: Vector2;
 
     /**
      * The rotation value of this Transfrom2.
      *
      * @type {number}
      */
-    public rotation: number;
+    public rot: number;
 
     /**
      * The parent transfrom of this Transfrom2.
@@ -39,14 +39,14 @@ class Transform2 {
          *
          * @type {Vector2}
          */
-        this.position = position;
+        this.pos = position;
 
         /**
          * The rotation value of this Transfrom2.
          *
          * @type {number}
          */
-        this.rotation = rotation;
+        this.rot = rotation;
 
         /**
          * The parent transfrom of this Transfrom2.
@@ -62,11 +62,11 @@ class Transform2 {
      */
     makeLocalMatrix() {
         let ret = new Matrix3();
-        const c = Math.cos(this.rotation);
-        const s = Math.sin(this.rotation);
+        const c = Math.cos(this.rot);
+        const s = Math.sin(this.rot);
         const n = -s;
-        const x = this.position.x;
-        const y = this.position.y;
+        const x = this.pos.x;
+        const y = this.pos.y;
         ret.set(
             c, n, x,
             s, c, y,

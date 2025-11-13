@@ -4756,6 +4756,20 @@ class Matrix2 {
 		);
 		return this;
 	}
+
+	/**
+	 * Computes and returns the determinant of this matrix.
+	 *
+	 * @return {number} The determinant.
+	 */
+	determinant() {
+		const te = this.elements;
+		const a = te[0], b = te[1], c = te[2],
+			d = te[3];
+
+		return a * d - c * b;
+
+	}
 }
 
 /**
