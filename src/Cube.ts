@@ -10,6 +10,7 @@ import { PlaneSurfaceData } from './geometry/data/base/surface/PlaneSurfaceData'
 import { Brep2Builder } from './geometry/algorithm/builder/Brep2Builder';
 import { BrepMeshBuilder } from './helper/MeshBuilder';
 import { MathUtils } from './math/MathUtils';
+import { Curve2Inter } from './geometry/algorithm/relation/intersection/Curve2Inter';
 
 export class Cube {
   public constructor() {
@@ -23,12 +24,42 @@ export class Cube {
     scene.add(cam.grid_xy);
     scene.add(cam.grid_yz);
 
+    // 创建一个基础材质
+    const material0 = new THREE.MeshBasicMaterial({ color: THREE.Color.NAMES.red });
+
+    // 基础材质（可配置颜色、贴图等）
+    const material1 = new THREE.MeshBasicMaterial({ color: THREE.Color.NAMES.green });
+
+    // 基础材质（可配置颜色、贴图等）
+    const material2 = new THREE.MeshBasicMaterial({ color: THREE.Color.NAMES.blue });
+
+
+
 
     // 创建一个直线段
     let lineEdge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(new Vector2(0, 0), new Vector2(20, 20));
     let geoLineEdgeEdge = BrepMeshBuilder.BuildEdge2Mesh(lineEdge, THREE.Color.NAMES.red);
     geoLineEdgeEdge.name = "Line2";
     scene.add(geoLineEdgeEdge);
+
+    // 创建一个直线段
+    let line1Edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(new Vector2(20, 0), new Vector2(0, 20));
+    let geoLine1EdgeEdge = BrepMeshBuilder.BuildEdge2Mesh(line1Edge, THREE.Color.NAMES.red);
+    geoLine1EdgeEdge.name = "Line2_1";
+    scene.add(geoLine1EdgeEdge);
+
+    // 基础材质（可配置颜色、贴图等）
+    const material = new THREE.MeshBasicMaterial({ color: 0x0088ff });
+    let inters = Curve2Inter.LineXLine(lineEdge.curve, line1Edge.curve, 0.0001);
+    for (let i = 0; i < inters.length; i++) {
+      // 创建一个球体
+      const geometry = new THREE.SphereGeometry(0.1);
+      const mesh = new THREE.Mesh(geometry, material);
+      mesh.position.x = inters[i].p.x;
+      mesh.position.y = inters[i].p.y;
+      mesh.name = "inter_" + i;
+      scene.add(mesh);
+    }
 
     // 创建一个圆
     let circleEdge = Brep2Builder.BuildCircleEdge2FromCenterRadius(new Vector2(0, 0), 10);
@@ -61,14 +92,7 @@ export class Cube {
     //创建一个圆柱体
     const geometry2 = new THREE.CylinderGeometry(1, 1, 2.5);
 
-    // 创建一个基础材质
-    const material0 = new THREE.MeshBasicMaterial({ color: THREE.Color.NAMES.red });
 
-    // 基础材质（可配置颜色、贴图等）
-    const material1 = new THREE.MeshBasicMaterial({ color: THREE.Color.NAMES.green });
-
-    // 基础材质（可配置颜色、贴图等）
-    const material2 = new THREE.MeshBasicMaterial({ color: THREE.Color.NAMES.blue });
 
 
     const mesh0 = new THREE.Mesh(geometry0, material0);

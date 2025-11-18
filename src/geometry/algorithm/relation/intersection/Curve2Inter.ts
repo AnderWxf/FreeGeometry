@@ -71,10 +71,6 @@ class Curve2Inter {
         let y = dety / det;
         let p = new Vector2(x, y);
 
-        let l0 = new Vector3(A0, B0, 1);
-        let l1 = new Vector3(A1, B1, 1);
-        let lp = l0.cross(l1);
-
         let v0 = p.clone().sub(c0.trans.pos);
         let v1 = p.clone().sub(c1.trans.pos);
 
