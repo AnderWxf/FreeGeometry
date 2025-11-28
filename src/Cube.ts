@@ -11,6 +11,7 @@ import { Brep2Builder } from './geometry/algorithm/builder/Brep2Builder';
 import { BrepMeshBuilder } from './helper/MeshBuilder';
 import { MathUtils } from './math/MathUtils';
 import { Curve2Inter } from './geometry/algorithm/relation/intersection/Curve2Inter';
+import { SolveEquation } from './geometry/data/base/SolveEquation';
 
 export class Cube {
   public constructor() {
@@ -171,5 +172,7 @@ export class Cube {
     let plane = new PlaneSurfaceData();
     let lineAlg = CurveBuilder.Algorithm2ByData(line);
     let planeAlg = SurfaceBulder.BuildSurfaceAlgorithmByData(plane);
+    SolveEquation.test();
+    SolveEquation.testCubicSolver();
   }
 }
