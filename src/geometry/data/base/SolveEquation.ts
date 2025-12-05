@@ -1,4 +1,4 @@
-import * as MATHJS from 'mathjs';
+import * as MATHJS from '../../../mathjs';
 
 class SolveEquation {
 
@@ -123,7 +123,7 @@ class SolveEquation {
 
         // 进一步化为 depressed cubic: t³ + pt + q = 0 (通过代换 x = t - p/3)
         const depressedP = MATHJS.subtract(q, MATHJS.divide(MATHJS.pow(p, 2), 3)) as MATHJS.BigNumber;//q - math.pow(p, 2) / 3;
-        const depressedQ = MATHJS.add(MATHJS.subtract(MATHJS.divide(MATHJS.pow(p, 3), 2 / 27), MATHJS.divide(MATHJS.multiply(p, q), 3)), r) as MATHJS.BigNumber;    //(2 * MATHJS.pow(p, 3)) / 27 - (p * q) / 3 + r
+        const depressedQ = MATHJS.add(MATHJS.subtract(MATHJS.multiply(MATHJS.pow(p, 3), MATHJS.bignumber(2 / 27)), MATHJS.divide(MATHJS.multiply(p, q), 3)), r) as MATHJS.BigNumber;    //(2 * MATHJS.pow(p, 3)) / 27 - (p * q) / 3 + r
 
 
         // 计算判别式
@@ -135,24 +135,32 @@ class SolveEquation {
         if (MATHJS.larger(discriminant, 0)) {
             // 一个实根，两个共轭复根
             type = '一个实根，两个共轭复根';
-            const u = MATHJS.pow(MATHJS.add(MATHJS.divide(-depressedQ, 2), MATHJS.sqrt(discriminant)), 1 / 3) as MATHJS.BigNumber;
-            const v = MATHJS.pow(MATHJS.subtract(-depressedQ / 2, MATHJS.sqrt(discriminant)), 1 / 3) as MATHJS.BigNumber;
+            // const u = math.cubeRoot(-depressedQ / 2 + math.sqrt(discriminant));
+            // const v = math.cubeRoot(-depressedQ / 2 - math.sqrt(discriminant));      
 
-            const realRoot = MATHJS.subtract(MATHJS.add(u, v), MATHJS.divide(p, 3));
-            const realPart = MATHJS.divide(MATHJS.divide(-MATHJS.add(u, v), 2), MATHJS.divide(p, 3)) as MATHJS.BigNumber;//-(u + v) / 2 - p / 3
-            const imaginaryPart = (MATHJS.multiply(MATHJS.subtract(u, v), MATHJS.divide(MATHJS.sqrt(3), 2))) as MATHJS.BigNumber;//(u - v) * MATHJS.sqrt(3) / 2
-            const complexRoot1 = MATHJS.complex([realPart, imaginaryPart]);
+            const dep_ = MATHJS.bignumber(MATHJS.divide(-depressedQ, 2));//-depressedQ / 2
+            const sqrt_ = MATHJS.sqrt(discriminant);
+            const u = MATHJS.cbrt(MATHJS.add(dep_, sqrt_));
+            const v = MATHJS.cbrt(MATHJS.subtract(dep_, sqrt_));
 
-            const complexRoot2 = MATHJS.complex([realPart, -imaginaryPart]);
-
+            const realRoot = MATHJS.subtract(MATHJS.add(u, v), MATHJS.divide(p, 3));//u + v - p / 3
+            const realPart = MATHJS.subtract(MATHJS.divide(MATHJS.add(u, v), -2), MATHJS.divide(p, 3)) as MATHJS.BigNumber;//-(u + v) / 2 - p / 3
+            const imaginaryPart = (MATHJS.multiply(MATHJS.subtract(u, v), MATHJS.divide(MATHJS.bignumber(MATHJS.sqrt(3) as number), 2))) as MATHJS.BigNumber;//(u - v) * MATHJS.sqrt(3) / 2
+            const complexRoot1 = MATHJS.complex(realPart.toNumber(), imaginaryPart.toNumber());
+            const complexRoot2 = MATHJS.complex(realPart.toNumber(), -imaginaryPart.toNumber());
             roots = [realRoot, complexRoot1, complexRoot2];
         } else if (MATHJS.equal(discriminant, 0)) {
             // 三个实根（至少两个相等）
             type = '三个实根（至少两个相等）';
-            const u = MATHJS.pow(-depressedQ / 2, 1 / 3);
-            const root1 = MATHJS.subtract(MATHJS.multiply(2, u), MATHJS.divide(p, 3));//2 * u - p / 3
-            const root2 = MATHJS.subtract(-u, MATHJS.divide(p, 3)); //-u - p / 3;
-            const root3 = MATHJS.subtract(-u, MATHJS.divide(p, 3)); //-u - p / 3;
+            // const u = math.cubeRoot(-depressedQ / 2);
+            // const root1 = 2 * u - p / 3;
+            // const root2 = -u - p / 3;
+            // const root3 = -u - p / 3;            
+            const u = MATHJS.cbrt(MATHJS.divide(depressedQ, -2) as MATHJS.BigNumber);//-depressedQ / 2
+            const p_3 = MATHJS.divide(p, 3) as MATHJS.BigNumber;
+            const root1 = MATHJS.subtract(MATHJS.multiply(2, u), p_3);//2 * u - p / 3
+            const root2 = MATHJS.subtract(MATHJS.bignumber(-u), p_3); //-u - p / 3;
+            const root3 = MATHJS.subtract(MATHJS.bignumber(-u), p_3); //-u - p / 3;
 
             roots = [root1, root2, root3];
         } else {
@@ -164,18 +172,18 @@ class SolveEquation {
             // const root2 = 2 * MATHJS.cubeRoot(r) * MATHJS.cos((theta + 2 * MATHJS.pi) / 3) - p / 3;
             // const root3 = 2 * MATHJS.cubeRoot(r) * MATHJS.cos((theta + 4 * MATHJS.pi) / 3) - p / 3;
 
-            const r = MATHJS.pow(MATHJS.pow(-MATHJS.divide(depressedP, 3), 3), 0.5) as MATHJS.BigNumber;
-            const angle = MATHJS.divide(depressedQ, -MATHJS.multiply(r, 2)) as MATHJS.BigNumber;
+            const r = MATHJS.bignumber(MATHJS.pow(MATHJS.pow(-MATHJS.divide(depressedP, 3), 3), 0.5) as MATHJS.BigNumber);
+            const angle = MATHJS.divide(depressedQ, MATHJS.bignumber(-MATHJS.multiply(r, 2))) as MATHJS.BigNumber;
             const theta = MATHJS.acos(angle);
 
             const theta_3 = MATHJS.divide(theta, 3) as MATHJS.BigNumber;
             const p_3 = MATHJS.divide(p, 3) as MATHJS.BigNumber;
-            const p_2_3 = MATHJS.multiply(MATHJS.pow(r, 1 / 3), 2) as MATHJS.BigNumber;
-            const r_2_3 = MATHJS.multiply(MATHJS.pow(r, 1 / 3), 2) as MATHJS.BigNumber;
+            const p_2_3 = MATHJS.multiply(MATHJS.pow(r, MATHJS.bignumber(1 / 3)), 2) as MATHJS.BigNumber;
+            const r_2_3 = MATHJS.multiply(MATHJS.pow(r, MATHJS.bignumber(1 / 3)), 2) as MATHJS.BigNumber;
 
             const root1 = MATHJS.subtract(MATHJS.multiply(p_2_3, MATHJS.cos(theta_3)), p_3);
-            const root2 = MATHJS.subtract(MATHJS.multiply(r_2_3, MATHJS.cos(MATHJS.divide(MATHJS.add(theta, 2 * MATHJS.pi), 3) as MATHJS.BigNumber)), p_3);
-            const root3 = MATHJS.subtract(MATHJS.multiply(r_2_3, MATHJS.cos(MATHJS.divide(MATHJS.add(theta, 4 * MATHJS.pi), 3) as MATHJS.BigNumber)), p_3);
+            const root2 = MATHJS.subtract(MATHJS.multiply(r_2_3, MATHJS.cos(MATHJS.divide(MATHJS.add(theta, MATHJS.bignumber(2 * MATHJS.pi)), 3) as MATHJS.BigNumber)), p_3);
+            const root3 = MATHJS.subtract(MATHJS.multiply(r_2_3, MATHJS.cos(MATHJS.divide(MATHJS.add(theta, MATHJS.bignumber(4 * MATHJS.pi)), 3) as MATHJS.BigNumber)), p_3);
 
             roots = [root1, root2, root3];
         }
@@ -204,16 +212,40 @@ class SolveEquation {
             throw new Error('a不能为0');
 
         // 构造伴随矩阵
-        const companionMatrix = [
-            [0, 1, 0],
-            [0, 0, 1],
-            [-d / a, -c / a, -b / a]
-        ];
-
+        // const companionMatrix = [
+        //     [0, 1, 0],
+        //     [0, 0, 1],
+        //     [-d / a, -c / a, -b / a]
+        // ];
+        let companionMatrix = new Array<Array<MATHJS.BigNumber>>(3);
+        let row0 = new Array<MATHJS.BigNumber>(3);
+        let row1 = new Array<MATHJS.BigNumber>(3);
+        let row2 = new Array<MATHJS.BigNumber>(3);
+        row0[0] = MATHJS.bignumber(0);
+        row0[1] = MATHJS.bignumber(1);
+        row0[2] = MATHJS.bignumber(0);
+        row1[0] = MATHJS.bignumber(0);
+        row1[1] = MATHJS.bignumber(0);
+        row1[2] = MATHJS.bignumber(1);
+        row2[0] = MATHJS.bignumber(-d / a);
+        row2[1] = MATHJS.bignumber(-c / a);
+        row2[2] = MATHJS.bignumber(-b / a);
+        companionMatrix[0] = row0;
+        companionMatrix[1] = row1;
+        companionMatrix[2] = row2;
         try {
             // 计算特征值（即方程的根）
             const eigenValues = MATHJS.eigs(companionMatrix).values;
-            return eigenValues;
+            let ret = new Array<MATHJS.Complex | number>();
+            eigenValues.forEach(element => {
+                if (MATHJS.typeOf(element) === 'Complex') {
+                    ret.push(element);
+                }
+                else {
+                    ret.push(element.toNumber());
+                }
+            });
+            return { eigenValues, ret };
         } catch (error) {
             // 如果特征值计算失败，回退到代数方法
             console.warn('特征值方法失败，使用代数方法:', error.message);
@@ -225,40 +257,44 @@ class SolveEquation {
     static testCubicSolver() {
         console.log('一元三次方程求解器测试\n');
 
-        try {
-            // 示例1: 三个实根
-            console.log('示例1: x³ - 6x² + 11x - 6 = 0 (根: 1, 2, 3)');
-            const result1 = SolveEquation.SolveCubicEquation(1, -6, 11, -6);
-            console.log(result1);
-            console.log('稳定方法解:', SolveEquation.SolveCubicEquation(1, -6, 11, -6));
-            console.log('\n' + '='.repeat(60) + '\n');
+        // try {
+        // 示例1: 三个实根
+        console.log('示例1: x³ - 6x² + 11x - 6 = 0 (根: 1, 2, 3)');
+        const result1 = SolveEquation.SolveCubicEquation(1, -6, 11, -6);
+        console.log(result1);
+        console.log('稳定方法解:', SolveEquation.SolveCubicStable(1, -6, 11, -6));
+        console.log('\n' + '='.repeat(60) + '\n');
 
-            // 示例2: 一个实根，两个复根
-            console.log('示例2: x³ + x + 1 = 0');
-            const result2 = SolveEquation.SolveCubicEquation(1, 0, 1, 1);
-            console.log(result2);
-            console.log('\n' + '='.repeat(60) + '\n');
+        // 示例2: 一个实根，两个复根
+        console.log('示例2: x³ + x + 1 = 0');
+        const result2 = SolveEquation.SolveCubicEquation(1, 0, 1, 1);
+        console.log(result2);
+        console.log('稳定方法解:', SolveEquation.SolveCubicStable(1, 0, 1, 1));
+        console.log('\n' + '='.repeat(60) + '\n');
 
-            // 示例3: 三个实根（有重根）
-            console.log('示例3: x³ - 3x² + 3x - 1 = 0 (三重根: 1)');
-            const result3 = SolveEquation.SolveCubicEquation(1, -3, 3, -1);
-            console.log(result3);
-            console.log('\n' + '='.repeat(60) + '\n');
+        // 示例3: 三个实根（有重根）
+        console.log('示例3: x³ - 3x² + 3x - 1 = 0 (三重根: 1)');
+        const result3 = SolveEquation.SolveCubicEquation(1, -3, 3, -1);
+        console.log(result3);
+        console.log('稳定方法解:', SolveEquation.SolveCubicStable(1, -3, 3, -1));
+        console.log('\n' + '='.repeat(60) + '\n');
 
-            // 示例4: 复杂系数
-            console.log('示例4: 2x³ - 4x² + 3x - 5 = 0');
-            const result4 = SolveEquation.SolveCubicEquation(2, -4, 3, -5);
-            console.log(result4);
-            console.log('\n' + '='.repeat(60) + '\n');
+        // 示例4: 复杂系数
+        console.log('示例4: 2x³ - 4x² + 3x - 5 = 0');
+        const result4 = SolveEquation.SolveCubicEquation(2, -4, 3, -5);
+        console.log(result4);
+        console.log('稳定方法解:', SolveEquation.SolveCubicStable(2, -4, 3, -5));
+        console.log('\n' + '='.repeat(60) + '\n');
 
-            // 示例5: 实际应用问题
-            console.log('示例5: 体积问题 x³ - 12x² + 44x - 48 = 0');
-            const result5 = SolveEquation.SolveCubicEquation(1, -12, 44, -48);
-            console.log(result5);
+        // 示例5: 实际应用问题
+        console.log('示例5: 体积问题 x³ - 12x² + 44x - 48 = 0');
+        const result5 = SolveEquation.SolveCubicEquation(1, -12, 44, -48);
+        console.log('稳定方法解:', SolveEquation.SolveCubicStable(1, -12, 44, -48));
+        console.log(result5);
 
-        } catch (error) {
-            console.error('错误:', error.message);
-        }
+        // } catch (error) {
+        //     console.error('错误:', error.message);
+        // }
     }
 }
 export { SolveEquation };

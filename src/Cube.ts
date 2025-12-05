@@ -41,6 +41,8 @@ export class Cube {
     let lineEdge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(new Vector2(0, 0), new Vector2(20, 20));
     let geoLineEdgeEdge = BrepMeshBuilder.BuildEdge2Mesh(lineEdge, THREE.Color.NAMES.red);
     geoLineEdgeEdge.name = "Line2";
+    geoLineEdgeEdge.frustumCulled = false;
+
     scene.add(geoLineEdgeEdge);
 
     // 创建一个直线段
@@ -172,7 +174,7 @@ export class Cube {
     let plane = new PlaneSurfaceData();
     let lineAlg = CurveBuilder.Algorithm2ByData(line);
     let planeAlg = SurfaceBulder.BuildSurfaceAlgorithmByData(plane);
-    SolveEquation.test();
+    // SolveEquation.test();
     SolveEquation.testCubicSolver();
   }
 }
