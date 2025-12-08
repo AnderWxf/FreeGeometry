@@ -33,11 +33,12 @@ class BrepMeshBuilder {
             let p = algor.p(i);
             vertices.push(p.x);
             vertices.push(p.y);
+            vertices.push(0);
             indices.push(index);
         }
         let buff = new THREE.BufferGeometry()
         buff.setIndex(indices);
-        buff.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 2));
+        buff.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
 
         const materialline = new THREE.MeshBasicMaterial({ color: color });
         let ret = new THREE.Line(buff, materialline);
@@ -59,11 +60,12 @@ class BrepMeshBuilder {
             let p = algor.p(i);
             vertices.push(p.x);
             vertices.push(p.y);
+            vertices.push(0);
             indices.push(index);
         }
         let ret = new THREE.WireframeGeometry()
         ret.setIndex(indices);
-        ret.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 2));
+        ret.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
         return ret;
     }
 
