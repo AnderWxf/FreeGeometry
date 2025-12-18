@@ -6,6 +6,7 @@
     "mathjs": "^15.1.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "requirejs": "^2.3.8",
     "three": "^0.180.0"
   },
   "devDependencies": {
@@ -13,6 +14,7 @@
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
     "@types/three": "^0.180.0",
+    "baseline-browser-mapping": "^2.9.6",
     "terser-webpack-plugin": "^5.3.14",
     "ts-loader": "^9.5.4",
     "typescript": "^5.9.3",

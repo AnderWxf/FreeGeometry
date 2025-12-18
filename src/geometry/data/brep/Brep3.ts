@@ -1,6 +1,7 @@
 import type { Vector2, Vector3, Vector4 } from "../../../math/Math";
 import type { Curve3Data } from "../base/Curve3Data";
 import type { SurfaceData } from "../base/SurfaceData";
+import type { Transform3 } from "../base/Transform3";
 
 /**
  * Brep data on xyz space;
@@ -56,9 +57,16 @@ class Edge3 {
 
     /**
      * Curve of Edge.
-     *
+     * 
      */
     curve: Curve3Data;
+
+    /**
+     * Curve index of Edge.
+     * Used to relate to curve array in Brep3 when curveIndex is -1.
+     */
+    curveIndex: number = -1;
+
     /**
      * u parameter interval of curve of Edge.
      * u.x is begin parameter on the curve.
@@ -127,6 +135,13 @@ class Loop3 {
  *
  */
 class Face3 {
+
+    /**
+     * Curve index of Edge.
+     *
+     */
+    curveIndex: number;
+
     /**
      * border of Face.
      */
@@ -141,6 +156,12 @@ class Face3 {
      * surface of Face.
      */
     surface: SurfaceData;
+
+    /**
+     * surface index of Face.
+     * Used to relate to surface array in Brep3 when index is not -1.
+     */
+    surfaceIndex: number = -1;
 
     /**
      * u parameter interval of surface of face.
@@ -196,9 +217,27 @@ class Lump3 {
 
 /**
  * Body.
- *
+ * Base geometry in Body3 is never transformed after construction.
+ * Wire and Face relate base geometry by reference.
+ * Just Body3 transform is changed to move geometry.
  */
 class Body3 {
+
+    /**
+     * curves of Body.
+     */
+    curves: Array<Curve3Data>;
+
+    /**
+     * surfaces of Body.
+     */
+    surfaces: Array<SurfaceData>;
+
+    /**
+     * transform of Body.
+     */
+    transform: Transform3;
+
     /**
      * lumps of Body.
      */

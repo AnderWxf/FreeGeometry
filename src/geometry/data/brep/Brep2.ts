@@ -1,5 +1,6 @@
 import type { Vector2 } from "../../../math/Math";
 import type { Curve2Data } from "../base/Curve2Data";
+import type { Transform2 } from "../base/Transform2";
 /**
  * Brep data on xy space;
  * face's border is loop.
@@ -56,6 +57,12 @@ class Edge2 {
      *
      */
     curve: Curve2Data;
+
+    /**
+     * Curve index of Edge.
+     * Used to relate to curve array in Brep2 when index is not -1. 
+     */
+    curveIndex: number = -1;
 
     /**
      * u parameter interval of curve of Edge.
@@ -124,9 +131,21 @@ class Loop2 {
 
 /**
  * Face2.
- *
+ * Base geometry in Brep Face2 is never transformed after construction.
+ * Wire relate base geometry by reference.
+ * Just Face2 transform is changed to move geometry.
  */
 class Face2 {
+    /**
+     * curves of Face.
+     */
+    curves: Array<Curve2Data>;
+
+    /**
+     * transform of Body.
+     */
+    transform: Transform2;
+
     /**
      * border of Face.
      */

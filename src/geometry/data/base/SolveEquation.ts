@@ -62,7 +62,7 @@ class SolveEquation {
         // };
     }
 
-    static test() {
+    static testQuadraticSolver() {
         // 示例测试
         try {
             // 示例1: 两个不等实根
@@ -98,7 +98,7 @@ class SolveEquation {
      * @param {number} d - 常数项
      * @returns {Object} 解的结果
      */
-    static SolveCubicEquation(a_: number | MATHJS.BigNumber, b_: number | MATHJS.BigNumber, c_: number | MATHJS.BigNumber, d_: number | MATHJS.BigNumber): Array<MATHJS.Complex | number> {
+    static SolveCubicNumberical(a_: number | MATHJS.BigNumber, b_: number | MATHJS.BigNumber, c_: number | MATHJS.BigNumber, d_: number | MATHJS.BigNumber): Array<MATHJS.Complex | number> {
         let a = MATHJS.bignumber(a_);
         let b = MATHJS.bignumber(b_);
         let c = MATHJS.bignumber(c_);
@@ -179,23 +179,9 @@ class SolveEquation {
 
             roots.push(root1.toNumber(), root2.toNumber(), root3.toNumber());
         }
+        roots.sort();
         return roots;
-        // return { 
-        //     方程: `${a}x³ + ${b}x² + ${c}x + ${d} = 0`,
-        //     简化形式: `x³ + ${p}x² + ${q}x + ${r} = 0`,
-        //     判别式: discriminant,
-        //     根的类型: type,
-        //     roots: roots,
-        //     解的数值形式: roots.map(root => {
-        //         if (typeof root === 'number') {
-        //             return MATHJS.format(root, { precision: 20 });
-        //         } else {
-        //             return MATHJS.format(root, { precision: 20 });
-        //         }
-        //     })
-        // };
     }
-
     /**
      * 更稳定的三次方程求解方法（使用特征值方法）
      */
@@ -244,10 +230,59 @@ class SolveEquation {
             return roots;
         } catch (error) {
             // 如果特征值计算失败，回退到代数方法
-            console.warn('特征值方法失败，使用代数方法:', error.message);
-            return SolveEquation.SolveCubicEquation(a, b, c, d);
+            console.log('特征值方法失败，使用代数方法:', error.message);
+            return null;
         }
     }
+    /**
+     * 使用MATHJS.js求解一元三次方程
+     * @param {number} a - 三次项系数
+     * @param {number} b - 二次项系数
+     * @param {number} c - 一次项系数
+     * @param {number} d - 常数项
+     * @returns {Object} 解的结果
+     */
+    static SolveCubicEquation(a: number, b: number, c: number, d: number): Array<MATHJS.Complex | number> {
+        const stables = SolveEquation.SolveCubicStable(a, b, c, d);
+        if (!stables) {
+            return SolveEquation.SolveCubicNumberical(a, b, c, d)
+        }
+        const numbericals = SolveEquation.SolveCubicNumberical(a, b, c, d);
+        const roots1 = stables;
+        const roots2 = numbericals;
+        let mean1 = MATHJS.bignumber(0);
+        let mean2 = MATHJS.bignumber(0);
+        // 比较两个结果，选择更准确的那个
+        roots1.forEach(root => {
+            const v = MATHJS.add(
+                MATHJS.add(
+                    MATHJS.add(
+                        MATHJS.multiply(MATHJS.pow(root, 4), a),
+                        MATHJS.multiply(MATHJS.pow(root, 3), b)),
+                    MATHJS.multiply(MATHJS.pow(root, 2), c)),
+                MATHJS.multiply(root, d));
+            mean1 = MATHJS.add(mean1, MATHJS.abs(v)) as MATHJS.BigNumber;
+        });
+        mean1 = MATHJS.divide(mean1, roots1.length) as MATHJS.BigNumber;
+        roots2.forEach(root => {
+            const v =
+                MATHJS.add(
+                    MATHJS.add(
+                        MATHJS.add(
+                            MATHJS.multiply(MATHJS.pow(root, 4), a),
+                            MATHJS.multiply(MATHJS.pow(root, 3), b)),
+                        MATHJS.multiply(MATHJS.pow(root, 2), c)),
+                    MATHJS.multiply(root, d));
+            mean2 = MATHJS.add(mean2, MATHJS.abs(v)) as MATHJS.BigNumber;
+        });
+        mean2 = MATHJS.divide(mean2, roots2.length) as MATHJS.BigNumber;
+        if (mean1.lte(mean2)) {
+            return roots1;
+        } else {
+            return roots2;
+        }
+    }
+
 
     // 示例测试
     static testCubicSolver() {
@@ -302,7 +337,7 @@ class SolveEquation {
      * @param {number} e - 常数项
      * @returns {Object} 解的结果
      */
-    static SolveQuarticEquation(a_: number | MATHJS.BigNumber, b_: number | MATHJS.BigNumber, c_: number | MATHJS.BigNumber, d_: number | MATHJS.BigNumber, e_: number | MATHJS.BigNumber) {
+    static SolveQuarticNumerical(a_: number | MATHJS.BigNumber, b_: number | MATHJS.BigNumber, c_: number | MATHJS.BigNumber, d_: number | MATHJS.BigNumber, e_: number | MATHJS.BigNumber): Array<MATHJS.Complex | number> {
         let a = MATHJS.bignumber(a_);
         let b = MATHJS.bignumber(b_);
         let c = MATHJS.bignumber(c_);
@@ -347,7 +382,9 @@ class SolveEquation {
         const cubicD = MATHJS.subtract(MATHJS.divide(MATHJS.multiply(A, C), 2), MATHJS.divide(MATHJS.multiply(B, B), 8)) as MATHJS.BigNumber;
 
         // 使用三次方程求解器
-        const mRoots = SolveEquation.SolveCubicStable(cubicA, cubicB.toNumber(), cubicC.toNumber(), cubicD.toNumber());
+        // const mRoots = SolveEquation.SolveCubicStable(cubicA, cubicB.toNumber(), cubicC.toNumber(), cubicD.toNumber());
+        const mRoots = SolveEquation.SolveCubicEquation(cubicA, cubicB.toNumber(), cubicC.toNumber(), cubicD.toNumber());
+        // const mRoots = SolveEquation.solveCubic(cubicA, cubicB.toNumber(), cubicC.toNumber(), cubicD.toNumber());
 
         // 选择实数根作为m
         let m: number = -Infinity;
@@ -369,8 +406,8 @@ class SolveEquation {
         // 构建二次方程参数
         // const sqrt2mMinusA = MATHJS.sqrt(2 * m - A);
         // const sqrtM2MinusC = MATHJS.sqrt(m * m - C);
-        const sqrt2mMinusA_ = MATHJS.sqrt(MATHJS.subtract(2 * m, A) as MATHJS.BigNumber);
-        const sqrtM2MinusC_ = MATHJS.sqrt(MATHJS.subtract(m * m, C) as MATHJS.BigNumber);
+        const sqrt2mMinusA_ = MATHJS.sqrt(MATHJS.subtract(MATHJS.multiply(MATHJS.bignumber(m), 2), A) as MATHJS.BigNumber);
+        const sqrtM2MinusC_ = MATHJS.sqrt(MATHJS.subtract(MATHJS.multiply(MATHJS.bignumber(m), MATHJS.bignumber(m)), C) as MATHJS.BigNumber);
         let sqrt2mMinusA: MATHJS.BigNumber;
         let sqrtM2MinusC: MATHJS.BigNumber;
         if (MATHJS.isNumeric(sqrt2mMinusA_)) {
@@ -393,126 +430,98 @@ class SolveEquation {
         const alpha = sqrt2mMinusA;
         const beta = MATHJS.multiply(sqrtM2MinusC, signB) as MATHJS.BigNumber;
 
-        // 解第一个二次方程: y² + αy + (m + β) = 0
+        // 解第一个二次方程: y² - αy + (m + β) = 0
         // const discriminant1 = alpha * alpha - 4 * (m + beta);
-        const discriminant1 = MATHJS.subtract(MATHJS.multiply(alpha, alpha), MATHJS.multiply(4, MATHJS.add(m, beta))) as MATHJS.BigNumber;
+        const discriminant1 = MATHJS.subtract(MATHJS.multiply(alpha, alpha), MATHJS.multiply(MATHJS.add(m, beta), 4)) as MATHJS.BigNumber;
         if (MATHJS.largerEq(discriminant1, 0)) {
-            // const root1 = (-alpha + MATHJS.sqrt(discriminant1)) / 2;
-            // const root2 = (-alpha - MATHJS.sqrt(discriminant1)) / 2;
-            const root1 = MATHJS.divide(MATHJS.add(-alpha, MATHJS.sqrt(discriminant1)), 2) as MATHJS.BigNumber;
-            const root2 = MATHJS.divide(MATHJS.subtract(-alpha, MATHJS.sqrt(discriminant1)), 2) as MATHJS.BigNumber;
-
+            // const root1 = (alpha + MATHJS.sqrt(discriminant1)) / 2;
+            // const root2 = (alpha - MATHJS.sqrt(discriminant1)) / 2;
+            const root1 = MATHJS.divide(MATHJS.add(alpha, MATHJS.sqrt(discriminant1)), 2) as MATHJS.BigNumber;
+            const root2 = MATHJS.divide(MATHJS.subtract(alpha, MATHJS.sqrt(discriminant1)), 2) as MATHJS.BigNumber;
             // roots.push(root1 - p / 4, root2 - p / 4);
             const r1 = MATHJS.subtract(root1, p_4).toNumber();
             const r2 = MATHJS.subtract(root2, p_4).toNumber();
             roots.push(r1, r2);
-
         } else {
-            // const realPart = -alpha / 2;
+            // const realPart = alpha / 2;
             // const imagPart = MATHJS.sqrt(-discriminant1) / 2;
             // roots.push(
             //     MATHJS.complex(realPart, imagPart) - p / 4,
             //     MATHJS.complex(realPart, -imagPart) - p / 4
             // );
-            const realPart = MATHJS.subtract(MATHJS.divide(alpha, -2), p_4) as MATHJS.BigNumber;
+            const realPart = MATHJS.divide(alpha, 2) as MATHJS.BigNumber;
             const imagPart = MATHJS.divide(MATHJS.sqrt(MATHJS.multiply(discriminant1, -1) as MATHJS.BigNumber), 2) as MATHJS.BigNumber;
-            roots.push(
-                MATHJS.complex(realPart.toNumber(), imagPart.toNumber()),
-                MATHJS.complex(realPart.toNumber(), -imagPart.toNumber())
-            );
+            const root1 = MATHJS.complex(realPart.toNumber(), imagPart.toNumber());
+            const root2 = MATHJS.complex(realPart.toNumber(), -imagPart.toNumber());
+            const r1 = MATHJS.subtract(root1, p_4) as MATHJS.Complex;
+            const r2 = MATHJS.subtract(root2, p_4) as MATHJS.Complex;
+            roots.push(r1, r2);
         }
+        // let root12 = SolveEquation.SolveQuadraticEquation(1, MATHJS.multiply(alpha, -1) as MATHJS.BigNumber, MATHJS.add(MATHJS.bignumber(m), beta));
+        // root12.forEach(root => {
+        //     const r = MATHJS.subtract(root, p_4);
+        //     if (MATHJS.typeOf(r) === 'Complex') {
+        //         roots.push(r as MATHJS.Complex);
+        //     }
+        //     else {
+        //         if (MATHJS.typeOf(r) === 'BigNumber') {
+        //             roots.push((r as MATHJS.BigNumber).toNumber());
+        //         } else {
+        //             roots.push(r as number);
+        //         }
+        //     }
+        // });
 
-        // 解第二个二次方程: y² - αy + (m - β) = 0
+
+        // 解第二个二次方程: y² + αy + (m - β) = 0
         // const discriminant2 = alpha * alpha - 4 * (m - beta);
-        const discriminant2 = MATHJS.subtract(MATHJS.multiply(alpha, alpha), MATHJS.multiply(4, MATHJS.subtract(m, beta))) as MATHJS.BigNumber;
+        const discriminant2 = MATHJS.subtract(MATHJS.multiply(alpha, alpha), MATHJS.multiply(MATHJS.subtract(m, beta), 4)) as MATHJS.BigNumber;
         if (MATHJS.largerEq(discriminant2, 0)) {
-            // const root3 = (alpha + MATHJS.sqrt(discriminant2)) / 2;
-            // const root4 = (alpha - MATHJS.sqrt(discriminant2)) / 2;
+            // const root3 = (-alpha + MATHJS.sqrt(discriminant2)) / 2;
+            // const root4 = (-alpha - MATHJS.sqrt(discriminant2)) / 2;
             // roots.push(root3 - p / 4, root4 - p / 4);
-            const root3 = MATHJS.divide(MATHJS.add(alpha, MATHJS.sqrt(discriminant2)), 2) as MATHJS.BigNumber;
-            const root4 = MATHJS.divide(MATHJS.subtract(alpha, MATHJS.sqrt(discriminant2)), 2) as MATHJS.BigNumber;
-            roots.push(MATHJS.subtract(root3, p_4).toNumber(), MATHJS.subtract(root4, p_4).toNumber());
+            const root3 = MATHJS.divide(MATHJS.add(MATHJS.multiply(alpha, -1), MATHJS.sqrt(discriminant2)), 2) as MATHJS.BigNumber;
+            const root4 = MATHJS.divide(MATHJS.subtract(MATHJS.multiply(alpha, -1), MATHJS.sqrt(discriminant2)), 2) as MATHJS.BigNumber;
+            const r3 = MATHJS.subtract(root3, p_4).toNumber();
+            const r4 = MATHJS.subtract(root4, p_4).toNumber();
+            roots.push(r3, r4);
         } else {
-            // const realPart = alpha / 2;
+            // const realPart = -alpha / 2;
             // const imagPart = MATHJS.sqrt(-discriminant2) / 2;
             // roots.push(
             //     MATHJS.complex(realPart, imagPart) - p / 4,
             //     MATHJS.complex(realPart, -imagPart) - p / 4
             // );
-            const realPart = MATHJS.subtract(MATHJS.divide(alpha, 2), p_4) as MATHJS.BigNumber;
+            const realPart = MATHJS.subtract(MATHJS.divide(alpha, -2), p_4) as MATHJS.BigNumber;
             const imagPart = MATHJS.divide(MATHJS.sqrt(MATHJS.multiply(discriminant2, -1) as MATHJS.BigNumber), 2) as MATHJS.BigNumber;
-            roots.push(
-                MATHJS.complex(realPart.toNumber(), imagPart.toNumber()),
-                MATHJS.complex(realPart.toNumber(), -imagPart.toNumber())
-            );
-
+            const root3 = MATHJS.complex(realPart.toNumber(), imagPart.toNumber());
+            const root4 = MATHJS.complex(realPart.toNumber(), -imagPart.toNumber());
+            const r3 = MATHJS.subtract(root3, p_4) as MATHJS.Complex;
+            const r4 = MATHJS.subtract(root4, p_4) as MATHJS.Complex;
+            roots.push(r3, r4);
         }
-
-        // 去重和排序
-        roots = SolveEquation.RemoveDuplicates(roots);
-
-        return {
-            方程: `${a}x⁴ + ${b}x³ + ${c}x² + ${d}x + ${e} = 0`,
-            简化形式: `x⁴ + ${p.toFixed(4)}x³ + ${q.toFixed(4)}x² + ${r.toFixed(4)}x + ${s.toFixed(4)} = 0`,
-            预解方程: `m³ + ${cubicB.toFixed(4)}m² + ${cubicC.toFixed(4)}m + ${cubicD.toFixed(4)} = 0`,
-            预解根: m,
-            根的个数: roots.length,
-            roots: roots,
-            解的数值形式: roots.map(root => MATHJS.format(root, { precision: 10 }))
-        };
-    }
-
-    /**
-     * 去除重复根
-     */
-    static RemoveDuplicates(roots: Array<MATHJS.Complex | number>, tolerance = 1e-15): Array<MATHJS.Complex | number> {
-        const uniqueRoots = [];
-
-        for (let root of roots) {
-            let isUnique = true;
-
-            for (let uniqueRoot of uniqueRoots) {
-
-                if (typeof uniqueRoot === 'number') {
-                    if (typeof root === 'number') {
-                        if (Math.abs(root - uniqueRoot) < tolerance) {
-                            isUnique = false;
-                            break;
-                        }
-                    } else {
-                        if (root.im === 0 && Math.abs(root.re - uniqueRoot) < tolerance) {
-                            isUnique = false;
-                            break;
-                        }
-                    }
-                } else {
-                    if (typeof root === 'number') {
-                        if (uniqueRoot.im === 0 && Math.abs(uniqueRoot.re - root) < tolerance) {
-                            isUnique = false;
-                            break;
-                        }
-                    } else {
-                        if (Math.abs(root.re - uniqueRoot.re) < tolerance &&
-                            Math.abs(root.im - uniqueRoot.im) < tolerance) {
-                            isUnique = false;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            if (isUnique) {
-                uniqueRoots.push(root);
-            }
-        }
-        uniqueRoots.sort();
-        return uniqueRoots;
+        // let root34 = SolveEquation.SolveQuadraticEquation(1, MATHJS.multiply(alpha, 1) as MATHJS.BigNumber, MATHJS.subtract(MATHJS.bignumber(m), beta));
+        // root34.forEach(root => {
+        //     const r = MATHJS.subtract(root, p_4);
+        //     if (MATHJS.typeOf(r) === 'Complex') {
+        //         roots.push(r as MATHJS.Complex);
+        //     }
+        //     else {
+        //         if (MATHJS.typeOf(r) === 'BigNumber') {
+        //             roots.push((r as MATHJS.BigNumber).toNumber());
+        //         } else {
+        //             roots.push(r as number);
+        //         }
+        //     }
+        // });
+        roots.sort();
+        return roots;
     }
 
     /**
      * 使用特征值方法求解四次方程（更稳定）
      */
-    static SolveQuarticStable(a: number, b: number, c: number, d: number, e: number) {
+    static SolveQuarticStable(a: number, b: number, c: number, d: number, e: number): Array<MATHJS.Complex | number> {
         if (a === 0) throw new Error('a不能为0');
 
         // 构造伴随矩阵
@@ -543,10 +552,10 @@ class SolveEquation {
         row2[2] = MATHJS.bignumber(0);
         row2[3] = MATHJS.bignumber(1);
 
-        row3[0] = MATHJS.bignumber(-e / a);
-        row3[1] = MATHJS.bignumber(-d / a);
-        row3[2] = MATHJS.bignumber(-c / a);
-        row3[3] = MATHJS.bignumber(-b / a);
+        row3[0] = MATHJS.divide(MATHJS.bignumber(-e), MATHJS.bignumber(a)) as MATHJS.BigNumber;
+        row3[1] = MATHJS.divide(MATHJS.bignumber(-d), MATHJS.bignumber(a)) as MATHJS.BigNumber;
+        row3[2] = MATHJS.divide(MATHJS.bignumber(-c), MATHJS.bignumber(a)) as MATHJS.BigNumber;
+        row3[3] = MATHJS.divide(MATHJS.bignumber(-b), MATHJS.bignumber(a)) as MATHJS.BigNumber;
 
         companionMatrix[0] = row0;
         companionMatrix[1] = row1;
@@ -568,58 +577,122 @@ class SolveEquation {
                     }
                 }
             });
-            return { eigenValues, roots };
+            roots.sort();
+            return roots;
         } catch (error) {
             // 如果特征值计算失败，回退到代数方法
-            console.warn('特征值方法失败，使用代数方法:', error.message);
-            return SolveEquation.SolveQuarticEquation(a, b, c, d, e);
+            console.log('特征值方法失败，使用代数方法:', error.message);
+            return null;
         }
+    }
+
+    /**
+     * 使用math.js求解一元四次方程
+     * @param {number} a - 四次项系数
+     * @param {number} b - 三次项系数
+     * @param {number} c - 二次项系数
+     * @param {number} d - 一次项系数
+     * @param {number} e - 常数项
+     * @returns {Object} 解的结果
+     */
+    static SolveQuarticEquation(a: number, b: number, c: number, d: number, e: number): Array<MATHJS.Complex | number> {
+        const stables = SolveEquation.SolveQuarticStable(a, b, c, d, e);
+        if (!stables) {
+            return SolveEquation.SolveQuarticNumerical(a, b, c, d, e);
+        }
+        const numbericals = SolveEquation.SolveQuarticNumerical(a, b, c, d, e);
+        const roots1 = stables;
+        const roots2 = numbericals;
+        let mean1 = MATHJS.bignumber(0);
+        let mean2 = MATHJS.bignumber(0);
+        // 比较两个结果，选择更准确的那个
+        roots1.forEach(root => {
+            const v = MATHJS.add(
+                MATHJS.add(
+                    MATHJS.add(
+                        MATHJS.add(
+                            MATHJS.multiply(MATHJS.pow(root, 4), a),
+                            MATHJS.multiply(MATHJS.pow(root, 3), b)),
+                        MATHJS.multiply(MATHJS.pow(root, 2), c)),
+                    MATHJS.multiply(root, d)),
+                e);
+            mean1 = MATHJS.add(mean1, MATHJS.abs(v)) as MATHJS.BigNumber;
+        });
+        mean1 = MATHJS.divide(mean1, roots1.length) as MATHJS.BigNumber;
+        roots2.forEach(root => {
+            const v = MATHJS.add(
+                MATHJS.add(
+                    MATHJS.add(
+                        MATHJS.add(
+                            MATHJS.multiply(MATHJS.pow(root, 4), a),
+                            MATHJS.multiply(MATHJS.pow(root, 3), b)),
+                        MATHJS.multiply(MATHJS.pow(root, 2), c)),
+                    MATHJS.multiply(root, d)),
+                e);
+            mean2 = MATHJS.add(mean2, MATHJS.abs(v)) as MATHJS.BigNumber;
+        });
+        mean2 = MATHJS.divide(mean2, roots2.length) as MATHJS.BigNumber;
+        console.log('特征值法平均距离 Mean1:', MATHJS.format(mean1, { precision: 20 }), '解析法平均距离 Mean2:', MATHJS.format(mean2, { precision: 20 }));
+        if (mean1.lessThanOrEqualTo(mean2)) {
+            return roots1;
+        } else {
+            return roots2
+        }
+    }
+
+    static testExecQuarticSolver(a: number, b: number, c: number, d: number, e: number, str: string) {
+        // try {
+        console.log('示例: ' + str + ' = 0');
+        const stables = SolveEquation.SolveQuarticStable(a, b, c, d, e);
+        console.log('特征值法解:', stables);
+        if (stables) {
+            stables.forEach(root => {
+                const v = MATHJS.add(
+                    MATHJS.add(
+                        MATHJS.add(
+                            MATHJS.add(
+                                MATHJS.multiply(MATHJS.pow(root, 4), a),
+                                MATHJS.multiply(MATHJS.pow(root, 3), b)),
+                            MATHJS.multiply(MATHJS.pow(root, 2), c)),
+                        MATHJS.multiply(root, d)),
+                    e);
+                console.log('验证: r = ' + MATHJS.format(root, { precision: 20 }) + ' => ' + str + ' = ' + MATHJS.format(v, { precision: 20 }));
+            });
+        }
+        const numericals = SolveEquation.SolveQuarticNumerical(a, b, c, d, e);
+        console.log('解析式法解:', numericals);
+        if (numericals) {
+            numericals.forEach(root => {
+                const v = MATHJS.add(
+                    MATHJS.add(
+                        MATHJS.add(
+                            MATHJS.add(
+                                MATHJS.multiply(MATHJS.pow(root, 4), a),
+                                MATHJS.multiply(MATHJS.pow(root, 3), b)),
+                            MATHJS.multiply(MATHJS.pow(root, 2), c)),
+                        MATHJS.multiply(root, d)),
+                    e);
+                console.log('验证: r = ' + MATHJS.format(root, { precision: 20 }) + ' => ' + str + ' = ' + MATHJS.format(v, { precision: 20 }));
+            });
+        }
+        const result1_min = SolveEquation.SolveQuarticEquation(a, b, c, d, e);
+        console.log('最优解:', result1_min);
+        console.log('\n' + '='.repeat(80) + '\n');
     }
 
     // 示例测试
     static testQuarticSolver() {
         console.log('一元四次方程求解器测试\n');
-
-        // try {
-        // 示例1: 四个实根
-        console.log('示例1: x⁴ - 10x³ + 35x² - 50x + 24 = 0 (根: 1, 2, 3, 4)');
-        const result1 = SolveEquation.SolveQuarticEquation(1, -10, 35, -50, 24);
-        console.log(result1);
-        console.log('特征值方法解:', SolveEquation.SolveQuarticStable(1, -10, 35, -50, 24));
-        console.log('\n' + '='.repeat(80) + '\n');
-
-        // 示例2: 两个实根，两个复根
-        console.log('示例2: x⁴ + x² + x + 1 = 0');
-        const result2 = SolveEquation.SolveQuarticEquation(1, 0, 1, 1, 1);
-        console.log(result2);
-        console.log('特征值方法解:', SolveEquation.SolveQuarticStable(1, 0, 1, 1, 1));
-        console.log('\n' + '='.repeat(80) + '\n');
-
-        // 示例3: 四个复根
-        console.log('示例3: x⁴ + 4 = 0');
-        const result3 = SolveEquation.SolveQuarticEquation(1, 0, 0, 0, 4);
-        console.log(result3);
-        console.log('特征值方法解:', SolveEquation.SolveQuarticStable(1, 0, 0, 0, 4));
-        console.log('\n' + '='.repeat(80) + '\n');
-
-        // 示例4: 可因式分解的情况
-        console.log('示例4: x⁴ - 5x² + 4 = 0 (根: ±1, ±2)');
-        const result4 = SolveEquation.SolveQuarticEquation(1, 0, -5, 0, 4);
-        console.log(result4);
-        console.log('特征值方法解:', SolveEquation.SolveQuarticStable(1, 0, -5, 0, 4));
-        console.log('\n' + '='.repeat(80) + '\n');
-
+        // 示例1: 四个实根 x⁴ - 10x³ + 35x² - 50x + 24 = 0 (根: 1, 2, 3, 4)
+        SolveEquation.testExecQuarticSolver(1, -10, 35, -50, 24, 'x⁴ - 10x³ + 35x² - 50x + 24');
+        // 示例2: 两个实根，两个复根 x⁴ + x² + x + 1 = 0
+        SolveEquation.testExecQuarticSolver(1, 0, 1, 1, 1, 'x⁴ + x² + x + 1');
+        // 示例3: 四个复根 x⁴ + 4 = 0
+        SolveEquation.testExecQuarticSolver(1, 0, 0, 0, 4, 'x⁴ + 4');
+        // 示例4: 可因式分解的情况 x⁴ - 5x² + 4 = 0 (根: ±1, ±2)
+        SolveEquation.testExecQuarticSolver(1, 0, -5, 0, 4, 'x⁴ - 5x² + 4');
         // 示例5: 实际应用问题
-        console.log('示例5: 16x⁴ - 32x³ + 24x² - 8x + 1 = 0');
-        const result5 = SolveEquation.SolveQuarticEquation(16, -32, 24, -8, 1);
-        console.log(result5);
-        console.log('特征值方法解:', SolveEquation.SolveQuarticStable(16, -32, 24, -8, 1));
-        console.log('\n' + '='.repeat(80) + '\n');
-        // } catch (error) {
-        //     console.error('错误:', error.message);
-        // }
+        SolveEquation.testExecQuarticSolver(16, -32, 24, -8, 1, '16x⁴ - 32x³ + 24x² - 8x + 1');
     }
-
-
 }
 export { SolveEquation };
