@@ -174,8 +174,8 @@ export class Cube {
     let plane = new PlaneSurfaceData();
     let lineAlg = CurveBuilder.Algorithm2ByData(line);
     let planeAlg = SurfaceBulder.BuildSurfaceAlgorithmByData(plane);
-    // SolveEquation.test();
-    // SolveEquation.testCubicSolver();
+    SolveEquation.testQuadraticSolver();
+    SolveEquation.testCubicSolver();
     SolveEquation.testQuarticSolver();
   }
 }
