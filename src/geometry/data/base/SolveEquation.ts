@@ -136,7 +136,7 @@ class SolveEquation {
             // const root2 = -u - p / 3;
             // const root3 = -u - p / 3;            
             const u = MATHJS.cbrt(MATHJS.unaryMinus(depressedQ_2));//-depressedQ / 2
-            const root1 = MATHJS.subtract(MATHJS.multiply(2, u), p_3) as MATHJS.BigNumber;//2 * u - p / 3
+            const root1 = MATHJS.subtract(MATHJS.multiply(u, 2), p_3) as MATHJS.BigNumber;//2 * u - p / 3
             const root2 = MATHJS.subtract(MATHJS.unaryMinus(u), p_3) as MATHJS.BigNumber; //-u - p / 3;
             const root3 = MATHJS.subtract(MATHJS.unaryMinus(u), p_3) as MATHJS.BigNumber; //-u - p / 3;
 

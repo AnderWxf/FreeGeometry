@@ -1,4 +1,5 @@
 import { Vector2 } from "../../../../math/Math";
+import * as MATHJS from '../../../../mathjs';
 import { MathUtils } from "../../../../math/MathUtils";
 import { Arc2Data } from "../../../data/base/curve2/Arc2Data";
 import { Curve2Algo } from "../Curve2Algo";
@@ -78,6 +79,40 @@ class Arc2Algo extends Curve2Algo {
                     return ret;
                 }
         }
+    }
+    /**
+     * the GE function return general equation coefficients of 2D Arc.
+     * @param {Arc2Data} [c = Arc2Data] - The data struct of 2D arc.
+     * @retun {A B C D E F} - General equation coefficients.
+     */
+    ge(): { A: MATHJS.BigNumber, B: MATHJS.BigNumber, C: MATHJS.BigNumber, D: MATHJS.BigNumber, E: MATHJS.BigNumber, F: MATHJS.BigNumber } {
+        // 曲线系数计算
+        // A = a²sin²φ + b²cos²φ, 
+        // B = (a² − b²)sin2φ
+        // C = a²cos²φ +b²sin²φ, 
+        // D = −2Ax0 − By0 ,E = −2Cy0 − Bx0
+        // F = Ax0² + Bx0y0 + Cy0² − a²b²     
+        // 曲线的二元二次方程组
+        // Ax² + Bxy + Cy² + Dx + Ey + F = 0
+        let c = this.dat;
+        let a = MATHJS.bignumber(c.radius.x);
+        let b = MATHJS.bignumber(c.radius.y);
+        let φ = MATHJS.bignumber(c.trans.rot);
+        let x0 = MATHJS.bignumber(c.trans.pos.x);
+        let y0 = MATHJS.bignumber(c.trans.pos.y);
+        let aa = MATHJS.multiply(a, a);
+        let bb = MATHJS.multiply(b, b);
+        let sinφ = MATHJS.sin(φ);
+        let cosφ = MATHJS.cos(φ);
+        let sin2φ = MATHJS.sin(MATHJS.multiply(φ, 2) as MATHJS.BigNumber);
+
+        let A = MATHJS.add(MATHJS.multiply(aa, MATHJS.multiply(sinφ, sinφ)), MATHJS.multiply(bb, MATHJS.multiply(cosφ, cosφ))) as MATHJS.BigNumber;
+        let B = MATHJS.multiply(MATHJS.subtract(aa, bb), sin2φ) as MATHJS.BigNumber;
+        let C = MATHJS.add(MATHJS.multiply(aa, MATHJS.multiply(cosφ, cosφ)), MATHJS.multiply(bb, MATHJS.multiply(sinφ, sinφ))) as MATHJS.BigNumber;
+        let D = MATHJS.add(MATHJS.unaryMinus(MATHJS.multiply(2, A)), x0) as MATHJS.BigNumber;
+        let E = MATHJS.add(MATHJS.unaryMinus(MATHJS.multiply(2, C)), y0) as MATHJS.BigNumber;
+        let F = MATHJS.add(MATHJS.add(MATHJS.multiply(A, x0), MATHJS.multiply(B, x0)), y0) as MATHJS.BigNumber;
+        return { A, B, C, D, E, F };
     }
 }
 

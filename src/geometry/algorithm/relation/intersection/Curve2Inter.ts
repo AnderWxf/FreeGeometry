@@ -1,8 +1,11 @@
 import { Matrix2, Vector2, Vector3 } from "../../../../math/Math";
+import * as MATHJS from '../../../../mathjs';
 import type { Arc2Data } from "../../../data/base/curve2/Arc2Data";
 import type { Line2Data } from "../../../data/base/curve2/Line2Data";
 import type { Nurbs2Data } from "../../../data/base/curve2/Nurbs2Data";
 import type { Curve2Data } from "../../../data/base/Curve2Data";
+import { Arc2Algo } from "../../base/curve2/Arc2Algo";
+import { Line2Algo } from "../../base/curve2/Line2Algo";
 import { CurveBuilder } from "../../builder/CurveBuilder";
 
 /**
@@ -34,48 +37,32 @@ class Curve2Inter {
      * @param {number} [tol] - The tolerance of distance.
      */
     static LineXLine(c0: Line2Data, c1: Line2Data, tol: number): Array<InterOfCurve2> {
-        // 系数计算
-        // A = -sin(r) B = cos(r)
-        // A(x - x0) + B(y - y0) = 0
-        // Ax + By - A*x0 - B*y0 = 0
-        // C = - A*x0 - B*y0
-        // 二元一次方程组
-        // Ax0 + By0 + C0 = 0
-        // Ax1 + By1 + C1 = 0
-        // => 非齐次方程组
-        // Ax0 + By0 = -C0
-        // Ax1 + By1 = -C1
-        // 克莱姆法则求解
-
         let ret = new Array<InterOfCurve2>();
         if (c0.trans.rot == c1.trans.rot) {
             return ret;
         }
-        let A0 = -Math.sin(c0.trans.rot), B0 = Math.cos(c0.trans.rot);
-        let A1 = -Math.sin(c1.trans.rot), B1 = Math.cos(c1.trans.rot);
-        let C0 = - A0 * c0.trans.pos.x - B0 * c0.trans.pos.y;
-        let C1 = - A1 * c1.trans.pos.x - B1 * c1.trans.pos.y;
 
-        let m = new Matrix2();
-        m.set(A0, B0
-            , A1, B1);
-        let det = m.determinant();
-        m.set(-C0, B0
-            , -C1, B1);
-        let detx = m.determinant();
-        m.set(A0, -C0
-            , A1, -C1);
+        let c0a = new Line2Algo(c0);
+        let c1a = new Line2Algo(c1);
+        // 获取一般方程参数
+        let { A: A0, B: B0, C: C0 } = c0a.ge();
+        let { A: A1, B: B1, C: C1 } = c1a.ge();
+        let c0_ = MATHJS.unaryMinus(C0);
+        let c1_ = MATHJS.unaryMinus(C1);
 
-        let dety = m.determinant();
-        let x = detx / det;
-        let y = dety / det;
+        // 克莱姆法则求解方程组
+        // A0x + B0y + C0 = 0
+        // A1x + B2y + C1 = 0
+        let det = MATHJS.det([[A0, B0], [A1, B1]]);
+        let detx = MATHJS.det([[c0_, B0], [c1_, B1]]);
+        let dety = MATHJS.det([[A0, c0_], [A1, c1_]]);
+
+        let x = MATHJS.divide(detx, det);
+        let y = MATHJS.divide(dety, det);
         let p = new Vector2(x, y);
 
-        let v0 = p.clone().sub(c0.trans.pos);
-        let v1 = p.clone().sub(c1.trans.pos);
-
-        let u0 = v0.length() * (v0.dot(new Vector2(Math.cos(c0.trans.rot), Math.sin(c0.trans.rot))) > 0 ? 1 : -1);
-        let u1 = v1.length() * (v1.dot(new Vector2(Math.cos(c1.trans.rot), Math.sin(c1.trans.rot))) > 0 ? 1 : -1);
+        let u0 = c0a.u(p);
+        let u1 = c1a.u(p);
         ret.push({ p, u0, u1 });
 
         return ret;
@@ -89,6 +76,34 @@ class Curve2Inter {
      * @param {number} [tol] - The tolerance of distance.
      */
     static LineXArc(c0: Line2Data, c1: Arc2Data, tol: number): Array<InterOfCurve2> {
+        // 直线的二元一次方程
+        // A0x + B0y + C0 = 0
+        let c0a = new Line2Algo(c0);
+        let { A: A0, B: B0, C: C0 } = c0a.ge();
+
+        // 曲线的二元二次方程
+        let c1a = new Arc2Algo(c1);
+        let { A: A1, B: B1, C: C1, D: D1, E: E1, F: F1 } = c1a.ge();
+
+        // 求解方程组
+        // A0x + B0y + C0 = 0 (1)
+        // A1x² + B1xy + C1y² + D1x + E1y + F1 = 0 (2)
+        // (1) >> x = (-C0 - B0y) / A0 带入方程（2）
+        if (!A0.equals(0) && !B0.equals(0)) {
+            // 关于x的方程 Ax² + Bx + C = 0
+            // A​ = A1 B0² - B1 A0 B0 + C1 A0²​
+            // B =-B1​ B0​ C0​ + 2C1​ A0​ C0 + D1​ B0²​ - E1 A0 B0​
+            // C​ = C1​ C0²​ - E1​ B0​ C0​ + F1​ B0²​
+
+            // y= -(B0/A0​)x − B0/C0​ 
+
+            let A = MATHJS.add(MATHJS.subtract(MATHJS.multiply(A1, B0, B0), MATHJS.multiply(B1, A0, B0)), MATHJS.multiply(C1, A0, A0));
+            let B = MATHJS.add(MATHJS.subtract(MATHJS.multiply(B1, B0, C0), MATHJS.multiply(B1, A0, B0)), MATHJS.multiply(C1, A0, A0));
+            let C = MATHJS.add(MATHJS.subtract(MATHJS.multiply(A1, B0, B0), MATHJS.multiply(B1, A0, B0)), MATHJS.multiply(C1, A0, A0));
+
+        }
+
+
         return null;
     }
 

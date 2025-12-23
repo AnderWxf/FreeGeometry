@@ -1,4 +1,5 @@
 import { Vector3 } from "../../../../math/Math";
+import * as MATHJS from '../../../../mathjs';
 import { Line3Data } from "../../../data/base/curve3/Line3Data";
 import { Curve3Algo } from "../Curve3Algo";
 /**
