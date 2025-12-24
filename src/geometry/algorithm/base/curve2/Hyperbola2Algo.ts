@@ -1,26 +1,26 @@
 import { Vector2 } from "../../../../math/Math";
-import * as MATHJS from '../../../../mathjs';
+import * as MATHJS from 'mathjs';
 import { MathUtils } from "../../../../math/MathUtils";
-import { Arc2Data } from "../../../data/base/curve2/Arc2Data";
+import { Hyperbola2Data } from "../../../data/base/curve2/Hyperbola2Data";
 import { Curve2Algo } from "../Curve2Algo";
 /**
- * 2D arc algorithm.
+ * 2D Hyperbola algorithm. TODO
  *
  */
-class Arc2Algo extends Curve2Algo {
+class Hyperbola2Algo extends Curve2Algo {
     /**
-     * The data struct of this 2D arc algorithm.
+     * The data struct of this 2D Hyperbola algorithm.
      *
-     * @type {Arc2Data}
+     * @type {Hyperbola2Data}
      */
-    public override dat: Arc2Data;
+    public override dat: Hyperbola2Data;
 
     /**
-     * Constructs a 2D arc algorithm.
+     * Constructs a 2D Hyperbola algorithm.
      *
-     * @param {Curve2Data} [dat=Arc2Data] - The data struct of this 2D arc algorithm.
+     * @param {Curve2Data} [dat=Hyperbola2Data] - The data struct of this 2D Hyperbola algorithm.
      */
-    constructor(dat = new Arc2Data()) {
+    constructor(dat = new Hyperbola2Data()) {
         super(dat);
         this.dat = dat;
     }
@@ -81,8 +81,8 @@ class Arc2Algo extends Curve2Algo {
         }
     }
     /**
-     * the GE function return general equation coefficients of 2D Arc.
-     * @param {Arc2Data} [c = Arc2Data] - The data struct of 2D arc.
+     * the GE function return general equation coefficients of 2D Hyperbola.
+     * @param {Hyperbola2Data} [c = Hyperbola2Data] - The data struct of 2D Hyperbola.
      * @retun {A B C D E F} - General equation coefficients.
      */
     ge(): { A: MATHJS.BigNumber, B: MATHJS.BigNumber, C: MATHJS.BigNumber, D: MATHJS.BigNumber, E: MATHJS.BigNumber, F: MATHJS.BigNumber } {
@@ -135,4 +135,4 @@ class Arc2Algo extends Curve2Algo {
     }
 }
 
-export { Arc2Algo };
+export { Hyperbola2Algo };

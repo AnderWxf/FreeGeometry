@@ -10,8 +10,9 @@ import { PlaneSurfaceData } from './geometry/data/base/surface/PlaneSurfaceData'
 import { Brep2Builder } from './geometry/algorithm/builder/Brep2Builder';
 import { BrepMeshBuilder } from './helper/MeshBuilder';
 import { MathUtils } from './math/MathUtils';
-import { Curve2Inter } from './geometry/algorithm/relation/intersection/Curve2Inter';
+import { Curve2Inter, type InterOfCurve2 } from './geometry/algorithm/relation/intersection/Curve2Inter';
 import { SolveEquation } from './geometry/data/base/SolveEquation';
+import type { Arc2Data } from './geometry/data/base/curve2/Arc2Data';
 
 export class Cube {
   public constructor() {
@@ -35,6 +36,29 @@ export class Cube {
     const material2 = new THREE.MeshBasicMaterial({ color: THREE.Color.NAMES.blue });
 
 
+    // 创建一个圆
+    let circleEdge = Brep2Builder.BuildCircleEdge2FromCenterRadius(new Vector2(0, 0), 10);
+    let geoCircleEdgeEdge = BrepMeshBuilder.BuildEdge2Mesh(circleEdge, THREE.Color.NAMES.green);
+    geoCircleEdgeEdge.name = "Circle2";
+    scene.add(geoCircleEdgeEdge);
+
+    // 三点创建一个圆
+    let circle1Edge = Brep2Builder.BuildCircleFromBeginMiddleEndPoint(new Vector2(0, 0), new Vector2(15, 15), new Vector2(0, 25));
+    let geoCircle1EdgeEdge = BrepMeshBuilder.BuildEdge2Mesh(circle1Edge, THREE.Color.NAMES.yellow);
+    geoCircle1EdgeEdge.name = "Circle2_Three_Point";
+    scene.add(geoCircle1EdgeEdge);
+
+    // 创建一个圆弧
+    let arcEdge = Brep2Builder.BuildCircleArcEdge2FromCenterBeginEndPoin(new Vector2(0, 0), new Vector2(13, 13), new Vector2(0, 13));
+    let geoArcEdgeEdge = BrepMeshBuilder.BuildEdge2Mesh(arcEdge, THREE.Color.NAMES.blue);
+    geoArcEdgeEdge.name = "Arc2";
+    scene.add(geoArcEdgeEdge);
+
+    // 根据三点创建一个椭圆
+    let ellipseEdge = Brep2Builder.BuildEllipseEdge2FromCenterBeginEndPoint(new Vector2(0, 0), new Vector2(15, 15), new Vector2(0, 10));
+    let geoEllipseEdge = BrepMeshBuilder.BuildEdge2Mesh(ellipseEdge, THREE.Color.NAMES.blueviolet);
+    geoEllipseEdge.name = "Ellipse2_Three_Point";
+    scene.add(geoEllipseEdge);
 
 
     // 创建一个直线段
@@ -51,42 +75,32 @@ export class Cube {
     geoLine1EdgeEdge.name = "Line2_1";
     scene.add(geoLine1EdgeEdge);
 
-    // 基础材质（可配置颜色、贴图等）
-    const material = new THREE.MeshBasicMaterial({ color: 0x0088ff });
-    let inters = Curve2Inter.LineXLine(lineEdge.curve, line1Edge.curve, 0.0001);
-    for (let i = 0; i < inters.length; i++) {
-      // 创建一个球体
-      const geometry = new THREE.SphereGeometry(0.1);
-      const mesh = new THREE.Mesh(geometry, material);
-      mesh.position.x = inters[i].p.x;
-      mesh.position.y = inters[i].p.y;
-      mesh.name = "inter_" + i;
-      scene.add(mesh);
+    let drawInters = (inters: Array<InterOfCurve2>) => {
+      for (let i = 0; i < inters.length; i++) {
+        // 创建一个球体
+        const geometry = new THREE.SphereGeometry(0.1);
+        const mesh = new THREE.Mesh(geometry, material);
+        mesh.position.x = inters[i].p.x;
+        mesh.position.y = inters[i].p.y;
+        mesh.name = "inter_" + i;
+        scene.add(mesh);
+      }
     }
 
-    // 创建一个圆
-    let circleEdge = Brep2Builder.BuildCircleEdge2FromCenterRadius(new Vector2(0, 0), 10);
-    let geoCircleEdgeEdge = BrepMeshBuilder.BuildEdge2Mesh(circleEdge, THREE.Color.NAMES.green);
-    geoCircleEdgeEdge.name = "Circle2";
-    scene.add(geoCircleEdgeEdge);
 
-    // 三点创建一个圆
-    let circle1Edge = Brep2Builder.BuildCircleFromBeginMiddleEndPoint(new Vector2(0, 0), new Vector2(15, 15), new Vector2(0, 25));
-    let geoCircle1EdgeEdge = BrepMeshBuilder.BuildEdge2Mesh(circle1Edge, THREE.Color.NAMES.yellow);
-    geoCircle1EdgeEdge.name = "Circle2_Three_Point";
-    scene.add(geoCircle1EdgeEdge);
-
-    // 创建一个圆弧
-    let arcEdge = Brep2Builder.BuildCircleArcEdge2FromCenterBeginEndPoin(new Vector2(0, 0), new Vector2(15, 15), new Vector2(0, 15));
-    let geoArcEdgeEdge = BrepMeshBuilder.BuildEdge2Mesh(arcEdge, THREE.Color.NAMES.blue);
-    geoArcEdgeEdge.name = "Arc2";
-    scene.add(geoArcEdgeEdge);
-
-    // 根据三点创建一个椭圆
-    let ellipseEdge = Brep2Builder.BuildEllipseEdge2FromCenterBeginEndPoint(new Vector2(0, 0), new Vector2(15, 15), new Vector2(0, 10));
-    let geoEllipseEdge = BrepMeshBuilder.BuildEdge2Mesh(ellipseEdge, THREE.Color.NAMES.blueviolet);
-    geoEllipseEdge.name = "Ellipse2_Three_Point";
-    scene.add(geoEllipseEdge);
+    // 基础材质（可配置颜色、贴图等）
+    const material = new THREE.MeshBasicMaterial({ color: 0x0088ff });
+    let inters = new Array<InterOfCurve2>();
+    inters.push(...Curve2Inter.LineXLine(lineEdge.curve, line1Edge.curve, 0.0001));
+    inters.push(...Curve2Inter.LineXArc(lineEdge.curve, circleEdge.curve as Arc2Data, 0.0001));
+    inters.push(...Curve2Inter.LineXArc(lineEdge.curve, circle1Edge.curve as Arc2Data, 0.0001));
+    inters.push(...Curve2Inter.LineXArc(lineEdge.curve, arcEdge.curve as Arc2Data, 0.0001));
+    inters.push(...Curve2Inter.LineXArc(lineEdge.curve, ellipseEdge.curve as Arc2Data, 0.0001));
+    inters.push(...Curve2Inter.LineXArc(line1Edge.curve, circleEdge.curve as Arc2Data, 0.0001));
+    inters.push(...Curve2Inter.LineXArc(line1Edge.curve, circle1Edge.curve as Arc2Data, 0.0001));
+    inters.push(...Curve2Inter.LineXArc(line1Edge.curve, arcEdge.curve as Arc2Data, 0.0001));
+    inters.push(...Curve2Inter.LineXArc(line1Edge.curve, ellipseEdge.curve as Arc2Data, 0.0001));
+    drawInters(inters);
 
     // 创建一个立方体几何体
     const geometry0 = new THREE.BoxGeometry(1, 1, 1);
@@ -174,8 +188,8 @@ export class Cube {
     let plane = new PlaneSurfaceData();
     let lineAlg = CurveBuilder.Algorithm2ByData(line);
     let planeAlg = SurfaceBulder.BuildSurfaceAlgorithmByData(plane);
-    SolveEquation.testQuadraticSolver();
-    SolveEquation.testCubicSolver();
-    SolveEquation.testQuarticSolver();
+    // SolveEquation.testQuadraticSolver();
+    // SolveEquation.testCubicSolver();
+    // SolveEquation.testQuarticSolver();
   }
 }

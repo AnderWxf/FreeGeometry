@@ -7,7 +7,8 @@ import { Curve2Data } from "../../data/base/Curve2Data";
  * u ∈ [0,a], the a is diffent for curve type : 
  * in case line, a = distance to o.
  * in case arc, a = 2π-1/Infinity.
- * in case conic, u = x ∈ R.
+ * in case hyperbola, u = x ∈ R.
+ * in case parabola, u = x ∈ R.
  * in case nurbs, a = 1, when u < 0 or u > 1 curve extend with 1-order derivative vector.
  * 
  * 2D curvr separates plane to parts;

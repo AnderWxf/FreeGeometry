@@ -1,3 +1,4 @@
+import type { BigNumber } from "mathjs";
 import { Matrix2, Vector2, Vector3 } from "../../../../math/Math";
 import * as MATHJS from '../../../../mathjs';
 import type { Arc2Data } from "../../../data/base/curve2/Arc2Data";
@@ -7,12 +8,13 @@ import type { Curve2Data } from "../../../data/base/Curve2Data";
 import { Arc2Algo } from "../../base/curve2/Arc2Algo";
 import { Line2Algo } from "../../base/curve2/Line2Algo";
 import { CurveBuilder } from "../../builder/CurveBuilder";
+import { SolveEquation } from "../../../data/base/SolveEquation";
 
 /**
  * compute curve intersection point utility.
  *
  */
-type InterOfCurve2 = {
+export type InterOfCurve2 = {
     p: Vector2; // Position of intersection point.
     u0: number; // The u parameter of intersection point on curve0.
     u1: number; // The u parameter of intersection point on curve1.
@@ -76,6 +78,7 @@ class Curve2Inter {
      * @param {number} [tol] - The tolerance of distance.
      */
     static LineXArc(c0: Line2Data, c1: Arc2Data, tol: number): Array<InterOfCurve2> {
+        let ret = new Array<InterOfCurve2>();
         // 直线的二元一次方程
         // A0x + B0y + C0 = 0
         let c0a = new Line2Algo(c0);
@@ -86,7 +89,7 @@ class Curve2Inter {
         let { A: A1, B: B1, C: C1, D: D1, E: E1, F: F1 } = c1a.ge();
 
         // 求解方程组
-        // A0x + B0y + C0 = 0 (1)
+        // A0x + B0y + C0 = 0 (1) 
         // A1x² + B1xy + C1y² + D1x + E1y + F1 = 0 (2)
         // (1) >> x = (-C0 - B0y) / A0 带入方程（2）
         if (!A0.equals(0) && !B0.equals(0)) {
@@ -94,17 +97,46 @@ class Curve2Inter {
             // A​ = A1 B0² - B1 A0 B0 + C1 A0²​
             // B =-B1​ B0​ C0​ + 2C1​ A0​ C0 + D1​ B0²​ - E1 A0 B0​
             // C​ = C1​ C0²​ - E1​ B0​ C0​ + F1​ B0²​
+            let A = MATHJS.add(
+                MATHJS.multiply(A1, B0, B0),
+                MATHJS.unaryMinus(MATHJS.multiply(B1, A0, B0)),
+                MATHJS.multiply(C1, A0, A0)
+            ) as BigNumber;
+            let B = MATHJS.add(
+                MATHJS.unaryMinus(MATHJS.multiply(B1, B0, C0)),
+                MATHJS.multiply(C1, A0, C0, 2),
+                MATHJS.multiply(D1, B0, B0),
+                MATHJS.unaryMinus(MATHJS.multiply(E1, A0, B0))
+            ) as BigNumber;
+            let C = MATHJS.add(
+                MATHJS.multiply(C1, C0, C0),
+                MATHJS.unaryMinus(MATHJS.multiply(E1, B0, C0)),
+                MATHJS.multiply(F1, B0, B0)
+            ) as BigNumber;
 
-            // y= -(B0/A0​)x − B0/C0​ 
-
-            let A = MATHJS.add(MATHJS.subtract(MATHJS.multiply(A1, B0, B0), MATHJS.multiply(B1, A0, B0)), MATHJS.multiply(C1, A0, A0));
-            let B = MATHJS.add(MATHJS.subtract(MATHJS.multiply(B1, B0, C0), MATHJS.multiply(B1, A0, B0)), MATHJS.multiply(C1, A0, A0));
-            let C = MATHJS.add(MATHJS.subtract(MATHJS.multiply(A1, B0, B0), MATHJS.multiply(B1, A0, B0)), MATHJS.multiply(C1, A0, A0));
-
+            let xs = SolveEquation.SolveQuadraticEquation(A, B, C);
+            for (let i = 0; i < xs.length; i++) {
+                let xi = xs[i];
+                let x: BigNumber;
+                if (MATHJS.typeOf(xi) === 'Complex') {
+                    xi = xi as MATHJS.Complex;
+                    if (Math.abs(xi.im) > tol) {
+                        continue;
+                    }
+                    x = MATHJS.bignumber(xi.re);
+                }
+                if (MATHJS.typeOf(xi) === 'BigNumber') {
+                    x = xi as BigNumber;
+                }
+                // y= -(A0/B0​)x − C0/B0​ ​ = - (xA0 + c0)/b0
+                let y = MATHJS.unaryMinus(MATHJS.divide(MATHJS.add((MATHJS.multiply(x, A0)), C0), B0)) as BigNumber;
+                let p = new Vector2(x.toNumber(), y.toNumber());
+                let u0 = c0a.u(p);
+                let u1 = c1a.u(p);
+                ret.push({ p, u0, u1 });
+            }
         }
-
-
-        return null;
+        return ret;
     }
 
     /**

@@ -1,22 +1,22 @@
 import { Vector2, type Vector3 } from "../../../math/Math";
 import { Arc2Data } from "../../data/base/curve2/Arc2Data";
-import { Conic2Data } from "../../data/base/curve2/Conic2Data";
+import { Parabola2Data } from "../../data/base/curve2/Parabola2Data";
 import { Line2Data } from "../../data/base/curve2/Line2Data";
 import { Nurbs2Data } from "../../data/base/curve2/Nurbs2Data";
 import type { Curve2Data } from "../../data/base/Curve2Data";
 import { Arc3Data } from "../../data/base/curve3/Arc3Data";
-import { Conic3Data } from "../../data/base/curve3/Conic3Data";
+import { Parabola3Data } from "../../data/base/curve3/Parabola3Data";
 import { Line3Data } from "../../data/base/curve3/Line3Data";
 import { Nurbs3Data } from "../../data/base/curve3/Nurbs3Data";
 import type { Curve3Data } from "../../data/base/Curve3Data";
 import { Transform2 } from "../../data/base/Transform2";
 import { Arc2Algo } from "../base/curve2/Arc2Algo";
-import { Conic2Algo } from "../base/curve2/Conic2Algo";
+import { Parabola2Algo } from "../base/curve2/Parabola2Algo";
 import { Line2Algo } from "../base/curve2/Line2Algo";
 import { Nurbs2Algo } from "../base/curve2/Nurbs2Algo";
 import type { Curve2Algo } from "../base/Curve2Algo";
 import { Arc3Algo } from "../base/curve3/Arc3Algo";
-import { Conic3Algo } from "../base/curve3/Conic3Algo";
+import { Parabola3Algo } from "../base/curve3/Parabola3Algo";
 import { Line3Algo } from "../base/curve3/Line3Algo";
 import { Nurbs3Algo } from "../base/curve3/Nurbs3Algo";
 import type { Curve3Algo } from "../base/Curve3Algo";
@@ -188,8 +188,8 @@ class CurveBuilder {
         if (dat instanceof Arc2Data) {
             return new Arc2Algo(dat);
         }
-        else if (dat instanceof Conic2Data) {
-            return new Conic2Algo(dat);
+        else if (dat instanceof Parabola2Data) {
+            return new Parabola2Algo(dat);
         }
         else if (dat instanceof Line2Data) {
             return new Line2Algo(dat);
@@ -205,8 +205,8 @@ class CurveBuilder {
         if (dat instanceof Arc3Data) {
             return new Arc3Algo(dat);
         }
-        else if (dat instanceof Conic3Data) {
-            return new Conic3Algo(dat);
+        else if (dat instanceof Parabola3Data) {
+            return new Parabola3Algo(dat);
         }
         else if (dat instanceof Line3Data) {
             return new Line3Algo(dat);

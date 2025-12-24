@@ -21,25 +21,19 @@ class SolveEquation {
         let _2a = MATHJS.multiply(a, 2);
         // 计算判别式
         const discriminant = MATHJS.subtract(MATHJS.multiply(b, b), MATHJS.multiply(a, c, 4)) as MATHJS.BigNumber;
-
         let roots = new Array<MATHJS.Complex | MATHJS.BigNumber>();
-        let type;
-
         if (MATHJS.larger(discriminant, 0)) {
             // 两个不等实根
-            type = '两个不等实根';
             const sqrtDiscriminant = MATHJS.sqrt(discriminant);
             const root1 = MATHJS.divide(MATHJS.add(_b, sqrtDiscriminant), _2a) as MATHJS.BigNumber;
             const root2 = MATHJS.divide(MATHJS.subtract(_b, sqrtDiscriminant), _2a) as MATHJS.BigNumber;
             roots.push(root1, root2);
         } else if (MATHJS.equal(discriminant, 0)) {
             // 两个相等实根
-            type = '两个相等实根';
             const root = MATHJS.divide(_b, _2a) as MATHJS.BigNumber;
             roots = [root, root];
         } else {
             // 两个共轭复根
-            type = '两个共轭复根';
             const realPart = MATHJS.divide(_b, _2a) as MATHJS.BigNumber;
             const imaginaryPart = MATHJS.divide(MATHJS.sqrt(MATHJS.unaryMinus(discriminant)), _2a) as MATHJS.BigNumber;
             roots.push(MATHJS.complex(realPart.toNumber(), imaginaryPart.toNumber()), MATHJS.complex(realPart.toNumber(), -imaginaryPart.toNumber()));
