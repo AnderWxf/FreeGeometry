@@ -1,5 +1,5 @@
 import type { BigNumber } from "mathjs";
-import { Matrix2, Vector2, Vector3 } from "../../../../math/Math";
+import { Vector2 } from "../../../../math/Math";
 import * as MATHJS from '../../../../mathjs';
 import type { Arc2Data } from "../../../data/base/curve2/Arc2Data";
 import type { Line2Data } from "../../../data/base/curve2/Line2Data";
@@ -9,6 +9,11 @@ import { Arc2Algo } from "../../base/curve2/Arc2Algo";
 import { Line2Algo } from "../../base/curve2/Line2Algo";
 import { CurveBuilder } from "../../builder/CurveBuilder";
 import { SolveEquation } from "../../../data/base/SolveEquation";
+import type { Hyperbola2Data } from "../../../data/base/curve2/Hyperbola2Data";
+import { Hyperbola2Algo } from "../../base/curve2/Hyperbola2Algo";
+import type { Parabola2Data } from "../../../data/base/curve2/Parabola2Data";
+import { Parabola2Algo } from "../../base/curve2/Parabola2Algo";
+import type { Curve2Algo } from "../../base/Curve2Algo";
 
 /**
  * compute curve intersection point utility.
@@ -82,12 +87,68 @@ class Curve2Inter {
         // 直线的二元一次方程
         // A0x + B0y + C0 = 0
         let c0a = new Line2Algo(c0);
-        let { A: A0, B: B0, C: C0 } = c0a.ge();
-
         // 曲线的二元二次方程
+        // A1x² + B1xy + C1y² + D1x + E1y + F1 = 0 (2)
         let c1a = new Arc2Algo(c1);
-        let { A: A1, B: B1, C: C1, D: D1, E: E1, F: F1 } = c1a.ge();
+        // 求解方程组
+        return Curve2Inter.LineXConic(c0a.ge(), c1a.ge(), c0a, c1a, tol);
+    }
 
+    /**
+     * compute line to arc intersection point.
+     *
+     * @param {Line2Data} [c0] - The frist curve.
+     * @param {Arc2Data} [c1] - The second curve.
+     * @param {number} [tol] - The tolerance of distance.
+     */
+    static LineXHyperbola(c0: Line2Data, c1: Hyperbola2Data, tol: number): Array<InterOfCurve2> {
+        let ret = new Array<InterOfCurve2>();
+        // 直线的二元一次方程
+        // A0x + B0y + C0 = 0
+        let c0a = new Line2Algo(c0);
+        // 曲线的二元二次方程
+        // A1x² + B1xy + C1y² + D1x + E1y + F1 = 0 (2)
+        let c1a = new Hyperbola2Algo(c1);
+        return Curve2Inter.LineXConic(c0a.ge(), c1a.ge(), c0a, c1a, tol);
+    }
+
+    /**
+     * compute line to arc intersection point.
+     *
+     * @param {Line2Data} [c0] - The frist curve.
+     * @param {Arc2Data} [c1] - The second curve.
+     * @param {number} [tol] - The tolerance of distance.
+     */
+    static LineXParabola(c0: Line2Data, c1: Parabola2Data, tol: number): Array<InterOfCurve2> {
+        let ret = new Array<InterOfCurve2>();
+        // 直线的二元一次方程
+        // A0x + B0y + C0 = 0
+        let c0a = new Line2Algo(c0);
+        // 曲线的二元二次方程
+        // A1x² + B1xy + C1y² + D1x + E1y + F1 = 0 (2)
+        let c1a = new Parabola2Algo(c1);
+        return Curve2Inter.LineXConic(c0a.ge(), c1a.ge(), c0a, c1a, tol);
+    }
+
+    /**
+     * compute line to arc intersection point.
+     *
+     * @param {Line2Data} [c0] - The frist curve.
+     * @param {Arc2Data} [c1] - The second curve.
+     * @param {number} [tol] - The tolerance of distance.
+     */
+    static LineXConic(c0: { A: MATHJS.BigNumber, B: MATHJS.BigNumber, C: MATHJS.BigNumber },
+        c1: { A: MATHJS.BigNumber, B: MATHJS.BigNumber, C: MATHJS.BigNumber, D: MATHJS.BigNumber, E: MATHJS.BigNumber, F: MATHJS.BigNumber },
+        c0a: Curve2Algo,
+        c1a: Curve2Algo,
+        tol: number): Array<InterOfCurve2> {
+        let ret = new Array<InterOfCurve2>();
+        // 直线的二元一次方程
+        // A0x + B0y + C0 = 0
+        let { A: A0, B: B0, C: C0 } = c0;
+        // 曲线的二元二次方程
+        // A1x² + B1xy + C1y² + D1x + E1y + F1 = 0 (2)
+        let { A: A1, B: B1, C: C1, D: D1, E: E1, F: F1 } = c1;
         // 求解方程组
         // A0x + B0y + C0 = 0 (1) 
         // A1x² + B1xy + C1y² + D1x + E1y + F1 = 0 (2)

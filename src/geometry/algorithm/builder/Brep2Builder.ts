@@ -91,6 +91,39 @@ class Brep2Builder {
     }
 
     /**
+     * build hyperbola edge2 from center a b point.
+     *
+     * @param {Vector2} [c] - The center point.
+     * @param {Vector2} [a] - The a point.
+     * @param {Vector2} [b] - The b point.
+     * @param {number} [u0] - The begin u.
+     * @param {number} [u1] - The end u. 
+     */
+    static BuildHyperbolaEdge2FromCenterABPoint(c: Vector2, a: Vector2, b: Vector2, u0: number = Math.PI / 2, u1: number = -Math.PI / 2): Edge2 {
+        let ret = new Edge2();
+        let curve = CurveBuilder.BuildHyperbola2FromCenterABPoint(c, a, b);
+        ret.u = new Vector2(u0, u1);
+        ret.curve = curve;
+        return ret;
+    }
+
+    /**
+     * build parabola edge2 from center a b point.
+     *
+     * @param {Vector2} [c] - The center point.
+     * @param {Vector2} [a] - The focus point.
+     * @param {number} [u0] - The u0.
+     * @param {number} [u1] - The u1. 
+     */
+    static BuildParabolaEdge2FromCenterABPoint(c: Vector2, a: Vector2, u0: number = 1, u1: number = -1): Edge2 {
+        let ret = new Edge2();
+        let curve = CurveBuilder.BuildParabola2FromCenterABPoint(c, a);
+        ret.u = new Vector2(u0, u1);
+        ret.curve = curve;
+        return ret;
+    }
+
+    /**
      * build nurbs edge2 from fitting points.
      *
      * @param {Array<Vector2>} [points] - The fitting points.

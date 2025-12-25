@@ -21,7 +21,7 @@ class BrepMeshBuilder {
             if (edge.curve instanceof Line2Data) {
                 segment = 1;
             } else {
-                segment = Math.ceil(MathUtils.clamp(Brep2Builder.Length(edge), 32, 256));
+                segment = Math.ceil(MathUtils.clamp(Brep2Builder.Length(edge, 1), 32, 256));
             }
         }
 

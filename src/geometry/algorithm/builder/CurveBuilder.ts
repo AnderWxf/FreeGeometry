@@ -20,6 +20,8 @@ import { Parabola3Algo } from "../base/curve3/Parabola3Algo";
 import { Line3Algo } from "../base/curve3/Line3Algo";
 import { Nurbs3Algo } from "../base/curve3/Nurbs3Algo";
 import type { Curve3Algo } from "../base/Curve3Algo";
+import { Hyperbola2Data } from "../../data/base/curve2/Hyperbola2Data";
+import { Hyperbola2Algo } from "../base/curve2/Hyperbola2Algo";
 
 /**
  * curvr builder.
@@ -118,6 +120,45 @@ class CurveBuilder {
     }
 
     /**
+     * build hyperbola from bengin center end point.
+     * center point is center of hyperbola.
+     * vector center to begin is major of radius.
+     * the distance of end point project to major radius of hyperbola is minor radius size of hyperbola.
+     * 
+     * @param {Vector2} [c] - The center point.
+     * @param {Vector2} [a] - The a point.
+     * @param {Vector2} [b] - The b point.
+     */
+    static BuildHyperbola2FromCenterABPoint(c: Vector2, a: Vector2, b: Vector2): Hyperbola2Data {
+        let major = a.clone().sub(c);
+        let radius = new Vector2();
+        radius.x = major.length();
+        major.normalize();
+        let rotation = Math.atan2(major.y, major.x);
+        major.multiplyScalar(b.clone().dot(major));
+        radius.y = b.distanceTo(major);
+        let tr = new Transform2(c, rotation);
+        return new Hyperbola2Data(tr, radius);
+    }
+
+    /**
+     * build parabola from bengin top focus point.
+     * center point is top of parabola.
+     * vector top to focus is major of parabola.
+     * 
+     * @param {Vector2} [c] - The top point.
+     * @param {Vector2} [a] - The focus point.
+     */
+    static BuildParabola2FromCenterABPoint(c: Vector2, a: Vector2): Parabola2Data {
+        let major = a.clone().sub(c);
+        let f = major.length();
+        major.normalize();
+        let rotation = Math.atan2(major.y, major.x);
+        let tr = new Transform2(c, rotation);
+        return new Parabola2Data(tr, f);
+    }
+
+    /**
      * build nurbs from fitting points.
      *
      * @param {Array<Vector2>} [points] - The fitting points.
@@ -196,6 +237,12 @@ class CurveBuilder {
         }
         else if (dat instanceof Nurbs2Data) {
             return new Nurbs2Algo(dat);
+        }
+        else if (dat instanceof Hyperbola2Data) {
+            return new Hyperbola2Algo(dat);
+        }
+        else if (dat instanceof Parabola2Data) {
+            return new Parabola2Algo(dat);
         }
         debugger;
         return null;

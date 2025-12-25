@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import * as WEBGPU from 'three/src/three.WebGPU';
 import { Vector2 } from "./math/Math"
+import * as MATHJS from './mathjs';
 import { Line2Data } from './geometry/data/base/curve2/Line2Data';
 import { Line2Algo } from './geometry/algorithm/base/curve2/Line2Algo';
 import CamToolBar from "./ui/CamToolBar";
@@ -13,6 +14,8 @@ import { MathUtils } from './math/MathUtils';
 import { Curve2Inter, type InterOfCurve2 } from './geometry/algorithm/relation/intersection/Curve2Inter';
 import { SolveEquation } from './geometry/data/base/SolveEquation';
 import type { Arc2Data } from './geometry/data/base/curve2/Arc2Data';
+import type { Hyperbola2Data } from './geometry/data/base/curve2/Hyperbola2Data';
+import type { Parabola2Data } from './geometry/data/base/curve2/Parabola2Data';
 
 export class Cube {
   public constructor() {
@@ -61,6 +64,25 @@ export class Cube {
     scene.add(geoEllipseEdge);
 
 
+    // 根据三点创建一个双曲线
+    let hyperbolaLeftEdge = Brep2Builder.BuildHyperbolaEdge2FromCenterABPoint(new Vector2(0, 0), new Vector2(15, 0), new Vector2(0, 30));
+    let geoHyperbolaLeftEdgeEdge = BrepMeshBuilder.BuildEdge2Mesh(hyperbolaLeftEdge, THREE.Color.NAMES.aqua);
+    geoHyperbolaLeftEdgeEdge.name = "Hyperbola2_Left_Three_Point";
+    scene.add(geoHyperbolaLeftEdgeEdge);
+
+    let hyperbolaRightEdge = Brep2Builder.BuildHyperbolaEdge2FromCenterABPoint(new Vector2(0, 0), new Vector2(15, 0), new Vector2(0, 30), Math.PI / 2 + 1e-10, Math.PI * 3 / 2 - 1e-10);
+    let geoHyperbolaRightEdgeEdge = BrepMeshBuilder.BuildEdge2Mesh(hyperbolaRightEdge, THREE.Color.NAMES.fuchsia);
+    geoHyperbolaRightEdgeEdge.name = "Hyperbola2_right_Three_Point";
+    scene.add(geoHyperbolaRightEdgeEdge);
+
+
+    // 根据两点创建一个双曲线
+    let parabolaEdge = Brep2Builder.BuildParabolaEdge2FromCenterABPoint(new Vector2(0, 0), new Vector2(10, 0), 50, -50);
+    let geoParabolaEdgeEdge = BrepMeshBuilder.BuildEdge2Mesh(parabolaEdge, THREE.Color.NAMES.coral);
+    geoParabolaEdgeEdge.name = "Parabola2_Left_Three_Point";
+    scene.add(geoParabolaEdgeEdge);
+
+
     // 创建一个直线段
     let lineEdge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(new Vector2(0, 0), new Vector2(20, 20));
     let geoLineEdgeEdge = BrepMeshBuilder.BuildEdge2Mesh(lineEdge, THREE.Color.NAMES.red);
@@ -96,10 +118,18 @@ export class Cube {
     inters.push(...Curve2Inter.LineXArc(lineEdge.curve, circle1Edge.curve as Arc2Data, 0.0001));
     inters.push(...Curve2Inter.LineXArc(lineEdge.curve, arcEdge.curve as Arc2Data, 0.0001));
     inters.push(...Curve2Inter.LineXArc(lineEdge.curve, ellipseEdge.curve as Arc2Data, 0.0001));
+    inters.push(...Curve2Inter.LineXHyperbola(lineEdge.curve, hyperbolaLeftEdge.curve as Hyperbola2Data, 0.0001));
+    inters.push(...Curve2Inter.LineXHyperbola(lineEdge.curve, hyperbolaRightEdge.curve as Hyperbola2Data, 0.0001));
+    inters.push(...Curve2Inter.LineXParabola(lineEdge.curve, parabolaEdge.curve as Parabola2Data, 0.0001));
+
+
     inters.push(...Curve2Inter.LineXArc(line1Edge.curve, circleEdge.curve as Arc2Data, 0.0001));
     inters.push(...Curve2Inter.LineXArc(line1Edge.curve, circle1Edge.curve as Arc2Data, 0.0001));
     inters.push(...Curve2Inter.LineXArc(line1Edge.curve, arcEdge.curve as Arc2Data, 0.0001));
     inters.push(...Curve2Inter.LineXArc(line1Edge.curve, ellipseEdge.curve as Arc2Data, 0.0001));
+    inters.push(...Curve2Inter.LineXHyperbola(line1Edge.curve, hyperbolaLeftEdge.curve as Hyperbola2Data, 0.0001));
+    inters.push(...Curve2Inter.LineXHyperbola(line1Edge.curve, hyperbolaRightEdge.curve as Hyperbola2Data, 0.0001));
+    inters.push(...Curve2Inter.LineXParabola(line1Edge.curve, parabolaEdge.curve as Parabola2Data, 0.0001));
     drawInters(inters);
 
     // 创建一个立方体几何体

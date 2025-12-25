@@ -1,11 +1,12 @@
 import { Vector2 } from "../../../../math/Math";
-import * as MATHJS from 'mathjs';
+import * as MATHJS from '../../../../mathjs';
 import { MathUtils } from "../../../../math/MathUtils";
 import { Hyperbola2Data } from "../../../data/base/curve2/Hyperbola2Data";
 import { Curve2Algo } from "../Curve2Algo";
 /**
  * 2D Hyperbola algorithm. TODO
- *
+ * x = asec(φ)
+ * y = btan(φ)
  */
 class Hyperbola2Algo extends Curve2Algo {
     /**
@@ -49,35 +50,57 @@ class Hyperbola2Algo extends Curve2Algo {
      * @retun {Vector2}
      */
     override d(u: number, r: number = 0): Vector2 {
-        switch (r % 4) {
+        let a = MATHJS.bignumber(this.dat.radius.x);
+        let b = MATHJS.bignumber(this.dat.radius.y);
+        let m = this.dat.trans.makeLocalMatrix();
+        switch (r) {
             case 0:
                 {
-                    let m = this.dat.trans.makeLocalMatrix();
-                    let ret = new Vector2(this.dat.radius.x * Math.cos(u), this.dat.radius.y * Math.sin(u));
+                    // x = asec(φ)
+                    // y = btan(φ)         
+                    let x = MATHJS.multiply(a, MATHJS.sec(u)) as MATHJS.BigNumber;
+                    let y = MATHJS.multiply(b, MATHJS.tan(u)) as MATHJS.BigNumber;
+                    let ret = new Vector2(x.toNumber(), y.toNumber());
                     ret.applyMatrix3(m);
                     return ret;
                 }
             case 1:
                 {
-                    let m = this.dat.trans.makeLocalMatrix();
-                    let ret = new Vector2(-this.dat.radius.x * Math.sin(u), this.dat.radius.y * Math.cos(u));
+                    // x' = asec(φ)tan(φ)
+                    // y' = bsec(φ)sec(φ)              
+                    let x = MATHJS.multiply(a, MATHJS.sec(u), MATHJS.tan(u)) as MATHJS.BigNumber;
+                    let y = MATHJS.multiply(b, MATHJS.tan(u), MATHJS.sec(u)) as MATHJS.BigNumber;
+                    let ret = new Vector2(x.toNumber(), y.toNumber());
                     ret.applyMatrix3(m);
                     return ret;
                 }
             case 2:
                 {
-                    let m = this.dat.trans.makeLocalMatrix();
-                    let ret = new Vector2(-this.dat.radius.x * Math.cos(u), -this.dat.radius.y * Math.sin(u));
+                    // x'' = a(sec(φ)tan(φ)tan(φ) + sec(φ)sec(φ)sec(φ)) = a(sec(φ)tan^2(φ) + sec^3(φ))
+                    // y'' = b(2sec(φ)sec(φ)tan(φ)) = 2bsec^2(φ)tan(φ)  
+                    let su = MATHJS.sec(u);
+                    let tu = MATHJS.tan(u);
+                    let x = MATHJS.add(MATHJS.multiply(su, tu, tu), MATHJS.multiply(su, su, su)) as MATHJS.BigNumber;
+                    let y = MATHJS.multiply(b, su, su, tu, 2) as MATHJS.BigNumber;
+                    let ret = new Vector2(x.toNumber(), y.toNumber());
                     ret.applyMatrix3(m);
                     return ret;
                 }
             case 3:
                 {
-                    let m = this.dat.trans.makeLocalMatrix();
-                    let ret = new Vector2(this.dat.radius.x * Math.sin(u), -this.dat.radius.y * Math.cos(u));
+                    // x'' = a(sec(φ)tan^3(φ) + 2tan(φ)sec^3(φ) + 3sec^3(φ)tan(φ))
+                    // y'' = 2b(2sec^2(φ)tan^2(φ) + sec^4(φ))
+                    let su = MATHJS.sec(u);
+                    let tu = MATHJS.tan(u);
+                    let x = MATHJS.add(MATHJS.multiply(a, su, tu, tu, tu), MATHJS.multiply(a, tu, su, su, su, 2), MATHJS.multiply(a, su, su, su, tu, 3)) as MATHJS.BigNumber;
+                    let y = MATHJS.add(MATHJS.multiply(b, su, su, tu, tu, 4), MATHJS.multiply(b, su, su, su, su, 2)) as MATHJS.BigNumber;
+                    let ret = new Vector2(x.toNumber(), y.toNumber());
                     ret.applyMatrix3(m);
                     return ret;
                 }
+            default:
+                debugger;
+                return;
         }
     }
     /**
@@ -86,14 +109,14 @@ class Hyperbola2Algo extends Curve2Algo {
      * @retun {A B C D E F} - General equation coefficients.
      */
     ge(): { A: MATHJS.BigNumber, B: MATHJS.BigNumber, C: MATHJS.BigNumber, D: MATHJS.BigNumber, E: MATHJS.BigNumber, F: MATHJS.BigNumber } {
-        //设椭圆中心在 (x0,y0)，长半轴 a（沿旋转前 X 轴方向），短半轴 b（沿旋转前 Y 轴方向），旋转角为 φ（绕中心逆时针转）。
+        //设中心在 (x0,y0)，长半轴 a（沿旋转前 X 轴方向），短半轴 b（沿旋转前 Y 轴方向），旋转角为 φ（绕中心逆时针转）。
         // 曲线系数计算
-        // A = a²sin²φ + b²cos²φ, 
-        // B = -(a² − b²)sin2φ
-        // C = a²cos²φ + b²sin²φ, 
+        // A = cos²φ/a² - sin²φ/b², 
+        // B = (1/a² + 1/b²)sin2φ
+        // C = sin²φ/a² - cos²φ/b², 
         // D = −2 A x0 − B y0 
         // E = −2 C y0 − B x0
-        // F = A x0² + B x0 y0 + C y0² − a²b²     
+        // F = A x0² + B x0 y0 + C y0² − 1     
         // 曲线的二元二次方程组
         // Ax² + Bxy + Cy² + Dx + Ey + F = 0
         let c = this.dat;
@@ -102,20 +125,20 @@ class Hyperbola2Algo extends Curve2Algo {
         let φ = MATHJS.bignumber(c.trans.rot);
         let x0 = MATHJS.bignumber(c.trans.pos.x);
         let y0 = MATHJS.bignumber(c.trans.pos.y);
-        let aa = MATHJS.multiply(a, a);
-        let bb = MATHJS.multiply(b, b);
+        let aa = MATHJS.divide(MATHJS.bignumber(1), MATHJS.multiply(a, a));// 1/a²
+        let bb = MATHJS.divide(MATHJS.bignumber(1), MATHJS.multiply(a, a));// 1/b²
         let sinφ = MATHJS.sin(φ);
         let cosφ = MATHJS.cos(φ);
         let sin2φ = MATHJS.sin(MATHJS.multiply(φ, 2) as MATHJS.BigNumber);
 
-        let A = MATHJS.add(
+        let A = MATHJS.subtract(
+            MATHJS.multiply(cosφ, cosφ, aa),
+            MATHJS.multiply(sinφ, sinφ, bb)
+        ) as MATHJS.BigNumber;
+        let B = MATHJS.multiply(MATHJS.add(aa, bb), sin2φ) as MATHJS.BigNumber;
+        let C = MATHJS.subtract(
             MATHJS.multiply(aa, sinφ, sinφ),
             MATHJS.multiply(bb, cosφ, cosφ)
-        ) as MATHJS.BigNumber;
-        let B = MATHJS.unaryMinus(MATHJS.multiply(MATHJS.subtract(aa, bb), sin2φ)) as MATHJS.BigNumber;
-        let C = MATHJS.add(
-            MATHJS.multiply(aa, cosφ, cosφ),
-            MATHJS.multiply(bb, sinφ, sinφ)
         ) as MATHJS.BigNumber;
         let D = MATHJS.add(
             MATHJS.unaryMinus(MATHJS.multiply(A, x0, 2)),
@@ -129,7 +152,7 @@ class Hyperbola2Algo extends Curve2Algo {
             MATHJS.multiply(A, x0, x0),
             MATHJS.multiply(B, x0, y0),
             MATHJS.multiply(C, y0, y0),
-            MATHJS.unaryMinus(MATHJS.multiply(aa, bb)),
+            MATHJS.bignumber(-1),
         ) as MATHJS.BigNumber;
         return { A, B, C, D, E, F };
     }

@@ -5,7 +5,8 @@ import { Arc2Data } from "../../../data/base/curve2/Arc2Data";
 import { Curve2Algo } from "../Curve2Algo";
 /**
  * 2D arc algorithm.
- *
+ * x = acos(φ)
+ * y = bsin(φ)
  */
 class Arc2Algo extends Curve2Algo {
     /**
