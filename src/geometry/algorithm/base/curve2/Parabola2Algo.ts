@@ -1,4 +1,5 @@
 import { Vector2 } from "../../../../math/Math";
+import { MathUtils } from "../../../../math/MathUtils";
 import * as MATHJS from '../../../../mathjs';
 import { Parabola2Data } from "../../../data/base/curve2/Parabola2Data";
 import { Curve2Algo } from "../Curve2Algo";
@@ -25,36 +26,47 @@ class Parabola2Algo extends Curve2Algo {
     }
 
     /**
+     * the U function return u parameter at a position .
+     * @param {Vector2} [point] - the point on curve.
+     * @retun {number}
+     */
+    u(point: Vector2): number {
+        let v = point.clone();
+        v.applyMatrix3(this.dat.trans.makeWorldMatrix().invert());
+        return v.x;
+    }
+
+    /**
      * the D(derivative) function return r-order derivative vector at u parameter.
      * @param {number} [u ∈ [0,a]] - the u parameter of curve.
      * @param {number} [r ∈ [0,1,2...]] - r-order.
      * @retun {Vector2}
      */
     override d(u: number, r: number = 0): Vector2 {
-        let x = MATHJS.bignumber(u);
-        let m = this.dat.trans.makeLocalMatrix();
-        let f4_ = MATHJS.divide(MATHJS.bignumber(1), MATHJS.multiply(MATHJS.bignumber(this.dat.f), 4)) as MATHJS.BigNumber;
+        const x = MATHJS.bignumber(u);
+        const m = this.dat.trans.makeLocalMatrix();
+        const f4_ = MATHJS.divide(MATHJS.bignumber(1), MATHJS.multiply(MATHJS.bignumber(this.dat.f), 4)) as MATHJS.BigNumber;
         switch (r) {
             case 0:
                 {
                     // y = x²/4f         
-                    let y = MATHJS.multiply(x, x, f4_) as MATHJS.BigNumber;
-                    let ret = new Vector2(x.toNumber(), y.toNumber());
+                    const y = MATHJS.multiply(x, x, f4_) as MATHJS.BigNumber;
+                    const ret = new Vector2(x.toNumber(), y.toNumber());
                     ret.applyMatrix3(m);
                     return ret;
                 }
             case 1:
                 {
                     // y' = 2x/4f           
-                    let y = MATHJS.add(x, x, f4_, 2) as MATHJS.BigNumber;
-                    let ret = new Vector2(x.toNumber(), y.toNumber());
+                    const y = MATHJS.add(x, x, f4_, 2) as MATHJS.BigNumber;
+                    const ret = new Vector2(x.toNumber(), y.toNumber());
                     ret.applyMatrix3(m);
                     return ret;
                 }
             case 2:
                 {
                     // y'' = 2/4f     
-                    let ret = new Vector2(u, f4_.toNumber() * 2);
+                    const ret = new Vector2(u, f4_.toNumber() * 2);
                     ret.applyMatrix3(m);
                     return ret;
                 }
@@ -80,29 +92,29 @@ class Parabola2Algo extends Curve2Algo {
         // F = A x0² + B x0 y0 + C y0² − 4 p sinφ x0 + 4 p cosφ y0     
         // 曲线的二元二次方程组
         // Ax² + Bxy + Cy² + Dx + Ey + F = 0
-        let c = this.dat;
-        let p = MATHJS.bignumber(c.f);
-        let φ = MATHJS.bignumber(c.trans.rot);
-        let x0 = MATHJS.bignumber(c.trans.pos.x);
-        let y0 = MATHJS.bignumber(c.trans.pos.y);
-        let sinφ = MATHJS.sin(φ);
-        let cosφ = MATHJS.cos(φ);
-        let sin2φ = MATHJS.sin(MATHJS.multiply(φ, 2) as MATHJS.BigNumber);
+        const c = this.dat;
+        const p = MATHJS.bignumber(c.f);
+        const φ = MATHJS.bignumber(c.trans.rot);
+        const x0 = MATHJS.bignumber(c.trans.pos.x);
+        const y0 = MATHJS.bignumber(c.trans.pos.y);
+        const sinφ = MATHJS.sin(φ);
+        const cosφ = MATHJS.cos(φ);
+        const sin2φ = MATHJS.sin(MATHJS.multiply(φ, 2) as MATHJS.BigNumber);
 
-        let A = MATHJS.multiply(cosφ, cosφ) as MATHJS.BigNumber;
-        let B = sin2φ;
-        let C = MATHJS.multiply(sinφ, sinφ) as MATHJS.BigNumber;
-        let D = MATHJS.add(
+        const A = MATHJS.multiply(cosφ, cosφ) as MATHJS.BigNumber;
+        const B = sin2φ;
+        const C = MATHJS.multiply(sinφ, sinφ) as MATHJS.BigNumber;
+        const D = MATHJS.add(
             MATHJS.multiply(p, sinφ, 4),
             MATHJS.unaryMinus(MATHJS.multiply(A, x0, 2)),
             MATHJS.unaryMinus(MATHJS.multiply(B, y0))
         ) as MATHJS.BigNumber;
-        let E = MATHJS.add(
+        const E = MATHJS.add(
             MATHJS.unaryMinus(MATHJS.multiply(p, cosφ, 4)),
             MATHJS.unaryMinus(MATHJS.multiply(B, x0)),
             MATHJS.unaryMinus(MATHJS.multiply(C, y0, 2))
         ) as MATHJS.BigNumber;
-        let F = MATHJS.add(
+        const F = MATHJS.add(
             MATHJS.multiply(A, x0, x0),
             MATHJS.multiply(B, x0, y0),
             MATHJS.multiply(C, y0, y0),
