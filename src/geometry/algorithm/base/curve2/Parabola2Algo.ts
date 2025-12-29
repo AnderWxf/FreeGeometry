@@ -77,6 +77,26 @@ class Parabola2Algo extends Curve2Algo {
     }
 
     /**
+     * the G(general) function return the value of the general equation for the curve.
+     * if point on curve then the return value is zero.
+     * f(x,y) = 0
+     * 4fy - x² = 0
+     * @param {Vector2} [point] - the point baout curve. 
+     * @retun {number}
+     */
+    g(point: Vector2): number {
+        let v = point.clone();
+        v.applyMatrix3(this.dat.trans.makeWorldMatrix().invert());
+        const x = MATHJS.bignumber(v.x);
+        const y = MATHJS.bignumber(v.y);
+        let f = MATHJS.bignumber(this.dat.f);
+        return (MATHJS.add(
+            MATHJS.multiply(y, f, 4),
+            MATHJS.unaryMinus(MATHJS.multiply(x, x))
+        ) as MATHJS.BigNumber).toNumber();
+    }
+
+    /**
      * the GE function return general equation coefficients of 2D Hyperbola.
      * @param {Hyperbola2Data} [c = Hyperbola2Data] - The data struct of 2D Hyperbola.
      * @retun {A B C D E F} - General equation coefficients.

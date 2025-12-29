@@ -104,6 +104,28 @@ class Hyperbola2Algo extends Curve2Algo {
                 return;
         }
     }
+
+    /**
+     * the G(general) function return the value of the general equation for the curve.
+     * if point on curve then the return value is zero.
+     * f(x,y) = 0
+     * x²/a² - y²/b² - 1 = 0
+     * @param {Vector2} [point] - the point baout curve. 
+     * @retun {number}
+     */
+    g(point: Vector2): number {
+        let v = point.clone();
+        v.applyMatrix3(this.dat.trans.makeWorldMatrix().invert());
+        const x = MATHJS.bignumber(v.x);
+        const y = MATHJS.bignumber(v.y);
+        let a = MATHJS.bignumber(this.dat.radius.x);
+        let b = MATHJS.bignumber(this.dat.radius.y);
+        return (MATHJS.add(
+            MATHJS.divide(MATHJS.multiply(x, x), MATHJS.multiply(a, a)),
+            MATHJS.divide(MATHJS.multiply(y, y), MATHJS.unaryMinus(MATHJS.multiply(b, b))),
+            -1) as MATHJS.BigNumber).toNumber();
+    }
+
     /**
      * the GE function return general equation coefficients of 2D Hyperbola.
      * @param {Hyperbola2Data} [c = Hyperbola2Data] - The data struct of 2D Hyperbola.

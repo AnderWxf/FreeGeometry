@@ -45,6 +45,20 @@ class Line2Algo extends Curve2Algo {
     }
 
     /**
+     * the G(general) function return the value of the general equation for the curve.
+     * if point on curve then the return value is zero.
+     * f(x,y) = 0
+     * 
+     * @param {Vector2} [point] - the point baout curve. 
+     * @retun {number}
+     */
+    g(point: Vector2): number {
+        let v = point.clone();
+        v.applyMatrix3(this.dat.trans.makeWorldMatrix().invert());
+        return v.y;
+    }
+
+    /**
      * the U function return u parameter at a position .
      * @param {Vector2} [point] - the point on curve.
      * @retun {number}
