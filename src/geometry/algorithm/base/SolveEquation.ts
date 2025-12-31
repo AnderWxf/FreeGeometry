@@ -10,18 +10,26 @@ class SolveEquation {
      * @returns {Object} 解的结果
      */
     static SolveQuadraticEquation(a_: number | MATHJS.BigNumber, b_: number | MATHJS.BigNumber, c_: number | MATHJS.BigNumber): Array<MATHJS.Complex | MATHJS.BigNumber> {
+        let roots = new Array<MATHJS.Complex | MATHJS.BigNumber>();
         let a = MATHJS.bignumber(a_);
         let b = MATHJS.bignumber(b_);
         let c = MATHJS.bignumber(c_);
         // 输入验证
         if (a.equals(0)) {
-            throw new Error('这不是一元二次方程(a不能为0)');
+            // 这不是一元二次方程（a不能为0）, 解一元一次方程 bx + c = 0
+            if (b.equals(0)) {
+                // 这不是一元一次方程（b不能为0）
+                return roots;
+            }
+            const root = MATHJS.divide(MATHJS.unaryMinus(c), b) as MATHJS.BigNumber;
+            roots.push(root);
+            return roots;
         }
         let _b = MATHJS.unaryMinus(b);
         let _2a = MATHJS.multiply(a, 2);
         // 计算判别式
         const discriminant = MATHJS.subtract(MATHJS.multiply(b, b), MATHJS.multiply(a, c, 4)) as MATHJS.BigNumber;
-        let roots = new Array<MATHJS.Complex | MATHJS.BigNumber>();
+
         if (MATHJS.larger(discriminant, 0)) {
             // 两个不等实根
             const sqrtDiscriminant = MATHJS.sqrt(discriminant);
@@ -82,7 +90,9 @@ class SolveEquation {
         let d = MATHJS.bignumber(d_);
         // 输入验证
         if (a.equals(0)) {
-            throw new Error('这不是一元三次方程（a不能为0）');
+            // 这不是一元三次方程（a不能为0），解一元二次方程 bx² + cx + d = 0
+            let roots = SolveEquation.SolveQuadraticEquation(b, c, d);
+            return roots;
         }
 
         // 将方程化为简化形式: x³ + px² + qx + r = 0
@@ -329,7 +339,9 @@ class SolveEquation {
         let e = MATHJS.bignumber(e_);
         // 输入验证
         if (a.equals(0)) {
-            throw new Error('这不是一元四次方程（a不能为0）');
+            // 这不是一元四次方程（a不能为0），解一元三次方程 bx³ + cx² + dx + e = 0
+            let roots = SolveEquation.SolveCubicNumberical(b, c, d, e);
+            return roots;
         }
 
         // 将方程化为简化形式: x⁴ + px³ + qx² + rx + s = 0

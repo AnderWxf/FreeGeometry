@@ -153,7 +153,7 @@ class CurveBuilder {
         let major = a.clone().sub(c);
         let f = major.length();
         major.normalize();
-        let rotation = Math.atan2(major.y, major.x);
+        let rotation = Math.atan2(major.y, major.x) - Math.PI / 2;
         let tr = new Transform2(c, rotation);
         return new Parabola2Data(tr, f);
     }
