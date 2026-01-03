@@ -94,16 +94,16 @@ export class Cube {
     geoLine1EdgeEdge.name = "Line2_1";
 
 
-    scene.add(geoCircleEdgeEdge);
-    // scene.add(geoCircleEdgeEdge_);
-    // scene.add(geoCircle1EdgeEdge);
+    // scene.add(geoCircleEdgeEdge);
+    scene.add(geoCircleEdgeEdge_);
+    scene.add(geoCircle1EdgeEdge);
     // scene.add(geoArcEdgeEdge);
     // scene.add(geoEllipseEdge);
     // scene.add(geoLineEdgeEdge);
     // scene.add(geoLine1EdgeEdge);
     // scene.add(geoHyperbolaLeftEdgeEdge);
     // scene.add(geoHyperbolaRightEdgeEdge);
-    scene.add(geoParabolaEdgeEdge);
+    // scene.add(geoParabolaEdgeEdge);
 
     let drawInters = (inters: Array<InterOfCurve2>) => {
       for (let i = 0; i < inters.length; i++) {
@@ -145,9 +145,9 @@ export class Cube {
     // inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge.curve as Arc2Data, ellipseEdge.curve as Arc2Data, 0.0001));
     // inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge.curve as Arc2Data, hyperbolaLeftEdge.curve as Hyperbola2Data, 0.0001));
     // inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge.curve as Arc2Data, hyperbolaRightEdge.curve as Hyperbola2Data, 0.0001));
-    inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge.curve as Arc2Data, parabolaEdge.curve as Parabola2Data, 0.0001));
+    // inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge.curve as Arc2Data, parabolaEdge.curve as Parabola2Data, 0.0001));
 
-    // inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge_.curve as Arc2Data, circle1Edge.curve as Arc2Data, 0.0001));
+    inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge_.curve as Arc2Data, circle1Edge.curve as Arc2Data, 0.0001));
     // inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge_.curve as Arc2Data, arcEdge.curve as Arc2Data, 0.0001));
     // inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge_.curve as Arc2Data, ellipseEdge.curve as Arc2Data, 0.0001));
     // inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge_.curve as Arc2Data, hyperbolaLeftEdge.curve as Hyperbola2Data, 0.0001));

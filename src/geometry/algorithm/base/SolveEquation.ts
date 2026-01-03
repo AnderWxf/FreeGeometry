@@ -1,4 +1,4 @@
-import * as MATHJS from 'mathjs';
+import * as MATHJS from '../../../mathjs';
 
 class SolveEquation {
 
