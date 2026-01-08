@@ -15,6 +15,7 @@ import type { Parabola2Data } from "../../../data/base/curve2/Parabola2Data";
 import { Parabola2Algo } from "../../base/curve2/Parabola2Algo";
 import type { Curve2Algo } from "../../base/Curve2Algo";
 import * as SVD from "svd-js";
+import { e } from '../../../../mathjs/lib/cjs/entry/pureFunctionsAny.generated';
 
 /**
  * compute curve intersection point utility.
@@ -417,9 +418,14 @@ class Curve2Inter {
             row2[1] = MATHJS.multiply(MATHJS.add(row2_[1], row2_t[1]), 0.5) as MATHJS.BigNumber;
             row2[2] = MATHJS.multiply(MATHJS.add(row2_[2], row2_t[2]), 0.5) as MATHJS.BigNumber;
 
-            B[0] = row0;
-            B[1] = row1;
-            B[2] = row2;
+            // B[0] = row0;
+            // B[1] = row1;
+            // B[2] = row2;
+
+            B[0] = row0_;
+            B[1] = row1_;
+            B[2] = row2_;
+
             // 4. 分解 B 为两条直线（利用对称 SVD 或配方法）。
             console.log(" B = A1 + λ A2 :\n " + format(row0) + " \n " + format(row1) + " \n " + format(row2));
             let isSVD = true;
@@ -543,7 +549,7 @@ class Curve2Inter {
             }
             // 特征值分解
             if (isEigs) {
-                const eigenvectors = MATHJS.eigs(B, { precision: 1e-15, eigenvectors: true }).eigenvectors;
+                const eigenvectors = MATHJS.eigs(B, { precision: 1e-25, eigenvectors: true }).eigenvectors;
                 eigenvectors.sort((a, b): number => {
                     let va = MATHJS.abs(a.value) as MATHJS.BigNumber;
                     let vb = MATHJS.abs(b.value) as MATHJS.BigNumber;
@@ -708,22 +714,88 @@ class Curve2Inter {
                     inters.push(...inters1, ...inters2);
 
                 }
-                inters.forEach(inter => {
+                for (let j = 0; j < inters.length; j++) {
+                    let inter = inters[j];
                     console.log(" p " + format(inter.p.x) + " " + format(inter.p.y) + " u0 " + inter.u0 + " u1 " + inter.u1);
                     // 6. 验证 候选点在两条曲线上，并去重。
                     let g0 = c0a.g(inter.p);
                     let g1 = c1a.g(inter.p);
+                    console.log(" g0 " + format(g0) + " g1 " + format(g1));
                     if (Math.abs(g0) < tol && Math.abs(g1) < tol) {
                         console.warn(" g0 " + format(g0) + " g1 " + format(g1));
                         ret.push({ p: inter.p, u0: inter.u1, u1: c1a.u(inter.p) });
-                    } else {
+                    }
+                    else if (Math.abs(g0) < tol) {
+                        inter.u0 = c0a.u(inter.p);
+                        Curve2Inter.Binary(c0a, c1a, inter, tol);
+                        g0 = c0a.g(inter.p);
+                        g1 = c1a.g(inter.p);
+                        if (Math.abs(g0) < tol && Math.abs(g1) < tol) {
+                            console.warn("Newton: g0 " + format(g0) + " g1 " + format(g1));
+                            ret.push({ p: inter.p, u0: inter.u1, u1: c1a.u(inter.p) });
+                        } else {
+                            console.log("Newton: g0 " + format(g0) + " g1 " + format(g1));
+                        }
+                    }
+                    else if (Math.abs(g1) < tol) {
+                        inter.u0 = c1a.u(inter.p);
+                        Curve2Inter.Binary(c1a, c0a, inter, tol);
+                        g0 = c0a.g(inter.p);
+                        g1 = c1a.g(inter.p);
+                        if (Math.abs(g0) < tol && Math.abs(g1) < tol) {
+                            console.warn("Newton: g0 " + format(g0) + " g1 " + format(g1));
+                            ret.push({ p: inter.p, u0: inter.u1, u1: c1a.u(inter.p) });
+                        } else {
+                            console.log("Newton: g0 " + format(g0) + " g1 " + format(g1));
+                        }
+                    }
+                    else {
                         console.log(" g0 " + format(g0) + " g1 " + format(g1));
                     }
-                });
+                }
             }
-
         }
         return ret;
+    }
+
+    /**
+     * 用二分逼近在c0上寻找与c1的交点。
+     * 在c0的参数空间内迭代。
+     * 寻找一个c0的参数u0，使得c0.p(u0)在c1上，即满足c1的一般方程。
+     * 误差小于tol时停止。
+     * p0s为c0上的初始猜测点。
+     * 
+     * @param {Curve2Algo} [c0] - The frist curve.
+     * @param {Curve2Algo} [c1] - The second curve.
+     * @param {number} [tol] - The tolerance of distance.
+     */
+    static Binary(
+        c0a: Curve2Algo,
+        c1a: Curve2Algo,
+        p0: InterOfCurve2,
+        tol: number): void {
+        let ret = p0;
+        let g = c1a.g(p0.p);
+        let du = 0.01;
+        while (true) {
+            let u = ret.u0;
+            let dp = c0a.p(u);
+            let dg = c1a.g(dp);
+            if (g * dg < 0) {
+                du = -du * 0.5;
+            } else if (Math.abs(dg) < Math.abs(g)) {
+                du = du * 0.5;
+            }
+            if (Math.abs(g) < tol || Math.abs(du) < tol) {
+                ret.p = dp;
+                ret.u0 = u;
+                ret.u1 = c1a.u(dp);
+                break;
+            } else {
+                g = dg;
+                ret.u0 += du;
+            }
+        }
     }
 
     // 构建二次型矩阵

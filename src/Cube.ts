@@ -121,56 +121,56 @@ export class Cube {
     // 基础材质（可配置颜色、贴图等）
     const material = new THREE.MeshBasicMaterial({ color: 0x0088ff });
     let inters = new Array<InterOfCurve2>();
-    // inters.push(...Curve2Inter.LineXLine(lineEdge.curve, line1Edge.curve, 0.0001));
-    // inters.push(...Curve2Inter.LineXArc(lineEdge.curve, circleEdge.curve as Arc2Data, 0.0001));
-    // inters.push(...Curve2Inter.LineXArc(lineEdge.curve, circle1Edge.curve as Arc2Data, 0.0001));
-    // inters.push(...Curve2Inter.LineXArc(lineEdge.curve, arcEdge.curve as Arc2Data, 0.0001));
-    // inters.push(...Curve2Inter.LineXArc(lineEdge.curve, ellipseEdge.curve as Arc2Data, 0.0001));
-    // inters.push(...Curve2Inter.LineXHyperbola(lineEdge.curve, hyperbolaLeftEdge.curve as Hyperbola2Data, 0.0001));
-    // inters.push(...Curve2Inter.LineXHyperbola(lineEdge.curve, hyperbolaRightEdge.curve as Hyperbola2Data, 0.0001));
-    // inters.push(...Curve2Inter.LineXParabola(lineEdge.curve, parabolaEdge.curve as Parabola2Data, 0.0001));
+    // inters.push(...Curve2Inter.LineXLine(lineEdge.curve, line1Edge.curve, 1e-10));
+    // inters.push(...Curve2Inter.LineXArc(lineEdge.curve, circleEdge.curve as Arc2Data, 1e-10));
+    // inters.push(...Curve2Inter.LineXArc(lineEdge.curve, circle1Edge.curve as Arc2Data, 1e-10));
+    // inters.push(...Curve2Inter.LineXArc(lineEdge.curve, arcEdge.curve as Arc2Data, 1e-10));
+    // inters.push(...Curve2Inter.LineXArc(lineEdge.curve, ellipseEdge.curve as Arc2Data, 1e-10));
+    // inters.push(...Curve2Inter.LineXHyperbola(lineEdge.curve, hyperbolaLeftEdge.curve as Hyperbola2Data, 1e-10));
+    // inters.push(...Curve2Inter.LineXHyperbola(lineEdge.curve, hyperbolaRightEdge.curve as Hyperbola2Data, 1e-10));
+    // inters.push(...Curve2Inter.LineXParabola(lineEdge.curve, parabolaEdge.curve as Parabola2Data, 1e-10));
 
 
-    // inters.push(...Curve2Inter.LineXArc(line1Edge.curve, circleEdge.curve as Arc2Data, 0.0001));
-    // inters.push(...Curve2Inter.LineXArc(line1Edge.curve, circle1Edge.curve as Arc2Data, 0.0001));
-    // inters.push(...Curve2Inter.LineXArc(line1Edge.curve, arcEdge.curve as Arc2Data, 0.0001));
-    // inters.push(...Curve2Inter.LineXArc(line1Edge.curve, ellipseEdge.curve as Arc2Data, 0.0001));
-    // inters.push(...Curve2Inter.LineXHyperbola(line1Edge.curve, hyperbolaLeftEdge.curve as Hyperbola2Data, 0.0001));
-    // inters.push(...Curve2Inter.LineXHyperbola(line1Edge.curve, hyperbolaRightEdge.curve as Hyperbola2Data, 0.0001));
-    // inters.push(...Curve2Inter.LineXParabola(line1Edge.curve, parabolaEdge.curve as Parabola2Data, 0.0001));
+    // inters.push(...Curve2Inter.LineXArc(line1Edge.curve, circleEdge.curve as Arc2Data, 1e-10));
+    // inters.push(...Curve2Inter.LineXArc(line1Edge.curve, circle1Edge.curve as Arc2Data, 1e-10));
+    // inters.push(...Curve2Inter.LineXArc(line1Edge.curve, arcEdge.curve as Arc2Data, 1e-10));
+    // inters.push(...Curve2Inter.LineXArc(line1Edge.curve, ellipseEdge.curve as Arc2Data, 1e-10));
+    // inters.push(...Curve2Inter.LineXHyperbola(line1Edge.curve, hyperbolaLeftEdge.curve as Hyperbola2Data, 1e-10));
+    // inters.push(...Curve2Inter.LineXHyperbola(line1Edge.curve, hyperbolaRightEdge.curve as Hyperbola2Data, 1e-10));
+    // inters.push(...Curve2Inter.LineXParabola(line1Edge.curve, parabolaEdge.curve as Parabola2Data, 1e-10));
 
-    // inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge.curve as Arc2Data, circleEdge_.curve as Arc2Data, 0.0001));
-    // inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge.curve as Arc2Data, circle1Edge.curve as Arc2Data, 0.0001));
-    // inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge.curve as Arc2Data, arcEdge.curve as Arc2Data, 0.0001));
-    // inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge.curve as Arc2Data, ellipseEdge.curve as Arc2Data, 0.0001));
-    // inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge.curve as Arc2Data, hyperbolaLeftEdge.curve as Hyperbola2Data, 0.0001));
-    // inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge.curve as Arc2Data, hyperbolaRightEdge.curve as Hyperbola2Data, 0.0001));
-    // inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge.curve as Arc2Data, parabolaEdge.curve as Parabola2Data, 0.0001));
+    // inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge.curve as Arc2Data, circleEdge_.curve as Arc2Data, 1e-10));
+    // inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge.curve as Arc2Data, circle1Edge.curve as Arc2Data, 1e-10));
+    // inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge.curve as Arc2Data, arcEdge.curve as Arc2Data, 1e-10));
+    // inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge.curve as Arc2Data, ellipseEdge.curve as Arc2Data, 1e-10));
+    // inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge.curve as Arc2Data, hyperbolaLeftEdge.curve as Hyperbola2Data, 1e-10));
+    // inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge.curve as Arc2Data, hyperbolaRightEdge.curve as Hyperbola2Data, 1e-10));
+    // inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge.curve as Arc2Data, parabolaEdge.curve as Parabola2Data, 1e-10));
 
-    inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge_.curve as Arc2Data, circle1Edge.curve as Arc2Data, 0.0001));
-    // inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge_.curve as Arc2Data, arcEdge.curve as Arc2Data, 0.0001));
-    // inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge_.curve as Arc2Data, ellipseEdge.curve as Arc2Data, 0.0001));
-    // inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge_.curve as Arc2Data, hyperbolaLeftEdge.curve as Hyperbola2Data, 0.0001));
-    // inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge_.curve as Arc2Data, hyperbolaRightEdge.curve as Hyperbola2Data, 0.0001));
-    // inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge_.curve as Arc2Data, parabolaEdge.curve as Parabola2Data, 0.0001));
+    inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge_.curve as Arc2Data, circle1Edge.curve as Arc2Data, 1e-10));
+    // inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge_.curve as Arc2Data, arcEdge.curve as Arc2Data, 1e-10));
+    // inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge_.curve as Arc2Data, ellipseEdge.curve as Arc2Data, 1e-10));
+    // inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge_.curve as Arc2Data, hyperbolaLeftEdge.curve as Hyperbola2Data, 1e-10));
+    // inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge_.curve as Arc2Data, hyperbolaRightEdge.curve as Hyperbola2Data, 1e-10));
+    // inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge_.curve as Arc2Data, parabolaEdge.curve as Parabola2Data, 1e-10));
 
-    // inters.push(...Curve2Inter.QuadraticXQuadratic(circle1Edge.curve as Arc2Data, arcEdge.curve as Arc2Data, 0.0001));
-    // inters.push(...Curve2Inter.QuadraticXQuadratic(circle1Edge.curve as Arc2Data, ellipseEdge.curve as Arc2Data, 0.0001));
-    // inters.push(...Curve2Inter.QuadraticXQuadratic(circle1Edge.curve as Arc2Data, hyperbolaLeftEdge.curve as Hyperbola2Data, 0.0001));
-    // inters.push(...Curve2Inter.QuadraticXQuadratic(circle1Edge.curve as Arc2Data, hyperbolaRightEdge.curve as Hyperbola2Data, 0.0001));
-    // inters.push(...Curve2Inter.QuadraticXQuadratic(circle1Edge.curve as Arc2Data, parabolaEdge.curve as Parabola2Data, 0.0001));
+    // inters.push(...Curve2Inter.QuadraticXQuadratic(circle1Edge.curve as Arc2Data, arcEdge.curve as Arc2Data, 1e-10));
+    // inters.push(...Curve2Inter.QuadraticXQuadratic(circle1Edge.curve as Arc2Data, ellipseEdge.curve as Arc2Data, 1e-10));
+    // inters.push(...Curve2Inter.QuadraticXQuadratic(circle1Edge.curve as Arc2Data, hyperbolaLeftEdge.curve as Hyperbola2Data, 1e-10));
+    // inters.push(...Curve2Inter.QuadraticXQuadratic(circle1Edge.curve as Arc2Data, hyperbolaRightEdge.curve as Hyperbola2Data, 1e-10));
+    // inters.push(...Curve2Inter.QuadraticXQuadratic(circle1Edge.curve as Arc2Data, parabolaEdge.curve as Parabola2Data, 1e-10));
 
-    // inters.push(...Curve2Inter.QuadraticXQuadratic(arcEdge.curve as Arc2Data, ellipseEdge.curve as Arc2Data, 0.0001));
-    // inters.push(...Curve2Inter.QuadraticXQuadratic(arcEdge.curve as Arc2Data, hyperbolaLeftEdge.curve as Hyperbola2Data, 0.0001));
-    // inters.push(...Curve2Inter.QuadraticXQuadratic(arcEdge.curve as Arc2Data, hyperbolaRightEdge.curve as Hyperbola2Data, 0.0001));
-    // inters.push(...Curve2Inter.QuadraticXQuadratic(arcEdge.curve as Arc2Data, parabolaEdge.curve as Parabola2Data, 0.0001));
+    // inters.push(...Curve2Inter.QuadraticXQuadratic(arcEdge.curve as Arc2Data, ellipseEdge.curve as Arc2Data, 1e-10));
+    // inters.push(...Curve2Inter.QuadraticXQuadratic(arcEdge.curve as Arc2Data, hyperbolaLeftEdge.curve as Hyperbola2Data, 1e-10));
+    // inters.push(...Curve2Inter.QuadraticXQuadratic(arcEdge.curve as Arc2Data, hyperbolaRightEdge.curve as Hyperbola2Data, 1e-10));
+    // inters.push(...Curve2Inter.QuadraticXQuadratic(arcEdge.curve as Arc2Data, parabolaEdge.curve as Parabola2Data, 1e-10));
 
-    // inters.push(...Curve2Inter.QuadraticXQuadratic(ellipseEdge.curve as Arc2Data, hyperbolaLeftEdge.curve as Hyperbola2Data, 0.0001));
-    // inters.push(...Curve2Inter.QuadraticXQuadratic(ellipseEdge.curve as Arc2Data, hyperbolaRightEdge.curve as Hyperbola2Data, 0.0001));
-    // inters.push(...Curve2Inter.QuadraticXQuadratic(ellipseEdge.curve as Arc2Data, parabolaEdge.curve as Parabola2Data, 0.0001));
+    // inters.push(...Curve2Inter.QuadraticXQuadratic(ellipseEdge.curve as Arc2Data, hyperbolaLeftEdge.curve as Hyperbola2Data, 1e-10));
+    // inters.push(...Curve2Inter.QuadraticXQuadratic(ellipseEdge.curve as Arc2Data, hyperbolaRightEdge.curve as Hyperbola2Data, 1e-10));
+    // inters.push(...Curve2Inter.QuadraticXQuadratic(ellipseEdge.curve as Arc2Data, parabolaEdge.curve as Parabola2Data, 1e-10));
 
-    // inters.push(...Curve2Inter.QuadraticXQuadratic(hyperbolaLeftEdge.curve as Arc2Data, parabolaEdge.curve as Hyperbola2Data, 0.0001));
-    // inters.push(...Curve2Inter.QuadraticXQuadratic(hyperbolaRightEdge.curve as Arc2Data, parabolaEdge.curve as Parabola2Data, 0.0001));
+    // inters.push(...Curve2Inter.QuadraticXQuadratic(hyperbolaLeftEdge.curve as Arc2Data, parabolaEdge.curve as Hyperbola2Data, 1e-10));
+    // inters.push(...Curve2Inter.QuadraticXQuadratic(hyperbolaRightEdge.curve as Arc2Data, parabolaEdge.curve as Parabola2Data, 1e-10));
     drawInters(inters);
 
     // 创建一个立方体几何体
