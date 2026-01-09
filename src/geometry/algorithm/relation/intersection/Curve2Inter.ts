@@ -308,15 +308,69 @@ class Curve2Inter {
         let format = (v: any): string => {
             return MATHJS.format(v, { precision: 6 });
         }
-        console.log("ConicXConic \n c0:  " + format(c0) +
-            "\n c1: " + format(c1));
+        let isExist = (p: Vector2): boolean => {
+            let isExist = false;
+            for (let k = 0; k < ret.length; k++) {
+                let exist = ret[k];
+                if (p.distanceTo(exist.p) < tol) {
+                    isExist = true;
+                    break;
+                }
+            }
+            return isExist;
+        }
+        // 6. 验证 候选点在两条曲线上，并去重。
+        let checkAndPush = (inters: Array<InterOfCurve2>) => {
+            for (let j = 0; j < inters.length; j++) {
+                let inter = inters[j];
+                if (isExist(inter.p)) {
+                    continue
+                }
+                let g0 = c0a.g(inter.p);
+                let g1 = c1a.g(inter.p);
+                if (Math.abs(g0) < tol && Math.abs(g1) < tol) {
+                    console.log("Right: g0 " + format(g0) + " g1 " + format(g1));
+                    ret.push({ p: inter.p, u0: inter.u1, u1: c1a.u(inter.p) });
+                }
+                else if (Math.abs(g0) < tol) {
+                    inter.u0 = c0a.u(inter.p);
+                    console.log("Binary before: g0 " + format(g0) + " g1 " + format(g1));
+                    Curve2Inter.Binary(c0a, c1a, inter, tol);
+                    g0 = c0a.g(inter.p);
+                    g1 = c1a.g(inter.p);
+                    console.log("Binary after: g0 " + format(g0) + " g1 " + format(g1));
+                    if (Math.abs(g0) < tol && Math.abs(g1) < tol) {
+                        if (!isExist(inter.p)) {
+                            ret.push({ p: inter.p, u0: inter.u1, u1: c1a.u(inter.p) });
+                        }
+
+                    }
+                }
+                else if (Math.abs(g1) < tol) {
+                    inter.u0 = c1a.u(inter.p);
+                    console.log("Binary before: g0 " + format(g0) + " g1 " + format(g1));
+                    Curve2Inter.Binary(c1a, c0a, inter, tol);
+                    g0 = c0a.g(inter.p);
+                    g1 = c1a.g(inter.p);
+                    console.log("Binary after: g0 " + format(g0) + " g1 " + format(g1));
+                    if (Math.abs(g0) < tol && Math.abs(g1) < tol) {
+                        if (!isExist(inter.p)) {
+                            ret.push({ p: inter.p, u0: inter.u1, u1: c1a.u(inter.p) });
+                        }
+                    }
+                }
+                else {
+                    console.log("Error: g0 " + format(g0) + " g1 " + format(g1));
+                }
+            }
+        }
+        // console.log("ConicXConic \n c0:  " + format(c0) + "\n c1: " + format(c1));
         let ret = new Array<InterOfCurve2>();
-        let inters = new Array<InterOfCurve2>()
+
         // 1. 构造对称矩阵 ( A1, A2 ) 表示两条二次曲线。
         let A_1 = Curve2Inter.QuadraticMatrix(c0);
         let A_2 = Curve2Inter.QuadraticMatrix(c1);
-        console.log("ConicXConic \n A_1: \n" + format(A_1)
-            + "\n A_2: \n" + format(A_2));
+        // console.log("ConicXConic \n A_1: \n" + format(A_1) + "\n A_2: \n" + format(A_2));
         let a_1 = c0.A, b_1 = c0.B, c_1 = c0.C, d_1 = c0.D, e_1 = c0.E, f_1 = c0.F;
         let a_2 = c1.A, b_2 = c1.B, c_2 = c1.C, d_2 = c1.D, e_2 = c1.E, f_2 = c1.F;
         //2. 解广义特征值问题 (det(A1 + λA2) = 0)，得到 λ（最多三个）。
@@ -369,70 +423,44 @@ class Curve2Inter {
         const C0 = MATHJS.divide(C_0, C_3) as MATHJS.BigNumber;
 
         //3. 对每个 λ 构造 ( B = A1 + λ A2 )。
-        console.log(" B = A1 + λ A2 :\n C3 " + format(C3) + " C2 " + format(C2) + " C1 " + format(C1) + " C0 " + format(C0));
+        // console.log(" B = A1 + λ A2 :\n C3 " + format(C3) + " C2 " + format(C2) + " C1 " + format(C1) + " C0 " + format(C0));
         const λs = SolveEquation.SolveCubicNumberical(C3, C2, C1, C0);
-        console.log(" λs : " + format(λs));
+        // console.log(" λs : " + format(λs));
         for (let i = 0; i < λs.length; i++) {
             let λ = λs[i];
             if (MATHJS.typeOf(λ) === "Complex") {
                 continue;
             }
-            console.log(" 取 λ" + i + " : " + format(λ));
+            if (ret.length >= 4) {
+                continue;
+            }
+            // console.log(" 取 λ" + i + " : " + format(λ));
             let B = new Array<Array<MATHJS.BigNumber>>(3);
-            let row0_ = new Array<MATHJS.BigNumber>(3);
-            let row1_ = new Array<MATHJS.BigNumber>(3);
-            let row2_ = new Array<MATHJS.BigNumber>(3);
-            row0_[0] = MATHJS.add(A_1[0][0], MATHJS.multiply(λ, A_2[0][0])) as MATHJS.BigNumber;
-            row0_[1] = MATHJS.add(A_1[0][1], MATHJS.multiply(λ, A_2[0][1])) as MATHJS.BigNumber;
-            row0_[2] = MATHJS.add(A_1[0][2], MATHJS.multiply(λ, A_2[0][2])) as MATHJS.BigNumber;
-            row1_[0] = MATHJS.add(A_1[1][0], MATHJS.multiply(λ, A_2[1][0])) as MATHJS.BigNumber;
-            row1_[1] = MATHJS.add(A_1[1][1], MATHJS.multiply(λ, A_2[1][1])) as MATHJS.BigNumber;
-            row1_[2] = MATHJS.add(A_1[1][2], MATHJS.multiply(λ, A_2[1][2])) as MATHJS.BigNumber;
-            row2_[0] = MATHJS.add(A_1[2][0], MATHJS.multiply(λ, A_2[2][0])) as MATHJS.BigNumber;
-            row2_[1] = MATHJS.add(A_1[2][1], MATHJS.multiply(λ, A_2[2][1])) as MATHJS.BigNumber;
-            row2_[2] = MATHJS.add(A_1[2][2], MATHJS.multiply(λ, A_2[2][2])) as MATHJS.BigNumber;
-
-            let row0_t = new Array<MATHJS.BigNumber>(3);
-            let row1_t = new Array<MATHJS.BigNumber>(3);
-            let row2_t = new Array<MATHJS.BigNumber>(3);
-            row0_t[0] = row0_[0];
-            row0_t[1] = row1_[0];
-            row0_t[2] = row2_[0];
-            row1_t[0] = row0_[1];
-            row1_t[1] = row1_[1];
-            row1_t[2] = row2_[1];
-            row2_t[0] = row0_[2];
-            row2_t[1] = row1_[2];
-            row2_t[2] = row2_[2];
-
             let row0 = new Array<MATHJS.BigNumber>(3);
             let row1 = new Array<MATHJS.BigNumber>(3);
             let row2 = new Array<MATHJS.BigNumber>(3);
-            row0[0] = MATHJS.multiply(MATHJS.add(row0_[0], row0_t[0]), 0.5) as MATHJS.BigNumber;
-            row0[1] = MATHJS.multiply(MATHJS.add(row0_[1], row0_t[1]), 0.5) as MATHJS.BigNumber;
-            row0[2] = MATHJS.multiply(MATHJS.add(row0_[2], row0_t[2]), 0.5) as MATHJS.BigNumber;
-            row1[0] = MATHJS.multiply(MATHJS.add(row1_[0], row1_t[0]), 0.5) as MATHJS.BigNumber;
-            row1[1] = MATHJS.multiply(MATHJS.add(row1_[1], row1_t[1]), 0.5) as MATHJS.BigNumber;
-            row1[2] = MATHJS.multiply(MATHJS.add(row1_[2], row1_t[2]), 0.5) as MATHJS.BigNumber;
-            row2[0] = MATHJS.multiply(MATHJS.add(row2_[0], row2_t[0]), 0.5) as MATHJS.BigNumber;
-            row2[1] = MATHJS.multiply(MATHJS.add(row2_[1], row2_t[1]), 0.5) as MATHJS.BigNumber;
-            row2[2] = MATHJS.multiply(MATHJS.add(row2_[2], row2_t[2]), 0.5) as MATHJS.BigNumber;
+            row0[0] = MATHJS.add(A_1[0][0], MATHJS.multiply(λ, A_2[0][0])) as MATHJS.BigNumber;
+            row0[1] = MATHJS.add(A_1[0][1], MATHJS.multiply(λ, A_2[0][1])) as MATHJS.BigNumber;
+            row0[2] = MATHJS.add(A_1[0][2], MATHJS.multiply(λ, A_2[0][2])) as MATHJS.BigNumber;
+            row1[0] = MATHJS.add(A_1[1][0], MATHJS.multiply(λ, A_2[1][0])) as MATHJS.BigNumber;
+            row1[1] = MATHJS.add(A_1[1][1], MATHJS.multiply(λ, A_2[1][1])) as MATHJS.BigNumber;
+            row1[2] = MATHJS.add(A_1[1][2], MATHJS.multiply(λ, A_2[1][2])) as MATHJS.BigNumber;
+            row2[0] = MATHJS.add(A_1[2][0], MATHJS.multiply(λ, A_2[2][0])) as MATHJS.BigNumber;
+            row2[1] = MATHJS.add(A_1[2][1], MATHJS.multiply(λ, A_2[2][1])) as MATHJS.BigNumber;
+            row2[2] = MATHJS.add(A_1[2][2], MATHJS.multiply(λ, A_2[2][2])) as MATHJS.BigNumber;
 
-            // B[0] = row0;
-            // B[1] = row1;
-            // B[2] = row2;
-
-            B[0] = row0_;
-            B[1] = row1_;
-            B[2] = row2_;
+            B[0] = row0;
+            B[1] = row1;
+            B[2] = row2;
 
             // 4. 分解 B 为两条直线（利用对称 SVD 或配方法）。
-            console.log(" B = A1 + λ A2 :\n " + format(row0) + " \n " + format(row1) + " \n " + format(row2));
+            // console.log(" B = A1 + λ A2 :\n " + format(row0) + " \n " + format(row1) + " \n " + format(row2));
             let isSVD = true;
             let isEigs = true;
             const tol_ = 1e-10;// 内部容差
             // svd分解
-            if (isSVD) {
+            if (isSVD && ret.length < 4) {
+                console.log("SVD分解");
                 const m = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
                 m[0][0] = B[0][0].toNumber();
                 m[0][1] = B[0][1].toNumber();
@@ -444,18 +472,18 @@ class Curve2Inter {
                 m[2][1] = B[2][1].toNumber();
                 m[2][2] = B[2][2].toNumber();
 
-                console.log(" m :\n" +
-                    format(m[0]) + "\n" +
-                    format(m[1]) + "\n" +
-                    format(m[2]) + "\n"
-                );
-                // const svd =
+                // console.log(" m :\n" +
+                //     format(m[0]) + "\n" +
+                //     format(m[1]) + "\n" +
+                //     format(m[2]) + "\n"
+                // );
+
                 const svd = SVD.SVD(m);
-                console.log(" svd分解 :" +
-                    "\n svd.q 奇异值数组" + format(svd.q) +
-                    "\n svd.u 左奇异向量" + format(svd.u) +
-                    "\n svd.v 右奇异向量" + format(svd.v)
-                );
+                // console.log(" svd分解 :" +
+                //     "\n svd.q 奇异值数组" + format(svd.q) +
+                //     "\n svd.u 左奇异向量" + format(svd.u) +
+                //     "\n svd.v 右奇异向量" + format(svd.v)
+                // );
                 const S: number[] = svd.q;
                 const U: number[][] = svd.u;
                 const V: number[][] = svd.v;
@@ -466,10 +494,10 @@ class Curve2Inter {
                         zeroIndices.push(i);
                     }
                 }
-                if (zeroIndices.length === 0) {
-                    console.warn('矩阵非奇异');
-                    // return ret;
-                }
+                // if (zeroIndices.length === 0) {
+                // console.warn('矩阵非奇异');
+                // return ret;
+                // }
 
                 // 4.2. 提取零空间向量（交点）
                 // const intersection = [];
@@ -488,9 +516,7 @@ class Curve2Inter {
                     }
                     // 4.4. 构造一条直线
                     const l0 = vec1;
-                    console.log(" 退化直线 :" +
-                        "\n l0 : " + format(l0)
-                    );
+                    // console.log(" 退化直线 :" + "\n l0 : " + format(l0));
                     lines.push(l0);
                 }
                 // 4.3.2有两个非零奇异值，说明两条直线不同
@@ -500,25 +526,25 @@ class Curve2Inter {
                         vec1.push(MATHJS.bignumber(U[row][nonZeroIndices[0]]));
                         vec2.push(MATHJS.bignumber(U[row][nonZeroIndices[1]]));
                     }
-                    console.log(" VEC :" +
-                        "\n vec1 : " + format(vec1) +
-                        "\n vec1 : " + format(vec2)
-                    );
+                    // console.log(" VEC :" +
+                    //     "\n vec1 : " + format(vec1) +
+                    //     "\n vec1 : " + format(vec2)
+                    // );
                     // 4.4. 构造两条直线
                     const sqrt_s1 = MATHJS.sqrt(MATHJS.bignumber(MATHJS.abs(S[nonZeroIndices[0]]))) as MATHJS.BigNumber;
                     const sqrt_s2 = MATHJS.sqrt(MATHJS.bignumber(MATHJS.abs(S[nonZeroIndices[1]]))) as MATHJS.BigNumber;
 
-                    console.log(" sqrt :" +
-                        "\n sqrt_s1 : " + format(sqrt_s1) +
-                        "\n sqrt_s2 : " + format(sqrt_s2)
-                    );
+                    // console.log(" sqrt :" +
+                    //     "\n sqrt_s1 : " + format(sqrt_s1) +
+                    //     "\n sqrt_s2 : " + format(sqrt_s2)
+                    // );
                     let p = MATHJS.multiply(sqrt_s1, vec1) as MATHJS.BigNumber[];
                     let q = MATHJS.multiply(sqrt_s2, vec2) as MATHJS.BigNumber[];
 
-                    console.log(" p q :" +
-                        "\n p : " + format(p) +
-                        "\n q : " + format(q)
-                    );
+                    // console.log(" p q :" +
+                    //     "\n p : " + format(p) +
+                    //     "\n q : " + format(q)
+                    // );
 
                     // 调整符号
                     // if (S[nonZeroIndices[0]] * S[nonZeroIndices[1]] < 0) {
@@ -529,41 +555,47 @@ class Curve2Inter {
                     q = MATHJS.unaryMinus(q) as MATHJS.BigNumber[];
                     const l0 = MATHJS.add(p, q);
                     const l1 = MATHJS.subtract(p, q);
-                    console.log(" 退化直线 :" +
-                        "\n l0 : " + format(l0) +
-                        "\n l1 : " + format(l1)
-                    );
+                    // console.log(" 退化直线 :" +
+                    //     "\n l0 : " + format(l0) +
+                    //     "\n l1 : " + format(l1)
+                    // );
                     lines.push(l0, l1);
                 }
 
                 // 5. 每条直线与原二次曲线之一求交（解二次方程），得到候选交点。
                 for (let j = 0; j < lines.length; j++) {
                     const l = lines[j];
-                    console.log(" 直线 l :" + format(l));
+                    // console.log(" 直线 l :" + format(l));
                     let inters1 = Curve2Inter.LineXConic({ A: l[0], B: l[1], C: l[2] }, c0, null, c0a, tol_);
+                    checkAndPush(inters1);
+                    if (ret.length >= 4) {
+                        break;
+                    }
                     let inters2 = Curve2Inter.LineXConic({ A: l[0], B: l[1], C: l[2] }, c0, null, c0a, tol_);
-                    console.log(" inters1 " + format(inters1));
-                    console.log(" inters2 " + format(inters2));
-                    inters.push(...inters1, ...inters2);
+                    checkAndPush(inters2);
+                    if (ret.length >= 4) {
+                        break;
+                    }
                 }
             }
             // 特征值分解
-            if (isEigs) {
+            if (isEigs && ret.length < 4) {
+                console.log("特征值分解");
                 const eigenvectors = MATHJS.eigs(B, { precision: 1e-25, eigenvectors: true }).eigenvectors;
                 eigenvectors.sort((a, b): number => {
                     let va = MATHJS.abs(a.value) as MATHJS.BigNumber;
                     let vb = MATHJS.abs(b.value) as MATHJS.BigNumber;
                     return MATHJS.compare(vb, va) as number;
                 });
-                console.log(" 特征值和特征向量 :" +
-                    "\n λ0 " + format(eigenvectors[0].value) + " vec " + format(eigenvectors[0].vector) +
-                    "\n λ1 " + format(eigenvectors[1].value) + " vec " + format(eigenvectors[1].vector) +
-                    "\n λ2 " + format(eigenvectors[2].value) + " vec " + format(eigenvectors[2].vector)
-                );
+                // console.log(" 特征值和特征向量 :" +
+                //     "\n λ0 " + format(eigenvectors[0].value) + " vec " + format(eigenvectors[0].vector) +
+                //     "\n λ1 " + format(eigenvectors[1].value) + " vec " + format(eigenvectors[1].vector) +
+                //     "\n λ2 " + format(eigenvectors[2].value) + " vec " + format(eigenvectors[2].vector)
+                // );
                 // 检查最小特征值是否接近0（验证退化性）
-                if (MATHJS.larger(MATHJS.abs(eigenvectors[2].value), tol_)) {
-                    console.warn(`最小特征值 ${eigenvectors[2].value} 不接近0，可能 λ 不准确`);
-                }
+                // if (MATHJS.larger(MATHJS.abs(eigenvectors[2].value), tol_)) {
+                //     console.warn(`最小特征值 ${format(eigenvectors[2].value)} 不接近0，可能 λ 不准确`);
+                // }
 
                 let λ0 = eigenvectors[0].value as MATHJS.BigNumber;
                 let λ1 = eigenvectors[1].value as MATHJS.BigNumber;
@@ -579,178 +611,42 @@ class Curve2Inter {
                     let λ0_sqrt = MATHJS.sqrt(MATHJS.abs(λ0)) as MATHJS.BigNumber;
                     let λ1_sqrt = MATHJS.sqrt(MATHJS.abs(λ1)) as MATHJS.BigNumber;
 
-                    console.log(" 特征值和特征向量 :" +
-                        "\n λ0 u : " + format(λ0) + " " + format(u[0]) + " " + format(u[1]) + " " + format(u[2]) +
-                        "\n λ1 v : " + format(λ1) + " " + format(v[0]) + " " + format(v[1]) + " " + format(v[2])
-                    );
+                    // console.log(" 特征值和特征向量 :" +
+                    //     "\n λ0 u : " + format(λ0) + " " + format(u[0]) + " " + format(u[1]) + " " + format(u[2]) +
+                    //     "\n λ1 v : " + format(λ1) + " " + format(v[0]) + " " + format(v[1]) + " " + format(v[2])
+                    // );
 
                     let p = MATHJS.multiply(u, λ0_sqrt) as MATHJS.BigNumber[];
                     let q = MATHJS.multiply(v, λ1_sqrt) as MATHJS.BigNumber[];
                     if (!MATHJS.largerEq(λ1, 0)) {
                         q = MATHJS.unaryMinus(q);
                     }
-                    console.log(" p q :" +
-                        "\n p : " + format(p) +
-                        "\n q : " + format(q)
-                    );
+                    // console.log(" p q :" +
+                    //     "\n p : " + format(p) +
+                    //     "\n q : " + format(q)
+                    // );
                     let l0 = MATHJS.add(p, q) as MATHJS.BigNumber[];
                     let l1 = MATHJS.subtract(p, q) as MATHJS.BigNumber[];
                     const lines: MATHJS.BigNumber[][] = [];
                     lines.push(l0, l1);
-                    console.log(" 退化直线 :" +
-                        "\n l0 : " + format(l0) +
-                        "\n l1 : " + format(l1)
-                    );
+                    // console.log(" 退化直线 :" +
+                    //     "\n l0 : " + format(l0) +
+                    //     "\n l1 : " + format(l1)
+                    // );
                     // 5. 每条直线与原二次曲线之一求交（解二次方程），得到候选交点。
                     for (let j = 0; j < lines.length; j++) {
                         const l = lines[j];
-                        console.log(" 直线 l :" + format(l));
+                        // console.log(" 直线 l :" + format(l));
                         let inters1 = Curve2Inter.LineXConic({ A: l[0], B: l[1], C: l[2] }, c0, null, c0a, tol_);
-                        let inters2 = Curve2Inter.LineXConic({ A: l[0], B: l[1], C: l[2] }, c1, null, c0a, tol_);
-                        console.log(" inters1 " + format(inters1));
-                        console.log(" inters2 " + format(inters2));
-                        inters.push(...inters1, ...inters2);
-
-                    }
-                }
-                // 使用0特征值和对应的特征向量进行分解
-                if (ret.length == 0) {
-                    // 1. 找到零特征向量 w
-                    let v = eigenvectors[2].vector as Array<MATHJS.BigNumber>;
-                    // 2. 找 B 的非零列（或行）
-                    let colIdx = -1;
-                    if (row0_[0] !== MATHJS.bignumber(0) || row0_[1] !== MATHJS.bignumber(0) || row0_[2] !== MATHJS.bignumber(0)) {
-                        colIdx = 0;
-                    } else if (row1_[0] !== MATHJS.bignumber(0) || row1_[1] !== MATHJS.bignumber(0) || row1_[2] !== MATHJS.bignumber(0)) {
-                        colIdx = 1;
-                    } else if (row2_[0] !== MATHJS.bignumber(0) || row2_[1] !== MATHJS.bignumber(0) || row2_[2] !== MATHJS.bignumber(0)) {
-                        colIdx = 2;
-                    }
-                    for (let j = 0; j < 3; j++) {
-                        const col = [B[0][j], B[1][j], B[2][j]];
-                        const norm = MATHJS.norm(col);
-                        if (MATHJS.larger(norm, 1e-10)) {
-                            colIdx = j;
+                        checkAndPush(inters1);
+                        if (ret.length >= 4) {
                             break;
                         }
-                    }
-
-                    if (colIdx === -1) {
-                        throw new Error('矩阵全零');
-                    }
-                    // 3. 取该列为 u
-                    const u = [B[0][colIdx], B[1][colIdx], B[2][colIdx]];
-                    // 4. 计算 w = (1/2) * B * e_j，其中 e_j 是标准基
-                    const ej = [0, 0, 0];
-                    ej[colIdx] = 1;
-                    const Bej = MATHJS.multiply(B, ej) as Array<MATHJS.BigNumber>;
-                    let w = MATHJS.multiply(Bej, 0.5) as Array<MATHJS.BigNumber>;
-                    // 5. 调整使 v = u × w（或成比例）
-                    const cross = MATHJS.cross(u, w);
-                    const dot = MATHJS.dot(cross, v);
-
-                    if (dot < 0) {
-                        w = MATHJS.unaryMinus(w); // 反向
-                    }
-
-                    let l0 = { A: u[0], B: u[1], C: u[2] };
-                    let l1 = { A: w[0], B: w[1], C: w[2] };
-                    console.log(" 退化直线 :" +
-                        "\n l0 : " + format(l0.A) + " " + format(l0.B) + " " + format(l0.C) +
-                        "\n l1 : " + format(l1.A) + " " + format(l1.B) + " " + format(l1.C)
-                    );
-                    // 5. 每条直线与原二次曲线之一求交（解二次方程），得到候选交点。
-                    let inters1 = Curve2Inter.LineXConic(l0, c0, null, c0a, tol_);
-                    let inters2 = Curve2Inter.LineXConic(l1, c1, null, c1a, tol_);
-                    console.log(" inters1 " + format(inters1));
-                    console.log(" inters2 " + format(inters2));
-                    inters.push(...inters1, ...inters2);
-
-                }
-                if (ret.length == 0) {
-                    let v = eigenvectors[2].vector as Array<MATHJS.BigNumber>;
-                    let u = [];
-                    if (MATHJS.larger(MATHJS.abs(v[0]), 1e-10) || MATHJS.larger(MATHJS.abs(v[2]), 1e-10)) {
-                        u = [0, 1, 0]; // 如果 v 不是纯 y 方向，用 y 轴
-                    } else {
-                        u = [1, 0, 0]; // 否则用 x 轴
-                    }
-                    // 通用方法：解线性方程组
-                    // B = u w^T + w u^T，未知 w
-                    // 对于对称矩阵，这等价于：对于所有 i,j，B_ij = u_i w_j + u_j w_i
-                    // 写成线性系统 A w_vec = b_vec
-
-                    // 构建 6×3 系统（来自上三角部分）
-                    const A_data = [];
-                    const b_data = [];
-
-                    for (let i = 0; i < 3; i++) {
-                        for (let j = i; j < 3; j++) {
-                            const row = [0, 0, 0];
-                            row[j] += u[i];
-                            row[i] += u[j];
-                            A_data.push(row);
-                            b_data.push(B[i][j]);
+                        let inters2 = Curve2Inter.LineXConic({ A: l[0], B: l[1], C: l[2] }, c1, null, c0a, tol_);
+                        checkAndPush(inters2);
+                        if (ret.length >= 4) {
+                            break;
                         }
-                    }
-
-                    const A = MATHJS.matrix(A_data);
-                    const b = MATHJS.matrix(b_data);
-
-                    // 最小二乘解
-                    let w = MATHJS.lusolve(MATHJS.multiply(MATHJS.transpose(A), A), MATHJS.multiply(MATHJS.transpose(A), b)).toArray() as Array<MATHJS.BigNumber>;
-
-                    let l0 = { A: MATHJS.bignumber(u[0]), B: MATHJS.bignumber(u[1]), C: MATHJS.bignumber(u[2]) };
-                    let l1 = { A: MATHJS.bignumber(w[0]), B: MATHJS.bignumber(w[1]), C: MATHJS.bignumber(w[2]) };
-                    console.log(" 退化直线 :" +
-                        "\n l0 : " + format(l0.A) + " " + format(l0.B) + " " + format(l0.C) +
-                        "\n l1 : " + format(l1.A) + " " + format(l1.B) + " " + format(l1.C)
-                    );
-                    // 5. 每条直线与原二次曲线之一求交（解二次方程），得到候选交点。
-                    let inters1 = Curve2Inter.LineXConic(l0, c0, null, c0a, tol_);
-                    let inters2 = Curve2Inter.LineXConic(l1, c1, null, c1a, tol_);
-                    console.log(" inters1 " + format(inters1));
-                    console.log(" inters2 " + format(inters2));
-                    inters.push(...inters1, ...inters2);
-
-                }
-                for (let j = 0; j < inters.length; j++) {
-                    let inter = inters[j];
-                    console.log(" p " + format(inter.p.x) + " " + format(inter.p.y) + " u0 " + inter.u0 + " u1 " + inter.u1);
-                    // 6. 验证 候选点在两条曲线上，并去重。
-                    let g0 = c0a.g(inter.p);
-                    let g1 = c1a.g(inter.p);
-                    console.log(" g0 " + format(g0) + " g1 " + format(g1));
-                    if (Math.abs(g0) < tol && Math.abs(g1) < tol) {
-                        console.warn(" g0 " + format(g0) + " g1 " + format(g1));
-                        ret.push({ p: inter.p, u0: inter.u1, u1: c1a.u(inter.p) });
-                    }
-                    else if (Math.abs(g0) < tol) {
-                        inter.u0 = c0a.u(inter.p);
-                        Curve2Inter.Binary(c0a, c1a, inter, tol);
-                        g0 = c0a.g(inter.p);
-                        g1 = c1a.g(inter.p);
-                        if (Math.abs(g0) < tol && Math.abs(g1) < tol) {
-                            console.warn("Newton: g0 " + format(g0) + " g1 " + format(g1));
-                            ret.push({ p: inter.p, u0: inter.u1, u1: c1a.u(inter.p) });
-                        } else {
-                            console.log("Newton: g0 " + format(g0) + " g1 " + format(g1));
-                        }
-                    }
-                    else if (Math.abs(g1) < tol) {
-                        inter.u0 = c1a.u(inter.p);
-                        Curve2Inter.Binary(c1a, c0a, inter, tol);
-                        g0 = c0a.g(inter.p);
-                        g1 = c1a.g(inter.p);
-                        if (Math.abs(g0) < tol && Math.abs(g1) < tol) {
-                            console.warn("Newton: g0 " + format(g0) + " g1 " + format(g1));
-                            ret.push({ p: inter.p, u0: inter.u1, u1: c1a.u(inter.p) });
-                        } else {
-                            console.log("Newton: g0 " + format(g0) + " g1 " + format(g1));
-                        }
-                    }
-                    else {
-                        console.log(" g0 " + format(g0) + " g1 " + format(g1));
                     }
                 }
             }
@@ -776,25 +672,52 @@ class Curve2Inter {
         tol: number): void {
         let ret = p0;
         let g = c1a.g(p0.p);
-        let du = 0.01;
+        let s = Math.log10(Math.abs(g));
+        let du = 0.1 * (s > 1 ? s : 1);
+        let du_ = 0;
+        let times = 0;
         while (true) {
+            times++;
+            ret.u0 += du;
             let u = ret.u0;
             let dp = c0a.p(u);
             let dg = c1a.g(dp);
+            // 异号时，说明跨过了根，减小步长并反向
             if (g * dg < 0) {
                 du = -du * 0.5;
-            } else if (Math.abs(dg) < Math.abs(g)) {
-                du = du * 0.5;
             }
-            if (Math.abs(g) < tol || Math.abs(du) < tol) {
+            // 扩张时，反向
+            else if (Math.abs(dg) > Math.abs(g)) {
+                du = -du * 0.5;
+            }
+            // 收缩时
+            else if (Math.abs(dg) < Math.abs(g)) {
+                // let s = Math.log10(Math.abs(dg) / (Math.abs(g) - Math.abs(dg)))
+                // if (s > 1) {
+                //     du = du * s;
+                // }
+            }
+            // 满足要求,找到了在c1上的点
+            if (Math.abs(dg) < tol) {
                 ret.p = dp;
-                ret.u0 = u;
                 ret.u1 = c1a.u(dp);
                 break;
-            } else {
-                g = dg;
-                ret.u0 += du;
             }
+            // 迭代结果不变，认为已经收敛，或者du已经很小。
+            else if (Math.abs(g - dg) < tol && du_ == du || Math.abs(du) < 1e-15) {
+                ret.p = dp;
+                ret.u1 = c1a.u(dp);
+                break;
+            }
+            else {
+                g = dg;
+                du_ = du;
+            }
+        }
+        if (times > 1000) {
+            console.warn("times :" + times);
+        } else {
+            console.log("times :" + times);
         }
     }
 
