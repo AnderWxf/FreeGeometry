@@ -91,6 +91,9 @@ class OrthographicController {
             case "Space":
                 this.KeySpaceDown = true;
                 break;
+            case "ControlLeft":
+                this.KeyCtrlDown = true;
+                break;
             case "ShiftLeft":
                 this.KeyShiftDown = true;
                 break;
@@ -120,7 +123,7 @@ class OrthographicController {
                 this.KeySpaceDown = false;
                 break;
             case "ControlLeft":
-                this.KeyCtrlDown = !this.KeyCtrlDown;
+                this.KeyCtrlDown = false;
                 break;
             case "ShiftLeft":
                 this.KeyShiftDown = false;

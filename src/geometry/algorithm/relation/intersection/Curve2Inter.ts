@@ -15,7 +15,6 @@ import type { Parabola2Data } from "../../../data/base/curve2/Parabola2Data";
 import { Parabola2Algo } from "../../base/curve2/Parabola2Algo";
 import type { Curve2Algo } from "../../base/Curve2Algo";
 import * as SVD from "svd-js";
-import { e } from '../../../../mathjs/lib/cjs/entry/pureFunctionsAny.generated';
 
 /**
  * compute curve intersection point utility.
@@ -43,9 +42,11 @@ class Curve2Inter {
      *
      * @param {Line2Data} [c0] - The frist curve.
      * @param {Line2Data} [c1] - The second curve.
-     * @param {number} [tol] - The tolerance of distance.
+     * @param {number} [tol0] - The tolerance of geometric.
+     * @param {number} [tol1] - The tolerance of algebraic.
+     * @param {number} [n] - The max number of intersection points.
      */
-    static LineXLine(c0: Line2Data, c1: Line2Data, tol: number): Array<InterOfCurve2> {
+    static LineXLine(c0: Line2Data, c1: Line2Data, tol0: number, tol1: number, n: number = 1): Array<InterOfCurve2> {
         let ret = new Array<InterOfCurve2>();
         if (c0.trans.rot == c1.trans.rot) {
             return ret;
@@ -82,9 +83,11 @@ class Curve2Inter {
      *
      * @param {Line2Data} [c0] - The frist curve.
      * @param {Arc2Data} [c1] - The second curve.
-     * @param {number} [tol] - The tolerance of distance.
+     * @param {number} [tol0] - The tolerance of geometric.
+     * @param {number} [tol1] - The tolerance of algebraic.
+     * @param {number} [n] - The max number of intersection points.
      */
-    static LineXArc(c0: Line2Data, c1: Arc2Data, tol: number): Array<InterOfCurve2> {
+    static LineXArc(c0: Line2Data, c1: Arc2Data, tol0: number, tol1: number, n: number = 2): Array<InterOfCurve2> {
         let ret = new Array<InterOfCurve2>();
         // 直线的二元一次方程
         // A0x + B0y + C0 = 0
@@ -93,7 +96,7 @@ class Curve2Inter {
         // A1x² + B1xy + C1y² + D1x + E1y + F1 = 0 (2)
         let c1a = new Arc2Algo(c1);
         // 求解方程组
-        return Curve2Inter.LineXConic(c0a.ge(), c1a.ge(), c0a, c1a, tol);
+        return Curve2Inter.LineXConic(c0a.ge(), c1a.ge(), c0a, c1a, tol0, tol1, n);
     }
 
     /**
@@ -101,9 +104,11 @@ class Curve2Inter {
      *
      * @param {Line2Data} [c0] - The frist curve.
      * @param {Arc2Data} [c1] - The second curve.
-     * @param {number} [tol] - The tolerance of distance.
+     * @param {number} [tol0] - The tolerance of geometric.
+     * @param {number} [tol1] - The tolerance of algebraic.
+     * @param {number} [n] - The max number of intersection points.
      */
-    static LineXHyperbola(c0: Line2Data, c1: Hyperbola2Data, tol: number): Array<InterOfCurve2> {
+    static LineXHyperbola(c0: Line2Data, c1: Hyperbola2Data, tol0: number, tol1: number, n: number = 2): Array<InterOfCurve2> {
         let ret = new Array<InterOfCurve2>();
         // 直线的二元一次方程
         // A0x + B0y + C0 = 0
@@ -111,7 +116,7 @@ class Curve2Inter {
         // 曲线的二元二次方程
         // A1x² + B1xy + C1y² + D1x + E1y + F1 = 0 (2)
         let c1a = new Hyperbola2Algo(c1);
-        return Curve2Inter.LineXConic(c0a.ge(), c1a.ge(), c0a, c1a, tol);
+        return Curve2Inter.LineXConic(c0a.ge(), c1a.ge(), c0a, c1a, tol0, tol1, n);
     }
 
     /**
@@ -119,9 +124,11 @@ class Curve2Inter {
      *
      * @param {Line2Data} [c0] - The frist curve.
      * @param {Arc2Data} [c1] - The second curve.
-     * @param {number} [tol] - The tolerance of distance.
+     * @param {number} [tol0] - The tolerance of geometric.
+     * @param {number} [tol1] - The tolerance of algebraic.
+     * @param {number} [n] - The max number of intersection points.
      */
-    static LineXParabola(c0: Line2Data, c1: Parabola2Data, tol: number): Array<InterOfCurve2> {
+    static LineXParabola(c0: Line2Data, c1: Parabola2Data, tol0: number, tol1: number, n: number = 2): Array<InterOfCurve2> {
         let ret = new Array<InterOfCurve2>();
         // 直线的二元一次方程
         // A0x + B0y + C0 = 0
@@ -129,7 +136,7 @@ class Curve2Inter {
         // 曲线的二元二次方程
         // A1x² + B1xy + C1y² + D1x + E1y + F1 = 0 (2)
         let c1a = new Parabola2Algo(c1);
-        return Curve2Inter.LineXConic(c0a.ge(), c1a.ge(), c0a, c1a, tol);
+        return Curve2Inter.LineXConic(c0a.ge(), c1a.ge(), c0a, c1a, tol0, tol1, n);
     }
 
     /**
@@ -137,13 +144,18 @@ class Curve2Inter {
      *
      * @param {Line2Data} [c0] - The frist curve.
      * @param {Arc2Data} [c1] - The second curve.
-     * @param {number} [tol] - The tolerance of distance.
+     * @param {number} [tol0] - The tolerance of geometric.
+     * @param {number} [tol1] - The tolerance of algebraic.
+     * @param {number} [n] - The max number of intersection points.
      */
     static LineXConic(c0: { A: MATHJS.BigNumber, B: MATHJS.BigNumber, C: MATHJS.BigNumber },
         c1: { A: MATHJS.BigNumber, B: MATHJS.BigNumber, C: MATHJS.BigNumber, D: MATHJS.BigNumber, E: MATHJS.BigNumber, F: MATHJS.BigNumber },
         c0a: Curve2Algo,
         c1a: Curve2Algo,
-        tol: number): Array<InterOfCurve2> {
+        tol0: number,
+        tol1: number,
+        n: number = 2,
+    ): Array<InterOfCurve2> {
         let ret = new Array<InterOfCurve2>();
         // 直线的二元一次方程
         // A0x + B0y + C0 = 0
@@ -183,7 +195,7 @@ class Curve2Inter {
                 let x: BigNumber;
                 if (MATHJS.typeOf(xi) === 'Complex') {
                     xi = xi as MATHJS.Complex;
-                    if (Math.abs(xi.im) > tol) {
+                    if (Math.abs(xi.im) > tol1) {
                         continue;
                     }
                     x = MATHJS.bignumber(xi.re);
@@ -215,7 +227,7 @@ class Curve2Inter {
                 let y: BigNumber;
                 if (MATHJS.typeOf(yi) === 'Complex') {
                     yi = yi as MATHJS.Complex;
-                    if (Math.abs(yi.im) > tol) {
+                    if (Math.abs(yi.im) > tol1) {
                         continue;
                     }
                     y = MATHJS.bignumber(yi.re);
@@ -245,7 +257,7 @@ class Curve2Inter {
                 let x: BigNumber;
                 if (MATHJS.typeOf(xi) === 'Complex') {
                     xi = xi as MATHJS.Complex;
-                    if (Math.abs(xi.im) > tol) {
+                    if (Math.abs(xi.im) > tol1) {
                         continue;
                     }
                     x = MATHJS.bignumber(xi.re);
@@ -267,11 +279,13 @@ class Curve2Inter {
      *
      * @param {Line2Data} [c0] - The frist curve.
      * @param {Nurbs2Data} [c1] - The second curve.
-     * @param {number} [tol] - The tolerance of distance.
+     * @param {number} [tol0] - The tolerance of geometric.
+     * @param {number} [tol1] - The tolerance of algebraic.
+     * @param {number} [n] - The max number of intersection points.
      */
-    static LineXNurbs(c0: Line2Data, c1: Nurbs2Data, tol: number): Array<InterOfCurve2> {
+    static LineXNurbs(c0: Line2Data, c1: Nurbs2Data, tol0: number, tol1: number, n: number): Array<InterOfCurve2> {
         let segment = c1.controls.length * 2;
-        return Curve2Inter.CurveXCurve(c1, c0, segment, tol);
+        return Curve2Inter.CurveXCurve(c1, c0, segment, tol0, tol1, n);
     }
 
     /**
@@ -279,12 +293,14 @@ class Curve2Inter {
      *
      * @param {Arc2Data} [c0] - The frist curve.
      * @param {Arc2Data} [c1] - The second curve.
-     * @param {number} [tol] - The tolerance of distance.
+     * @param {number} [tol0] - The tolerance of geometric.
+     * @param {number} [tol1] - The tolerance of algebraic.
+     * @param {number} [n] - The max number of intersection points.
      */
-    static QuadraticXQuadratic(c0: Arc2Data | Hyperbola2Data | Parabola2Data, c1: Arc2Data | Hyperbola2Data | Parabola2Data, tol: number): Array<InterOfCurve2> {
+    static QuadraticXQuadratic(c0: Arc2Data | Hyperbola2Data | Parabola2Data, c1: Arc2Data | Hyperbola2Data | Parabola2Data, tol0: number, tol1: number, n: number = 4): Array<InterOfCurve2> {
         let c0a = CurveBuilder.Algorithm2ByData(c0) as Arc2Algo | Hyperbola2Algo | Parabola2Algo;
         let c1a = CurveBuilder.Algorithm2ByData(c1) as Arc2Algo | Hyperbola2Algo | Parabola2Algo;
-        return Curve2Inter.ConicXConic(c0a.ge(), c1a.ge(), c0a, c1a, tol);
+        return Curve2Inter.ConicXConic(c0a.ge(), c1a.ge(), c0a, c1a, tol0, tol1, n);
     }
 
     /**
@@ -297,14 +313,19 @@ class Curve2Inter {
      * 6. 验证 候选点在两条曲线上，并去重。
      * @param {Arc2Data} [c0] - The frist curve.
      * @param {Arc2Data} [c1] - The second curve.
-     * @param {number} [tol] - The tolerance of distance.
+     * @param {number} [tol0] - The tolerance of geometric.
+     * @param {number} [tol1] - The tolerance of algebraic.
+     * @param {number} [n] - The max number of intersection points.
      */
     static ConicXConic(
         c0: { A: MATHJS.BigNumber, B: MATHJS.BigNumber, C: MATHJS.BigNumber, D: MATHJS.BigNumber, E: MATHJS.BigNumber, F: MATHJS.BigNumber },
         c1: { A: MATHJS.BigNumber, B: MATHJS.BigNumber, C: MATHJS.BigNumber, D: MATHJS.BigNumber, E: MATHJS.BigNumber, F: MATHJS.BigNumber },
         c0a: Curve2Algo,
         c1a: Curve2Algo,
-        tol: number): Array<InterOfCurve2> {
+        tol0: number,
+        tol1: number,
+        n: number = 4
+    ): Array<InterOfCurve2> {
         let format = (v: any): string => {
             return MATHJS.format(v, { precision: 6 });
         }
@@ -312,7 +333,7 @@ class Curve2Inter {
             let isExist = false;
             for (let k = 0; k < ret.length; k++) {
                 let exist = ret[k];
-                if (p.distanceTo(exist.p) < tol) {
+                if (p.distanceTo(exist.p) < tol0) {
                     isExist = true;
                     break;
                 }
@@ -328,39 +349,39 @@ class Curve2Inter {
                 }
                 let g0 = c0a.g(inter.p);
                 let g1 = c1a.g(inter.p);
-                if (Math.abs(g0) < tol && Math.abs(g1) < tol) {
-                    console.log("Right: g0 " + format(g0) + " g1 " + format(g1));
+                if (Math.abs(g0) < tol1 && Math.abs(g1) < tol1) {
+                    // console.log("Right: g0 " + format(g0) + " g1 " + format(g1));
                     ret.push({ p: inter.p, u0: inter.u1, u1: c1a.u(inter.p) });
                 }
-                else if (Math.abs(g0) < tol) {
+                else if (Math.abs(g0) < tol1) {
                     inter.u0 = c0a.u(inter.p);
-                    console.log("Binary before: g0 " + format(g0) + " g1 " + format(g1));
-                    Curve2Inter.Binary(c0a, c1a, inter, tol);
+                    // console.log("Binary before: g0 " + format(g0) + " g1 " + format(g1));
+                    Curve2Inter.Binary(c0a, c1a, inter, tol1);
                     g0 = c0a.g(inter.p);
                     g1 = c1a.g(inter.p);
-                    console.log("Binary after: g0 " + format(g0) + " g1 " + format(g1));
-                    if (Math.abs(g0) < tol && Math.abs(g1) < tol) {
+                    // console.log("Binary after: g0 " + format(g0) + " g1 " + format(g1));
+                    if (Math.abs(g0) < tol1 && Math.abs(g1) < tol1) {
                         if (!isExist(inter.p)) {
                             ret.push({ p: inter.p, u0: inter.u1, u1: c1a.u(inter.p) });
                         }
 
                     }
                 }
-                else if (Math.abs(g1) < tol) {
+                else if (Math.abs(g1) < tol1) {
                     inter.u0 = c1a.u(inter.p);
-                    console.log("Binary before: g0 " + format(g0) + " g1 " + format(g1));
-                    Curve2Inter.Binary(c1a, c0a, inter, tol);
+                    // console.log("Binary before: g0 " + format(g0) + " g1 " + format(g1));
+                    Curve2Inter.Binary(c1a, c0a, inter, tol1);
                     g0 = c0a.g(inter.p);
                     g1 = c1a.g(inter.p);
-                    console.log("Binary after: g0 " + format(g0) + " g1 " + format(g1));
-                    if (Math.abs(g0) < tol && Math.abs(g1) < tol) {
+                    // console.log("Binary after: g0 " + format(g0) + " g1 " + format(g1));
+                    if (Math.abs(g0) < tol1 && Math.abs(g1) < tol1) {
                         if (!isExist(inter.p)) {
                             ret.push({ p: inter.p, u0: inter.u1, u1: c1a.u(inter.p) });
                         }
                     }
                 }
                 else {
-                    console.log("Error: g0 " + format(g0) + " g1 " + format(g1));
+                    // console.log("Error: g0 " + format(g0) + " g1 " + format(g1));
                 }
             }
         }
@@ -431,7 +452,7 @@ class Curve2Inter {
             if (MATHJS.typeOf(λ) === "Complex") {
                 continue;
             }
-            if (ret.length >= 4) {
+            if (ret.length >= n) {
                 continue;
             }
             // console.log(" 取 λ" + i + " : " + format(λ));
@@ -457,10 +478,9 @@ class Curve2Inter {
             // console.log(" B = A1 + λ A2 :\n " + format(row0) + " \n " + format(row1) + " \n " + format(row2));
             let isSVD = true;
             let isEigs = true;
-            const tol_ = 1e-10;// 内部容差
             // svd分解
-            if (isSVD && ret.length < 4) {
-                console.log("SVD分解");
+            if (isSVD && ret.length < n) {
+                // console.log("SVD分解");
                 const m = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
                 m[0][0] = B[0][0].toNumber();
                 m[0][1] = B[0][1].toNumber();
@@ -566,21 +586,21 @@ class Curve2Inter {
                 for (let j = 0; j < lines.length; j++) {
                     const l = lines[j];
                     // console.log(" 直线 l :" + format(l));
-                    let inters1 = Curve2Inter.LineXConic({ A: l[0], B: l[1], C: l[2] }, c0, null, c0a, tol_);
+                    let inters1 = Curve2Inter.LineXConic({ A: l[0], B: l[1], C: l[2] }, c0, null, c0a, tol0, tol1, 2);
                     checkAndPush(inters1);
-                    if (ret.length >= 4) {
+                    if (ret.length >= n) {
                         break;
                     }
-                    let inters2 = Curve2Inter.LineXConic({ A: l[0], B: l[1], C: l[2] }, c0, null, c0a, tol_);
+                    let inters2 = Curve2Inter.LineXConic({ A: l[0], B: l[1], C: l[2] }, c0, null, c0a, tol0, tol1, 2);
                     checkAndPush(inters2);
-                    if (ret.length >= 4) {
+                    if (ret.length >= n) {
                         break;
                     }
                 }
             }
             // 特征值分解
-            if (isEigs && ret.length < 4) {
-                console.log("特征值分解");
+            if (isEigs && ret.length < n) {
+                // console.log("特征值分解");
                 const eigenvectors = MATHJS.eigs(B, { precision: 1e-25, eigenvectors: true }).eigenvectors;
                 eigenvectors.sort((a, b): number => {
                     let va = MATHJS.abs(a.value) as MATHJS.BigNumber;
@@ -637,14 +657,14 @@ class Curve2Inter {
                     for (let j = 0; j < lines.length; j++) {
                         const l = lines[j];
                         // console.log(" 直线 l :" + format(l));
-                        let inters1 = Curve2Inter.LineXConic({ A: l[0], B: l[1], C: l[2] }, c0, null, c0a, tol_);
+                        let inters1 = Curve2Inter.LineXConic({ A: l[0], B: l[1], C: l[2] }, c0, null, c0a, tol0, tol1, 2);
                         checkAndPush(inters1);
-                        if (ret.length >= 4) {
+                        if (ret.length >= n) {
                             break;
                         }
-                        let inters2 = Curve2Inter.LineXConic({ A: l[0], B: l[1], C: l[2] }, c1, null, c0a, tol_);
+                        let inters2 = Curve2Inter.LineXConic({ A: l[0], B: l[1], C: l[2] }, c1, null, c0a, tol0, tol1, 2);
                         checkAndPush(inters2);
-                        if (ret.length >= 4) {
+                        if (ret.length >= n) {
                             break;
                         }
                     }
@@ -663,8 +683,9 @@ class Curve2Inter {
      * 
      * @param {Curve2Algo} [c0] - The frist curve.
      * @param {Curve2Algo} [c1] - The second curve.
-     * @param {number} [tol] - The tolerance of distance.
+     * @param {number} [tol] - The tolerance of algebraic.
      */
+    static totaltimes = 0;
     static Binary(
         c0a: Curve2Algo,
         c1a: Curve2Algo,
@@ -672,8 +693,8 @@ class Curve2Inter {
         tol: number): void {
         let ret = p0;
         let g = c1a.g(p0.p);
-        let s = Math.log10(Math.abs(g));
-        let du = 0.1 * (s > 1 ? s : 1);
+        let s = Math.log(Math.abs(g));
+        let du = 0.75 * (s > 1 ? s : 1);
         let du_ = 0;
         let times = 0;
         while (true) {
@@ -692,7 +713,7 @@ class Curve2Inter {
             }
             // 收缩时
             else if (Math.abs(dg) < Math.abs(g)) {
-                // let s = Math.log10(Math.abs(dg) / (Math.abs(g) - Math.abs(dg)))
+                // let s = Math.log(Math.abs(dg));
                 // if (s > 1) {
                 //     du = du * s;
                 // }
@@ -714,11 +735,12 @@ class Curve2Inter {
                 du_ = du;
             }
         }
-        if (times > 1000) {
+        if (times > 200) {
             console.warn("times :" + times);
         } else {
             console.log("times :" + times);
         }
+        Curve2Inter.totaltimes += times;
     }
 
     // 构建二次型矩阵
@@ -747,11 +769,13 @@ class Curve2Inter {
      *
      * @param {Arc2Data} [c0] - The frist curve.
      * @param {Nurbs2Data} [c1] - The second curve.
-     * @param {number} [tol] - The tolerance of distance.
+     * @param {number} [tol0] - The tolerance of geometric.
+     * @param {number} [tol1] - The tolerance of algebraic.
+     * @param {number} [n] - The max number of intersection points.
      */
-    static ArcXNurbs(c0: Arc2Data, c1: Nurbs2Data, tol: number): Array<InterOfCurve2> {
+    static ArcXNurbs(c0: Arc2Data, c1: Nurbs2Data, tol0: number, tol1: number, n: number = 2): Array<InterOfCurve2> {
         let segment = c1.controls.length * 2;
-        return Curve2Inter.CurveXCurve(c1, c0, segment, tol);
+        return Curve2Inter.CurveXCurve(c1, c0, segment, tol0, tol1, n);
     }
 
     /**
@@ -759,15 +783,17 @@ class Curve2Inter {
      *
      * @param {Nurbs2Data} [c0] - The frist curve.
      * @param {Nurbs2Data} [c1] - The second curve.
-     * @param {number} [tol] - The tolerance of distance.
+     * @param {number} [tol0] - The tolerance of geometric.
+     * @param {number} [tol1] - The tolerance of algebraic.
+     * @param {number} [n] - The max number of intersection points.
      */
-    static NurbsXNurbs(c0: Nurbs2Data, c1: Nurbs2Data, tol: number): Array<InterOfCurve2> {
+    static NurbsXNurbs(c0: Nurbs2Data, c1: Nurbs2Data, tol0: number, tol1: number, n: number = 2): Array<InterOfCurve2> {
         if (c0.controls.length <= c1.controls.length) {
             let segment = c0.controls.length * 2;
-            return Curve2Inter.CurveXCurve(c0, c1, segment, tol);
+            return Curve2Inter.CurveXCurve(c0, c1, segment, tol0, tol1, n);
         } else {
             let segment = c1.controls.length * 2;
-            return Curve2Inter.CurveXCurve(c1, c0, segment, tol);
+            return Curve2Inter.CurveXCurve(c1, c0, segment, tol0, tol1, n);
         }
     }
 
@@ -777,9 +803,11 @@ class Curve2Inter {
      * @param {Curve2Data} [c0] - The frist curve , binary search curve.
      * @param {Curve2Data} [c1] - The second curve , general equation curve.
      * @param {number} [segment] - The segment of frist curve.
-     * @param {number} [tol] - The tolerance of distance.
+     * @param {number} [tol0] - The tolerance of geometric.
+     * @param {number} [tol1] - The tolerance of algebraic.
+     * @param {number} [n] - The max number of intersection points.
      */
-    private static CurveXCurve(c0: Curve2Data, c1: Curve2Data, segment: number, tol: number): Array<InterOfCurve2> {
+    private static CurveXCurve(c0: Curve2Data, c1: Curve2Data, segment: number, tol0: number, tol1: number, n: number): Array<InterOfCurve2> {
         let algor0 = CurveBuilder.Algorithm2ByData(c0);
         let algor1 = CurveBuilder.Algorithm2ByData(c1);
         let ret = new Array<InterOfCurve2>();

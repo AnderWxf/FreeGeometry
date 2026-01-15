@@ -1,6 +1,8 @@
 import { Vector2 } from "../../../../math/Math";
 import { Nurbs2Data } from "../../../data/base/curve2/Nurbs2Data";
 import { Curve2Algo } from "../Curve2Algo";
+// import * as verb from 'verb-nurbs';
+
 /**
  * nurbs algorithm.
  *
@@ -30,7 +32,9 @@ class Nurbs2Algo extends Curve2Algo {
      * @retun {Vector2}
      */
     override d(u: number, r: number = 0): Vector2 {
-        debugger;
+        // const curve = new verb.geom.NurbsCurve(this.dat.p, this.dat.knots, this.dat.controls.map(c => [c.x, c.y]));
+        // const derivatives = verb.eval.Eval.derivatives(curve, u, r);
+        // return new Vector2(derivatives[0][0], derivatives[0][1]);
         return null;
     }
 }

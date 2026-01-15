@@ -44,7 +44,7 @@ export class Cube {
     let geoCircleEdgeEdge = BrepMeshBuilder.BuildEdge2Mesh(circleEdge, THREE.Color.NAMES.green);
     geoCircleEdgeEdge.name = "Circle2";
 
-    let circleEdge_ = Brep2Builder.BuildCircleEdge2FromCenterRadius(new Vector2(1, 0), 1);
+    let circleEdge_ = Brep2Builder.BuildCircleEdge2FromCenterRadius(new Vector2(2, 0), 1);
     let geoCircleEdgeEdge_ = BrepMeshBuilder.BuildEdge2Mesh(circleEdge_, THREE.Color.NAMES.green);
     geoCircleEdgeEdge_.name = "Circle2";
 
@@ -98,6 +98,9 @@ export class Cube {
     geoLine1EdgeEdge.name = "Line2_1";
 
 
+    CurveBuilder.BuildNurbs2FromFittingPoints(null);
+
+
     scene.add(geoCircleEdgeEdge);
     scene.add(geoCircleEdgeEdge_);
     scene.add(geoCircle1EdgeEdge);
@@ -126,99 +129,100 @@ export class Cube {
     const material = new THREE.MeshBasicMaterial({ color: 0x0088ff });
     let begin = new Date().getTime();
     let inters = new Array<InterOfCurve2>();
-    inters.push(...Curve2Inter.LineXLine(lineEdge.curve, line1Edge.curve, 1e-10));
+    inters.push(...Curve2Inter.LineXLine(lineEdge.curve, line1Edge.curve, 1e-4, 1e-10));
     console.warn("共找到交点数量：" + inters.length);
-    inters.push(...Curve2Inter.LineXArc(lineEdge.curve, circleEdge.curve as Arc2Data, 1e-10));
+    inters.push(...Curve2Inter.LineXArc(lineEdge.curve, circleEdge.curve as Arc2Data, 1e-4, 1e-10));
     console.warn("共找到交点数量：" + inters.length);
-    inters.push(...Curve2Inter.LineXArc(lineEdge.curve, circle1Edge.curve as Arc2Data, 1e-10));
+    inters.push(...Curve2Inter.LineXArc(lineEdge.curve, circle1Edge.curve as Arc2Data, 1e-4, 1e-10));
     console.warn("共找到交点数量：" + inters.length);
-    inters.push(...Curve2Inter.LineXArc(lineEdge.curve, arcEdge.curve as Arc2Data, 1e-10));
+    inters.push(...Curve2Inter.LineXArc(lineEdge.curve, arcEdge.curve as Arc2Data, 1e-4, 1e-10));
     console.warn("共找到交点数量：" + inters.length);
-    inters.push(...Curve2Inter.LineXArc(lineEdge.curve, ellipseEdge.curve as Arc2Data, 1e-10));
+    inters.push(...Curve2Inter.LineXArc(lineEdge.curve, ellipseEdge.curve as Arc2Data, 1e-4, 1e-10));
     console.warn("共找到交点数量：" + inters.length);
-    inters.push(...Curve2Inter.LineXHyperbola(lineEdge.curve, hyperbolaLeftEdge.curve as Hyperbola2Data, 1e-10));
+    inters.push(...Curve2Inter.LineXHyperbola(lineEdge.curve, hyperbolaLeftEdge.curve as Hyperbola2Data, 1e-4, 1e-10));
     console.warn("共找到交点数量：" + inters.length);
-    inters.push(...Curve2Inter.LineXHyperbola(lineEdge.curve, hyperbolaRightEdge.curve as Hyperbola2Data, 1e-10));
+    inters.push(...Curve2Inter.LineXHyperbola(lineEdge.curve, hyperbolaRightEdge.curve as Hyperbola2Data, 1e-4, 1e-10));
     console.warn("共找到交点数量：" + inters.length);
-    inters.push(...Curve2Inter.LineXParabola(lineEdge.curve, parabolaEdge.curve as Parabola2Data, 1e-10));
-    console.warn("共找到交点数量：" + inters.length);
-
-    inters.push(...Curve2Inter.LineXArc(line1Edge.curve, circleEdge.curve as Arc2Data, 1e-10));
-    console.warn("共找到交点数量：" + inters.length);
-    inters.push(...Curve2Inter.LineXArc(line1Edge.curve, circle1Edge.curve as Arc2Data, 1e-10));
-    console.warn("共找到交点数量：" + inters.length);
-    inters.push(...Curve2Inter.LineXArc(line1Edge.curve, arcEdge.curve as Arc2Data, 1e-10));
-    console.warn("共找到交点数量：" + inters.length);
-    inters.push(...Curve2Inter.LineXArc(line1Edge.curve, ellipseEdge.curve as Arc2Data, 1e-10));
-    console.warn("共找到交点数量：" + inters.length);
-    inters.push(...Curve2Inter.LineXHyperbola(line1Edge.curve, hyperbolaLeftEdge.curve as Hyperbola2Data, 1e-10));
-    console.warn("共找到交点数量：" + inters.length);
-    inters.push(...Curve2Inter.LineXHyperbola(line1Edge.curve, hyperbolaRightEdge.curve as Hyperbola2Data, 1e-10));
-    console.warn("共找到交点数量：" + inters.length);
-    inters.push(...Curve2Inter.LineXParabola(line1Edge.curve, parabolaEdge.curve as Parabola2Data, 1e-10));
+    inters.push(...Curve2Inter.LineXParabola(lineEdge.curve, parabolaEdge.curve as Parabola2Data, 1e-4, 1e-10));
     console.warn("共找到交点数量：" + inters.length);
 
-    inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge.curve as Arc2Data, circleEdge_.curve as Arc2Data, 1e-10));
+    inters.push(...Curve2Inter.LineXArc(line1Edge.curve, circleEdge.curve as Arc2Data, 1e-4, 1e-10));
     console.warn("共找到交点数量：" + inters.length);
-    inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge.curve as Arc2Data, circle1Edge.curve as Arc2Data, 1e-10));
+    inters.push(...Curve2Inter.LineXArc(line1Edge.curve, circle1Edge.curve as Arc2Data, 1e-4, 1e-10));
     console.warn("共找到交点数量：" + inters.length);
-    inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge.curve as Arc2Data, arcEdge.curve as Arc2Data, 1e-10));
+    inters.push(...Curve2Inter.LineXArc(line1Edge.curve, arcEdge.curve as Arc2Data, 1e-4, 1e-10));
     console.warn("共找到交点数量：" + inters.length);
-    inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge.curve as Arc2Data, ellipseEdge.curve as Arc2Data, 1e-10));
+    inters.push(...Curve2Inter.LineXArc(line1Edge.curve, ellipseEdge.curve as Arc2Data, 1e-4, 1e-10));
     console.warn("共找到交点数量：" + inters.length);
-    inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge.curve as Arc2Data, hyperbolaLeftEdge.curve as Hyperbola2Data, 1e-10));
+    inters.push(...Curve2Inter.LineXHyperbola(line1Edge.curve, hyperbolaLeftEdge.curve as Hyperbola2Data, 1e-4, 1e-10));
     console.warn("共找到交点数量：" + inters.length);
-    inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge.curve as Arc2Data, hyperbolaRightEdge.curve as Hyperbola2Data, 1e-10));
+    inters.push(...Curve2Inter.LineXHyperbola(line1Edge.curve, hyperbolaRightEdge.curve as Hyperbola2Data, 1e-4, 1e-10));
     console.warn("共找到交点数量：" + inters.length);
-    inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge.curve as Arc2Data, parabolaEdge.curve as Parabola2Data, 1e-10));
-    console.warn("共找到交点数量：" + inters.length);
-
-    inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge_.curve as Arc2Data, circle1Edge.curve as Arc2Data, 1e-10));
-    console.warn("共找到交点数量：" + inters.length);
-    inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge_.curve as Arc2Data, arcEdge.curve as Arc2Data, 1e-10));
-    console.warn("共找到交点数量：" + inters.length);
-    inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge_.curve as Arc2Data, ellipseEdge.curve as Arc2Data, 1e-10));
-    console.warn("共找到交点数量：" + inters.length);
-    inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge_.curve as Arc2Data, hyperbolaLeftEdge.curve as Hyperbola2Data, 1e-10));
-    console.warn("共找到交点数量：" + inters.length);
-    inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge_.curve as Arc2Data, hyperbolaRightEdge.curve as Hyperbola2Data, 1e-10));
-    console.warn("共找到交点数量：" + inters.length);
-    inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge_.curve as Arc2Data, parabolaEdge.curve as Parabola2Data, 1e-10));
-    console.warn("共找到交点数量：" + inters.length);
-    inters.push(...Curve2Inter.QuadraticXQuadratic(circle1Edge.curve as Arc2Data, arcEdge.curve as Arc2Data, 1e-10));
-    console.warn("共找到交点数量：" + inters.length);
-    inters.push(...Curve2Inter.QuadraticXQuadratic(circle1Edge.curve as Arc2Data, ellipseEdge.curve as Arc2Data, 1e-10));
-    console.warn("共找到交点数量：" + inters.length);
-    inters.push(...Curve2Inter.QuadraticXQuadratic(circle1Edge.curve as Arc2Data, hyperbolaLeftEdge.curve as Hyperbola2Data, 1e-10));
-    console.warn("共找到交点数量：" + inters.length);
-    inters.push(...Curve2Inter.QuadraticXQuadratic(circle1Edge.curve as Arc2Data, hyperbolaRightEdge.curve as Hyperbola2Data, 1e-10));
-    console.warn("共找到交点数量：" + inters.length);
-    inters.push(...Curve2Inter.QuadraticXQuadratic(circle1Edge.curve as Arc2Data, parabolaEdge.curve as Parabola2Data, 1e-10));
+    inters.push(...Curve2Inter.LineXParabola(line1Edge.curve, parabolaEdge.curve as Parabola2Data, 1e-4, 1e-10));
     console.warn("共找到交点数量：" + inters.length);
 
-    inters.push(...Curve2Inter.QuadraticXQuadratic(arcEdge.curve as Arc2Data, ellipseEdge.curve as Arc2Data, 1e-10));
+    inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge.curve as Arc2Data, circleEdge_.curve as Arc2Data, 1e-4, 1e-10, 2));
     console.warn("共找到交点数量：" + inters.length);
-    inters.push(...Curve2Inter.QuadraticXQuadratic(arcEdge.curve as Arc2Data, hyperbolaLeftEdge.curve as Hyperbola2Data, 1e-10));
+    inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge.curve as Arc2Data, circle1Edge.curve as Arc2Data, 1e-4, 1e-10, 2));
     console.warn("共找到交点数量：" + inters.length);
-    inters.push(...Curve2Inter.QuadraticXQuadratic(arcEdge.curve as Arc2Data, hyperbolaRightEdge.curve as Hyperbola2Data, 1e-10));
+    inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge.curve as Arc2Data, arcEdge.curve as Arc2Data, 1e-4, 1e-10, 2));
     console.warn("共找到交点数量：" + inters.length);
-    inters.push(...Curve2Inter.QuadraticXQuadratic(arcEdge.curve as Arc2Data, parabolaEdge.curve as Parabola2Data, 1e-10));
+    inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge.curve as Arc2Data, ellipseEdge.curve as Arc2Data, 1e-4, 1e-10));
+    console.warn("共找到交点数量：" + inters.length);
+    inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge.curve as Arc2Data, hyperbolaLeftEdge.curve as Hyperbola2Data, 1e-4, 1e-10));
+    console.warn("共找到交点数量：" + inters.length);
+    inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge.curve as Arc2Data, hyperbolaRightEdge.curve as Hyperbola2Data, 1e-4, 1e-10));
+    console.warn("共找到交点数量：" + inters.length);
+    inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge.curve as Arc2Data, parabolaEdge.curve as Parabola2Data, 1e-4, 1e-10));
     console.warn("共找到交点数量：" + inters.length);
 
-    inters.push(...Curve2Inter.QuadraticXQuadratic(ellipseEdge.curve as Arc2Data, hyperbolaLeftEdge.curve as Hyperbola2Data, 1e-10));
+    inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge_.curve as Arc2Data, circle1Edge.curve as Arc2Data, 1e-4, 1e-10, 2));
     console.warn("共找到交点数量：" + inters.length);
-    inters.push(...Curve2Inter.QuadraticXQuadratic(ellipseEdge.curve as Arc2Data, hyperbolaRightEdge.curve as Hyperbola2Data, 1e-10));
+    inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge_.curve as Arc2Data, arcEdge.curve as Arc2Data, 1e-4, 1e-10, 2));
     console.warn("共找到交点数量：" + inters.length);
-    inters.push(...Curve2Inter.QuadraticXQuadratic(ellipseEdge.curve as Arc2Data, parabolaEdge.curve as Parabola2Data, 1e-10));
+    inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge_.curve as Arc2Data, ellipseEdge.curve as Arc2Data, 1e-4, 1e-10));
+    console.warn("共找到交点数量：" + inters.length);
+    inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge_.curve as Arc2Data, hyperbolaLeftEdge.curve as Hyperbola2Data, 1e-4, 1e-10));
+    console.warn("共找到交点数量：" + inters.length);
+    inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge_.curve as Arc2Data, hyperbolaRightEdge.curve as Hyperbola2Data, 1e-4, 1e-10));
+    console.warn("共找到交点数量：" + inters.length);
+    inters.push(...Curve2Inter.QuadraticXQuadratic(circleEdge_.curve as Arc2Data, parabolaEdge.curve as Parabola2Data, 1e-4, 1e-10));
+    console.warn("共找到交点数量：" + inters.length);
+    inters.push(...Curve2Inter.QuadraticXQuadratic(circle1Edge.curve as Arc2Data, arcEdge.curve as Arc2Data, 1e-4, 1e-10, 2));
+    console.warn("共找到交点数量：" + inters.length);
+    inters.push(...Curve2Inter.QuadraticXQuadratic(circle1Edge.curve as Arc2Data, ellipseEdge.curve as Arc2Data, 1e-4, 1e-10));
+    console.warn("共找到交点数量：" + inters.length);
+    inters.push(...Curve2Inter.QuadraticXQuadratic(circle1Edge.curve as Arc2Data, hyperbolaLeftEdge.curve as Hyperbola2Data, 1e-4, 1e-10));
+    console.warn("共找到交点数量：" + inters.length);
+    inters.push(...Curve2Inter.QuadraticXQuadratic(circle1Edge.curve as Arc2Data, hyperbolaRightEdge.curve as Hyperbola2Data, 1e-4, 1e-10));
+    console.warn("共找到交点数量：" + inters.length);
+    inters.push(...Curve2Inter.QuadraticXQuadratic(circle1Edge.curve as Arc2Data, parabolaEdge.curve as Parabola2Data, 1e-4, 1e-10));
     console.warn("共找到交点数量：" + inters.length);
 
-    inters.push(...Curve2Inter.QuadraticXQuadratic(hyperbolaLeftEdge.curve as Arc2Data, parabolaEdge.curve as Hyperbola2Data, 1e-10));
+    inters.push(...Curve2Inter.QuadraticXQuadratic(arcEdge.curve as Arc2Data, ellipseEdge.curve as Arc2Data, 1e-4, 1e-10));
     console.warn("共找到交点数量：" + inters.length);
-    inters.push(...Curve2Inter.QuadraticXQuadratic(hyperbolaRightEdge.curve as Arc2Data, parabolaEdge.curve as Parabola2Data, 1e-10));
+    inters.push(...Curve2Inter.QuadraticXQuadratic(arcEdge.curve as Arc2Data, hyperbolaLeftEdge.curve as Hyperbola2Data, 1e-4, 1e-10));
+    console.warn("共找到交点数量：" + inters.length);
+    inters.push(...Curve2Inter.QuadraticXQuadratic(arcEdge.curve as Arc2Data, hyperbolaRightEdge.curve as Hyperbola2Data, 1e-4, 1e-10));
+    console.warn("共找到交点数量：" + inters.length);
+    inters.push(...Curve2Inter.QuadraticXQuadratic(arcEdge.curve as Arc2Data, parabolaEdge.curve as Parabola2Data, 1e-4, 1e-10));
+    console.warn("共找到交点数量：" + inters.length);
+
+    inters.push(...Curve2Inter.QuadraticXQuadratic(ellipseEdge.curve as Arc2Data, hyperbolaLeftEdge.curve as Hyperbola2Data, 1e-4, 1e-10));
+    console.warn("共找到交点数量：" + inters.length);
+    inters.push(...Curve2Inter.QuadraticXQuadratic(ellipseEdge.curve as Arc2Data, hyperbolaRightEdge.curve as Hyperbola2Data, 1e-4, 1e-10));
+    console.warn("共找到交点数量：" + inters.length);
+    inters.push(...Curve2Inter.QuadraticXQuadratic(ellipseEdge.curve as Arc2Data, parabolaEdge.curve as Parabola2Data, 1e-4, 1e-10));
+    console.warn("共找到交点数量：" + inters.length);
+
+    inters.push(...Curve2Inter.QuadraticXQuadratic(hyperbolaLeftEdge.curve as Arc2Data, parabolaEdge.curve as Hyperbola2Data, 1e-4, 1e-10));
+    console.warn("共找到交点数量：" + inters.length);
+    inters.push(...Curve2Inter.QuadraticXQuadratic(hyperbolaRightEdge.curve as Arc2Data, parabolaEdge.curve as Parabola2Data, 1e-4, 1e-10));
     console.warn("共找到交点数量：" + inters.length);
 
     let end = new Date().getTime();
     console.warn("计算耗时：" + (end - begin) + " 毫秒，共找到交点数量：" + inters.length);
+    console.warn("总计迭代：" + Curve2Inter.totaltimes);
     drawInters(inters);
 
     // 创建一个立方体几何体

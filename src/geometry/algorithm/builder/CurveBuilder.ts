@@ -22,6 +22,7 @@ import { Nurbs3Algo } from "../base/curve3/Nurbs3Algo";
 import type { Curve3Algo } from "../base/Curve3Algo";
 import { Hyperbola2Data } from "../../data/base/curve2/Hyperbola2Data";
 import { Hyperbola2Algo } from "../base/curve2/Hyperbola2Algo";
+import { NURBSCurve } from 'three/examples/jsm/curves/NURBSCurve';
 
 /**
  * curvr builder.
@@ -164,7 +165,7 @@ class CurveBuilder {
      * @param {Array<Vector2>} [points] - The fitting points.
      */
     static BuildNurbs2FromFittingPoints(points: Array<Vector2>): Nurbs2Data {
-        debugger;
+        const curve = new NURBSCurve(3, [], [], 0, 1);
         return null;
     }
 
