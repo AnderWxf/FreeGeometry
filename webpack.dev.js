@@ -38,7 +38,11 @@ module.exports = {
     extensions: ['.ts', '.tsx', '.js'],
     alias: {
       '@': path.resolve(__dirname, 'src') // 路径别名，方便调试时定位
-    }
+    },
+    modules: [
+      path.resolve(__dirname, 'node_modules'),
+      path.resolve(__dirname, 'types')
+    ]
   },
   output: {
     filename: 'bundle.js',

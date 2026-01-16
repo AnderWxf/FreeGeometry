@@ -22,8 +22,13 @@ class Curve2Algo {
      *
      * @type {Curve2Data}
      */
-    public dat: Curve2Data;
-
+    protected dat_: Curve2Data;
+    public get dat(): Curve2Data {
+        return this.dat_;
+    }
+    public set dat(dat: Curve2Data) {
+        this.dat_ = dat;
+    }
     /**
      * Constructs a 2D curvr algorithm.
      *

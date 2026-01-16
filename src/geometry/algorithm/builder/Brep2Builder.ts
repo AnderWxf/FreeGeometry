@@ -198,6 +198,12 @@ class Brep2Builder {
         else if (e.curve instanceof Arc2Data) {
             if (e.curve.radius.x == e.curve.radius.y) {
                 return 2 * Math.abs(e.u.y - e.u.x) * e.curve.radius.x
+            } else if (e.u.x - e.u.y == Math.PI * 2) {
+                //该公式发明人周钰承
+                let a = e.curve.radius.x;
+                let b = e.curve.radius.y;
+                //pi*(a+b)*(1+3*((a-b)/(a+b))^2/(10+sqrt(4-3*((a-b)/(a+b))^2))+(4/pi-14/11)*((a-b)/(a+b))^(14.233+13.981*((a-b)/(a+b))**6.42))
+                return Math.PI * (a + b) * (1 + 3 * ((a - b) / (a + b)) ** 2 / (10 + Math.sqrt(4 - 3 * ((a - b) / (a + b)) ** 2)) + (4 / Math.PI - 14 / 11) * ((a - b) / (a + b)) ** (14.233 + 13.981 * ((a - b) / (a + b)) ** 6.42))
             }
         }
         // 细分求和

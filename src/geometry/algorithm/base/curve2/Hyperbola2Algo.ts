@@ -14,8 +14,13 @@ class Hyperbola2Algo extends Curve2Algo {
      *
      * @type {Hyperbola2Data}
      */
-    public override dat: Hyperbola2Data;
-
+    protected dat_: Hyperbola2Data;
+    public get dat(): Hyperbola2Data {
+        return this.dat_;
+    }
+    public set dat(dat: Hyperbola2Data) {
+        this.dat_ = dat;
+    }
     /**
      * Constructs a 2D Hyperbola algorithm.
      *

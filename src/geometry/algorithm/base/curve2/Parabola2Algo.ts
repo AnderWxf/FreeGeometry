@@ -13,8 +13,13 @@ class Parabola2Algo extends Curve2Algo {
      *
      * @type {Parabola2Data}
      */
-    public override dat: Parabola2Data;
-
+    protected dat_: Parabola2Data;
+    public get dat(): Parabola2Data {
+        return this.dat_;
+    }
+    public set dat(dat: Parabola2Data) {
+        this.dat_ = dat;
+    }
     /**
      * Constructs a 2D Parabola algorithm.
      *

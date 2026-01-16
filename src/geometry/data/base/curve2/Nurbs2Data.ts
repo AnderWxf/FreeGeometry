@@ -32,7 +32,7 @@ class Nurbs2Data extends Curve2Data {
      *
      * @type {number}
      */
-    public p: number;
+    public degree: number;
 
     /**
      * Constructs a new 2D Transfrom.
@@ -41,14 +41,14 @@ class Nurbs2Data extends Curve2Data {
      * @param {Array<Vector2>} [controls=null] - The controls points of this nurbs.
      * @param {Array<number>} [knots=null] - The knots of this nurbs.
      * @param {Array<number>} [weights=null] - The weights of this nurbs.
-     * @param {number} [p=3] - The degree of this nurbs.
+     * @param {number} [degree=3] - The degree of this nurbs.
      */
-    constructor(trans = new Transform2(), controls = new Array<Vector2>(), knots = new Array<number>(), weights = new Array<number>(), p = 3) {
+    constructor(trans = new Transform2(), controls = new Array<Vector2>(), knots = new Array<number>(), weights = new Array<number>(), degree = 3) {
         super(trans);
         this.controls = controls;
         this.knots = knots;
         this.weights = weights;
-        this.p = p;
+        this.degree = degree;
     }
 }
 

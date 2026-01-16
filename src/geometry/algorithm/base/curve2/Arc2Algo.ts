@@ -14,8 +14,13 @@ class Arc2Algo extends Curve2Algo {
      *
      * @type {Arc2Data}
      */
-    public override dat: Arc2Data;
-
+    protected dat_: Arc2Data;
+    public get dat(): Arc2Data {
+        return this.dat_;
+    }
+    public set dat(dat: Arc2Data) {
+        this.dat_ = dat;
+    }
     /**
      * Constructs a 2D arc algorithm.
      *
