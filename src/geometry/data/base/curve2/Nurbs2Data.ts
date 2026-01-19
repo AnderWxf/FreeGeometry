@@ -1,4 +1,4 @@
-import type { Vector2 } from "../../../../math/Math";
+import type { Vector2, Vector3 } from "../../../../math/Math";
 import { Transform2 } from "../Transform2";
 import { Curve2Data } from "../Curve2Data";
 /**
@@ -8,10 +8,10 @@ import { Curve2Data } from "../Curve2Data";
 class Nurbs2Data extends Curve2Data {
     /**
      * The contrls points of this Nurbs2Data.
-     *
-     * @type {Array<Vector2>}
+     * use Vector3 to include weight info (z is weight)
+     * @type {Array<Vector3>}
      */
-    public controls: Array<Vector2>;
+    public controls: Array<Vector3>;
 
     /**
      * The knots of this Nurbs2Data.
@@ -20,12 +20,6 @@ class Nurbs2Data extends Curve2Data {
      */
     public knots: Array<number>;
 
-    /**
-     * The weights of this Nurbs2Data.
-     *
-     * @type {Array<number>}
-     */
-    public weights: Array<number>;
 
     /**
      * The degree of this Nurbs2Data.
@@ -38,16 +32,14 @@ class Nurbs2Data extends Curve2Data {
      * Constructs a new 2D Transfrom.
      *
      * @param {Transform2} [trans={position=(0,0),rotation=0}]- The transfrom value of this nurbs.
-     * @param {Array<Vector2>} [controls=null] - The controls points of this nurbs.
+     * @param {Array<Vector3>} [controls=null] - The controls points of this nurbs.
      * @param {Array<number>} [knots=null] - The knots of this nurbs.
-     * @param {Array<number>} [weights=null] - The weights of this nurbs.
      * @param {number} [degree=3] - The degree of this nurbs.
      */
-    constructor(trans = new Transform2(), controls = new Array<Vector2>(), knots = new Array<number>(), weights = new Array<number>(), degree = 3) {
+    constructor(trans = new Transform2(), controls = new Array<Vector3>(), knots = new Array<number>(), degree = 3) {
         super(trans);
         this.controls = controls;
         this.knots = knots;
-        this.weights = weights;
         this.degree = degree;
     }
 }

@@ -2,7 +2,7 @@ import { Vector2 } from "../../../../math/Math";
 import { Transform3 } from "../Transform3";
 import { Curve3Data } from "../Curve3Data";
 /**
- * 3D Hyperbola data struct. TODO
+ * 3D Hyperbola data struct. 
  *
  */
 class Hyperbola3Data extends Curve3Data {

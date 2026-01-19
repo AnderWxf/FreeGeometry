@@ -1,8 +1,10 @@
 import { Vector2, type Vector3 } from "../../../math/Math";
 import { Arc2Data } from "../../data/base/curve2/Arc2Data";
 import { Line2Data } from "../../data/base/curve2/Line2Data";
+import { Nurbs2Data } from "../../data/base/curve2/Nurbs2Data";
 import type { Curve2Data } from "../../data/base/Curve2Data";
 import { Edge2, type Face2 } from "../../data/brep/Brep2";
+import { Nurbs2Algo } from "../base/curve2/Nurbs2Algo";
 import { CurveBuilder } from "./CurveBuilder";
 
 /**
@@ -129,8 +131,11 @@ class Brep2Builder {
      * @param {Array<Vector2>} [points] - The fitting points.
      */
     static BuildEdge2FromFittingPoints(points: Array<Vector2>): Edge2 {
-        debugger;
-        return null;
+        let ret = new Edge2();
+        let curve = CurveBuilder.BuildNurbs2FromFittingPoints(points);
+        ret.u = new Vector2(0, 1);
+        ret.curve = curve;
+        return ret;
     }
 
     /**
@@ -206,13 +211,34 @@ class Brep2Builder {
                 return Math.PI * (a + b) * (1 + 3 * ((a - b) / (a + b)) ** 2 / (10 + Math.sqrt(4 - 3 * ((a - b) / (a + b)) ** 2)) + (4 / Math.PI - 14 / 11) * ((a - b) / (a + b)) ** (14.233 + 13.981 * ((a - b) / (a + b)) ** 6.42))
             }
         }
+        else if (e.curve instanceof Nurbs2Data) {
+            let nurbsAlgo = new Nurbs2Algo(e.curve as Nurbs2Data);
+            // let start = new Date().getTime();
+            let nurbsLength = nurbsAlgo.length();
+            // let end = new Date().getTime();
+            // console.log("nurbsAlgo :" + nurbsLength + " time:" + (end - start));
+            return nurbsLength;
+        }
         // 细分求和
         let algor = CurveBuilder.Algorithm2ByData(e.curve);
+        // let start = new Date().getTime();
         let length = 0;
         let ps = new Array<{ u: number, p: Vector2 }>();
         ps.push({ u: e.u.x, p: algor.p(e.u.x) });
+        ps.push({ u: e.u.x + (e.u.y - e.u.x) * 1 / 8, p: algor.p(e.u.x + (e.u.y - e.u.x) * 1 / 8) });
+        ps.push({ u: e.u.x + (e.u.y - e.u.x) * 2 / 8, p: algor.p(e.u.x + (e.u.y - e.u.x) * 2 / 8) });
+        ps.push({ u: e.u.x + (e.u.y - e.u.x) * 3 / 8, p: algor.p(e.u.x + (e.u.y - e.u.x) * 3 / 8) });
+        ps.push({ u: e.u.x + (e.u.y - e.u.x) * 4 / 8, p: algor.p(e.u.x + (e.u.y - e.u.x) * 4 / 8) });
+        ps.push({ u: e.u.x + (e.u.y - e.u.x) * 5 / 8, p: algor.p(e.u.x + (e.u.y - e.u.x) * 5 / 8) });
+        ps.push({ u: e.u.x + (e.u.y - e.u.x) * 6 / 8, p: algor.p(e.u.x + (e.u.y - e.u.x) * 6 / 8) });
         ps.push({ u: e.u.y, p: algor.p(e.u.y) });
         length = ps[0].p.distanceTo(ps[1].p);
+        length = length + ps[1].p.distanceTo(ps[2].p);
+        length = length + ps[2].p.distanceTo(ps[3].p);
+        length = length + ps[3].p.distanceTo(ps[4].p);
+        length = length + ps[4].p.distanceTo(ps[5].p);
+        length = length + ps[5].p.distanceTo(ps[6].p);
+        length = length + ps[6].p.distanceTo(ps[7].p);
         while (1) {
             let ps_ = new Array<{ u: number, p: Vector2 }>();
             var l = 0;
@@ -227,6 +253,8 @@ class Brep2Builder {
             }
             ps_.push(ps[ps.length - 1]);
             if (Math.abs(l - length) < tol) {
+                // let end = new Date().getTime();
+                // console.log("length :" + l + " time:" + (end - start));
                 return l;
             }
             length = l;

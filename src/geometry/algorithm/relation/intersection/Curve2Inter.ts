@@ -825,18 +825,24 @@ class Curve2Inter {
         }
         // 二分法递归细分
         let bin = (a: ValueOfBinary, b: ValueOfBinary) => {
-            let u = (a.u + b.u) * 0.5;
-            let p = algor0.p(u);
-            let g = algor1.g(p);
-            // 一般方程返回值是0，则恰好是交点。
-            if (g == 0) {//Math.abs(g) < tol
-                ret.push({ p: p, u0: u, u1: algor1.u(p) });
-            } else {
-                if (a.g * g < 0) {
-                    bin(a, { p, u, g });
-                }
-                else if (b.g * g < 0) {
-                    bin({ p, u, g }, b);
+            let times = 0;
+            while (true) {
+                times++;
+                let u = (a.u + b.u) * 0.5;
+                let p = algor0.p(u);
+                let g = algor1.g(p);
+                // 一般方程返回值是0，则恰好是交点。
+                if (Math.abs(g) < tol1) {
+                    ret.push({ p: p, u0: u, u1: algor1.u(p) });
+                    console.log("times :" + times);
+                    break;
+                } else {
+                    if (a.g * g < 0) {
+                        b = { p, u, g };
+                    }
+                    else if (b.g * g < 0) {
+                        a = { p, u, g };
+                    }
                 }
             }
         }

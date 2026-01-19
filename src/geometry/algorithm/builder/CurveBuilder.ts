@@ -23,6 +23,8 @@ import type { Curve3Algo } from "../base/Curve3Algo";
 import { Hyperbola2Data } from "../../data/base/curve2/Hyperbola2Data";
 import { Hyperbola2Algo } from "../base/curve2/Hyperbola2Algo";
 import { NURBSCurve } from 'three/examples/jsm/curves/NURBSCurve';
+import { Hyperbola3Data } from "../../data/base/curve3/Hyperbola3Data";
+import { Hyperbola3Algo } from "../base/curve3/Hyperbola3Algo";
 
 /**
  * curvr builder.
@@ -165,8 +167,8 @@ class CurveBuilder {
      * @param {Array<Vector2>} [points] - The fitting points.
      */
     static BuildNurbs2FromFittingPoints(points: Array<Vector2>): Nurbs2Data {
-        const curve = new NURBSCurve(3, [], [], 0, 1);
-        return null;
+        const curve = Nurbs2Algo.Fit(points, 3);
+        return curve;
     }
 
     /**
@@ -230,9 +232,6 @@ class CurveBuilder {
         if (dat instanceof Arc2Data) {
             return new Arc2Algo(dat);
         }
-        else if (dat instanceof Parabola2Data) {
-            return new Parabola2Algo(dat);
-        }
         else if (dat instanceof Line2Data) {
             return new Line2Algo(dat);
         }
@@ -252,6 +251,9 @@ class CurveBuilder {
     static Algorithm3ByData(dat: Curve3Data): Curve3Algo {
         if (dat instanceof Arc3Data) {
             return new Arc3Algo(dat);
+        }
+        else if (dat instanceof Hyperbola3Data) {
+            return new Hyperbola3Algo(dat);
         }
         else if (dat instanceof Parabola3Data) {
             return new Parabola3Algo(dat);
