@@ -47,6 +47,18 @@ class Nurbs2Algo extends Curve2Algo {
     }
 
     /**
+     * the U function return u parameter at a position .
+     * @param {Vector2} [point] - the point on curve.
+     * @retun {number}
+     */
+    u(point: Vector2): number {
+        let v = point.clone();
+        v.applyMatrix3(this.dat.trans.makeWorldMatrix().invert());
+        let u = verb.eval.Analyze.rationalCurveClosestParam(this.curve_._data, [v.x, v.y]) as number;
+        return u;
+    }
+
+    /**
      * the D(derivative) function return r-order derivative vector at u parameter.
      * @param {number} [u ∈ [0,a]] - the u parameter of curve.
      * @param {number} [r ∈ [0,1,2...]] - r-order.
