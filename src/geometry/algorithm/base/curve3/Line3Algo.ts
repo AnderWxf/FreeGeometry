@@ -12,7 +12,13 @@ class Line3Algo extends Curve3Algo {
      *
      * @type {Line3Data}
      */
-    public override dat: Line3Data;
+    protected dat_: Line3Data;
+    public get dat(): Line3Data {
+        return this.dat_;
+    }
+    public set dat(dat: Line3Data) {
+        this.dat_ = dat;
+    }
 
     /**
      * Constructs a 3D line algorithm.

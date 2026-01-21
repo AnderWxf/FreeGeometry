@@ -11,7 +11,13 @@ class Arc3Algo extends Curve3Algo {
      *
      * @type {Arc3Data}
      */
-    public override dat: Arc3Data;
+    protected dat_: Arc3Data;
+    public get dat(): Arc3Data {
+        return this.dat_;
+    }
+    public set dat(dat: Arc3Data) {
+        this.dat_ = dat;
+    }
 
     /**
      * Constructs a 3D arc algorithm.

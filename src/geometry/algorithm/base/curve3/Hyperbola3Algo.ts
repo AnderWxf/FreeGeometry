@@ -11,7 +11,13 @@ class Hyperbola3Algo extends Curve3Algo {
      *
      * @type {Hyperbola3Data}
      */
-    public override dat: Hyperbola3Data;
+    protected dat_: Hyperbola3Data;
+    public get dat(): Hyperbola3Data {
+        return this.dat_;
+    }
+    public set dat(dat: Hyperbola3Data) {
+        this.dat_ = dat;
+    }
 
     /**
      * Constructs a 3D Hyperbola algorithm.

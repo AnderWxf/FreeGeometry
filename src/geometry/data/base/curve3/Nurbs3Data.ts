@@ -21,11 +21,11 @@ class Nurbs3Data extends Curve3Data {
     public knots: Array<number>;
 
     /**
-     * The degree of this Nurbs3Data.
+     * The degree of this Nurbs2Data.
      *
      * @type {number}
      */
-    public p: number;
+    public degree: number;
 
     /**
      * Constructs a new 3D Transfrom.
@@ -33,13 +33,13 @@ class Nurbs3Data extends Curve3Data {
      * @param {Transform3} [trans={position=(0,0,0),rotation=(0,0,0)}]- The transfrom value of this nurbs.
      * @param {Array<Vector3>} [controls=null] - The controls points of this nurbs.
      * @param {Array<number>} [knots=null] - The knots of this nurbs.
-     * @param {number} [p=3] - The degree of this nurbs.
+     * @param {number} [degree=3] - The degree of this nurbs.
      */
-    constructor(trans = new Transform3(), controls = new Array<Vector4>(), knots = new Array<number>(), p = 3) {
+    constructor(trans = new Transform3(), controls = new Array<Vector4>(), knots = new Array<number>(), degree = 3) {
         super(trans);
         this.controls = controls;
         this.knots = knots;
-        this.p = p;
+        this.degree = degree;
     }
 }
 

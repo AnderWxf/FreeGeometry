@@ -19,6 +19,7 @@ import { Parabola2Data } from './geometry/data/base/curve2/Parabola2Data';
 import { Nurbs2Data } from './geometry/data/base/curve2/Nurbs2Data';
 import type { Curve2Data } from './geometry/data/base/Curve2Data';
 import type { Edge2 } from './geometry/data/brep/Brep2';
+import type { Curve2Algo } from './geometry/algorithm/base/Curve2Algo';
 
 export class Cube {
   public constructor() {
@@ -114,35 +115,46 @@ export class Cube {
       new Vector2(20, 0),
       new Vector2(30, 10)
     ]);
-    let geoNurbsEdge = BrepMeshBuilder.BuildEdge2Mesh(nurbsEdge, THREE.Color.NAMES.orange, 256);
-    geoNurbsEdge.name = "Nurbs2";
+    let geoNurbsEdge = BrepMeshBuilder.BuildEdge2Mesh(nurbsEdge, THREE.Color.NAMES.mediumseagreen, 256);
+    let geoNurbsTangents = BrepMeshBuilder.BuildEdge2Tangents(nurbsEdge, THREE.Color.NAMES.orangered, 8);
 
-    // scene.add(geoLineEdgeEdge);
-    // scene.add(geoLine1EdgeEdge);
-    // scene.add(geoLine2EdgeEdge);
-    // scene.add(geoCircleEdgeEdge);
-    // scene.add(geoCircleEdgeEdge_);
-    // scene.add(geoCircle1EdgeEdge);
-    // scene.add(geoArcEdgeEdge);
-    // scene.add(geoEllipseEdge);
+    let nurbsEdge1 = Brep2Builder.BuildEdge2FromFittingPoints([
+      new Vector2(0, 10),
+      new Vector2(10, 0),
+      new Vector2(20, 10),
+      new Vector2(30, 0)
+    ]);
+    let geoNurbsEdge1 = BrepMeshBuilder.BuildEdge2Mesh(nurbsEdge1, THREE.Color.NAMES.orange, 256);
+    let geoNurbsTangents1 = BrepMeshBuilder.BuildEdge2Tangents(nurbsEdge1, THREE.Color.NAMES.orangered, 8);
+
+    scene.add(geoLineEdgeEdge);
+    scene.add(geoLine1EdgeEdge);
+    scene.add(geoLine2EdgeEdge);
+    scene.add(geoCircleEdgeEdge);
+    scene.add(geoCircleEdgeEdge_);
+    scene.add(geoCircle1EdgeEdge);
+    scene.add(geoArcEdgeEdge);
+    scene.add(geoEllipseEdge);
     scene.add(geoHyperbolaLeftEdgeEdge);
-    // scene.add(geoHyperbolaRightEdgeEdge);
+    scene.add(geoHyperbolaRightEdgeEdge);
     scene.add(geoParabolaEdgeEdge);
-    // scene.add(geoNurbsEdge);
+    scene.add(geoNurbsEdge); //scene.add(geoNurbsTangents);
+    scene.add(geoNurbsEdge1); //scene.add(geoNurbsTangents1);
 
     let curves = new Array<Curve2Data>();
-    // curves.push(lineEdge.curve);
-    // curves.push(line1Edge.curve);
-    // curves.push(line2Edge.curve);
-    // curves.push(circleEdge.curve);
-    // curves.push(circleEdge_.curve);
-    // curves.push(circle1Edge.curve);
-    // curves.push(arcEdge.curve);
-    // curves.push(ellipseEdge.curve);
+    curves.push(lineEdge.curve);
+    curves.push(line1Edge.curve);
+    curves.push(line2Edge.curve);
+    curves.push(circleEdge.curve);
+    curves.push(circleEdge_.curve);
+    curves.push(circle1Edge.curve);
+    curves.push(arcEdge.curve);
+    curves.push(ellipseEdge.curve);
     curves.push(hyperbolaLeftEdge.curve);
-    // curves.push(hyperbolaRightEdge.curve);
+    curves.push(hyperbolaRightEdge.curve);
     curves.push(parabolaEdge.curve);
-    // curves.push(nurbsEdge.curve);
+    curves.push(nurbsEdge.curve);
+    curves.push(nurbsEdge1.curve);
 
     let edges = new Array<Edge2>();
     // edges.push(lineEdge);
@@ -169,6 +181,7 @@ export class Cube {
         scene.add(mesh);
       }
     }
+
 
 
 

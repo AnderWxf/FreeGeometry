@@ -1,8 +1,13 @@
 import { Vector2, Vector3 } from "../../../math/Math";
 import { Curve2Data } from "../../data/base/Curve2Data";
+import { Arc3Data } from "../../data/base/curve3/Arc3Data";
+import { Line3Data } from "../../data/base/curve3/Line3Data";
+import { Nurbs3Data } from "../../data/base/curve3/Nurbs3Data";
 import { Curve3Data } from "../../data/base/Curve3Data";
 import { Transform3 } from "../../data/base/Transform3";
-import { Body3, Face3 } from "../../data/brep/Brep3";
+import { Body3, Edge3, Face3 } from "../../data/brep/Brep3";
+import { Nurbs3Algo } from "../base/curve3/Nurbs3Algo";
+import { CurveBuilder } from "./CurveBuilder";
 
 /**
  * brep builder.
@@ -164,7 +169,77 @@ class Brep3Builder {
         debugger;
         return null;
     }
-
+    /**
+     * return legnth if this edge.
+     *
+     * @param {number} [u ∈ [0,a]] - the u parameter of curve.
+     * @retun {Matrix2}
+     */
+    static Length(e: Edge3, tol = 0.0001): number {
+        if (e.curve instanceof Line3Data) {
+            return Math.abs(e.u.y - e.u.x);
+        }
+        else if (e.curve instanceof Arc3Data) {
+            if (e.curve.radius.x == e.curve.radius.y) {
+                return 2 * Math.abs(e.u.y - e.u.x) * e.curve.radius.x
+            } else if (e.u.x - e.u.y == Math.PI * 2) {
+                //该公式发明人周钰承
+                let a = e.curve.radius.x;
+                let b = e.curve.radius.y;
+                //pi*(a+b)*(1+3*((a-b)/(a+b))^2/(10+sqrt(4-3*((a-b)/(a+b))^2))+(4/pi-14/11)*((a-b)/(a+b))^(14.233+13.981*((a-b)/(a+b))**6.42))
+                return Math.PI * (a + b) * (1 + 3 * ((a - b) / (a + b)) ** 2 / (10 + Math.sqrt(4 - 3 * ((a - b) / (a + b)) ** 2)) + (4 / Math.PI - 14 / 11) * ((a - b) / (a + b)) ** (14.233 + 13.981 * ((a - b) / (a + b)) ** 6.42))
+            }
+        }
+        else if (e.curve instanceof Nurbs3Data) {
+            let nurbsAlgo = new Nurbs3Algo(e.curve as Nurbs3Data);
+            // let start = new Date().getTime();
+            let nurbsLength = nurbsAlgo.length();
+            // let end = new Date().getTime();
+            // console.log("nurbsAlgo :" + nurbsLength + " time:" + (end - start));
+            return nurbsLength;
+        }
+        // 细分求和
+        let algor = CurveBuilder.Algorithm3ByData(e.curve);
+        // let start = new Date().getTime();
+        let length = 0;
+        let ps = new Array<{ u: number, p: Vector3 }>();
+        ps.push({ u: e.u.x, p: algor.p(e.u.x) });
+        ps.push({ u: e.u.x + (e.u.y - e.u.x) * 1 / 8, p: algor.p(e.u.x + (e.u.y - e.u.x) * 1 / 8) });
+        ps.push({ u: e.u.x + (e.u.y - e.u.x) * 2 / 8, p: algor.p(e.u.x + (e.u.y - e.u.x) * 2 / 8) });
+        ps.push({ u: e.u.x + (e.u.y - e.u.x) * 3 / 8, p: algor.p(e.u.x + (e.u.y - e.u.x) * 3 / 8) });
+        ps.push({ u: e.u.x + (e.u.y - e.u.x) * 4 / 8, p: algor.p(e.u.x + (e.u.y - e.u.x) * 4 / 8) });
+        ps.push({ u: e.u.x + (e.u.y - e.u.x) * 5 / 8, p: algor.p(e.u.x + (e.u.y - e.u.x) * 5 / 8) });
+        ps.push({ u: e.u.x + (e.u.y - e.u.x) * 6 / 8, p: algor.p(e.u.x + (e.u.y - e.u.x) * 6 / 8) });
+        ps.push({ u: e.u.y, p: algor.p(e.u.y) });
+        length = ps[0].p.distanceTo(ps[1].p);
+        length = length + ps[1].p.distanceTo(ps[2].p);
+        length = length + ps[2].p.distanceTo(ps[3].p);
+        length = length + ps[3].p.distanceTo(ps[4].p);
+        length = length + ps[4].p.distanceTo(ps[5].p);
+        length = length + ps[5].p.distanceTo(ps[6].p);
+        length = length + ps[6].p.distanceTo(ps[7].p);
+        while (1) {
+            let ps_ = new Array<{ u: number, p: Vector3 }>();
+            var l = 0;
+            for (let i = 1; i < ps.length; i++) {
+                let p0 = ps[i - 1];
+                let p1 = ps[i];
+                let u = (p0.u + p1.u) * 0.5;
+                let p = algor.p(u);
+                l += p.distanceTo(p0.p) + p.distanceTo(p1.p)
+                ps_.push(p0);
+                ps_.push({ u: u, p: p });
+            }
+            ps_.push(ps[ps.length - 1]);
+            if (Math.abs(l - length) < tol) {
+                // let end = new Date().getTime();
+                // console.log("length :" + l + " time:" + (end - start));
+                return l;
+            }
+            length = l;
+            ps = ps_;
+        }
+    }
 }
 
 export { Brep3Builder };

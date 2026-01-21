@@ -11,7 +11,13 @@ class UvCurveAlgo extends Curve3Algo {
      *
      * @type {UvCurveData}
      */
-    public override dat: UvCurveData;
+    protected dat_: UvCurveData;
+    public get dat(): UvCurveData {
+        return this.dat_;
+    }
+    public set dat(dat: UvCurveData) {
+        this.dat_ = dat;
+    }
 
     /**
      * Constructs a 3D ellipse arc algorithm.

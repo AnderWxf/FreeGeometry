@@ -20,8 +20,13 @@ class Curve3Algo {
      *
      * @type {Curve3Data}
      */
-    public dat: Curve3Data;
-
+    protected dat_: Curve3Data;
+    public get dat(): Curve3Data {
+        return this.dat_;
+    }
+    public set dat(dat: Curve3Data) {
+        this.dat_ = dat;
+    }
     /**
      * Constructs a 3D curvr algorithm.
      *

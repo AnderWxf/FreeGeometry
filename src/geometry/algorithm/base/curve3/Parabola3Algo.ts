@@ -11,7 +11,13 @@ class Parabola3Algo extends Curve3Algo {
      *
      * @type {Parabola3Data}
      */
-    public override dat: Parabola3Data;
+    protected dat_: Parabola3Data;
+    public get dat(): Parabola3Data {
+        return this.dat_;
+    }
+    public set dat(dat: Parabola3Data) {
+        this.dat_ = dat;
+    }
 
     /**
      * Constructs a 3D Parabola algorithm.

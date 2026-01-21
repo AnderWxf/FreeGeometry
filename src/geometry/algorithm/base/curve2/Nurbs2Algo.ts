@@ -2,7 +2,6 @@ import { Vector2, Vector3, Vector4 } from "../../../../math/Math";
 import { Nurbs2Data } from "../../../data/base/curve2/Nurbs2Data";
 import { Transform2 } from "../../../data/base/Transform2";
 import { Curve2Algo } from "../Curve2Algo";
-import * as MATHJS from 'mathjs';
 import verb from 'verb-nurbs';
 // import * as verb from 'verb-nurbs';
 
@@ -25,15 +24,6 @@ class Nurbs2Algo extends Curve2Algo {
 
     public override set dat(dat: Nurbs2Data) {
         this.dat_ = dat;
-    }
-    /**
-     * Constructs a nurbs algorithm.
-     *
-     * @param {Curve2Data} [dat=Nurbs2Data] - The data struct of this nurbs algorithm.
-     */
-    constructor(dat: Nurbs2Data) {
-        super(dat);
-        this.dat = dat;
         let controls: number[][] = [];
         for (let i = 0; i < dat.controls.length; i++) {
             controls.push([dat.controls[i].x, dat.controls[i].y, dat.controls[i].z]);
@@ -44,6 +34,15 @@ class Nurbs2Algo extends Curve2Algo {
             controlPoints: controls
         }
         );
+    }
+    /**
+     * Constructs a nurbs algorithm.
+     *
+     * @param {Curve2Data} [dat=Nurbs2Data] - The data struct of this nurbs algorithm.
+     */
+    constructor(dat: Nurbs2Data) {
+        super(dat);
+        this.dat = dat;
     }
 
     /**
@@ -69,8 +68,8 @@ class Nurbs2Algo extends Curve2Algo {
             let points = verb.eval.Eval.curvePoint(this.curve_._data, u) as number[];
             return new Vector2(points[0], points[1]);
         } else {
-            let points = verb.eval.Eval.rationalCurveDerivatives(this.curve_._data, u, r) as number[];
-            return new Vector2(points[0], points[1]);
+            let points = verb.eval.Eval.rationalCurveDerivatives(this.curve_._data, u, r) as number[][];
+            return new Vector2(points[1][0], points[1][1]);
         }
     }
 
@@ -84,11 +83,10 @@ class Nurbs2Algo extends Curve2Algo {
         let v = point.clone();
         v.applyMatrix3(this.dat.trans.makeWorldMatrix().invert());
         let u = verb.eval.Analyze.rationalCurveClosestParam(this.curve_._data, [v.x, v.y]) as number;
-        let p_ = verb.eval.Eval.rationalCurvePoint(this.curve_._data, u) as number[];
-        let t_ = verb.eval.Eval.rationalCurveDerivatives(this.curve_._data, u, 1) as number[];
-        let p = new Vector2(p_[0], p_[1]);
-        let v0 = new Vector2(t_[0], t_[1]); // 切向量
-        let v1 = p.clone().sub(v);          // 投影点到目标点方向
+        let d_ = verb.eval.Eval.rationalCurveDerivatives(this.curve_._data, u, 1) as number[][];
+        let p = new Vector2(d_[0][0], d_[0][1]);
+        let v0 = new Vector2(d_[1][0], d_[1][1]); // 切向量
+        let v1 = v.sub(p);          // 投影点到目标点方向
         let ret = v1.length();
         let d = v1.cross(v0);
         // 叉乘>0,则v1在v0右侧，返回值取负数，反之取正数。
