@@ -103,6 +103,7 @@ class Nurbs2Algo extends Curve2Algo {
         return verb.eval.Analyze.rationalCurveArcLength(this.curve_._data, 1);
         // return this.curve_.length();
     }
+
     /**
      * 使用正则化最小二乘法拟合 NURBS 曲线
      */
@@ -121,6 +122,14 @@ class Nurbs2Algo extends Curve2Algo {
         const curveData = verb.eval.Make.rationalInterpCurve(pts, degree, false, null, null);
         const controlPoints = curveData.controlPoints.map((point: any) => new Vector3(point[0], point[1], point[2]));
         return new Nurbs2Data(new Transform2(), controlPoints, curveData.knots, degree);
+    }
+
+    /**
+     * 使用正则化最小二乘法拟合 NURBS 曲线
+     */
+    public static FromVerb(dat: any): Nurbs2Data {
+        const controlPoints = dat.controlPoints.map((point: any) => new Vector3(point[0], point[1], point[2]));
+        return new Nurbs2Data(new Transform2(), controlPoints, dat.knots, dat.degree);
     }
 }
 

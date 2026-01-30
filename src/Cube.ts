@@ -20,6 +20,10 @@ import { Nurbs2Data } from './geometry/data/base/curve2/Nurbs2Data';
 import type { Curve2Data } from './geometry/data/base/Curve2Data';
 import type { Edge2 } from './geometry/data/brep/Brep2';
 import type { Curve2Algo } from './geometry/algorithm/base/Curve2Algo';
+import type { Hyperbola2Algo } from './geometry/algorithm/base/curve2/Hyperbola2Algo';
+import type { Parabola2Algo } from './geometry/algorithm/base/curve2/Parabola2Algo';
+import verb from 'verb-nurbs';
+import { Nurbs2Algo } from './geometry/algorithm/base/curve2/Nurbs2Algo';
 
 export class Cube {
   public constructor() {
@@ -45,24 +49,24 @@ export class Cube {
 
     // 创建一个圆
     let circleEdge = Brep2Builder.BuildCircleEdge2FromCenterRadius(new Vector2(0, 0), 1);
-    let geoCircleEdgeEdge = BrepMeshBuilder.BuildEdge2Mesh(circleEdge, THREE.Color.NAMES.green);
-    geoCircleEdgeEdge.name = "Circle2";
+    let geoCircleEdge = BrepMeshBuilder.BuildEdge2Mesh(circleEdge, THREE.Color.NAMES.green);
+    geoCircleEdge.name = "Circle2";
 
     let circleEdge_ = Brep2Builder.BuildCircleEdge2FromCenterRadius(new Vector2(2, 0), 1);
-    let geoCircleEdgeEdge_ = BrepMeshBuilder.BuildEdge2Mesh(circleEdge_, THREE.Color.NAMES.green);
-    geoCircleEdgeEdge_.name = "Circle2";
+    let geoCircleEdge_ = BrepMeshBuilder.BuildEdge2Mesh(circleEdge_, THREE.Color.NAMES.green);
+    geoCircleEdge_.name = "Circle2";
 
 
     // 三点创建一个圆
     let circle1Edge = Brep2Builder.BuildCircleFromBeginMiddleEndPoint(new Vector2(0, 0), new Vector2(15, 15), new Vector2(0, 25));
-    let geoCircle1EdgeEdge = BrepMeshBuilder.BuildEdge2Mesh(circle1Edge, THREE.Color.NAMES.yellow);
-    geoCircle1EdgeEdge.name = "Circle2_Three_Point";
+    let geoCircle1Edge = BrepMeshBuilder.BuildEdge2Mesh(circle1Edge, THREE.Color.NAMES.yellow);
+    geoCircle1Edge.name = "Circle2_Three_Point";
 
     // 创建一个圆弧
     let arcEdge = Brep2Builder.BuildCircleArcEdge2FromCenterBeginEndPoin(new Vector2(0, 0), new Vector2(13, 13), new Vector2(0, 13));
     arcEdge.u.y = arcEdge.u.x + Math.PI * 2;
-    let geoArcEdgeEdge = BrepMeshBuilder.BuildEdge2Mesh(arcEdge, THREE.Color.NAMES.blue);
-    geoArcEdgeEdge.name = "Arc2";
+    let geoArcEdge = BrepMeshBuilder.BuildEdge2Mesh(arcEdge, THREE.Color.NAMES.blue);
+    geoArcEdge.name = "Arc2";
 
     // 根据三点创建一个椭圆
     let ellipseEdge = Brep2Builder.BuildEllipseEdge2FromCenterBeginEndPoint(new Vector2(0, 0), new Vector2(20, 0), new Vector2(0, 10));
@@ -71,42 +75,56 @@ export class Cube {
 
     // 根据三点创建一个双曲线
     let hyperbolaRightEdge = Brep2Builder.BuildHyperbolaEdge2FromCenterABPoint(new Vector2(0, 0), new Vector2(15, 0), new Vector2(0, 30), -Math.PI / 2 + 1e-10, Math.PI * 1 / 2 - 1e-10);
-    let geoHyperbolaRightEdgeEdge = BrepMeshBuilder.BuildEdge2Mesh(hyperbolaRightEdge, THREE.Color.NAMES.aqua);
-    geoHyperbolaRightEdgeEdge.name = "Hyperbola2_Right_Three_Point";
+    let geoHyperbolaRightEdge = BrepMeshBuilder.BuildEdge2Mesh(hyperbolaRightEdge, THREE.Color.NAMES.aqua);
+    geoHyperbolaRightEdge.name = "Hyperbola2_Right_Three_Point";
 
     let hyperbolaLeftEdge = Brep2Builder.BuildHyperbolaEdge2FromCenterABPoint(new Vector2(0, 0), new Vector2(15, 0), new Vector2(0, 30), Math.PI / 2 + 1e-10, Math.PI * 3 / 2 - 1e-10);
-    let geoHyperbolaLeftEdgeEdge = BrepMeshBuilder.BuildEdge2Mesh(hyperbolaLeftEdge, THREE.Color.NAMES.fuchsia);
-    geoHyperbolaLeftEdgeEdge.name = "Hyperbola2_Left_Three_Point";
-
+    let geoHyperbolaLeftEdge = BrepMeshBuilder.BuildEdge2Mesh(hyperbolaLeftEdge, THREE.Color.NAMES.fuchsia);
+    geoHyperbolaLeftEdge.name = "Hyperbola2_Left_Three_Point";
 
     // 根据两点创建一个抛物线
     let parabolaEdge = Brep2Builder.BuildParabolaEdge2FromCenterABPoint(new Vector2(0, 0), new Vector2(0, 10), 500, -500);
-    let geoParabolaEdgeEdge = BrepMeshBuilder.BuildEdge2Mesh(parabolaEdge, THREE.Color.NAMES.coral);
-    geoParabolaEdgeEdge.name = "Parabola2_Left_Three_Point";
+    let geoParabolaEdge = BrepMeshBuilder.BuildEdge2Mesh(parabolaEdge, THREE.Color.NAMES.coral);
+    geoParabolaEdge.name = "Parabola2_Left_Three_Point";
+
+    let ha = CurveBuilder.Algorithm2ByData(hyperbolaLeftEdge.curve) as Hyperbola2Algo;
+    let pa = CurveBuilder.Algorithm2ByData(parabolaEdge.curve) as Parabola2Algo;
+
+    let ns = ha.vernurbs();
+    ns.push(...pa.vernurbs(new Vector2(50, -50)));
+    for (let i = 0; i < ns.length; i++) {
+      console.log("NURBS 控制点：");
+      console.log(ns[i]);
+
+      let curveData = Nurbs2Algo.FromVerb(ns[i]._data);
+      let edge = Brep2Builder.BuildEdge2FromCurve2(curveData, 0, 1);
+      let mesh = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.blue);
+      scene.add(mesh);
+    }
 
 
     // 创建一个直线段
     let lineEdge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(new Vector2(0, 0), new Vector2(20, 20));
     lineEdge.u.x = -100;
     lineEdge.u.y = 100;
-    let geoLineEdgeEdge = BrepMeshBuilder.BuildEdge2Mesh(lineEdge, THREE.Color.NAMES.red);
-    geoLineEdgeEdge.name = "Line2";
-    geoLineEdgeEdge.frustumCulled = false;
+    let geoLineEdge = BrepMeshBuilder.BuildEdge2Mesh(lineEdge, THREE.Color.NAMES.red);
+    geoLineEdge.name = "Line2";
+    geoLineEdge.frustumCulled = false;
 
 
     // 创建一个直线段
     let line1Edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(new Vector2(20, 0), new Vector2(0, 20));
     line1Edge.u.x = -100;
     line1Edge.u.y = 100;
-    let geoLine1EdgeEdge = BrepMeshBuilder.BuildEdge2Mesh(line1Edge, THREE.Color.NAMES.red);
-    geoLine1EdgeEdge.name = "Line2_1";
+    let geoLine1Edge = BrepMeshBuilder.BuildEdge2Mesh(line1Edge, THREE.Color.NAMES.red);
+    geoLine1Edge.name = "Line2_1";
 
     // 创建一个直线段
     let line2Edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(new Vector2(0, 10.94), new Vector2(10, 10.94));
     line2Edge.u.x = -100;
     line2Edge.u.y = 100;
-    let geoLine2EdgeEdge = BrepMeshBuilder.BuildEdge2Mesh(line2Edge, THREE.Color.NAMES.red);
-    geoLine2EdgeEdge.name = "Line2_2";
+    let geoLine2Edge = BrepMeshBuilder.BuildEdge2Mesh(line2Edge, THREE.Color.NAMES.red);
+    geoLine2Edge.name = "Line2_2";
 
     // 创建一个Nurbs线段
     let nurbsEdge = Brep2Builder.BuildEdge2FromFittingPoints([
@@ -127,34 +145,34 @@ export class Cube {
     let geoNurbsEdge1 = BrepMeshBuilder.BuildEdge2Mesh(nurbsEdge1, THREE.Color.NAMES.orange, 256);
     let geoNurbsTangents1 = BrepMeshBuilder.BuildEdge2Tangents(nurbsEdge1, THREE.Color.NAMES.orangered, 8);
 
-    scene.add(geoLineEdgeEdge);
-    scene.add(geoLine1EdgeEdge);
-    scene.add(geoLine2EdgeEdge);
-    scene.add(geoCircleEdgeEdge);
-    scene.add(geoCircleEdgeEdge_);
-    scene.add(geoCircle1EdgeEdge);
-    scene.add(geoArcEdgeEdge);
-    scene.add(geoEllipseEdge);
-    scene.add(geoHyperbolaLeftEdgeEdge);
-    scene.add(geoHyperbolaRightEdgeEdge);
-    scene.add(geoParabolaEdgeEdge);
-    scene.add(geoNurbsEdge); //scene.add(geoNurbsTangents);
-    scene.add(geoNurbsEdge1); //scene.add(geoNurbsTangents1);
+    // scene.add(geoLineEdge);
+    // scene.add(geoLine1Edge);
+    // scene.add(geoLine2Edge);
+    // scene.add(geoCircleEdge);
+    // scene.add(geoCircleEdge_);
+    // scene.add(geoCircle1Edge);
+    // scene.add(geoArcEdge);
+    // scene.add(geoEllipseEdge);
+    // scene.add(geoHyperbolaLeftEdge);
+    // scene.add(geoHyperbolaRightEdge);
+    // scene.add(geoParabolaEdge);
+    // scene.add(geoNurbsEdge); //scene.add(geoNurbsTangents);
+    // scene.add(geoNurbsEdge1); //scene.add(geoNurbsTangents1);
 
     let curves = new Array<Curve2Data>();
-    curves.push(lineEdge.curve);
-    curves.push(line1Edge.curve);
-    curves.push(line2Edge.curve);
-    curves.push(circleEdge.curve);
-    curves.push(circleEdge_.curve);
-    curves.push(circle1Edge.curve);
-    curves.push(arcEdge.curve);
-    curves.push(ellipseEdge.curve);
+    // curves.push(lineEdge.curve);
+    // curves.push(line1Edge.curve);
+    // curves.push(line2Edge.curve);
+    // curves.push(circleEdge.curve);
+    // curves.push(circleEdge_.curve);
+    // curves.push(circle1Edge.curve);
+    // curves.push(arcEdge.curve);
+    // curves.push(ellipseEdge.curve);
     curves.push(hyperbolaLeftEdge.curve);
-    curves.push(hyperbolaRightEdge.curve);
+    // curves.push(hyperbolaRightEdge.curve);
     curves.push(parabolaEdge.curve);
-    curves.push(nurbsEdge.curve);
-    curves.push(nurbsEdge1.curve);
+    // curves.push(nurbsEdge.curve);
+    // curves.push(nurbsEdge1.curve);
 
     let edges = new Array<Edge2>();
     // edges.push(lineEdge);

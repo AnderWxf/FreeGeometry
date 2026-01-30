@@ -3,6 +3,8 @@ import * as MATHJS from '../../../../mathjs';
 import { MathUtils } from "../../../../math/MathUtils";
 import { Hyperbola2Data } from "../../../data/base/curve2/Hyperbola2Data";
 import { Curve2Algo } from "../Curve2Algo";
+import verb from 'verb-nurbs';
+
 /**
  * 2D Hyperbola algorithm. TODO
  * x = asec(φ)
@@ -32,6 +34,62 @@ class Hyperbola2Algo extends Curve2Algo {
     }
 
     /**
+     * to ver-nurbs object.
+     * @retun {any}
+     */
+    vernurbs(): Array<any> {
+        const a: number = this.dat.radius.x;
+        const b: number = this.dat.radius.y;
+        const m = this.dat.trans.makeLocalMatrix();
+        let ret = [];
+        // 权重（关键）
+
+        // 权重（关键）
+        // 计算精确权重（对于双曲线）
+        // 离心率 e = sqrt(1 + (b/a)^2)
+        let e = Math.sqrt(1 + (b / a) ** 2)
+        let w1 = 1 / Math.sqrt(1 + e)  // 中间控制点的权重        
+        const weights = [1.0, w1, 1.0];
+        {
+            // 右支（对称）
+            let p0 = this.p(-Math.PI / 2 + 1e-10);     // 顶点
+            let p1 = this.p(0);     // 通过点
+            let p2 = this.p(Math.PI / 2 - 1e-10);    // 中心点
+            // p0.applyMatrix3(m);
+            // p1.applyMatrix3(m);
+            // p2.applyMatrix3(m);
+
+            const points = [
+                [p0.x, p0.y, weights[0]],
+                [p1.x, p1.y, weights[1]],
+                [p2.x, p2.y, weights[2]],
+            ];
+            // 构建曲线
+            const nurbs = new verb.geom.NurbsCurve({ controlPoints: points, knots: [0, 0, 0, 1, 1, 1], degree: 2 })
+            ret.push(nurbs);
+        }
+        {
+            // 左支（对称）
+            let p0 = this.p(Math.PI / 2 + 1e-10);    // 顶点
+            let p1 = this.p(-Math.PI);    // 通过点
+            let p2 = this.p(Math.PI * 3 / 2 - 1e-10);     // 中心点
+            // p0.applyMatrix3(m);
+            // p1.applyMatrix3(m);
+            // p2.applyMatrix3(m);
+
+            const points_left = [
+                [p0.x, p0.y, weights[0]],
+                [p1.x, p1.y, weights[1]],
+                [p2.x, p2.y, weights[2]],
+            ];
+            // 构建曲线
+            const nurbs = new verb.geom.NurbsCurve({ controlPoints: points_left, knots: [0, 0, 0, 1, 1, 1], degree: 2 })
+            ret.push(nurbs);
+        }
+        return ret;
+    }
+
+    /**
      * the U function return u parameter at a position .
      * @param {Vector2} [point] - the point on curve.
      * @retun {number}
@@ -55,7 +113,7 @@ class Hyperbola2Algo extends Curve2Algo {
      * @param {number} [r ∈ [0,1,2...]] - r-order.
      * @retun {Vector2}
      */
-    override d(u: number, r: number = 0): Vector2 {
+    d(u: number, r: number = 0): Vector2 {
         const a = MATHJS.bignumber(this.dat.radius.x);
         const b = MATHJS.bignumber(this.dat.radius.y);
         const m = this.dat.trans.makeLocalMatrix();

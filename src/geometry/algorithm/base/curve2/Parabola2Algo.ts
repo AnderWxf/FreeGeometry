@@ -3,6 +3,8 @@ import { MathUtils } from "../../../../math/MathUtils";
 import * as MATHJS from '../../../../mathjs';
 import { Parabola2Data } from "../../../data/base/curve2/Parabola2Data";
 import { Curve2Algo } from "../Curve2Algo";
+import verb from 'verb-nurbs';
+
 /**
  * 2D Parabola algorithm. 
  * 4fy = x²
@@ -28,6 +30,18 @@ class Parabola2Algo extends Curve2Algo {
     constructor(dat = new Parabola2Data()) {
         super(dat);
         this.dat = dat;
+    }
+
+    /**
+     * to ver-nurbs object.
+     * @retun {any}
+     */
+    vernurbs(u: Vector2 = new Vector2(-1000, 1000)): Array<any> {
+        let p0 = this.p(u.x);
+        let p1 = this.p((u.x + u.y) * 0.5);
+        let p2 = this.p(u.y);
+        let nurbs = new verb.geom.BezierCurve([[p0.x, p0.y], [p1.x, p1.y], [p2.x, p2.y]]);
+        return [nurbs];
     }
 
     /**

@@ -138,6 +138,22 @@ class Brep2Builder {
         return ret;
     }
 
+
+    /**
+     * build edge2 from curve2.
+     *
+     * @param {Vector2} [c] - The center point.
+     * @param {Vector2} [a] - The focus point.
+     * @param {number} [u0] - The u0.
+     * @param {number} [u1] - The u1. 
+     */
+    static BuildEdge2FromCurve2(curve: Curve2Data, u0: number, u1: number): Edge2 {
+        let ret = new Edge2();
+        ret.u = new Vector2(u0, u1);
+        ret.curve = curve;
+        return ret;
+    }
+
     /**
      * build rectangle face from size vector.
      *

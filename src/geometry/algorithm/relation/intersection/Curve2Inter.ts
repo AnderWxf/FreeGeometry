@@ -14,7 +14,8 @@ import { Hyperbola2Algo } from "../../base/curve2/Hyperbola2Algo";
 import type { Parabola2Data } from "../../../data/base/curve2/Parabola2Data";
 import { Parabola2Algo } from "../../base/curve2/Parabola2Algo";
 import type { Curve2Algo } from "../../base/Curve2Algo";
-import * as SVD from "svd-js";
+import verb from 'verb-nurbs';
+// import * as SVD from "svd-js";
 
 /**
  * compute curve intersection point utility.
@@ -335,6 +336,28 @@ class Curve2Inter {
         }
         let c0a = CurveBuilder.Algorithm2ByData(c0) as Arc2Algo | Hyperbola2Algo | Parabola2Algo;
         let c1a = CurveBuilder.Algorithm2ByData(c1) as Arc2Algo | Hyperbola2Algo | Parabola2Algo;
+
+        if (c0a instanceof Hyperbola2Algo || c0a instanceof Parabola2Algo
+            && c1a instanceof Hyperbola2Algo || c1a instanceof Parabola2Algo
+        ) {
+            let c0a_ = c0a as Hyperbola2Algo | Parabola2Algo;
+            let c1a_ = c1a as Hyperbola2Algo | Parabola2Algo
+            let ns0 = c0a_.vernurbs();
+            let ns1 = c1a_.vernurbs();
+            let ret = new Array<InterOfCurve2>();
+            for (let i = 0; i < ns0.length; i++) {
+                let nurbs0 = ns0[i];
+                for (let j = 0; j < ns1.length; j++) {
+                    let nurbs1 = ns1[j];
+                    verb.eval.Intersect.curves(nurbs0._data, nurbs1._data, tol0).forEach((inter: any) => {
+                        let p = new Vector2(inter.point0[0], inter.point0[1]);
+                        ret.push({ p, u0: inter.u1, u1: inter.u2 });
+                    });
+                }
+            }
+            return ret;
+        }
+
         return Curve2Inter.ConicXConic(c0a.ge(), c1a.ge(), c0a, c1a, tol0, tol1, n);
     }
 
@@ -570,88 +593,88 @@ class Curve2Inter {
                     }
                 }
             }
-            // svd分解
-            if (isSVD && ret.length < n) {
-                // console.log("SVD分解");
-                const m = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
-                m[0][0] = B[0][0].toNumber();
-                m[0][1] = B[0][1].toNumber();
-                m[0][2] = B[0][2].toNumber();
-                m[1][0] = B[1][0].toNumber();
-                m[1][1] = B[1][1].toNumber();
-                m[1][2] = B[1][2].toNumber();
-                m[2][0] = B[2][0].toNumber();
-                m[2][1] = B[2][1].toNumber();
-                m[2][2] = B[2][2].toNumber();
+            // // svd分解
+            // if (isSVD && ret.length < n) {
+            //     // console.log("SVD分解");
+            //     const m = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
+            //     m[0][0] = B[0][0].toNumber();
+            //     m[0][1] = B[0][1].toNumber();
+            //     m[0][2] = B[0][2].toNumber();
+            //     m[1][0] = B[1][0].toNumber();
+            //     m[1][1] = B[1][1].toNumber();
+            //     m[1][2] = B[1][2].toNumber();
+            //     m[2][0] = B[2][0].toNumber();
+            //     m[2][1] = B[2][1].toNumber();
+            //     m[2][2] = B[2][2].toNumber();
 
-                const svd = SVD.SVD(m);
-                const S: number[] = svd.q;
-                const U: number[][] = svd.u;
-                const V: number[][] = svd.v;
-                // 4.1. 找到零奇异值索引
-                const zeroIndices: number[] = [];
-                for (let i = 0; i < S.length; i++) {
-                    if (Math.abs(S[i]) < 1e-10) {
-                        zeroIndices.push(i);
-                    }
-                }
+            //     const svd = SVD.SVD(m);
+            //     const S: number[] = svd.q;
+            //     const U: number[][] = svd.u;
+            //     const V: number[][] = svd.v;
+            //     // 4.1. 找到零奇异值索引
+            //     const zeroIndices: number[] = [];
+            //     for (let i = 0; i < S.length; i++) {
+            //         if (Math.abs(S[i]) < 1e-10) {
+            //             zeroIndices.push(i);
+            //         }
+            //     }
 
-                // 4.3. 提取非零奇异值对应的向量
-                const nonZeroIndices = [0, 1, 2].filter(i => !zeroIndices.includes(i));
-                if (nonZeroIndices.length > 0) {
-                    const lines: MATHJS.BigNumber[][] = [];
-                    // 4.3.1只有一个非零奇异值，说明两条直线重合，退化情况未处理
-                    if (nonZeroIndices.length < 2) {
-                        const vec1: MATHJS.BigNumber[] = [];
-                        for (let row = 0; row < 3; row++) {
-                            vec1.push(MATHJS.bignumber(U[row][nonZeroIndices[0]]));
-                        }
-                        // 4.4. 构造一条直线
-                        const l0 = vec1;
-                        lines.push(l0);
-                    }
-                    // 4.3.2有两个非零奇异值，说明两条直线不同
-                    else {
-                        const vec1: MATHJS.BigNumber[] = [], vec2: MATHJS.BigNumber[] = [];
-                        for (let row = 0; row < 3; row++) {
-                            vec1.push(MATHJS.bignumber(U[row][nonZeroIndices[0]]));
-                            vec2.push(MATHJS.bignumber(U[row][nonZeroIndices[1]]));
-                        }
+            //     // 4.3. 提取非零奇异值对应的向量
+            //     const nonZeroIndices = [0, 1, 2].filter(i => !zeroIndices.includes(i));
+            //     if (nonZeroIndices.length > 0) {
+            //         const lines: MATHJS.BigNumber[][] = [];
+            //         // 4.3.1只有一个非零奇异值，说明两条直线重合，退化情况未处理
+            //         if (nonZeroIndices.length < 2) {
+            //             const vec1: MATHJS.BigNumber[] = [];
+            //             for (let row = 0; row < 3; row++) {
+            //                 vec1.push(MATHJS.bignumber(U[row][nonZeroIndices[0]]));
+            //             }
+            //             // 4.4. 构造一条直线
+            //             const l0 = vec1;
+            //             lines.push(l0);
+            //         }
+            //         // 4.3.2有两个非零奇异值，说明两条直线不同
+            //         else {
+            //             const vec1: MATHJS.BigNumber[] = [], vec2: MATHJS.BigNumber[] = [];
+            //             for (let row = 0; row < 3; row++) {
+            //                 vec1.push(MATHJS.bignumber(U[row][nonZeroIndices[0]]));
+            //                 vec2.push(MATHJS.bignumber(U[row][nonZeroIndices[1]]));
+            //             }
 
-                        // 4.4. 构造两条直线
-                        const sqrt_s1 = MATHJS.sqrt(MATHJS.bignumber(MATHJS.abs(S[nonZeroIndices[0]]))) as MATHJS.BigNumber;
-                        const sqrt_s2 = MATHJS.sqrt(MATHJS.bignumber(MATHJS.abs(S[nonZeroIndices[1]]))) as MATHJS.BigNumber;
+            //             // 4.4. 构造两条直线
+            //             const sqrt_s1 = MATHJS.sqrt(MATHJS.bignumber(MATHJS.abs(S[nonZeroIndices[0]]))) as MATHJS.BigNumber;
+            //             const sqrt_s2 = MATHJS.sqrt(MATHJS.bignumber(MATHJS.abs(S[nonZeroIndices[1]]))) as MATHJS.BigNumber;
 
-                        let p = MATHJS.multiply(sqrt_s1, vec1) as MATHJS.BigNumber[];
-                        let q = MATHJS.multiply(sqrt_s2, vec2) as MATHJS.BigNumber[];
+            //             let p = MATHJS.multiply(sqrt_s1, vec1) as MATHJS.BigNumber[];
+            //             let q = MATHJS.multiply(sqrt_s2, vec2) as MATHJS.BigNumber[];
 
-                        // 调整符号
-                        // if (S[nonZeroIndices[0]] * S[nonZeroIndices[1]] < 0) {
-                        //     if (S[nonZeroIndices[1]] < 0) {
-                        //         q = MATHJS.unaryMinus(q) as MATHJS.BigNumber[];
-                        //     }
-                        // }
-                        q = MATHJS.unaryMinus(q) as MATHJS.BigNumber[];
-                        const l0 = MATHJS.add(p, q);
-                        const l1 = MATHJS.subtract(p, q);
-                        lines.push(l0, l1);
-                    }
-                    // 5. 每条直线与原二次曲线之一求交（解二次方程），得到候选交点。
-                    for (let j = 0; j < lines.length; j++) {
-                        const l = lines[j];
-                        let inters = Curve2Inter.LineXConic({ A: l[0], B: l[1], C: l[2] }, c0, null, c0a, tol0, tol1, 2);
-                        checkAndPush(inters);
-                        if (ret.length >= n) {
-                            break;
-                        }
-                        inters = Curve2Inter.LineXConic({ A: l[0], B: l[1], C: l[2] }, c0, null, c0a, tol0, tol1, 2);
-                        checkAndPush(inters);
-                        if (ret.length >= n) {
-                            break;
-                        }
-                    }
-                }
-            }
+            //             // 调整符号
+            //             // if (S[nonZeroIndices[0]] * S[nonZeroIndices[1]] < 0) {
+            //             //     if (S[nonZeroIndices[1]] < 0) {
+            //             //         q = MATHJS.unaryMinus(q) as MATHJS.BigNumber[];
+            //             //     }
+            //             // }
+            //             q = MATHJS.unaryMinus(q) as MATHJS.BigNumber[];
+            //             const l0 = MATHJS.add(p, q);
+            //             const l1 = MATHJS.subtract(p, q);
+            //             lines.push(l0, l1);
+            //         }
+            //         // 5. 每条直线与原二次曲线之一求交（解二次方程），得到候选交点。
+            //         for (let j = 0; j < lines.length; j++) {
+            //             const l = lines[j];
+            //             let inters = Curve2Inter.LineXConic({ A: l[0], B: l[1], C: l[2] }, c0, null, c0a, tol0, tol1, 2);
+            //             checkAndPush(inters);
+            //             if (ret.length >= n) {
+            //                 break;
+            //             }
+            //             inters = Curve2Inter.LineXConic({ A: l[0], B: l[1], C: l[2] }, c0, null, c0a, tol0, tol1, 2);
+            //             checkAndPush(inters);
+            //             if (ret.length >= n) {
+            //                 break;
+            //             }
+            //         }
+            //     }
+            // }
         }
         return ret;
     }
