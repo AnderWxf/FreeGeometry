@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import * as WEBGPU from 'three/src/three.WebGPU';
-import { Vector2 } from "./math/Math"
+import { Vector2, Vector3 } from "./math/Math"
 import * as MATHJS from './mathjs';
 import { Line2Data } from './geometry/data/base/curve2/Line2Data';
 import { Line2Algo } from './geometry/algorithm/base/curve2/Line2Algo';
@@ -29,6 +29,35 @@ export class Cube {
   public constructor() {
     // 创建一个场景
     const scene = new THREE.Scene();
+    const material = new THREE.MeshBasicMaterial({ color: 0x0088ff });
+    let drawInters = (inters: Array<InterOfCurve2>) => {
+      for (let i = 0; i < inters.length; i++) {
+        let p = inters[i].p;
+        // 创建一个球体
+        const geometry = new THREE.SphereGeometry(0.1);
+        const mesh = new THREE.Mesh(geometry, material);
+        mesh.position.x = p.x;
+        mesh.position.y = p.y;
+        mesh.name = "inter_" + i;
+        scene.add(mesh);
+      }
+    }
+    let drawPoints = (points: Array<Vector2> | Array<Vector3>) => {
+      for (let i = 0; i < points.length; i++) {
+        let p = points[i];
+        // 创建一个球体
+        const geometry = new THREE.SphereGeometry(0.1);
+        const mesh = new THREE.Mesh(geometry, material);
+        mesh.position.x = p.x;
+        mesh.position.y = p.y;
+        if (p instanceof Vector3) {
+          mesh.position.z = p.z;
+        }
+        mesh.name = "point_" + i;
+        scene.add(mesh);
+      }
+    }
+
     //通过scene.add(元素)添加元素
 
     const cam = CamToolBar;
@@ -74,24 +103,34 @@ export class Cube {
     geoEllipseEdge.name = "Ellipse2_Three_Point";
 
     // 根据三点创建一个双曲线
-    let hyperbolaRightEdge = Brep2Builder.BuildHyperbolaEdge2FromCenterABPoint(new Vector2(0, 0), new Vector2(15, 0), new Vector2(0, 30), -Math.PI / 2 + 1e-10, Math.PI * 1 / 2 - 1e-10);
+    let hyperbolaRightEdge = Brep2Builder.BuildHyperbolaEdge2FromCenterABPoint(
+      new Vector2(0, 0),
+      new Vector2(15, 0),
+      new Vector2(0, 30),
+      -Math.PI / 2 + 1e-10,
+      Math.PI * 1 / 2 - 1e-10);
     let geoHyperbolaRightEdge = BrepMeshBuilder.BuildEdge2Mesh(hyperbolaRightEdge, THREE.Color.NAMES.aqua);
     geoHyperbolaRightEdge.name = "Hyperbola2_Right_Three_Point";
 
-    let hyperbolaLeftEdge = Brep2Builder.BuildHyperbolaEdge2FromCenterABPoint(new Vector2(0, 0), new Vector2(15, 0), new Vector2(0, 30), Math.PI / 2 + 1e-10, Math.PI * 3 / 2 - 1e-10);
+    let hyperbolaLeftEdge = Brep2Builder.BuildHyperbolaEdge2FromCenterABPoint(
+      new Vector2(0, 0),
+      new Vector2(15, 0),
+      new Vector2(0, 30),
+      Math.PI / 2 + 1e-10,
+      Math.PI * 3 / 2 - 1e-10);
     let geoHyperbolaLeftEdge = BrepMeshBuilder.BuildEdge2Mesh(hyperbolaLeftEdge, THREE.Color.NAMES.fuchsia);
     geoHyperbolaLeftEdge.name = "Hyperbola2_Left_Three_Point";
 
     // 根据两点创建一个抛物线
-    let parabolaEdge = Brep2Builder.BuildParabolaEdge2FromCenterABPoint(new Vector2(0, 0), new Vector2(0, 10), 500, -500);
+    let parabolaEdge = Brep2Builder.BuildParabolaEdge2FromCenterABPoint(new Vector2(0, 0), new Vector2(0, 10), 50, -50);
     let geoParabolaEdge = BrepMeshBuilder.BuildEdge2Mesh(parabolaEdge, THREE.Color.NAMES.coral);
     geoParabolaEdge.name = "Parabola2_Left_Three_Point";
 
     let ha = CurveBuilder.Algorithm2ByData(hyperbolaLeftEdge.curve) as Hyperbola2Algo;
     let pa = CurveBuilder.Algorithm2ByData(parabolaEdge.curve) as Parabola2Algo;
-
-    let ns = ha.vernurbs();
-    ns.push(...pa.vernurbs(new Vector2(50, -50)));
+    let ns = [];
+    ns.push(...ha.vernurbs(new Vector2(-Math.PI / 4, Math.PI / 4)));
+    ns.push(...pa.vernurbs(new Vector2(-50, 50)));
     for (let i = 0; i < ns.length; i++) {
       console.log("NURBS 控制点：");
       console.log(ns[i]);
@@ -100,6 +139,7 @@ export class Cube {
       let edge = Brep2Builder.BuildEdge2FromCurve2(curveData, 0, 1);
       let mesh = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.blue);
       scene.add(mesh);
+      drawPoints(curveData.controls);
     }
 
 
@@ -153,8 +193,8 @@ export class Cube {
     // scene.add(geoCircle1Edge);
     // scene.add(geoArcEdge);
     // scene.add(geoEllipseEdge);
-    // scene.add(geoHyperbolaLeftEdge);
-    // scene.add(geoHyperbolaRightEdge);
+    scene.add(geoHyperbolaLeftEdge);
+    scene.add(geoHyperbolaRightEdge);
     // scene.add(geoParabolaEdge);
     // scene.add(geoNurbsEdge); //scene.add(geoNurbsTangents);
     // scene.add(geoNurbsEdge1); //scene.add(geoNurbsTangents1);
@@ -168,9 +208,9 @@ export class Cube {
     // curves.push(circle1Edge.curve);
     // curves.push(arcEdge.curve);
     // curves.push(ellipseEdge.curve);
-    curves.push(hyperbolaLeftEdge.curve);
+    // curves.push(hyperbolaLeftEdge.curve);
     // curves.push(hyperbolaRightEdge.curve);
-    curves.push(parabolaEdge.curve);
+    // curves.push(parabolaEdge.curve);
     // curves.push(nurbsEdge.curve);
     // curves.push(nurbsEdge1.curve);
 
@@ -188,23 +228,12 @@ export class Cube {
     // edges.push(parabolaEdge);
     // edges.push(nurbsEdge);
 
-    let drawInters = (inters: Array<InterOfCurve2>) => {
-      for (let i = 0; i < inters.length; i++) {
-        // 创建一个球体
-        const geometry = new THREE.SphereGeometry(0.1);
-        const mesh = new THREE.Mesh(geometry, material);
-        mesh.position.x = inters[i].p.x;
-        mesh.position.y = inters[i].p.y;
-        mesh.name = "inter_" + i;
-        scene.add(mesh);
-      }
-    }
 
 
 
 
     // 基础材质（可配置颜色、贴图等）
-    const material = new THREE.MeshBasicMaterial({ color: 0x0088ff });
+
     let curveInter = true;
     let edgeInter = false;
     if (curveInter) {

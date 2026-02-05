@@ -7,8 +7,8 @@ import verb from 'verb-nurbs';
 
 /**
  * 2D Hyperbola algorithm. TODO
- * x = asec(φ)
- * y = btan(φ)
+ * x = a sec(φ)
+ * y = b tan(φ)
  */
 class Hyperbola2Algo extends Curve2Algo {
     /**
@@ -37,53 +37,152 @@ class Hyperbola2Algo extends Curve2Algo {
      * to ver-nurbs object.
      * @retun {any}
      */
-    vernurbs(): Array<any> {
+    vernurbs(u: Vector2 = new Vector2(-Math.PI / 4, Math.PI / 4)): Array<any> {
+        let ret = [];
+        // ret.push(...this.vernurbs0(u));
+        ret.push(...this.vernurbs1(u));
+        return ret;
+    }
+    vernurbs0(u: Vector2 = new Vector2(-Math.PI / 4, Math.PI / 4)): Array<any> {
         const a: number = this.dat.radius.x;
         const b: number = this.dat.radius.y;
         const m = this.dat.trans.makeLocalMatrix();
+
+        // P0=(a cosh(u0),b sinh(u0) )
+        // P1=(a cosh(um​)/cosh(Δu/2),b sinh(um)/cosh(Δu/2))
+        // P1=(a cosh(u1),b sinh(u1))
+        // 其中 um=(u0+u1)/2,Δu=u1−u0,w=cosh(Δu/2)
+
         let ret = [];
-        // 权重（关键）
-
-        // 权重（关键）
-        // 计算精确权重（对于双曲线）
-        // 离心率 e = sqrt(1 + (b/a)^2)
-        let e = Math.sqrt(1 + (b / a) ** 2)
-        let w1 = 1 / Math.sqrt(1 + e)  // 中间控制点的权重        
-        const weights = [1.0, w1, 1.0];
+        // 右支（对称）
         {
-            // 右支（对称）
-            let p0 = this.p(-Math.PI / 2 + 1e-10);     // 顶点
-            let p1 = this.p(0);     // 通过点
-            let p2 = this.p(Math.PI / 2 - 1e-10);    // 中心点
-            // p0.applyMatrix3(m);
-            // p1.applyMatrix3(m);
-            // p2.applyMatrix3(m);
+            let u0 = u.x + 1e-10;
+            let u1 = u.y - 1e-10;
+            let um = (u0 + u1) * 0.5;
+            let Δu = u1 - u0;
+            let w = Math.cosh(Δu / 2);
 
+            // u0 = Math.log(1 / Math.cos(u0) + Math.tan(u0));
+            // u1 = Math.log(1 / Math.cos(u1) + Math.tan(u1));
+            const ws = [1.0, w, 1.0];
+            let p0 = new Vector2(a * Math.cosh(u0), b * Math.sinh(u0));
+            let p1 = new Vector2(a * Math.cosh(um) / w, b * Math.sinh(um) / w);
+            let p2 = new Vector2(a * Math.cosh(u1), b * Math.sinh(u1));
+            p0.applyMatrix3(m);
+            p1.applyMatrix3(m);
+            p2.applyMatrix3(m);
             const points = [
-                [p0.x, p0.y, weights[0]],
-                [p1.x, p1.y, weights[1]],
-                [p2.x, p2.y, weights[2]],
+                [p0.x, p0.y, ws[0]],
+                [p1.x, p1.y, ws[1]],
+                [p2.x, p2.y, ws[2]],
             ];
             // 构建曲线
             const nurbs = new verb.geom.NurbsCurve({ controlPoints: points, knots: [0, 0, 0, 1, 1, 1], degree: 2 })
             ret.push(nurbs);
         }
+        // 左支（对称）
         {
-            // 左支（对称）
-            let p0 = this.p(Math.PI / 2 + 1e-10);    // 顶点
-            let p1 = this.p(-Math.PI);    // 通过点
-            let p2 = this.p(Math.PI * 3 / 2 - 1e-10);     // 中心点
-            // p0.applyMatrix3(m);
-            // p1.applyMatrix3(m);
-            // p2.applyMatrix3(m);
+            let u0 = u.x + Math.PI + 1e-10;
+            let u1 = u.y + Math.PI - 1e-10;
+            let um = (u0 + u1) * 0.5;
+            let Δu = u1 - u0;
+            let w = Math.cosh(Δu / 2);
 
-            const points_left = [
-                [p0.x, p0.y, weights[0]],
-                [p1.x, p1.y, weights[1]],
-                [p2.x, p2.y, weights[2]],
+            // u0 = Math.log(1 / Math.cos(u0) + Math.tan(u0));
+            // u1 = Math.log(1 / Math.cos(u1) + Math.tan(u1));
+            const ws = [1.0, w, 1.0];
+            let p0 = new Vector2(a * Math.cosh(u0), b * Math.sinh(u0));
+            let p1 = new Vector2(a * Math.cosh(um) / Math.cosh(Δu / 2), b * Math.sinh(um) / Math.cosh(Δu / 2));
+            let p2 = new Vector2(a * Math.cosh(u1), b * Math.sinh(u1));
+            p0.applyMatrix3(m);
+            p1.applyMatrix3(m);
+            p2.applyMatrix3(m);
+            const points = [
+                [p0.x, p0.y, ws[0]],
+                [p1.x, p1.y, ws[1]],
+                [p2.x, p2.y, ws[2]],
             ];
             // 构建曲线
-            const nurbs = new verb.geom.NurbsCurve({ controlPoints: points_left, knots: [0, 0, 0, 1, 1, 1], degree: 2 })
+            const nurbs = new verb.geom.NurbsCurve({ controlPoints: points, knots: [0, 0, 0, 1, 1, 1], degree: 2 })
+            // ret.push(nurbs);
+        }
+        return ret;
+    }
+    vernurbs1(u: Vector2 = new Vector2(-Math.PI / 4, Math.PI / 4)): Array<any> {
+        const a = MATHJS.bignumber(this.dat.radius.x);
+        const b = MATHJS.bignumber(this.dat.radius.y);
+        const m = this.dat.trans.makeLocalMatrix();
+
+        // P0=(a sec(θ0),b tan(θ0))
+        // P1=(a sec(θm​) / s,b tan(θm) / s)
+        // P2=(a sec(u1),b tan(u1))
+        // 其中 θm = (θ0 + θ1) / 2,Δθ = θ1 − u0,w = s = sec(Δθ / 2)
+        let ret = [];
+        let θ = Math.PI / 6;
+        // 右支（对称）
+        {
+            let θ0 = MATHJS.bignumber(0 + u.x + 1e-10);
+            let θ1 = MATHJS.bignumber(0 + u.y - 1e-10);
+            let θm = MATHJS.multiply(MATHJS.add(θ0, θ1), 0.5) as MATHJS.BigNumber;
+            let Δθ = MATHJS.subtract(θ1, θ0) as MATHJS.BigNumber;
+            let s = MATHJS.sec(MATHJS.divide(Δθ, 2) as MATHJS.BigNumber);
+            let w = s;
+            const ws = [1.0, w.toNumber(), 1.0];
+            let p0 = new Vector2(
+                (MATHJS.multiply(a, MATHJS.sec(θ0)) as MATHJS.BigNumber).toNumber(),
+                (MATHJS.multiply(b, MATHJS.tan(θ0)) as MATHJS.BigNumber).toNumber()
+            );
+            let p1 = new Vector2(
+                (MATHJS.divide(MATHJS.multiply(a, MATHJS.sec(θm)), s) as MATHJS.BigNumber).toNumber(),
+                (MATHJS.divide(MATHJS.multiply(b, MATHJS.tan(θm)), s) as MATHJS.BigNumber).toNumber()
+            );
+            let p2 = new Vector2(
+                (MATHJS.multiply(a, MATHJS.sec(θ1)) as MATHJS.BigNumber).toNumber(),
+                (MATHJS.multiply(b, MATHJS.tan(θ1)) as MATHJS.BigNumber).toNumber()
+            );
+            p0.applyMatrix3(m);
+            p1.applyMatrix3(m);
+            p2.applyMatrix3(m);
+            const points = [
+                [p0.x, p0.y, ws[0]],
+                [p1.x, p1.y, ws[1]],
+                [p2.x, p2.y, ws[2]],
+            ];
+            // 构建曲线
+            const nurbs = new verb.geom.NurbsCurve({ controlPoints: points, knots: [0, 0, 0, 1, 1, 1], degree: 2 })
+            ret.push(nurbs);
+        }
+        // 左支（对称）
+        {
+            let θ0 = MATHJS.bignumber(Math.PI + u.x + 1e-10);
+            let θ1 = MATHJS.bignumber(Math.PI + u.y - 1e-10);
+            let θm = MATHJS.multiply(MATHJS.add(θ0, θ1), 0.5) as MATHJS.BigNumber;
+            let Δθ = MATHJS.subtract(θ1, θ0) as MATHJS.BigNumber;
+            let s = MATHJS.sec(MATHJS.divide(Δθ, 2) as MATHJS.BigNumber);
+            let w = s;
+            const ws = [1.0, w.toNumber(), 1.0];
+            let p0 = new Vector2(
+                (MATHJS.multiply(a, MATHJS.sec(θ0)) as MATHJS.BigNumber).toNumber(),
+                (MATHJS.multiply(b, MATHJS.tan(θ0)) as MATHJS.BigNumber).toNumber()
+            );
+            let p1 = new Vector2(
+                (MATHJS.divide(MATHJS.multiply(a, MATHJS.sec(θm)), s) as MATHJS.BigNumber).toNumber(),
+                (MATHJS.divide(MATHJS.multiply(b, MATHJS.tan(θm)), s) as MATHJS.BigNumber).toNumber()
+            );
+            let p2 = new Vector2(
+                (MATHJS.multiply(a, MATHJS.sec(θ1)) as MATHJS.BigNumber).toNumber(),
+                (MATHJS.multiply(b, MATHJS.tan(θ1)) as MATHJS.BigNumber).toNumber()
+            );
+            p0.applyMatrix3(m);
+            p1.applyMatrix3(m);
+            p2.applyMatrix3(m);
+            const points = [
+                [p0.x, p0.y, ws[0]],
+                [p1.x, p1.y, ws[1]],
+                [p2.x, p2.y, ws[2]],
+            ];
+            // 构建曲线
+            const nurbs = new verb.geom.NurbsCurve({ controlPoints: points, knots: [0, 0, 0, 1, 1, 1], degree: 2 })
             ret.push(nurbs);
         }
         return ret;

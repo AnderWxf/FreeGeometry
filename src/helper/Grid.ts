@@ -9,8 +9,8 @@ class Grid extends THREE.WireframeGeometry {
     /**
      * Constructs a Grid.
      *
-     * @param {number} [min=-1000] - The min position of grid.
-     * @param {number} [max=1000] - The max position of grid.
+     * @param {number} [min=-10000] - The min position of grid.
+     * @param {number} [max=10000] - The max position of grid.
      * @param {number} [step0=100] - The big step of grid.
      * @param {number} [step1=10] - The small step of grid.
      */

@@ -47,7 +47,7 @@ class OrthographicController {
             this._size * s,
             -this._size * s,
             0.1, // 近裁剪面
-            3000 // 远裁剪面
+            30000 // 远裁剪面
         );
         this._camera = _camera;
         this.up = _camera.up;
@@ -172,8 +172,8 @@ class OrthographicController {
             let distance = Math.abs(event.movementX) > Math.abs(event.movementY) ? event.movementX : event.movementY;
             let _camera = this._camera;
             _camera.zoom += distance * keyScale * 0.01;
-            if (_camera.zoom < 0.1) {
-                _camera.zoom = 0.1;
+            if (_camera.zoom < 0.001) {
+                _camera.zoom = 0.001;
             }
             _camera.updateProjectionMatrix();
         }

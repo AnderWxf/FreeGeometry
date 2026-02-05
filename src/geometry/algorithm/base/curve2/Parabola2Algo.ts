@@ -1,4 +1,4 @@
-import { Vector2 } from "../../../../math/Math";
+import { Vector2, Vector3 } from "../../../../math/Math";
 import { MathUtils } from "../../../../math/MathUtils";
 import * as MATHJS from '../../../../mathjs';
 import { Parabola2Data } from "../../../data/base/curve2/Parabola2Data";
@@ -37,10 +37,23 @@ class Parabola2Algo extends Curve2Algo {
      * @retun {any}
      */
     vernurbs(u: Vector2 = new Vector2(-1000, 1000)): Array<any> {
-        let p0 = this.p(u.x);
-        let p1 = this.p((u.x + u.y) * 0.5);
-        let p2 = this.p(u.y);
-        let nurbs = new verb.geom.BezierCurve([[p0.x, p0.y], [p1.x, p1.y], [p2.x, p2.y]]);
+        let a = 1 / (this.dat.f * 4);
+        let um = (u.x + u.y) * 0.5;
+        let u0 = u.x;
+        let u1 = u.y;
+        // 二次贝塞尔曲线控制点
+        // P0​=(u0 ,au0^2​)
+        // P1=(um,au0u1),其中um = (u0+u1)/2
+        // P2=(u1,au1^2)
+        let p0 = new Vector2(u0, a * u0 * u0);
+        let p1 = new Vector2(um, a * u0 * u1);
+        let p2 = new Vector2(u1, a * u1 * u1);
+        let m = this.dat.trans.makeLocalMatrix();
+        p0.applyMatrix3(m);
+        p1.applyMatrix3(m);
+        p2.applyMatrix3(m);
+        let pts: number[][] = [[p0.x, p0.y, 1], [p1.x, p1.y, 1], [p2.x, p2.y, 1]];
+        const nurbs = new verb.geom.NurbsCurve({ controlPoints: pts, knots: [0, 0, 0, 1, 1, 1], degree: 2 })
         return [nurbs];
     }
 

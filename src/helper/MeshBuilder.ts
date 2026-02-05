@@ -31,12 +31,12 @@ class BrepMeshBuilder {
         let step = (edge.u.y - edge.u.x) / segment;
         let vertices = new Array<number>;
         // let indices = Array<number>();
-        for (let i = edge.u.x, index = 0; index <= segment; i += step, index++) {
-            let p = algor.p(i);
+        for (let u = edge.u.x, i = 0; i <= segment; u += step, i++) {
+            let p = algor.p(u);
             vertices.push(p.x);
             vertices.push(p.y);
             vertices.push(0);
-            // indices.push(index);
+            // indices.push(i);
         }
         let buff = new THREE.BufferGeometry()
         // buff.setIndex(indices);
