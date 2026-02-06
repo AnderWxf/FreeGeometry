@@ -4721,6 +4721,17 @@ class Matrix2 {
 	}
 
 	/**
+	 * Returns a matrix with copied values from this instance.
+	 *
+	 * @return {Matrix2} A clone of this instance.
+	 */
+	clone() {
+
+		return new Matrix2().fromArray(this.elements);
+
+	}
+
+	/**
 	 * Sets the elements of the matrix.The arguments are supposed to be
 	 * in row-major order.
 	 *
@@ -4768,6 +4779,35 @@ class Matrix2 {
 			d = te[3];
 
 		return a * d - c * b;
+
+	}
+
+	/**
+	 * Inverts this matrix, using the [analytic method]{@link https://en.wikipedia.org/wiki/Invertible_matrix#Analytic_solution}.
+	 * You can not invert with a determinant of zero. If you attempt this, the method produces
+	 * a zero matrix instead.
+	 *
+	 * @return {Matrix2} A reference to this matrix.
+	 */
+	invert() {
+
+		const te = this.elements,
+
+			n11 = te[0], n21 = te[1],
+			n12 = te[2], n22 = te[3],
+
+			det = n11 * n22 - n21 * n12;
+
+		if (det === 0) return this.set(0, 0, 0, 0);
+
+		const detInv = 1 / det;
+
+		te[0] = n22 * detInv;
+		te[1] = -n21 * detInv;
+		te[2] = -n12 * detInv;
+		te[3] = n11 * detInv;
+
+		return this;
 
 	}
 }

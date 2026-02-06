@@ -103,21 +103,34 @@ export class Cube {
     geoEllipseEdge.name = "Ellipse2_Three_Point";
 
     // 根据三点创建一个双曲线
+    // let hyperbolaRightEdge = Brep2Builder.BuildHyperbolaEdge2FromCenterABPoint(
+    //   new Vector2(0, 0),
+    //   new Vector2(15, 0),
+    //   new Vector2(0, 30),
+    //   -Math.PI / 2 + 1e-10,
+    //   Math.PI * 1 / 2 - 1e-10);
+
     let hyperbolaRightEdge = Brep2Builder.BuildHyperbolaEdge2FromCenterABPoint(
       new Vector2(0, 0),
       new Vector2(15, 0),
       new Vector2(0, 30),
-      -Math.PI / 2 + 1e-10,
-      Math.PI * 1 / 2 - 1e-10);
+      0 + 1e-10,
+      100);
     let geoHyperbolaRightEdge = BrepMeshBuilder.BuildEdge2Mesh(hyperbolaRightEdge, THREE.Color.NAMES.aqua);
     geoHyperbolaRightEdge.name = "Hyperbola2_Right_Three_Point";
 
+    // let hyperbolaLeftEdge = Brep2Builder.BuildHyperbolaEdge2FromCenterABPoint(
+    //   new Vector2(0, 0),
+    //   new Vector2(15, 0),
+    //   new Vector2(0, 30),
+    //   Math.PI / 2 + 1e-10,
+    //   Math.PI * 3 / 2 - 1e-10);
     let hyperbolaLeftEdge = Brep2Builder.BuildHyperbolaEdge2FromCenterABPoint(
       new Vector2(0, 0),
       new Vector2(15, 0),
       new Vector2(0, 30),
-      Math.PI / 2 + 1e-10,
-      Math.PI * 3 / 2 - 1e-10);
+      -100,
+      0 - 1e-10);
     let geoHyperbolaLeftEdge = BrepMeshBuilder.BuildEdge2Mesh(hyperbolaLeftEdge, THREE.Color.NAMES.fuchsia);
     geoHyperbolaLeftEdge.name = "Hyperbola2_Left_Three_Point";
 

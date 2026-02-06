@@ -1,14 +1,18 @@
-import { Vector2 } from "../../../../math/Math";
+import { Matrix2, Vector2 } from "../../../../math/Math";
 import * as MATHJS from '../../../../mathjs';
-import { MathUtils } from "../../../../math/MathUtils";
 import { Hyperbola2Data } from "../../../data/base/curve2/Hyperbola2Data";
 import { Curve2Algo } from "../Curve2Algo";
 import verb from 'verb-nurbs';
 
 /**
- * 2D Hyperbola algorithm. TODO
+ * 2D Hyperbola algorithm. 
+ * 定义A:
  * x = a sec(φ)
  * y = b tan(φ)
+ * φ != kπ/2，k∈Z
+ * 
+ * 定义B:
+ * 在(a,b)和(-a,b)张成的空间下定义双曲线，xy = -1/4，x!=0，y∈R
  */
 class Hyperbola2Algo extends Curve2Algo {
     /**
@@ -213,6 +217,7 @@ class Hyperbola2Algo extends Curve2Algo {
      * @retun {Vector2}
      */
     d(u: number, r: number = 0): Vector2 {
+        return this.d1(u, r);
         const a = MATHJS.bignumber(this.dat.radius.x);
         const b = MATHJS.bignumber(this.dat.radius.y);
         const m = this.dat.trans.makeLocalMatrix();
@@ -265,6 +270,33 @@ class Hyperbola2Algo extends Curve2Algo {
                 debugger;
                 return;
         }
+    }
+
+    /**
+     * the D(derivative) function return r-order derivative vector at u parameter.
+     * @param {number} [u != 0] - the u parameter of curve.
+     * @param {number} [r ∈ [0,1,2...]] - r-order.
+     * @retun {Vector2}
+     */
+    //xy = -1/4 => y = -1/4 * x^-1
+    d1(u: number, r: number = 0): Vector2 {
+        const a = this.dat.radius.x;
+        const b = this.dat.radius.y;
+        const m = this.dat.trans.makeLocalMatrix();
+        let v0 = new Vector2(1, b / a);// v0.normalize();
+        let v1 = new Vector2(-1, b / a);// v1.normalize();
+        let M = new Matrix2(
+            v0.x, v1.x,
+            v0.y, v1.y);
+        M.invert();
+        let x = MATHJS.bignumber(u);
+        // y(n) = -1/4 * (-1)^n * n! * x^(-n-1)
+        let y = MATHJS.multiply(MATHJS.pow(x, - r - 1), MATHJS.bignumber(-1 / 4), MATHJS.pow(-1, r), MATHJS.factorial(r)) as MATHJS.BigNumber;
+
+        let ret = new Vector2(x.toNumber(), y.toNumber());
+        ret.applyMatrix2(M);
+        ret.applyMatrix3(m);
+        return ret;
     }
 
     /**
