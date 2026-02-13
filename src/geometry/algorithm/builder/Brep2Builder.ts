@@ -212,7 +212,7 @@ class Brep2Builder {
      * @param {number} [u ∈ [0,a]] - the u parameter of curve.
      * @retun {Matrix2}
      */
-    static Length(e: Edge2, tol = 0.0001): number {
+    static Length(e: Edge2, tol = 0.0001, min: number = 0): number {
         if (e.curve instanceof Line2Data) {
             return Math.abs(e.u.y - e.u.x);
         }
@@ -255,6 +255,9 @@ class Brep2Builder {
         length = length + ps[4].p.distanceTo(ps[5].p);
         length = length + ps[5].p.distanceTo(ps[6].p);
         length = length + ps[6].p.distanceTo(ps[7].p);
+        if (min > 0 && length > min) {
+            return length;
+        }
         while (1) {
             let ps_ = new Array<{ u: number, p: Vector2 }>();
             var l = 0;
@@ -274,6 +277,9 @@ class Brep2Builder {
                 return l;
             }
             length = l;
+            if (min > 0 && length > min) {
+                return length;
+            }
             ps = ps_;
         }
     }

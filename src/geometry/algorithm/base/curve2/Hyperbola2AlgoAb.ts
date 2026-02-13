@@ -1,20 +1,16 @@
 import { Matrix2, Vector2 } from "../../../../math/Math";
 import * as MATHJS from '../../../../mathjs';
 import { Hyperbola2Data } from "../../../data/base/curve2/Hyperbola2Data";
-import { CurveBuilder } from "../../builder/CurveBuilder";
-import { Curve2Inter } from "../../relation/intersection/Curve2Inter";
 import { Curve2Algo } from "../Curve2Algo";
 import verb from 'verb-nurbs';
 
 /**
  * 2D Hyperbola algorithm. 
- * 定义A:
- * x = a sec(φ)
- * y = b tan(φ)
- * φ != kπ/2，k∈Z
  * 
+ * 定义B:
+ * 在(a,b)和(-a,b)张成的空间下定义双曲线，xy = -1/4，x!=0，y∈R
  */
-class Hyperbola2Algo extends Curve2Algo {
+class Hyperbola2AlgoAb extends Curve2Algo {
     /**
      * The data struct of this 2D Hyperbola algorithm.
      *
@@ -44,7 +40,7 @@ class Hyperbola2Algo extends Curve2Algo {
     vernurbs(u: Vector2 = new Vector2(-Math.PI / 4, Math.PI / 4)): Array<any> {
         let ret = [];
         // ret.push(...this.vernurbs0(u));
-        ret.push(...this.vernurbs2(u));
+        ret.push(...this.vernurbs1(u));
         return ret;
     }
     vernurbs0(u: Vector2 = new Vector2(-Math.PI / 4, Math.PI / 4)): Array<any> {
@@ -137,9 +133,8 @@ class Hyperbola2Algo extends Curve2Algo {
                 (MATHJS.multiply(b, MATHJS.tan(θ0)) as MATHJS.BigNumber).toNumber()
             );
             let p1 = new Vector2(
-                // (MATHJS.divide(MATHJS.multiply(a, MATHJS.sec(θm)), s) as MATHJS.BigNumber).toNumber(),
-                // (MATHJS.divide(MATHJS.multiply(b, MATHJS.tan(θm)), s) as MATHJS.BigNumber).toNumber()
-                0, 0
+                (MATHJS.divide(MATHJS.multiply(a, MATHJS.sec(θm)), s) as MATHJS.BigNumber).toNumber(),
+                (MATHJS.divide(MATHJS.multiply(b, MATHJS.tan(θm)), s) as MATHJS.BigNumber).toNumber()
             );
             let p2 = new Vector2(
                 (MATHJS.multiply(a, MATHJS.sec(θ1)) as MATHJS.BigNumber).toNumber(),
@@ -171,142 +166,8 @@ class Hyperbola2Algo extends Curve2Algo {
                 (MATHJS.multiply(b, MATHJS.tan(θ0)) as MATHJS.BigNumber).toNumber()
             );
             let p1 = new Vector2(
-                // (MATHJS.divide(MATHJS.multiply(a, MATHJS.sec(θm)), s) as MATHJS.BigNumber).toNumber(),
-                // (MATHJS.divide(MATHJS.multiply(b, MATHJS.tan(θm)), s) as MATHJS.BigNumber).toNumber()
-                0, 0
-            );
-            let p2 = new Vector2(
-                (MATHJS.multiply(a, MATHJS.sec(θ1)) as MATHJS.BigNumber).toNumber(),
-                (MATHJS.multiply(b, MATHJS.tan(θ1)) as MATHJS.BigNumber).toNumber()
-            );
-            p0.applyMatrix3(m);
-            p1.applyMatrix3(m);
-            p2.applyMatrix3(m);
-            const points = [
-                [p0.x, p0.y, ws[0]],
-                [p1.x, p1.y, ws[1]],
-                [p2.x, p2.y, ws[2]],
-            ];
-            // 构建曲线
-            const nurbs = new verb.geom.NurbsCurve({ controlPoints: points, knots: [0, 0, 0, 1, 1, 1], degree: 2 })
-            ret.push(nurbs);
-        }
-        return ret;
-    }
-    vernurbs2(u: Vector2 = new Vector2(-Math.PI / 4, Math.PI / 4)): Array<any> {
-        const a = MATHJS.bignumber(this.dat.radius.x);
-        const b = MATHJS.bignumber(this.dat.radius.y);
-        const m = this.dat.trans.makeLocalMatrix();
-
-        let ret = [];
-        // let θ = Math.PI / 6;
-        // 右支（对称）
-        {
-            let θ0 = MATHJS.bignumber(0 + u.x + 1e-10);
-            let θ1 = MATHJS.bignumber(0 + u.y - 1e-10);
-            let θm = MATHJS.multiply(MATHJS.add(θ0, θ1), 0.5) as MATHJS.BigNumber;
-            let p0 = new Vector2(
-                MATHJS.multiply(a, MATHJS.sec(θ0)) as number,
-                MATHJS.multiply(b, MATHJS.tan(θ0)) as number
-            );
-            let p2 = new Vector2(
-                MATHJS.multiply(a, MATHJS.sec(θ1)) as number,
-                MATHJS.multiply(b, MATHJS.tan(θ1)) as number
-            );
-            // 从二次曲线到有理二次Bézier曲线的转换（期刊） 施法中 工程图学学报 1989 (02)
-
-            // 计算p0 p2 处的切线，计算控制点p1
-            let v0 = new Vector2(
-                MATHJS.multiply(a, MATHJS.sec(θ0), MATHJS.tan(θ0)) as number,
-                MATHJS.multiply(b, MATHJS.sec(θ0), MATHJS.sec(θ0)) as number
-            );
-            let v2 = new Vector2(
-                MATHJS.multiply(a, MATHJS.sec(θ1), MATHJS.tan(θ1)) as number,
-                MATHJS.multiply(b, MATHJS.sec(θ1), MATHJS.sec(θ1)) as number
-            );
-            let line0 = CurveBuilder.BuildLine2FromPointAndVector(p0, v0);
-            let line2 = CurveBuilder.BuildLine2FromPointAndVector(p2, v2);
-            let ls = Curve2Inter.LineXLine(line0, line2, 0, 0);
-            let p1 = ls[0].p;
-            p1.x = (p1.x as any).toNumber();
-            p1.y = (p1.y as any).toNumber();
-            // 线上点p
-            let p = new Vector2(
-                MATHJS.multiply(a, MATHJS.sec(θm)) as number,
-                MATHJS.multiply(b, MATHJS.tan(θm)) as number
-            );
-
-            // p0.set(-1, 0);
-            // p1.set(0, 1);
-            // p2.set(1, 0);
-            // p.set(1 / 2, 3 / 8);
-
-            let x = MATHJS.bignumber(p.x);
-            let y = MATHJS.bignumber(p.y);
-            let x0 = MATHJS.bignumber(p0.x);
-            let y0 = MATHJS.bignumber(p0.y);
-            let x1 = MATHJS.bignumber(p1.x);
-            let y1 = MATHJS.bignumber(p1.y);
-            let x2 = MATHJS.bignumber(p2.x);
-            let y2 = MATHJS.bignumber(p2.y);
-
-            let detA = MATHJS.subtract(
-                MATHJS.multiply(MATHJS.subtract(x, x1), MATHJS.subtract(y2, y1)),
-                MATHJS.multiply(MATHJS.subtract(y, y1), MATHJS.subtract(x2, x1))
-            );
-            let detB = MATHJS.subtract(
-                MATHJS.multiply(MATHJS.subtract(x0, x1), MATHJS.subtract(y, y1)),
-                MATHJS.multiply(MATHJS.subtract(y0, y1), MATHJS.subtract(x, x1))
-            );
-            let det = MATHJS.subtract(
-                MATHJS.multiply(MATHJS.subtract(x0, x1), MATHJS.subtract(y2, y1)),
-                MATHJS.multiply(MATHJS.subtract(y0, y1), MATHJS.subtract(x2, x1))
-            );
-
-            let α = MATHJS.divide(detA, det) as MATHJS.BigNumber;
-            let β = MATHJS.divide(detB, det) as MATHJS.BigNumber;
-            let v10 = p0.clone().sub(p1);
-            let v12 = p2.clone().sub(p1);
-            let αv10 = v10.clone().multiplyScalar(α.toNumber());
-            let βv12 = v12.clone().multiplyScalar(β.toNumber());
-            let pp = p1.clone().add(αv10).add(βv12);
-            let λ = MATHJS.divide(MATHJS.multiply(α, β), MATHJS.add(MATHJS.multiply(α, β), MATHJS.pow(MATHJS.add(α, β, -1), 2)));
-            let w1 = MATHJS.multiply(MATHJS.sqrt(MATHJS.divide(MATHJS.subtract(MATHJS.bignumber(1), λ), λ) as MATHJS.BigNumber), 0.5);
-            let w = MATHJS.divide(
-                MATHJS.subtract(MATHJS.bignumber(1), MATHJS.add(α, β)),
-                MATHJS.multiply(MATHJS.sqrt(MATHJS.multiply(α, β) as MATHJS.BigNumber), 2));
-            w = 1.25;
-            const ws = [1.0, w, 1.0];
-
-            p0.applyMatrix3(m);
-            p1.applyMatrix3(m);
-            p2.applyMatrix3(m);
-            const points = [
-                [p0.x, p0.y, ws[0]],
-                [p1.x, p1.y, ws[1]],
-                [p2.x, p2.y, ws[2]],
-            ];
-            // 构建曲线
-            const nurbs = new verb.geom.NurbsCurve({ controlPoints: points, knots: [0, 0, 0, 1, 1, 1], degree: 2 })
-            ret.push(nurbs);
-        }
-        // 左支（对称）
-        {
-            let θ0 = MATHJS.bignumber(Math.PI + u.x + 1e-10);
-            let θ1 = MATHJS.bignumber(Math.PI + u.y - 1e-10);
-            let θm = MATHJS.multiply(MATHJS.add(θ0, θ1), 0.5) as MATHJS.BigNumber;
-            let Δθ = MATHJS.subtract(θ1, θ0) as MATHJS.BigNumber;
-            let s = MATHJS.sec(MATHJS.divide(Δθ, 2) as MATHJS.BigNumber);
-            let w = s;
-            const ws = [1.0, w.toNumber(), 1.0];
-            let p0 = new Vector2(
-                (MATHJS.multiply(a, MATHJS.sec(θ0)) as MATHJS.BigNumber).toNumber(),
-                (MATHJS.multiply(b, MATHJS.tan(θ0)) as MATHJS.BigNumber).toNumber()
-            );
-            let p1 = new Vector2(
-                // (MATHJS.divide(MATHJS.multiply(a, MATHJS.sec(θm)), s) as MATHJS.BigNumber).toNumber(),
-                // (MATHJS.divide(MATHJS.multiply(b, MATHJS.tan(θm)), s) as MATHJS.BigNumber).toNumber()
-                0, 0
+                (MATHJS.divide(MATHJS.multiply(a, MATHJS.sec(θm)), s) as MATHJS.BigNumber).toNumber(),
+                (MATHJS.divide(MATHJS.multiply(b, MATHJS.tan(θm)), s) as MATHJS.BigNumber).toNumber()
             );
             let p2 = new Vector2(
                 (MATHJS.multiply(a, MATHJS.sec(θ1)) as MATHJS.BigNumber).toNumber(),
@@ -347,61 +208,29 @@ class Hyperbola2Algo extends Curve2Algo {
 
     /**
      * the D(derivative) function return r-order derivative vector at u parameter.
-     * @param {number} [u ∈ [0,a]] - the u parameter of curve.
+     * @param {number} [u != 0] - the u parameter of curve.
      * @param {number} [r ∈ [0,1,2...]] - r-order.
      * @retun {Vector2}
      */
+    //xy = -1/4 => y = -1/4 * x^-1
     d(u: number, r: number = 0): Vector2 {
-        const a = MATHJS.bignumber(this.dat.radius.x);
-        const b = MATHJS.bignumber(this.dat.radius.y);
+        const a = this.dat.radius.x;
+        const b = this.dat.radius.y;
         const m = this.dat.trans.makeLocalMatrix();
-        const secu = MATHJS.sec(u);
-        const tanu = MATHJS.tan(u);
-        switch (r) {
-            case 0:
-                {
-                    // x = a sec(u)
-                    // y = b tan(u)         
-                    const x = MATHJS.multiply(a, secu) as MATHJS.BigNumber;
-                    const y = MATHJS.multiply(b, tanu) as MATHJS.BigNumber;
-                    let ret = new Vector2(x.toNumber(), y.toNumber());
-                    ret.applyMatrix3(m);
-                    return ret;
-                }
-            case 1:
-                {
-                    // x' = a sec(u) tan(u)
-                    // y' = b sec(u) sec(u)              
-                    const x = MATHJS.multiply(a, secu, tanu) as MATHJS.BigNumber;
-                    const y = MATHJS.multiply(b, secu, secu) as MATHJS.BigNumber;
-                    let ret = new Vector2(x.toNumber(), y.toNumber());
-                    ret.applyMatrix3(m);
-                    return ret;
-                }
-            case 2:
-                {
-                    // x'' = a(sec(u)tan(u)tan(u) + sec(u)sec(u)sec(u)) = a(sec(u)tan^2(u) + sec^3(u))
-                    // y'' = b(2sec(u)sec(u)tan(u)) = 2bsec^2(u)tan(u)  
-                    const x = MATHJS.add(MATHJS.multiply(secu, tanu, tanu), MATHJS.multiply(secu, secu, secu)) as MATHJS.BigNumber;
-                    const y = MATHJS.multiply(b, secu, secu, tanu, 2) as MATHJS.BigNumber;
-                    let ret = new Vector2(x.toNumber(), y.toNumber());
-                    ret.applyMatrix3(m);
-                    return ret;
-                }
-            case 3:
-                {
-                    // x'' = a(sec(u)tan^3(u) + 2tan(u)sec^3(u) + 3sec^3(u)tan(u))
-                    // y'' = 2b(2sec^2(u)tan^2(u) + sec^4(u))
-                    let x = MATHJS.add(MATHJS.multiply(a, secu, tanu, tanu, tanu), MATHJS.multiply(a, tanu, secu, secu, secu, 2), MATHJS.multiply(a, secu, secu, secu, tanu, 3)) as MATHJS.BigNumber;
-                    let y = MATHJS.add(MATHJS.multiply(b, secu, secu, tanu, tanu, 4), MATHJS.multiply(b, secu, secu, secu, secu, 2)) as MATHJS.BigNumber;
-                    let ret = new Vector2(x.toNumber(), y.toNumber());
-                    ret.applyMatrix3(m);
-                    return ret;
-                }
-            default:
-                debugger;
-                return;
-        }
+        let v0 = new Vector2(a, b);
+        let v1 = new Vector2(-a, b);
+        let M = new Matrix2(
+            v0.x, v1.x,
+            v0.y, v1.y);
+        // M.invert();
+        let x = MATHJS.bignumber(u);
+        // y(n) = -1/4 * (-1)^n * n! * x^(-n-1)
+        let y = MATHJS.multiply(MATHJS.pow(x, - r - 1), -0.25, MATHJS.pow(-1, r), MATHJS.factorial(r)) as MATHJS.BigNumber;
+
+        let ret = new Vector2(x.toNumber(), y.toNumber());
+        ret.applyMatrix2(M);
+        ret.applyMatrix3(m);
+        return ret;
     }
 
     /**
@@ -480,4 +309,4 @@ class Hyperbola2Algo extends Curve2Algo {
     }
 }
 
-export { Hyperbola2Algo };
+export { Hyperbola2AlgoAb };

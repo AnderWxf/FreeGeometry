@@ -66,7 +66,8 @@ class Nurbs2Algo extends Curve2Algo {
     override d(u: number, r: number = 0): Vector2 {
         if (r === 0) {
             let points = verb.eval.Eval.curvePoint(this.curve_._data, u) as number[];
-            return new Vector2(points[0], points[1]);
+            // let points = verb.eval.Eval.rationalCurvePoint(this.curve_._data, u) as number[];
+            return new Vector2(points[0] / points[2], points[1] / points[2]);
         } else {
             let points = verb.eval.Eval.rationalCurveDerivatives(this.curve_._data, u, r) as number[][];
             return new Vector2(points[1][0], points[1][1]);

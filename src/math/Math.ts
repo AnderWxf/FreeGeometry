@@ -415,8 +415,8 @@ class Vector2 {
 		const e = m.elements;
 		let e11 = e[0] || 0;
 		let e12 = e[1] || 0;
-		let e21 = e[3] || 0;
-		let e22 = e[4] || 0;
+		let e21 = e[2] || 0;
+		let e22 = e[3] || 0;
 
 		this.x = x * e11 + y * e21;
 		this.y = x * e12 + y * e22;

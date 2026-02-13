@@ -103,36 +103,43 @@ export class Cube {
     geoEllipseEdge.name = "Ellipse2_Three_Point";
 
     // 根据三点创建一个双曲线
-    // let hyperbolaRightEdge = Brep2Builder.BuildHyperbolaEdge2FromCenterABPoint(
-    //   new Vector2(0, 0),
-    //   new Vector2(15, 0),
-    //   new Vector2(0, 30),
-    //   -Math.PI / 2 + 1e-10,
-    //   Math.PI * 1 / 2 - 1e-10);
-
     let hyperbolaRightEdge = Brep2Builder.BuildHyperbolaEdge2FromCenterABPoint(
       new Vector2(0, 0),
       new Vector2(15, 0),
       new Vector2(0, 30),
-      0 + 1e-10,
-      100);
+      -Math.PI / 3, Math.PI / 3);
     let geoHyperbolaRightEdge = BrepMeshBuilder.BuildEdge2Mesh(hyperbolaRightEdge, THREE.Color.NAMES.aqua);
     geoHyperbolaRightEdge.name = "Hyperbola2_Right_Three_Point";
 
-    // let hyperbolaLeftEdge = Brep2Builder.BuildHyperbolaEdge2FromCenterABPoint(
-    //   new Vector2(0, 0),
-    //   new Vector2(15, 0),
-    //   new Vector2(0, 30),
-    //   Math.PI / 2 + 1e-10,
-    //   Math.PI * 3 / 2 - 1e-10);
+    let geoHyperbolaRightDerivatives = BrepMeshBuilder.BuildEdge2Derivatives(hyperbolaRightEdge, THREE.Color.NAMES.orangered, 1);
+
+
+    let hyperbolaRightEdgeAb = Brep2Builder.BuildHyperbolaEdge2FromCenterABPoint(
+      new Vector2(0, 0),
+      new Vector2(15, 0),
+      new Vector2(0, 30),
+      0 + 1e-1,
+      10);
+    let geoHyperbolaRightEdgeAb = BrepMeshBuilder.BuildEdge2Mesh(hyperbolaRightEdgeAb, THREE.Color.NAMES.blueviolet, undefined, 1);
+    geoHyperbolaRightEdgeAb.name = "Hyperbola2_Right_Three_Point_Ab";
+
     let hyperbolaLeftEdge = Brep2Builder.BuildHyperbolaEdge2FromCenterABPoint(
       new Vector2(0, 0),
       new Vector2(15, 0),
       new Vector2(0, 30),
-      -100,
-      0 - 1e-10);
+      -Math.PI / 3 + Math.PI, Math.PI / 3 + Math.PI);
     let geoHyperbolaLeftEdge = BrepMeshBuilder.BuildEdge2Mesh(hyperbolaLeftEdge, THREE.Color.NAMES.fuchsia);
     geoHyperbolaLeftEdge.name = "Hyperbola2_Left_Three_Point";
+    let geoHyperbolaLeftDerivatives = BrepMeshBuilder.BuildEdge2Derivatives(hyperbolaLeftEdge, THREE.Color.NAMES.orangered, 1);
+
+    let hyperbolaLeftEdgeAb = Brep2Builder.BuildHyperbolaEdge2FromCenterABPoint(
+      new Vector2(0, 0),
+      new Vector2(15, 0),
+      new Vector2(0, 30),
+      -10,
+      0 - 1e-1);
+    let geoHyperbolaLeftEdgeAb = BrepMeshBuilder.BuildEdge2Mesh(hyperbolaLeftEdgeAb, THREE.Color.NAMES.blueviolet, undefined, 1);
+    geoHyperbolaLeftEdgeAb.name = "Hyperbola2_Left_Three_Point_Ab";
 
     // 根据两点创建一个抛物线
     let parabolaEdge = Brep2Builder.BuildParabolaEdge2FromCenterABPoint(new Vector2(0, 0), new Vector2(0, 10), 50, -50);
@@ -142,8 +149,8 @@ export class Cube {
     let ha = CurveBuilder.Algorithm2ByData(hyperbolaLeftEdge.curve) as Hyperbola2Algo;
     let pa = CurveBuilder.Algorithm2ByData(parabolaEdge.curve) as Parabola2Algo;
     let ns = [];
-    ns.push(...ha.vernurbs(new Vector2(-Math.PI / 4, Math.PI / 4)));
-    ns.push(...pa.vernurbs(new Vector2(-50, 50)));
+    ns.push(...ha.vernurbs(new Vector2(-Math.PI / 3, Math.PI / 3)));
+    // ns.push(...pa.vernurbs(new Vector2(-50, 50)));
     for (let i = 0; i < ns.length; i++) {
       console.log("NURBS 控制点：");
       console.log(ns[i]);
@@ -208,7 +215,11 @@ export class Cube {
     // scene.add(geoEllipseEdge);
     scene.add(geoHyperbolaLeftEdge);
     scene.add(geoHyperbolaRightEdge);
-    // scene.add(geoParabolaEdge);
+    scene.add(geoHyperbolaLeftDerivatives);
+    scene.add(geoHyperbolaRightDerivatives);
+    // scene.add(geoHyperbolaLeftEdgeAb);
+    // scene.add(geoHyperbolaRightEdgeAb);
+    scene.add(geoParabolaEdge);
     // scene.add(geoNurbsEdge); //scene.add(geoNurbsTangents);
     // scene.add(geoNurbsEdge1); //scene.add(geoNurbsTangents1);
 

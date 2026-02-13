@@ -18,16 +18,16 @@ class BrepMeshBuilder {
      *
      * @param {Edge2} [edge] - The edge2 object.
      */
-    static BuildEdge2Mesh(edge: Edge2, color: number, segment?: number): THREE.Line {
+    static BuildEdge2Mesh(edge: Edge2, color: number, segment?: number, sub: number = 0): THREE.Line {
         if (segment == undefined) {
             if (edge.curve instanceof Line2Data) {
                 segment = 1;
             } else {
-                segment = Math.ceil(MathUtils.clamp(Brep2Builder.Length(edge, 1), 32, 512));
+                segment = Math.ceil(MathUtils.clamp(Brep2Builder.Length(edge, 1, 512), 32, 512));
             }
         }
 
-        let algor = CurveBuilder.Algorithm2ByData(edge.curve);
+        let algor = CurveBuilder.Algorithm2ByData(edge.curve, sub);
         let step = (edge.u.y - edge.u.x) / segment;
         let vertices = new Array<number>;
         // let indices = Array<number>();
@@ -69,6 +69,49 @@ class BrepMeshBuilder {
         for (let i = edge.u.x, index = 0; index <= segment; i += step, index++) {
             let p = algor.p(i);
             let t = algor.t(i);
+            vertices.push(p.x);
+            vertices.push(p.y);
+            vertices.push(0);
+            vertices.push(p.x + t.x);
+            vertices.push(p.y + t.y);
+            vertices.push(0);
+            // indices.push(index);
+            // indices.push(index++);
+        }
+        let buff = new THREE.BufferGeometry()
+        // buff.setIndex(indices);
+        buff.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+
+        const materialline = new THREE.MeshBasicMaterial({ color: color });
+        let ret = new THREE.LineSegments(buff, materialline);
+
+        return ret;
+    }
+
+    /**
+     * build edge2 derivative WireframeGeometry.
+     *
+     * @param {Edge2} [edge] - The edge2 object.
+     */
+    static BuildEdge2Derivatives(edge: Edge2, color: number, segment?: number): THREE.LineSegments {
+        if (segment == undefined) {
+            if (edge.curve instanceof Line2Data) {
+                segment = 1;
+            } else {
+                segment = Math.ceil(MathUtils.clamp(Brep2Builder.Length(edge, 1), 32, 512));
+            }
+        }
+
+        let algor = CurveBuilder.Algorithm2ByData(edge.curve);
+        let step = (edge.u.y - edge.u.x) / segment;
+        let vertices = new Array<number>;
+        // let indices = Array<number>();
+        for (let i = edge.u.x, index = 0; index <= segment; i += step, index++) {
+            let p = algor.p(i);
+            let t = algor.d(i, 1);
+            if (index == segment) {
+                t.multiplyScalar(-1);
+            }
             vertices.push(p.x);
             vertices.push(p.y);
             vertices.push(0);

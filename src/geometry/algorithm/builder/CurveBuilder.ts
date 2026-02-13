@@ -25,6 +25,7 @@ import { Hyperbola2Algo } from "../base/curve2/Hyperbola2Algo";
 import { NURBSCurve } from 'three/examples/jsm/curves/NURBSCurve';
 import { Hyperbola3Data } from "../../data/base/curve3/Hyperbola3Data";
 import { Hyperbola3Algo } from "../base/curve3/Hyperbola3Algo";
+import { Hyperbola2AlgoAb } from "../base/curve2/Hyperbola2AlgoAb";
 
 /**
  * curvr builder.
@@ -42,6 +43,19 @@ class CurveBuilder {
         ret.trans.pos = b;
         let r = e.clone().sub(b).normalize();
         ret.trans.rot = r.angle();
+        return ret;
+    }
+
+    /**
+     * build line2 from begin point and end point.
+     *
+     * @param {Vector2} [p] - The point.
+     * @param {Vector2} [v] - The vector.
+     */
+    static BuildLine2FromPointAndVector(p: Vector2, v: Vector2): Line2Data {
+        let ret = new Line2Data();
+        ret.trans.pos = p;
+        ret.trans.rot = v.angle();
         return ret;
     }
 
@@ -228,7 +242,7 @@ class CurveBuilder {
     }
 
 
-    static Algorithm2ByData(dat: Curve2Data): Curve2Algo {
+    static Algorithm2ByData(dat: Curve2Data, sub: number = 0): Curve2Algo {
         if (dat instanceof Arc2Data) {
             return new Arc2Algo(dat);
         }
@@ -239,7 +253,12 @@ class CurveBuilder {
             return new Nurbs2Algo(dat);
         }
         else if (dat instanceof Hyperbola2Data) {
-            return new Hyperbola2Algo(dat);
+            switch (sub) {
+                case 0:
+                    return new Hyperbola2Algo(dat);
+                case 1:
+                    return new Hyperbola2AlgoAb(dat);
+            }
         }
         else if (dat instanceof Parabola2Data) {
             return new Parabola2Algo(dat);
