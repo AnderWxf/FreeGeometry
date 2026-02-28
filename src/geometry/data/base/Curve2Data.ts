@@ -1,3 +1,4 @@
+import { DataBase } from "../DataBase";
 import { Transform2 } from "./Transform2";
 
 /**
@@ -5,7 +6,7 @@ import { Transform2 } from "./Transform2";
  * curvr has not endpoint.
  * 
  */
-class Curve2Data {
+class Curve2Data extends DataBase {
     /**
      * The transfrom value of this Curve2Data.
      *
@@ -21,6 +22,7 @@ class Curve2Data {
      * @param {number} [scale=1] - The rotation value of this Transfrom.
      */
     constructor(trans = new Transform2()) {
+        super();
         this.trans = trans;
     }
 }

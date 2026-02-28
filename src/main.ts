@@ -1,6 +1,22 @@
 import { Cube } from "./Cube";
 import verb from 'verb-nurbs';
 import * as THREE from 'three';
+import { Matrix3, Vector2 } from "./math/Math";
+
+let m = new Matrix3();
+m.compose(new Vector2(10, 20), 0.643501, new Vector2(2.5, 2.5));
+m.set(
+  2.0, -1.5, 10,
+  1.5, 2.0, 20,
+  0, 0, 1
+);
+let pos = new Vector2();
+let rot = 0;
+let scale = new Vector2();
+let result = m.decompose();
+pos = result.position;
+rot = result.rotation;
+scale = result.scale;
 
 let v = new THREE.Vector2(0, 0);
 // // 创建 NURBS 曲线

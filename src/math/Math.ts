@@ -5365,7 +5365,84 @@ class Matrix3 {
 		return this;
 
 	}
+	/**
+	 * Sets this matrix to the transformation composed of the given position,
+	 * rotation (Quaternion) and scale.
+	 *
+	 * @param {Vector2} position - The position vector.
+	 * @param {number} rotation - The rotation in radians.
+	 * @param {Vector2} scale - The scale vector.
+	 * @return {Matrix3} A reference to this matrix.
+	 */
+	compose(position: Vector2, rotation: number, scale: Vector2) {
 
+		const te = this.elements;
+
+		const c = Math.cos(rotation);
+		const s = Math.sin(rotation);
+
+		const sx = scale.x, sy = scale.y;
+
+		te[0] = c * sx;
+		te[1] = s * sx;
+		te[2] = 0;
+
+		te[3] = - s * sy;
+		te[4] = c * sy;
+		te[5] = 0;
+
+		te[6] = position.x;
+		te[7] = position.y;
+		te[8] = 1;
+
+		return this;
+
+	}
+
+	/**
+	 * Decomposes this matrix into its position, rotation and scale components
+	 * and provides the result in the given objects.
+	 *
+	 * Note: Not all matrices are decomposable in this way. For example, if an
+	 * object has a non-uniformly scaled parent, then the object's world matrix
+	 * may not be decomposable, and this method may not be appropriate.
+	 *
+	 * @param {Vector2} position - The position vector.
+	 * @param {number} rotation - The rotation in radians.
+	 * @param {Vector2} scale - The scale vector.
+	 * @return {Matrix3} A reference to this matrix.
+	 */
+	decompose(): { position: Vector2, rotation: number, scale: Vector2 } {
+
+		let position: Vector2 = new Vector2();
+		let rotation: number;
+		let scale: Vector2 = new Vector2();
+		const te = this.elements;
+
+		let sx = _v1.set(te[0], te[1], 0).length();
+		const sy = _v1.set(te[3], te[4], 0).length();
+
+		// if determine is negative, we need to invert one scale
+		const det = this.determinant();
+		if (det < 0) sx = - sx;
+
+		position.x = te[6];
+		position.y = te[7];
+
+		// scale the rotation part
+		const a = te[0];
+		const c = te[1];
+		const b = te[3];
+		const d = te[4];
+
+		rotation = (Math.atan2(c, a) + Math.atan2(b, d)) * 0.5;
+
+		scale.x = sx;
+		scale.y = sy;
+
+		return { position, rotation, scale };
+
+	}
 	/**
 	 * Returns `true` if this matrix is equal with the given one.
 	 *

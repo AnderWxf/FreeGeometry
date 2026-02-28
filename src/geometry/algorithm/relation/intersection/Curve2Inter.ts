@@ -337,26 +337,26 @@ class Curve2Inter {
         let c0a = CurveBuilder.Algorithm2ByData(c0) as Arc2Algo | Hyperbola2Algo | Parabola2Algo;
         let c1a = CurveBuilder.Algorithm2ByData(c1) as Arc2Algo | Hyperbola2Algo | Parabola2Algo;
 
-        if (c0a instanceof Hyperbola2Algo || c0a instanceof Parabola2Algo
-            && c1a instanceof Hyperbola2Algo || c1a instanceof Parabola2Algo
-        ) {
-            let c0a_ = c0a as Hyperbola2Algo | Parabola2Algo;
-            let c1a_ = c1a as Hyperbola2Algo | Parabola2Algo
-            let ns0 = c0a_.vernurbs();
-            let ns1 = c1a_.vernurbs();
-            let ret = new Array<InterOfCurve2>();
-            for (let i = 0; i < ns0.length; i++) {
-                let nurbs0 = ns0[i];
-                for (let j = 0; j < ns1.length; j++) {
-                    let nurbs1 = ns1[j];
-                    verb.eval.Intersect.curves(nurbs0._data, nurbs1._data, tol0).forEach((inter: any) => {
-                        let p = new Vector2(inter.point0[0], inter.point0[1]);
-                        ret.push({ p, u0: inter.u1, u1: inter.u2 });
-                    });
-                }
-            }
-            return ret;
-        }
+        // if (c0a instanceof Hyperbola2Algo || c0a instanceof Parabola2Algo
+        //     && c1a instanceof Hyperbola2Algo || c1a instanceof Parabola2Algo
+        // ) {
+        //     let c0a_ = c0a as Hyperbola2Algo | Parabola2Algo;
+        //     let c1a_ = c1a as Hyperbola2Algo | Parabola2Algo
+        //     let ns0 = c0a_.vernurbs();
+        //     let ns1 = c1a_.vernurbs();
+        //     let ret = new Array<InterOfCurve2>();
+        //     for (let i = 0; i < ns0.length; i++) {
+        //         let nurbs0 = ns0[i];
+        //         for (let j = 0; j < ns1.length; j++) {
+        //             let nurbs1 = ns1[j];
+        //             verb.eval.Intersect.curves(nurbs0._data, nurbs1._data, tol0).forEach((inter: any) => {
+        //                 let p = new Vector2(inter.point0[0], inter.point0[1]);
+        //                 ret.push({ p, u0: inter.u1, u1: inter.u2 });
+        //             });
+        //         }
+        //     }
+        //     return ret;
+        // }
 
         return Curve2Inter.ConicXConic(c0a.ge(), c1a.ge(), c0a, c1a, tol0, tol1, n);
     }

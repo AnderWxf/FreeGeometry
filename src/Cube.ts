@@ -24,29 +24,52 @@ import type { Hyperbola2Algo } from './geometry/algorithm/base/curve2/Hyperbola2
 import type { Parabola2Algo } from './geometry/algorithm/base/curve2/Parabola2Algo';
 import verb from 'verb-nurbs';
 import { Nurbs2Algo } from './geometry/algorithm/base/curve2/Nurbs2Algo';
+import { Select } from './helper/Select';
+import { Global } from './core/Global';
+import { CreateLine2Com } from './helper/command/coms/CreateLine2Com';
+
+// import CommandBar from './ui/CommandBar';
 
 export class Cube {
   public constructor() {
     // 创建一个场景
     const scene = new THREE.Scene();
-    const material = new THREE.MeshBasicMaterial({ color: 0x0088ff });
+    // 创建一个 WebGPU 渲染器
+    const renderer = new WEBGPU.WebGPURenderer({ antialias: false });
+    renderer.setClearColor(0x000000);
+    renderer.samples = 4;
+
+    // 设置渲染器的大小
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    // 将渲染器的 DOM 元素添加到页面中
+    document.getElementById('gpu').appendChild(renderer.domElement)
+
+    Global.scene = scene;
+    Global.renderer = renderer;
+
+    // 创建一个基础材质
+
     let drawInters = (inters: Array<InterOfCurve2>) => {
+      const geometry = new THREE.SphereGeometry(0.1);
       for (let i = 0; i < inters.length; i++) {
         let p = inters[i].p;
         // 创建一个球体
-        const geometry = new THREE.SphereGeometry(0.1);
+        const material = new THREE.MeshBasicMaterial({ color: 0x0088ff });
         const mesh = new THREE.Mesh(geometry, material);
         mesh.position.x = p.x;
         mesh.position.y = p.y;
         mesh.name = "inter_" + i;
+        mesh.userData.canPick = true;
+        mesh.userData.original = inters[i];
         scene.add(mesh);
       }
     }
     let drawPoints = (points: Array<Vector2> | Array<Vector3>) => {
+      const geometry = new THREE.SphereGeometry(0.1);
       for (let i = 0; i < points.length; i++) {
         let p = points[i];
         // 创建一个球体
-        const geometry = new THREE.SphereGeometry(0.1);
+        const material = new THREE.MeshBasicMaterial({ color: 0x0088ff });
         const mesh = new THREE.Mesh(geometry, material);
         mesh.position.x = p.x;
         mesh.position.y = p.y;
@@ -54,6 +77,7 @@ export class Cube {
           mesh.position.z = p.z;
         }
         mesh.name = "point_" + i;
+        mesh.userData.original = p;
         scene.add(mesh);
       }
     }
@@ -61,10 +85,14 @@ export class Cube {
     //通过scene.add(元素)添加元素
 
     const cam = CamToolBar;
+    const select = new Select(scene);
+    Global.select = select;
     // 创建XZ平面的网格提
     scene.add(cam.grid_xz);
     scene.add(cam.grid_xy);
     scene.add(cam.grid_yz);
+
+    // const com = CommandBar;
 
     // 创建一个基础材质
     const material0 = new THREE.MeshBasicMaterial({ color: THREE.Color.NAMES.red });
@@ -80,6 +108,7 @@ export class Cube {
     let circleEdge = Brep2Builder.BuildCircleEdge2FromCenterRadius(new Vector2(0, 0), 1);
     let geoCircleEdge = BrepMeshBuilder.BuildEdge2Mesh(circleEdge, THREE.Color.NAMES.green);
     geoCircleEdge.name = "Circle2";
+    geoCircleEdge
 
     let circleEdge_ = Brep2Builder.BuildCircleEdge2FromCenterRadius(new Vector2(2, 0), 1);
     let geoCircleEdge_ = BrepMeshBuilder.BuildEdge2Mesh(circleEdge_, THREE.Color.NAMES.green);
@@ -103,64 +132,55 @@ export class Cube {
     geoEllipseEdge.name = "Ellipse2_Three_Point";
 
     // 根据三点创建一个双曲线
-    let hyperbolaRightEdge = Brep2Builder.BuildHyperbolaEdge2FromCenterABPoint(
-      new Vector2(0, 0),
-      new Vector2(15, 0),
-      new Vector2(0, 30),
-      -Math.PI / 3, Math.PI / 3);
-    let geoHyperbolaRightEdge = BrepMeshBuilder.BuildEdge2Mesh(hyperbolaRightEdge, THREE.Color.NAMES.aqua);
+    let hyperbola = CurveBuilder.BuildHyperbola2FromCenterABPoint(new Vector2(0, 0), new Vector2(15, 0), new Vector2(0, 30));
+    let hyperbolaRightEdge = Brep2Builder.BuildEdge2FromCurve2(hyperbola, -Math.PI / 3, Math.PI / 3);
+    let geoHyperbolaRightEdge = BrepMeshBuilder.BuildEdge2Mesh(hyperbolaRightEdge, THREE.Color.NAMES.fuchsia);
     geoHyperbolaRightEdge.name = "Hyperbola2_Right_Three_Point";
 
-    let geoHyperbolaRightDerivatives = BrepMeshBuilder.BuildEdge2Derivatives(hyperbolaRightEdge, THREE.Color.NAMES.orangered, 1);
+    // let geoHyperbolaRightDerivatives = BrepMeshBuilder.BuildEdge2Derivatives(hyperbolaRightEdge, THREE.Color.NAMES.orangered, 1);
+    // let hyperbolaRightEdgeAb = Brep2Builder.BuildHyperbolaEdge2FromCenterABPoint(
+    //   new Vector2(0, 0),
+    //   new Vector2(15, 0),
+    //   new Vector2(0, 30),
+    //   0 + 1e-1,
+    //   10);
+    // let geoHyperbolaRightEdgeAb = BrepMeshBuilder.BuildEdge2Mesh(hyperbolaRightEdgeAb, THREE.Color.NAMES.blueviolet, undefined, 1);
+    // geoHyperbolaRightEdgeAb.name = "Hyperbola2_Right_Three_Point_Ab";
 
-
-    let hyperbolaRightEdgeAb = Brep2Builder.BuildHyperbolaEdge2FromCenterABPoint(
-      new Vector2(0, 0),
-      new Vector2(15, 0),
-      new Vector2(0, 30),
-      0 + 1e-1,
-      10);
-    let geoHyperbolaRightEdgeAb = BrepMeshBuilder.BuildEdge2Mesh(hyperbolaRightEdgeAb, THREE.Color.NAMES.blueviolet, undefined, 1);
-    geoHyperbolaRightEdgeAb.name = "Hyperbola2_Right_Three_Point_Ab";
-
-    let hyperbolaLeftEdge = Brep2Builder.BuildHyperbolaEdge2FromCenterABPoint(
-      new Vector2(0, 0),
-      new Vector2(15, 0),
-      new Vector2(0, 30),
-      -Math.PI / 3 + Math.PI, Math.PI / 3 + Math.PI);
+    let hyperbolaLeftEdge = Brep2Builder.BuildEdge2FromCurve2(hyperbola, -Math.PI / 3 + Math.PI, Math.PI / 3 + Math.PI);
     let geoHyperbolaLeftEdge = BrepMeshBuilder.BuildEdge2Mesh(hyperbolaLeftEdge, THREE.Color.NAMES.fuchsia);
     geoHyperbolaLeftEdge.name = "Hyperbola2_Left_Three_Point";
-    let geoHyperbolaLeftDerivatives = BrepMeshBuilder.BuildEdge2Derivatives(hyperbolaLeftEdge, THREE.Color.NAMES.orangered, 1);
+    // let geoHyperbolaLeftDerivatives = BrepMeshBuilder.BuildEdge2Derivatives(hyperbolaLeftEdge, THREE.Color.NAMES.orangered, 1);
 
-    let hyperbolaLeftEdgeAb = Brep2Builder.BuildHyperbolaEdge2FromCenterABPoint(
-      new Vector2(0, 0),
-      new Vector2(15, 0),
-      new Vector2(0, 30),
-      -10,
-      0 - 1e-1);
-    let geoHyperbolaLeftEdgeAb = BrepMeshBuilder.BuildEdge2Mesh(hyperbolaLeftEdgeAb, THREE.Color.NAMES.blueviolet, undefined, 1);
-    geoHyperbolaLeftEdgeAb.name = "Hyperbola2_Left_Three_Point_Ab";
+    // let hyperbolaLeftEdgeAb = Brep2Builder.BuildHyperbolaEdge2FromCenterABPoint(
+    //   new Vector2(0, 0),
+    //   new Vector2(15, 0),
+    //   new Vector2(0, 30),
+    //   -10,
+    //   0 - 1e-1);
+    // let geoHyperbolaLeftEdgeAb = BrepMeshBuilder.BuildEdge2Mesh(hyperbolaLeftEdgeAb, THREE.Color.NAMES.blueviolet, undefined, 1);
+    // geoHyperbolaLeftEdgeAb.name = "Hyperbola2_Left_Three_Point_Ab";
 
     // 根据两点创建一个抛物线
     let parabolaEdge = Brep2Builder.BuildParabolaEdge2FromCenterABPoint(new Vector2(0, 0), new Vector2(0, 10), 50, -50);
     let geoParabolaEdge = BrepMeshBuilder.BuildEdge2Mesh(parabolaEdge, THREE.Color.NAMES.coral);
     geoParabolaEdge.name = "Parabola2_Left_Three_Point";
 
-    let ha = CurveBuilder.Algorithm2ByData(hyperbolaLeftEdge.curve) as Hyperbola2Algo;
-    let pa = CurveBuilder.Algorithm2ByData(parabolaEdge.curve) as Parabola2Algo;
-    let ns = [];
-    ns.push(...ha.vernurbs(new Vector2(-Math.PI / 3, Math.PI / 3)));
-    // ns.push(...pa.vernurbs(new Vector2(-50, 50)));
-    for (let i = 0; i < ns.length; i++) {
-      console.log("NURBS 控制点：");
-      console.log(ns[i]);
+    // let ha = CurveBuilder.Algorithm2ByData(hyperbolaLeftEdge.curve) as Hyperbola2Algo;
+    // let pa = CurveBuilder.Algorithm2ByData(parabolaEdge.curve) as Parabola2Algo;
+    // let ns = [];
+    // ns.push(...ha.vernurbs(new Vector2(-Math.PI / 3, Math.PI / 3)));
+    // // ns.push(...pa.vernurbs(new Vector2(-50, 50)));
+    // for (let i = 0; i < ns.length; i++) {
+    //   console.log("NURBS 控制点：");
+    //   console.log(ns[i]);
 
-      let curveData = Nurbs2Algo.FromVerb(ns[i]._data);
-      let edge = Brep2Builder.BuildEdge2FromCurve2(curveData, 0, 1);
-      let mesh = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.blue);
-      scene.add(mesh);
-      drawPoints(curveData.controls);
-    }
+    //   let curveData = Nurbs2Algo.FromVerb(ns[i]._data);
+    //   let edge = Brep2Builder.BuildEdge2FromCurve2(curveData, 0, 1);
+    //   let mesh = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.blue);
+    //   scene.add(mesh);
+    //   drawPoints(curveData.controls);
+    // }
 
 
     // 创建一个直线段
@@ -170,7 +190,6 @@ export class Cube {
     let geoLineEdge = BrepMeshBuilder.BuildEdge2Mesh(lineEdge, THREE.Color.NAMES.red);
     geoLineEdge.name = "Line2";
     geoLineEdge.frustumCulled = false;
-
 
     // 创建一个直线段
     let line1Edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(new Vector2(20, 0), new Vector2(0, 20));
@@ -205,38 +224,38 @@ export class Cube {
     let geoNurbsEdge1 = BrepMeshBuilder.BuildEdge2Mesh(nurbsEdge1, THREE.Color.NAMES.orange, 256);
     let geoNurbsTangents1 = BrepMeshBuilder.BuildEdge2Tangents(nurbsEdge1, THREE.Color.NAMES.orangered, 8);
 
-    // scene.add(geoLineEdge);
-    // scene.add(geoLine1Edge);
-    // scene.add(geoLine2Edge);
-    // scene.add(geoCircleEdge);
-    // scene.add(geoCircleEdge_);
-    // scene.add(geoCircle1Edge);
-    // scene.add(geoArcEdge);
-    // scene.add(geoEllipseEdge);
+    scene.add(geoLineEdge);
+    scene.add(geoLine1Edge);
+    scene.add(geoLine2Edge);
+    scene.add(geoCircleEdge);
+    scene.add(geoCircleEdge_);
+    scene.add(geoCircle1Edge);
+    scene.add(geoArcEdge);
+    scene.add(geoEllipseEdge);
     scene.add(geoHyperbolaLeftEdge);
     scene.add(geoHyperbolaRightEdge);
-    scene.add(geoHyperbolaLeftDerivatives);
-    scene.add(geoHyperbolaRightDerivatives);
+    // scene.add(geoHyperbolaLeftDerivatives);
+    // scene.add(geoHyperbolaRightDerivatives);
     // scene.add(geoHyperbolaLeftEdgeAb);
     // scene.add(geoHyperbolaRightEdgeAb);
     scene.add(geoParabolaEdge);
-    // scene.add(geoNurbsEdge); //scene.add(geoNurbsTangents);
-    // scene.add(geoNurbsEdge1); //scene.add(geoNurbsTangents1);
+    scene.add(geoNurbsEdge); //scene.add(geoNurbsTangents);
+    scene.add(geoNurbsEdge1); //scene.add(geoNurbsTangents1);
 
     let curves = new Array<Curve2Data>();
-    // curves.push(lineEdge.curve);
-    // curves.push(line1Edge.curve);
-    // curves.push(line2Edge.curve);
-    // curves.push(circleEdge.curve);
-    // curves.push(circleEdge_.curve);
-    // curves.push(circle1Edge.curve);
-    // curves.push(arcEdge.curve);
-    // curves.push(ellipseEdge.curve);
-    // curves.push(hyperbolaLeftEdge.curve);
-    // curves.push(hyperbolaRightEdge.curve);
-    // curves.push(parabolaEdge.curve);
-    // curves.push(nurbsEdge.curve);
-    // curves.push(nurbsEdge1.curve);
+    curves.push(lineEdge.curve);
+    curves.push(line1Edge.curve);
+    curves.push(line2Edge.curve);
+    curves.push(circleEdge.curve);
+    curves.push(circleEdge_.curve);
+    curves.push(circle1Edge.curve);
+    curves.push(arcEdge.curve);
+    curves.push(ellipseEdge.curve);
+    curves.push(hyperbolaLeftEdge.curve);
+    curves.push(hyperbolaRightEdge.curve);
+    curves.push(parabolaEdge.curve);
+    curves.push(nurbsEdge.curve);
+    curves.push(nurbsEdge1.curve);
 
     let edges = new Array<Edge2>();
     // edges.push(lineEdge);
@@ -257,7 +276,6 @@ export class Cube {
 
 
     // 基础材质（可配置颜色、贴图等）
-
     let curveInter = true;
     let edgeInter = false;
     if (curveInter) {
@@ -267,6 +285,9 @@ export class Cube {
         let c0 = curves[i];
         for (let j = i + 1; j < curves.length; j++) {
           let c1 = curves[j];
+          if (c0 === c1) {
+            continue;
+          }
           let beginij = new Date().getTime();
           if (c0 instanceof Line2Data) {
             if (c1 instanceof Line2Data) {
@@ -306,7 +327,7 @@ export class Cube {
             }
           }
           let end = new Date().getTime();
-          console.warn("i j: " + i + " " + j + " 单次耗时：" + (end - beginij) + " ms，共找到交点数量：" + inters.length);
+          // console.warn("i j: " + i + " " + j + " 单次耗时：" + (end - beginij) + " ms，共找到交点数量：" + inters.length);
         }
       }
 
@@ -359,15 +380,7 @@ export class Cube {
     mesh2.name = "cylinder";
     // scene.add(mesh2);
 
-    // 创建一个 WebGPU 渲染器
-    const renderer = new WEBGPU.WebGPURenderer({ antialias: false });
-    renderer.setClearColor(0x000000);
-    renderer.samples = 4;
 
-    // 设置渲染器的大小
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    // 将渲染器的 DOM 元素添加到页面中
-    document.getElementById('gpu').appendChild(renderer.domElement)
 
     // 创建一个 Clock 对象
     const clock = new THREE.Clock();
@@ -389,10 +402,14 @@ export class Cube {
       mesh2.rotation.y += 0.01;
       if (cam.perspective.isActive) {
         cam.perspective.onFrame(delta);
+        select.camera = cam.perspective.camera;
+        Global.camera = select.camera;
         renderer.render(scene, cam.perspective.camera);
       }
       if (cam.orthographic.isActive) {
         cam.orthographic.onFrame(delta);
+        select.camera = cam.orthographic.camera;
+        Global.camera = select.camera;
         renderer.render(scene, cam.orthographic.camera);
       }
     }
@@ -415,11 +432,15 @@ export class Cube {
       }
     });
 
+
     let v2 = new Vector2();
     let line = new Line2Data();
     let plane = new PlaneSurfaceData();
     let lineAlg = CurveBuilder.Algorithm2ByData(line);
     let planeAlg = SurfaceBulder.BuildSurfaceAlgorithmByData(plane);
+
+    let createLine = new CreateLine2Com();
+    createLine.exec();
     // SolveEquation.testQuadraticSolver();
     // SolveEquation.testCubicSolver();
     // SolveEquation.testQuarticSolver();

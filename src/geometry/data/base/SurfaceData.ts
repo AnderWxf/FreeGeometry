@@ -1,3 +1,4 @@
+import { DataBase } from "../DataBase";
 import { Transform3 } from "./Transform3";
 
 /**
@@ -5,7 +6,7 @@ import { Transform3 } from "./Transform3";
  * surface has not border.
  * 
  */
-class SurfaceData {
+class SurfaceData extends DataBase {
     /**
      * The transfrom value of this Curve3Data.
      *
@@ -19,6 +20,7 @@ class SurfaceData {
      * @param {Transform3} [trans] - The base transfrom of surface.
      */
     constructor(trans = new Transform3()) {
+        super();
         this.trans = trans;
     }
 }

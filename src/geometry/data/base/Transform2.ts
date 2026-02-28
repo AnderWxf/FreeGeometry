@@ -1,7 +1,7 @@
 import { Matrix3, Vector2 } from "../../../math/Math";
 
 /**
- * 2D translation transfrom =.
+ * 2D translation transfrom .
  *
  */
 class Transform2 {
@@ -20,6 +20,13 @@ class Transform2 {
     public rot: number;
 
     /**
+     * The scale value of this Transfrom2.
+     *
+     * @type {Vector2}
+     */
+    public scale: Vector2;
+
+    /**
      * The parent transfrom of this Transfrom2.
      *
      * @type {Transform2}
@@ -31,9 +38,10 @@ class Transform2 {
      *
      * @param {Vector2} [position=(0,0)] - The position value of this Transfrom.
      * @param {number} [rotation=0] - The rotation value of this Transfrom.
+     * @param {Vector2} [scale=(1,1)] - The scale value of this Transfrom.
      * @param {Transform2} [parent=null] - The parent transfrom of this Transfrom.
      */
-    constructor(position = new Vector2(), rotation = 0, parent?: Transform2) {
+    constructor(position = new Vector2(), rotation = 0, scale = new Vector2(1, 1), parent?: Transform2) {
         /**
          * The position value of this Transfrom2.
          *
@@ -47,6 +55,13 @@ class Transform2 {
          * @type {number}
          */
         this.rot = rotation;
+
+        /**
+         * The scale value of this Transform2.
+         *
+         * @type {Vector2}
+         */
+        this.scale = scale;
 
         /**
          * The parent transfrom of this Transfrom2.
@@ -64,12 +79,13 @@ class Transform2 {
         let ret = new Matrix3();
         const c = Math.cos(this.rot);
         const s = Math.sin(this.rot);
-        const n = -s;
         const x = this.pos.x;
         const y = this.pos.y;
+        const sx = this.scale.x;
+        const sy = this.scale.y;
         ret.set(
-            c, n, x,
-            s, c, y,
+            c * sx, -s * sy, x,
+            s * sx, c * sy, y,
             0, 0, 1
         );
         return ret;

@@ -1,10 +1,11 @@
 import React from 'react';
 import * as THREE from 'three';
 import ReactDOM from 'react-dom/client';
-import { Select, Space } from 'antd';
+import { Input, Select, Space } from 'antd';
 import { PerspectiveController } from '../helper/camera/PerspectiveController';
 import { OrthographicController } from '../helper/camera/OrthographicController';
 import { Grid } from '../helper/Grid';
+
 const perspective: PerspectiveController = new PerspectiveController();
 const orthographic: OrthographicController = new OrthographicController();
 perspective.bind(window);
@@ -101,7 +102,7 @@ const CamToolBar: React.FC = () => (
     <Space wrap>
         <Select
             defaultValue="前"
-            style={{ width: 50 }}
+            style={{ width: 50, position: 'fixed', top: 10, left: 10, zIndex: 1000 }}
             onChange={(value: string) => {
                 if (CamToolBarOnChange) {
                     CamToolBarOnChange(value);
@@ -119,6 +120,22 @@ const CamToolBar: React.FC = () => (
         />
     </Space>
 );
+let CommandBarOnEnter = (value: string) => {
+
+};
+const CommandBar: React.FC = () => (
+    <Space wrap>
+        <Input placeholder="请输入命令"
+            style={{ position: 'fixed', width: '100%', bottom: 0 }}
+            onPressEnter={(e) => {
+                const value = (e.target as HTMLInputElement).value;
+                if (CommandBarOnEnter) {
+                    CommandBarOnEnter(value);
+                }
+            }}
+        />
+    </Space>
+);
 CamToolBarOnChange('前');
 export default { perspective, orthographic, grid_xz, grid_xy, grid_yz, CamToolBarOnChange };
 
@@ -126,6 +143,7 @@ const root = ReactDOM.createRoot(document.getElementById('ui'));
 root.render(
     <React.StrictMode>
         <CamToolBar />
+        <CommandBar />
     </React.StrictMode>
 );
 

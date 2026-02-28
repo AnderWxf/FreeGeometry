@@ -1,6 +1,7 @@
 import type { Vector2 } from "../../../math/Math";
 import type { Curve2Data } from "../base/Curve2Data";
 import type { Transform2 } from "../base/Transform2";
+import { DataBase } from "../DataBase";
 /**
  * Brep data on xy space;
  * face's border is loop.
@@ -13,21 +14,13 @@ import type { Transform2 } from "../base/Transform2";
  * Vertice2.
  *
  */
-class Vertice2 {
+class Vertice2 extends DataBase {
     /**
      * Constructs a Vertice.
      *
      */
     constructor() {
-    }
-
-    /**
-     * Position of Vertice.
-     *
-     * @type {Vector2}
-     */
-    get pos(): Vector2 {
-        return null;
+        super();
     }
 
     /**
@@ -40,7 +33,7 @@ class Vertice2 {
  * Edge.
  *
  */
-class Edge2 {
+class Edge2 extends DataBase {
     /**
      * v0 of Edge.
      *
@@ -89,6 +82,7 @@ class Edge2 {
      *
      */
     constructor() {
+        super();
     }
 }
 
@@ -96,7 +90,7 @@ class Edge2 {
  * Codge2.
  *
  */
-class Coedge2 {
+class Coedge2 extends DataBase {
     /**
      * Edge of Coedge.
      *
@@ -108,6 +102,7 @@ class Coedge2 {
      *
      */
     constructor() {
+        super();
     }
 }
 
@@ -115,7 +110,7 @@ class Coedge2 {
  * Loop2.
  *
  */
-class Loop2 {
+class Loop2 extends DataBase {
     /**
      * Coedges of Loop.
      */
@@ -126,6 +121,7 @@ class Loop2 {
      *
      */
     constructor() {
+        super();
     }
 }
 
@@ -135,7 +131,7 @@ class Loop2 {
  * Wire relate base geometry by reference.
  * Just Face2 transform is changed to move geometry.
  */
-class Face2 {
+class Face2 extends DataBase {
     /**
      * curves of Face.
      */
@@ -161,6 +157,7 @@ class Face2 {
      *
      */
     constructor() {
+        super();
     }
 }
 

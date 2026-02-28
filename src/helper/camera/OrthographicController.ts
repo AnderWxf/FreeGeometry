@@ -178,6 +178,10 @@ class OrthographicController {
             _camera.updateProjectionMatrix();
         }
     };
+
+    onMouseClick = (event: MouseEvent) => {
+
+    };
     onFrame(time: number) {
         if (!this.isActive) { return; }
         let keyScale = 1.0;
@@ -220,6 +224,7 @@ class OrthographicController {
         window.addEventListener("mousedown", this.onMouseDown);
         window.addEventListener("mouseup", this.onMouseUp);
         window.addEventListener("mousemove", this.onMouseMove);
+        window.addEventListener('click', this.onMouseClick);
     }
     unbind(window: Window) {
         this._isActive = false;
@@ -229,6 +234,7 @@ class OrthographicController {
         window.removeEventListener("mousedown", this.onMouseDown);
         window.removeEventListener("mouseup", this.onMouseUp);
         window.removeEventListener("mousemove", this.onMouseMove);
+        window.removeEventListener("click", this.onMouseClick);
     }
 
 }

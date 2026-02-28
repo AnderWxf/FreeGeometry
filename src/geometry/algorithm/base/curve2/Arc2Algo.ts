@@ -1,4 +1,4 @@
-import { Vector2 } from "../../../../math/Math";
+import { Matrix3, Vector2 } from "../../../../math/Math";
 import * as MATHJS from '../../../../mathjs';
 import { MathUtils } from "../../../../math/MathUtils";
 import { Arc2Data } from "../../../data/base/curve2/Arc2Data";
@@ -118,52 +118,73 @@ class Arc2Algo extends Curve2Algo {
      * @retun {A B C D E F} - General equation coefficients.
      */
     ge(): { A: MATHJS.BigNumber, B: MATHJS.BigNumber, C: MATHJS.BigNumber, D: MATHJS.BigNumber, E: MATHJS.BigNumber, F: MATHJS.BigNumber } {
-        //设椭圆中心在 (x0,y0)，长半轴 a（沿旋转前 X 轴方向），短半轴 b（沿旋转前 Y 轴方向），旋转角为 φ（绕中心逆时针转）。
-        // 曲线系数计算
-        // A = a²sin²φ + b²cos²φ, 
-        // B = -(a² − b²)sin2φ
-        // C = a²cos²φ + b²sin²φ, 
-        // D = −2 A x0 − B y0 
-        // E = −2 C y0 − B x0
-        // F = A x0² + B x0 y0 + C y0² − a²b²     
-        // 曲线的二元二次方程组
-        // Ax² + Bxy + Cy² + Dx + Ey + F = 0
-        let c = this.dat;
-        let a = MATHJS.bignumber(c.radius.x);
-        let b = MATHJS.bignumber(c.radius.y);
-        let φ = MATHJS.bignumber(c.trans.rot);
-        let x0 = MATHJS.bignumber(c.trans.pos.x);
-        let y0 = MATHJS.bignumber(c.trans.pos.y);
-        let aa = MATHJS.multiply(a, a);
-        let bb = MATHJS.multiply(b, b);
-        let sinφ = MATHJS.sin(φ);
-        let cosφ = MATHJS.cos(φ);
-        let sin2φ = MATHJS.sin(MATHJS.multiply(φ, 2) as MATHJS.BigNumber);
+        // //设椭圆中心在 (x0,y0)，长半轴 a（沿旋转前 X 轴方向），短半轴 b（沿旋转前 Y 轴方向），旋转角为 φ（绕中心逆时针转）。
+        // // 曲线系数计算
+        // // A = a²sin²φ + b²cos²φ, 
+        // // B = -(a² − b²)sin2φ
+        // // C = a²cos²φ + b²sin²φ, 
+        // // D = −2 A x0 − B y0 
+        // // E = −2 C y0 − B x0
+        // // F = A x0² + B x0 y0 + C y0² − a²b²     
+        // // 曲线的二元二次方程组
+        // // Ax² + Bxy + Cy² + Dx + Ey + F = 0
+        // let c = this.dat;
+        // let a = MATHJS.bignumber(c.radius.x);
+        // let b = MATHJS.bignumber(c.radius.y);
+        // let φ = MATHJS.bignumber(c.trans.rot);
+        // let x0 = MATHJS.bignumber(c.trans.pos.x);
+        // let y0 = MATHJS.bignumber(c.trans.pos.y);
+        // let aa = MATHJS.multiply(a, a);
+        // let bb = MATHJS.multiply(b, b);
+        // let sinφ = MATHJS.sin(φ);
+        // let cosφ = MATHJS.cos(φ);
+        // let sin2φ = MATHJS.sin(MATHJS.multiply(φ, 2) as MATHJS.BigNumber);
 
-        let A = MATHJS.add(
-            MATHJS.multiply(aa, sinφ, sinφ),
-            MATHJS.multiply(bb, cosφ, cosφ)
-        ) as MATHJS.BigNumber;
-        let B = MATHJS.unaryMinus(MATHJS.multiply(MATHJS.subtract(aa, bb), sin2φ)) as MATHJS.BigNumber;
-        let C = MATHJS.add(
-            MATHJS.multiply(aa, cosφ, cosφ),
-            MATHJS.multiply(bb, sinφ, sinφ)
-        ) as MATHJS.BigNumber;
-        let D = MATHJS.add(
-            MATHJS.unaryMinus(MATHJS.multiply(A, x0, 2)),
-            MATHJS.unaryMinus(MATHJS.multiply(B, y0))
-        ) as MATHJS.BigNumber;
-        let E = MATHJS.add(
-            MATHJS.unaryMinus(MATHJS.multiply(C, y0, 2)),
-            MATHJS.unaryMinus(MATHJS.multiply(B, x0))
-        ) as MATHJS.BigNumber;
-        let F = MATHJS.add(
-            MATHJS.multiply(A, x0, x0),
-            MATHJS.multiply(B, x0, y0),
-            MATHJS.multiply(C, y0, y0),
-            MATHJS.unaryMinus(MATHJS.multiply(aa, bb)),
-        ) as MATHJS.BigNumber;
-        return { A, B, C, D, E, F };
+        // let A = MATHJS.add(
+        //     MATHJS.multiply(aa, sinφ, sinφ),
+        //     MATHJS.multiply(bb, cosφ, cosφ)
+        // ) as MATHJS.BigNumber;
+        // let B = MATHJS.unaryMinus(MATHJS.multiply(MATHJS.subtract(aa, bb), sin2φ)) as MATHJS.BigNumber;
+        // let C = MATHJS.add(
+        //     MATHJS.multiply(aa, cosφ, cosφ),
+        //     MATHJS.multiply(bb, sinφ, sinφ)
+        // ) as MATHJS.BigNumber;
+        // let D = MATHJS.add(
+        //     MATHJS.unaryMinus(MATHJS.multiply(A, x0, 2)),
+        //     MATHJS.unaryMinus(MATHJS.multiply(B, y0))
+        // ) as MATHJS.BigNumber;
+        // let E = MATHJS.add(
+        //     MATHJS.unaryMinus(MATHJS.multiply(C, y0, 2)),
+        //     MATHJS.unaryMinus(MATHJS.multiply(B, x0))
+        // ) as MATHJS.BigNumber;
+        // let F = MATHJS.add(
+        //     MATHJS.multiply(A, x0, x0),
+        //     MATHJS.multiply(B, x0, y0),
+        //     MATHJS.multiply(C, y0, y0),
+        //     MATHJS.unaryMinus(MATHJS.multiply(aa, bb)),
+        // ) as MATHJS.BigNumber;
+        // return { A, B, C, D, E, F };
+
+        // Qnew = T^-T * Qold * T^-1
+        let dat = this.dat;
+        let a = (MATHJS.divide(MATHJS.bignumber(1), MATHJS.multiply(dat.radius.x, dat.radius.x)) as MATHJS.BigNumber).toNumber();
+        let c = (MATHJS.divide(MATHJS.bignumber(1), MATHJS.multiply(dat.radius.y, dat.radius.y)) as MATHJS.BigNumber).toNumber();
+        let t_1 = dat.trans.makeLocalMatrix().invert();
+        let t_t = t_1.clone().transpose();
+        let Qold = new Matrix3().set(
+            a, 0, 0,
+            0, c, 0,
+            0, 0, -1
+        );
+        let Qnew = t_t.multiply(Qold).multiply(t_1);
+        return {
+            A: MATHJS.bignumber(Qnew.elements[0]),
+            B: MATHJS.bignumber(Qnew.elements[1] + Qnew.elements[3]),
+            C: MATHJS.bignumber(Qnew.elements[4]),
+            D: MATHJS.bignumber(Qnew.elements[2] + Qnew.elements[6]),
+            E: MATHJS.bignumber(Qnew.elements[5] + Qnew.elements[7]),
+            F: MATHJS.bignumber(Qnew.elements[8])
+        };
     }
 }
 

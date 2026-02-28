@@ -2,6 +2,7 @@ import type { Vector2, Vector3, Vector4 } from "../../../math/Math";
 import type { Curve3Data } from "../base/Curve3Data";
 import type { SurfaceData } from "../base/SurfaceData";
 import type { Transform3 } from "../base/Transform3";
+import { DataBase } from "../DataBase";
 
 /**
  * Brep data on xyz space;
@@ -16,21 +17,13 @@ import type { Transform3 } from "../base/Transform3";
  * Vertice3.
  *
  */
-class Vertice3 {
+class Vertice3 extends DataBase {
     /**
      * Constructs a Vertice.
      *
      */
     constructor() {
-    }
-
-    /**
-     * Position of Vertice.
-     *
-     * @type {Vector3}
-     */
-    get pos(): Vector3 {
-        return null;
+        super();
     }
 
     /**
@@ -43,7 +36,7 @@ class Vertice3 {
  * Edge.
  *
  */
-class Edge3 {
+class Edge3 extends DataBase {
     /**
      * v0: begin vertice of Edge.
      *
@@ -90,6 +83,7 @@ class Edge3 {
      *
      */
     constructor() {
+        super();
     }
 }
 
@@ -97,7 +91,7 @@ class Edge3 {
  * Codge.
  *
  */
-class Coedge3 {
+class Coedge3 extends DataBase {
     /**
      * Edge of Coedge.
      *
@@ -109,6 +103,7 @@ class Coedge3 {
      *
      */
     constructor() {
+        super();
     }
 }
 
@@ -116,7 +111,7 @@ class Coedge3 {
  * Loop3.
  *
  */
-class Loop3 {
+class Loop3 extends DataBase {
     /**
      * Coedges of Loop.
      */
@@ -127,6 +122,7 @@ class Loop3 {
      *
      */
     constructor() {
+        super();
     }
 }
 
@@ -134,7 +130,7 @@ class Loop3 {
  * Face.
  *
  */
-class Face3 {
+class Face3 extends DataBase {
 
     /**
      * Curve index of Edge.
@@ -176,6 +172,7 @@ class Face3 {
      *
      */
     constructor() {
+        super();
     }
 }
 
@@ -183,7 +180,7 @@ class Face3 {
  * Shell3.
  *
  */
-class Shell3 {
+class Shell3 extends DataBase {
     /**
      * faces of Shell.
      */
@@ -194,6 +191,7 @@ class Shell3 {
      *
      */
     constructor() {
+        super();
     }
 }
 
@@ -201,7 +199,7 @@ class Shell3 {
  * Lump3.
  *
  */
-class Lump3 {
+class Lump3 extends DataBase {
     /**
      * shells of Lump.
      */
@@ -212,6 +210,7 @@ class Lump3 {
      *
      */
     constructor() {
+        super();
     }
 }
 
@@ -221,7 +220,7 @@ class Lump3 {
  * Wire and Face relate base geometry by reference.
  * Just Body3 transform is changed to move geometry.
  */
-class Body3 {
+class Body3 extends DataBase {
 
     /**
      * curves of Body.
@@ -248,6 +247,7 @@ class Body3 {
      *
      */
     constructor() {
+        super();
     }
 }
 

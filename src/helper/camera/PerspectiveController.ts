@@ -180,6 +180,9 @@ class PerspectiveController {
             this.pos.add(off);
         }
     };
+
+
+
     onFrame(time: number) {
         if (!this._isActive) { return; }
         let keyScale = 1.0;

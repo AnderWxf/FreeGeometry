@@ -1,4 +1,4 @@
-import { Matrix2, Vector2 } from "../../../../math/Math";
+import { Matrix2, Matrix3, Vector2 } from "../../../../math/Math";
 import * as MATHJS from '../../../../mathjs';
 import { Hyperbola2Data } from "../../../data/base/curve2/Hyperbola2Data";
 import { CurveBuilder } from "../../builder/CurveBuilder";
@@ -275,7 +275,7 @@ class Hyperbola2Algo extends Curve2Algo {
             let w = MATHJS.divide(
                 MATHJS.subtract(MATHJS.bignumber(1), MATHJS.add(α, β)),
                 MATHJS.multiply(MATHJS.sqrt(MATHJS.multiply(α, β) as MATHJS.BigNumber), 2));
-            w = 1.25;
+            // w = 1.25;
             const ws = [1.0, w, 1.0];
 
             p0.applyMatrix3(m);
@@ -431,52 +431,73 @@ class Hyperbola2Algo extends Curve2Algo {
      * @retun {A B C D E F} - General equation coefficients.
      */
     ge(): { A: MATHJS.BigNumber, B: MATHJS.BigNumber, C: MATHJS.BigNumber, D: MATHJS.BigNumber, E: MATHJS.BigNumber, F: MATHJS.BigNumber } {
-        //设中心在 (x0,y0)，长半轴 a（沿旋转前 X 轴方向），短半轴 b（沿旋转前 Y 轴方向），旋转角为 φ（绕中心逆时针转）。
-        // 曲线系数计算
-        // A = cos²φ/a² - sin²φ/b², 
-        // B = (1/a² + 1/b²)sin2φ
-        // C = sin²φ/a² - cos²φ/b², 
-        // D = −2 A x0 − B y0 
-        // E = −2 C y0 − B x0
-        // F = A x0² + B x0 y0 + C y0² − 1     
-        // 曲线的二元二次方程组
-        // Ax² + Bxy + Cy² + Dx + Ey + F = 0
-        const c = this.dat;
-        const a = MATHJS.bignumber(c.radius.x);
-        const b = MATHJS.bignumber(c.radius.y);
-        const φ = MATHJS.bignumber(c.trans.rot);
-        const x0 = MATHJS.bignumber(c.trans.pos.x);
-        const y0 = MATHJS.bignumber(c.trans.pos.y);
-        const aa = MATHJS.divide(MATHJS.bignumber(1), MATHJS.multiply(a, a));// 1/a²
-        const bb = MATHJS.divide(MATHJS.bignumber(1), MATHJS.multiply(b, b));// 1/b²
-        const sinφ = MATHJS.sin(φ);
-        const cosφ = MATHJS.cos(φ);
-        const sin2φ = MATHJS.sin(MATHJS.multiply(φ, 2) as MATHJS.BigNumber);
+        // //设中心在 (x0,y0)，长半轴 a（沿旋转前 X 轴方向），短半轴 b（沿旋转前 Y 轴方向），旋转角为 φ（绕中心逆时针转）。
+        // // 曲线系数计算
+        // // A = cos²φ/a² - sin²φ/b², 
+        // // B = (1/a² + 1/b²)sin2φ
+        // // C = sin²φ/a² - cos²φ/b², 
+        // // D = −2 A x0 − B y0 
+        // // E = −2 C y0 − B x0
+        // // F = A x0² + B x0 y0 + C y0² − 1     
+        // // 曲线的二元二次方程组
+        // // Ax² + Bxy + Cy² + Dx + Ey + F = 0
+        // const c = this.dat;
+        // const a = MATHJS.bignumber(c.radius.x);
+        // const b = MATHJS.bignumber(c.radius.y);
+        // const φ = MATHJS.bignumber(c.trans.rot);
+        // const x0 = MATHJS.bignumber(c.trans.pos.x);
+        // const y0 = MATHJS.bignumber(c.trans.pos.y);
+        // const aa = MATHJS.divide(MATHJS.bignumber(1), MATHJS.multiply(a, a));// 1/a²
+        // const bb = MATHJS.divide(MATHJS.bignumber(1), MATHJS.multiply(b, b));// 1/b²
+        // const sinφ = MATHJS.sin(φ);
+        // const cosφ = MATHJS.cos(φ);
+        // const sin2φ = MATHJS.sin(MATHJS.multiply(φ, 2) as MATHJS.BigNumber);
 
-        const A = MATHJS.subtract(
-            MATHJS.multiply(cosφ, cosφ, aa),
-            MATHJS.multiply(sinφ, sinφ, bb)
-        ) as MATHJS.BigNumber;
-        const B = MATHJS.multiply(MATHJS.add(aa, bb), sin2φ) as MATHJS.BigNumber;
-        const C = MATHJS.subtract(
-            MATHJS.multiply(aa, sinφ, sinφ),
-            MATHJS.multiply(bb, cosφ, cosφ)
-        ) as MATHJS.BigNumber;
-        const D = MATHJS.add(
-            MATHJS.unaryMinus(MATHJS.multiply(A, x0, 2)),
-            MATHJS.unaryMinus(MATHJS.multiply(B, y0))
-        ) as MATHJS.BigNumber;
-        const E = MATHJS.add(
-            MATHJS.unaryMinus(MATHJS.multiply(C, y0, 2)),
-            MATHJS.unaryMinus(MATHJS.multiply(B, x0))
-        ) as MATHJS.BigNumber;
-        const F = MATHJS.add(
-            MATHJS.multiply(A, x0, x0),
-            MATHJS.multiply(B, x0, y0),
-            MATHJS.multiply(C, y0, y0),
-            MATHJS.bignumber(-1),
-        ) as MATHJS.BigNumber;
-        return { A, B, C, D, E, F };
+        // const A = MATHJS.subtract(
+        //     MATHJS.multiply(cosφ, cosφ, aa),
+        //     MATHJS.multiply(sinφ, sinφ, bb)
+        // ) as MATHJS.BigNumber;
+        // const B = MATHJS.multiply(MATHJS.add(aa, bb), sin2φ) as MATHJS.BigNumber;
+        // const C = MATHJS.subtract(
+        //     MATHJS.multiply(aa, sinφ, sinφ),
+        //     MATHJS.multiply(bb, cosφ, cosφ)
+        // ) as MATHJS.BigNumber;
+        // const D = MATHJS.add(
+        //     MATHJS.unaryMinus(MATHJS.multiply(A, x0, 2)),
+        //     MATHJS.unaryMinus(MATHJS.multiply(B, y0))
+        // ) as MATHJS.BigNumber;
+        // const E = MATHJS.add(
+        //     MATHJS.unaryMinus(MATHJS.multiply(C, y0, 2)),
+        //     MATHJS.unaryMinus(MATHJS.multiply(B, x0))
+        // ) as MATHJS.BigNumber;
+        // const F = MATHJS.add(
+        //     MATHJS.multiply(A, x0, x0),
+        //     MATHJS.multiply(B, x0, y0),
+        //     MATHJS.multiply(C, y0, y0),
+        //     MATHJS.bignumber(-1),
+        // ) as MATHJS.BigNumber;
+        // return { A, B, C, D, E, F };
+
+        // Qnew = T^-T * Qold * T^-1
+        let dat = this.dat;
+        let t_1 = dat.trans.makeLocalMatrix().invert();
+        let t_t = t_1.clone().transpose();
+        let a = (MATHJS.divide(MATHJS.bignumber(1), MATHJS.multiply(dat.radius.x, dat.radius.x)) as MATHJS.BigNumber).toNumber();
+        let c = -(MATHJS.divide(MATHJS.bignumber(1), MATHJS.multiply(dat.radius.y, dat.radius.y)) as MATHJS.BigNumber).toNumber();
+        let Qold = new Matrix3().set(
+            a, 0, 0,
+            0, c, 0,
+            0, 0, -1
+        )
+        let Qnew = t_t.multiply(Qold).multiply(t_1);
+        return {
+            A: MATHJS.bignumber(Qnew.elements[0]),
+            B: MATHJS.bignumber(Qnew.elements[1] + Qnew.elements[3]),
+            C: MATHJS.bignumber(Qnew.elements[4]),
+            D: MATHJS.bignumber(Qnew.elements[2] + Qnew.elements[6]),
+            E: MATHJS.bignumber(Qnew.elements[5] + Qnew.elements[7]),
+            F: MATHJS.bignumber(Qnew.elements[8])
+        };
     }
 }
 
