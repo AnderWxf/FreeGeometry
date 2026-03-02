@@ -7,6 +7,7 @@ import { ActPickPoint2 } from "../acts/ActPickPoint2";
 import { Brep2Builder } from "../../../geometry/algorithm/builder/Brep2Builder";
 import { Vector2 } from "../../../math/Math";
 import { BrepMeshBuilder } from "../../MeshBuilder";
+import type { CommandExecuter } from "../CommandExecuter";
 
 /**
  * Create command class.
@@ -17,22 +18,29 @@ class CreateLine2Com extends ComCreate {
     beginPoint: Vector2;
     endPoint: Vector2;
     tempLine: THREE.Object3D;
-    constructor() {
-        super();
+    constructor(executer: CommandExecuter, text: string) {
+        super(executer, text);
     }
     async exec(): Promise<void> {
-        this.bind(window);
-        let context: ActionContext3D = new ActionContext3D(Global.scene, Global.camera, Global.renderer, Global.select);
-        let act_pick_begin = new ActPickPoint2();
+        let str = this._text;
+        let paras = str.split(' ');
+        if (paras.length == 5) {
+            // 创建一个直线段
+            this.beginPoint = new Vector2(new Number(paras[1]).valueOf(), new Number(paras[2]).valueOf());
+            this.endPoint = new Vector2(new Number(paras[3]).valueOf(), new Number(paras[4]).valueOf());
+        } else {
+            this.bind(window);
+            let context: ActionContext3D = new ActionContext3D(Global.scene, Global.camera, Global.renderer, Global.select);
+            let act_pick_begin = new ActPickPoint2();
 
-        await act_pick_begin.execute(context);
-        if (this._isCancel) { this.cancel(); return; }
-        this.beginPoint = new Vector2(act_pick_begin.result.x, act_pick_begin.result.y);
-        let act_pick_end = new ActPickPoint2();
-        await act_pick_end.execute(context);
-        if (this._isCancel) { this.cancel(); return; }
-        this.endPoint = new Vector2(act_pick_end.result.x, act_pick_end.result.y);
-
+            await act_pick_begin.execute(context);
+            if (this._isCancel) { this.cancel(); return; }
+            this.beginPoint = new Vector2(act_pick_begin.result.x, act_pick_begin.result.y);
+            let act_pick_end = new ActPickPoint2();
+            await act_pick_end.execute(context);
+            if (this._isCancel) { this.cancel(); return; }
+            this.endPoint = new Vector2(act_pick_end.result.x, act_pick_end.result.y);
+        }
         // 创建一个直线段
         let lineEdge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(this.beginPoint, this.endPoint);
         let geoLineEdge = BrepMeshBuilder.BuildEdge2Mesh(lineEdge, THREE.Color.NAMES.red);

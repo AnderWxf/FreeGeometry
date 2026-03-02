@@ -11,7 +11,7 @@ class Select {
     private _raycaster: THREE.Raycaster;
 
     private _isMultiple: boolean = false;
-    private _isSnap: boolean = true;
+    private _isSnap: boolean = false;
 
     selectedObjects: THREE.Object3D[] = [];
     overObjects: THREE.Object3D[] = [];
@@ -42,10 +42,24 @@ class Select {
 
     set camera(camera: THREE.Camera) {
         this._camera = camera;
-
         this.bind(window);
     }
+
     clear() {
+        for (let i = 0; i < this.selectedObjects.length; i++) {
+            let obj = this.selectedObjects[i] as THREE.Object3D;
+            let originalColor = obj.userData.originalColor as THREE.Color;
+            if (originalColor) {
+                (obj as any).material.color.copy(originalColor);
+            }
+        }
+        for (let i = 0; i < this.overObjects.length; i++) {
+            let obj = this.overObjects[i] as THREE.Object3D;
+            let originalColor = obj.userData.originalColor as THREE.Color;
+            if (originalColor) {
+                (obj as any).material.color.copy(originalColor);
+            }
+        }
         this.selectedObjects = [];
         this.overObjects = [];
         this.pickedPoint = null;

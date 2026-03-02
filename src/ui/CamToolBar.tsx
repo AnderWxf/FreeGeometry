@@ -1,14 +1,16 @@
 import React from 'react';
 import * as THREE from 'three';
 import ReactDOM from 'react-dom/client';
-import { Input, Select, Space } from 'antd';
+import { Input, Select, Space, Checkbox } from 'antd';
 import { PerspectiveController } from '../helper/camera/PerspectiveController';
 import { OrthographicController } from '../helper/camera/OrthographicController';
 import { Grid } from '../helper/Grid';
+import { CommandExecuter } from '../helper/command/CommandExecuter';
+import { Global } from '../core/Global';
+
 
 const perspective: PerspectiveController = new PerspectiveController();
 const orthographic: OrthographicController = new OrthographicController();
-perspective.bind(window);
 
 const grid_xz = new THREE.LineSegments(new Grid(100, 5, 1, "xz"));
 grid_xz.name = "Grid_xz";
@@ -120,8 +122,25 @@ const CamToolBar: React.FC = () => (
         />
     </Space>
 );
-let CommandBarOnEnter = (value: string) => {
 
+
+const ComOptionBar: React.FC = () => (
+    <Space wrap>
+        <Checkbox
+            style={{ width: 100, position: 'fixed', top: 10, left: 75, zIndex: 1000, color: '#00A000' }}
+            onChange={(e) => {
+                Global.select.isSnap = e.target.checked;
+            }}
+        >捕捉</Checkbox>
+    </Space>
+);
+
+let executer = new CommandExecuter();
+executer.bind(window);
+let inputs = new Array<string>();
+let pos = 0;
+let CommandBarOnEnter = (value: string) => {
+    executer.execute(value);
 };
 const CommandBar: React.FC = () => (
     <Space wrap>
@@ -129,21 +148,63 @@ const CommandBar: React.FC = () => (
             style={{ position: 'fixed', width: '100%', bottom: 0 }}
             onPressEnter={(e) => {
                 const value = (e.target as HTMLInputElement).value;
+                inputs.push(value);
+                pos = inputs.length - 1;
+                (e.target as HTMLInputElement).value = '';
+                (e.target as HTMLInputElement).defaultValue = '';
                 if (CommandBarOnEnter) {
                     CommandBarOnEnter(value);
                 }
             }}
+            onFocus={(e) => {
+                (e.target as HTMLInputElement).value = '';
+                e.stopPropagation();
+            }}
+            onKeyUp={(e) => {
+                e.stopPropagation();
+            }}
+            onKeyDown={(e) => {
+                switch (e.key) {
+                    case 'ArrowUp':
+                        if (pos > 0) {
+                            pos--;
+                            (e.target as HTMLInputElement).value = inputs[pos];
+                        }
+                        break;
+                    case 'ArrowDown':
+                        if (pos < inputs.length - 1) {
+                            pos++;
+                            (e.target as HTMLInputElement).value = inputs[pos];
+                        }
+                        break;
+                };
+                e.stopPropagation();
+            }}
         />
     </Space>
 );
-CamToolBarOnChange('前');
+
+// const gpu: HTMLElement = document.getElementById('gpu');
+// let onFocus = () => {
+//     perspective.setActive(false);
+//     orthographic.setActive(false);
+// };
+// let onFocusCapture = () => {
+//     perspective.setActive(true);
+//     orthographic.setActive(true);
+// }
+
+// gpu.addEventListener("focus", onFocus);
+// gpu.addEventListener("unfocus", onFocus);
 export default { perspective, orthographic, grid_xz, grid_xy, grid_yz, CamToolBarOnChange };
 
 const root = ReactDOM.createRoot(document.getElementById('ui'));
 root.render(
     <React.StrictMode>
         <CamToolBar />
+        <ComOptionBar />
         <CommandBar />
     </React.StrictMode>
 );
+
 

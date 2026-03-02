@@ -13,4 +13,6 @@ export class Global {
     static scene: THREE.Scene;
     static renderer: WEBGPU.WebGPURenderer;
     static camera: THREE.Camera;
+    static gpu: HTMLElement;
+    static canvas: HTMLCanvasElement;
 }

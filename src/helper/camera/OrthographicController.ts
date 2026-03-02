@@ -68,6 +68,9 @@ class OrthographicController {
     get isActive(): boolean {
         return this._isActive;
     }
+    setActive(value: boolean): void {
+        this._isActive = value;
+    }
     onKeyDown = (event: KeyboardEvent) => {
         switch (event.code) {
             case "KeyW":

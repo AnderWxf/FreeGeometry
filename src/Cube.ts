@@ -34,21 +34,34 @@ export class Cube {
   public constructor() {
     // 创建一个场景
     const scene = new THREE.Scene();
+    Global.scene = scene;
+
+    const cam = CamToolBar;
+
+    const gpu: HTMLElement = document.getElementById('gpu');
+    Global.gpu = gpu;
+
     // 创建一个 WebGPU 渲染器
     const renderer = new WEBGPU.WebGPURenderer({ antialias: false });
+    Global.renderer = renderer;
+    Global.canvas = renderer.domElement;
+
     renderer.setClearColor(0x000000);
     renderer.samples = 4;
 
     // 设置渲染器的大小
     renderer.setSize(window.innerWidth, window.innerHeight);
     // 将渲染器的 DOM 元素添加到页面中
-    document.getElementById('gpu').appendChild(renderer.domElement)
+    gpu.appendChild(renderer.domElement)
 
-    Global.scene = scene;
-    Global.renderer = renderer;
+
+    cam.CamToolBarOnChange('前');
+
+    const select = new Select(scene);
+    Global.select = select;
+
 
     // 创建一个基础材质
-
     let drawInters = (inters: Array<InterOfCurve2>) => {
       const geometry = new THREE.SphereGeometry(0.1);
       for (let i = 0; i < inters.length; i++) {
@@ -84,9 +97,7 @@ export class Cube {
 
     //通过scene.add(元素)添加元素
 
-    const cam = CamToolBar;
-    const select = new Select(scene);
-    Global.select = select;
+
     // 创建XZ平面的网格提
     scene.add(cam.grid_xz);
     scene.add(cam.grid_xy);
@@ -439,8 +450,8 @@ export class Cube {
     let lineAlg = CurveBuilder.Algorithm2ByData(line);
     let planeAlg = SurfaceBulder.BuildSurfaceAlgorithmByData(plane);
 
-    let createLine = new CreateLine2Com();
-    createLine.exec();
+    // let createLine = new CreateLine2Com();
+    // createLine.exec();
     // SolveEquation.testQuadraticSolver();
     // SolveEquation.testCubicSolver();
     // SolveEquation.testQuarticSolver();
