@@ -87,6 +87,11 @@ class Select {
                 if (originalColor) {
                     (obj as any).material.color.copy(originalColor);
                 }
+                obj.children.forEach(element => {
+                    if (element.userData.canPick) {
+                        element.visible = false;
+                    }
+                });
             }
             this.selectedObjects = [];
         }
@@ -131,6 +136,11 @@ class Select {
                             }
                         }
                         this.selectedObjects.push(obj);
+                        obj.children.forEach(element => {
+                            if (element.userData.canPick) {
+                                element.visible = true;
+                            }
+                        });
                     }
                     return;
                 }
@@ -151,6 +161,11 @@ class Select {
             if (originalColor) {
                 (obj as any).material.color.copy(originalColor);
             }
+            obj.children.forEach(element => {
+                if (element.userData.canPick) {
+                    element.visible = false;
+                }
+            });
         }
         this.overObjects = [];
         // 创建射线投射器
@@ -178,6 +193,11 @@ class Select {
                             (obj as any).material.color.set(THREE.Color.NAMES.aqua);
                         }
                         this.overObjects.push(obj);
+                        obj.children.forEach(element => {
+                            if (element.userData.canPick) {
+                                element.visible = true;
+                            }
+                        });
                     }
                 }
             }

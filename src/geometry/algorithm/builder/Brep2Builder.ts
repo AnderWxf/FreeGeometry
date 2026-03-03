@@ -52,14 +52,14 @@ class Brep2Builder {
         let ret = new Edge2();
         let curve = CurveBuilder.BuildCircle2FromCenterBeginEndPoint(c, b);
         let algor = CurveBuilder.Algorithm2ByData(curve);
-        ret.u = new Vector2(algor.u(b), algor.u(e));
+        ret.u = new Vector2(0, algor.u(e));
         ret.curve = curve;
         return ret;
     }
 
     /**
      * build circle edge2 from bengin middle end point.
-     * bengin middle end point on citcle.
+     * bengin middle end point on circle.
      * 
      * D = 2 * (x1 * (y2 - y3) + x2 * (y3 - y1) + x3 * (y1 - y2));
      * Ux = [(x1^2 + y1^2)(y2-y3) + (x2^2 + y2^2)(y3-y1) + (x3^2 + y3^2)(y1-y2)]/D
@@ -73,6 +73,28 @@ class Brep2Builder {
         let ret = new Edge2();
         let curve = CurveBuilder.BuildCircle2FromBeginMiddleEndPoint(b, m, e);
         ret.u = new Vector2(0, Math.PI * 2);
+        ret.curve = curve;
+        return ret;
+    }
+
+
+    /**
+     * build arc edge2 from bengin middle end point.
+     * bengin middle end point on circle.
+     * 
+     * D = 2 * (x1 * (y2 - y3) + x2 * (y3 - y1) + x3 * (y1 - y2));
+     * Ux = [(x1^2 + y1^2)(y2-y3) + (x2^2 + y2^2)(y3-y1) + (x3^2 + y3^2)(y1-y2)]/D
+     * Uy = [(x1^2 + y1^2)(x3-x2) + (x2^2 + y2^2)(x1-x3) + (x3^2 + y3^2)(x2-x1)]/D
+     * 
+     * @param {Vector2} [b] - The bengin point.
+     * @param {Vector2} [m] - The middle point.
+     * @param {Vector2} [e] - The end point.
+     */
+    static BuildArcFromBeginMiddleEndPoint(b: Vector2, m: Vector2, e: Vector2): Edge2 {
+        let ret = new Edge2();
+        let curve = CurveBuilder.BuildCircle2FromBeginMiddleEndPoint(b, m, e);
+        let algor = CurveBuilder.Algorithm2ByData(curve);
+        ret.u = new Vector2(algor.u(b), algor.u(e));
         ret.curve = curve;
         return ret;
     }

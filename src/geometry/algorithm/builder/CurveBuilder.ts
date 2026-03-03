@@ -82,6 +82,7 @@ class CurveBuilder {
         let ret = new Arc2Data();
         let r = c.distanceTo(b);
         ret.trans.pos = c;
+        ret.trans.rot = Math.atan2(b.y - c.y, b.x - c.x);
         ret.radius.set(r, r);
         return ret;
     }
@@ -109,9 +110,13 @@ class CurveBuilder {
         let sqrt3 = e.lengthSq();
         let Ux = (sqrt1 * (y2 - y3) + sqrt2 * (y3 - y2) + sqrt3 * (y1 - y2)) / D;
         let Uy = (sqrt1 * (x3 - x2) + sqrt2 * (x1 - x3) + sqrt3 * (x2 - x1)) / D;
-        let center = new Vector2(Ux, Uy);
-        let r = center.distanceTo(b);
-        return new Arc2Data(new Transform2(center), new Vector2(r, r));
+        let c = new Vector2(Ux, Uy);
+        let r = c.distanceTo(b);
+        let ret = new Arc2Data();
+        ret.trans.pos = c;
+        ret.trans.rot = Math.atan2(b.y - c.y, b.x - c.x);
+        ret.radius.set(r, r);
+        return ret;
     }
 
     /**

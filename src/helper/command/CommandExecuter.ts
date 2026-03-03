@@ -2,6 +2,10 @@ import { Command } from "./Command";
 import { Stack } from "../../core/Stack";
 import { CreateLine2Com } from "./coms/CreateLine2Com";
 import { DeleteObjectsCom } from "./coms/DeleteObjectsCom";
+import { CreateCircle2Com } from "./coms/CreateCircle2Com";
+import { CreateArc2Com } from "./coms/CreateArc2Com";
+import { CreateArc2ThreePointCom } from "./coms/CreateArc2ThreePointCom";
+import { CreateCircle2ThreePointCom } from "./coms/CreateCircle2ThreePointCom";
 
 /**
  * Command executer base class.
@@ -56,12 +60,27 @@ class CommandExecuter {
         let s = comstr.split(' ');
         if (s.length) {
             let command = s[0];
+            command = command.toUpperCase();
             let com: Command;
             switch (command) {
                 // REC：矩形
                 // A：绘圆弧
+                case 'A':
+                    com = new CreateArc2Com(this, comstr);
+                    break;
+                // A3：三点绘圆弧
+                case 'A3':
+                    com = new CreateArc2ThreePointCom(this, comstr);
+                    break;
                 // B：定义块
                 // C：画圆
+                case 'C':
+                    com = new CreateCircle2Com(this, comstr);
+                    break;
+                // C3：三点画圆
+                case 'C3':
+                    com = new CreateCircle2ThreePointCom(this, comstr);
+                    break;
                 // D：尺寸资源管理器
                 // E：删除
                 case 'E':
@@ -77,7 +96,6 @@ class CommandExecuter {
                 // W：定义块并保存到硬盘中
                 // L：直线
                 case 'L':
-                case 'l':
                     com = new CreateLine2Com(this, comstr);
                     break;
                 // PL：画多段线。先PL在根据下面的提示W设置线宽再A就可以画线型较粗的圆了

@@ -39,17 +39,27 @@ class Arc2Algo extends Curve2Algo {
     u(point: Vector2): number {
         let v = point.clone();
         v.applyMatrix3(this.dat.trans.makeWorldMatrix().invert());
-        const x = MATHJS.bignumber(v.x);
-        const y = MATHJS.bignumber(v.y);
-        let a = MathUtils.clamp((MATHJS.divide(x, MATHJS.bignumber(this.dat.radius.x)) as MATHJS.BigNumber).toNumber(), -1, 1);
-        let b = MathUtils.clamp((MATHJS.divide(y, MATHJS.bignumber(this.dat.radius.y)) as MATHJS.BigNumber).toNumber(), -1, 1);
-        a = Math.acos(a);
-        b = Math.asin(b);
-        if (b >= 0) {
-            return a;
-        } else {
-            return Math.PI * 2 - a;
+        // const x = MATHJS.bignumber(v.x);
+        // const y = MATHJS.bignumber(v.y);
+        // let a = MathUtils.clamp((MATHJS.divide(x, MATHJS.bignumber(this.dat.radius.x)) as MATHJS.BigNumber).toNumber(), -1, 1);
+        // let b = MathUtils.clamp((MATHJS.divide(y, MATHJS.bignumber(this.dat.radius.y)) as MATHJS.BigNumber).toNumber(), -1, 1);
+
+        let x = MathUtils.clamp(v.x / this.dat.radius.x, -1, 1);
+        let y = MathUtils.clamp(v.y / this.dat.radius.y, -1, 1);
+
+        let r = Math.atan2(y, x);
+        if (r < 0) {
+            r += Math.PI * 2
         }
+        return r;
+
+        // a = Math.acos(a);
+        // b = Math.asin(b);
+        // if (b >= 0) {
+        //     return a;
+        // } else {
+        //     return Math.PI * 2 - a;
+        // }
     }
 
     /**
