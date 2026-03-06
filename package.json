@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@ant-design/icons": "^6.1.0",
     "antd": "^5.27.6",
     "es-module-loader": "^2.3.0",
     "es6-module-loader": "^0.17.11",
@@ -8,8 +9,9 @@
     "react-dom": "^19.2.0",
     "requirejs": "^2.3.8",
     "svd-js": "^1.1.1",
-    "verb-nurbs": "^3.0.3",
-    "three": "^0.180.0"
+    "three": "^0.180.0",
+    "uuid": "^13.0.0",
+    "verb-nurbs": "^3.0.3"
   },
   "devDependencies": {
     "@types/dat.gui": "^0.7.13",

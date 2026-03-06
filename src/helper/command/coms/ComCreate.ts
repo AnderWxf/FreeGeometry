@@ -1,4 +1,5 @@
 import { Global } from "../../../core/Global";
+import type { DataBase } from "../../../geometry/data/DataBase";
 import type { Vector2 } from "../../../math/Math";
 import { Command } from "../Command";
 import type { CommandExecuter } from "../CommandExecuter";
@@ -9,9 +10,12 @@ import * as THREE from "three";
  * 
  */
 class ComCreate extends Command {
+    protected data: DataBase;
     protected result: THREE.Object3D;
+    protected tempResult: THREE.Object3D;
+
     protected assists: THREE.Object3D[];
-    protected temp: THREE.Object3D;
+
     constructor(executer: CommandExecuter, text: string) {
         super(executer, text);
         this.assists = [];
@@ -19,29 +23,25 @@ class ComCreate extends Command {
     onMouseMove = (event: MouseEvent) => {
     };
 
-    protected createPoint(p: Vector2): THREE.Mesh {
-        const geometry = new THREE.SphereGeometry(0.1);
-        const material = new THREE.MeshBasicMaterial({ color: 0x0088ff });
-        const mesh = new THREE.Mesh(geometry, material);
-        mesh.position.x = p.x;
-        mesh.position.y = p.y;
-        mesh.name = "point";
-        mesh.userData.canPick = true;
-        mesh.userData.original = p;
-        return mesh;
-    }
     protected cancel() {
         this.unbind(window);
-        if (this.temp) {
-            Global.scene.remove(this.temp);
+        if (this.tempResult) {
+            Global.scene.remove(this.tempResult);
         }
     }
     override done() {
         super.done();
         this.unbind(window);
-        if (this.temp) {
-            Global.scene.remove(this.temp);
+        if (this.tempResult) {
+            Global.scene.remove(this.tempResult);
         }
+        this.assists.forEach(element => {
+            if (Global.scene.children.includes(element)) {
+                Global.scene.remove(element);
+            }
+            this.result.children.push(element);
+            element.visible = Global.isShowAssists;
+        });
     }
     override bind(window: Window) {
         super.bind(window);

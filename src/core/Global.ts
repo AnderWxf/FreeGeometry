@@ -15,4 +15,7 @@ export class Global {
     static camera: THREE.Camera;
     static gpu: HTMLElement;
     static canvas: HTMLCanvasElement;
+
+
+    static isShowAssists: boolean = true;
 }

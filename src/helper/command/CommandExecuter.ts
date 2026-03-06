@@ -6,6 +6,7 @@ import { CreateCircle2Com } from "./coms/CreateCircle2Com";
 import { CreateArc2Com } from "./coms/CreateArc2Com";
 import { CreateArc2ThreePointCom } from "./coms/CreateArc2ThreePointCom";
 import { CreateCircle2ThreePointCom } from "./coms/CreateCircle2ThreePointCom";
+import { ModifyLine2Com } from "./coms/ModifyLine2Com";
 
 /**
  * Command executer base class.
@@ -23,6 +24,10 @@ class CommandExecuter {
 
     onKeyDown = (event: KeyboardEvent) => {
         switch (event.code) {
+            case "Enter":
+                const comline: HTMLElement = document.getElementById('CommandLine');
+                comline.focus();
+                break;
             case "Delete":
                 this.execute('E');
                 break;
@@ -97,6 +102,10 @@ class CommandExecuter {
                 // L：直线
                 case 'L':
                     com = new CreateLine2Com(this, comstr);
+                    break;
+                // L：直线
+                case 'ML':
+                    com = new ModifyLine2Com(this, comstr);
                     break;
                 // PL：画多段线。先PL在根据下面的提示W设置线宽再A就可以画线型较粗的圆了
                 // M：移动

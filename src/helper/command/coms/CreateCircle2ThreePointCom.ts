@@ -49,7 +49,7 @@ class CreateCircle2ThreePointCom extends ComCreate {
             this._text = 'C3' + ' ' + this.beginPoint.x + ' ' + this.beginPoint.y + ' ' + this.endPoint.x + ' ' + this.endPoint.y;
         }
         // 创建一个曲线段
-        let edge = Brep2Builder.BuildCircleFromBeginMiddleEndPoint(this.beginPoint, this.middlePoint, this.endPoint);
+        let edge = this.data = Brep2Builder.BuildCircleFromBeginMiddleEndPoint(this.beginPoint, this.middlePoint, this.endPoint);
         let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
         geo.name = "Arc2";
         geo.frustumCulled = false;
@@ -60,8 +60,8 @@ class CreateCircle2ThreePointCom extends ComCreate {
     onMouseMove = (event: MouseEvent) => {
         if (this._isCancel) { this.cancel(); return; }
         if (this.beginPoint && !this.middlePoint) {
-            if (this.temp) {
-                Global.scene.remove(this.temp);
+            if (this.tempResult) {
+                Global.scene.remove(this.tempResult);
             }
             let middlePoint: Vector2 = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
             // 创建一个临时曲线段
@@ -69,12 +69,12 @@ class CreateCircle2ThreePointCom extends ComCreate {
             let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray);
             t.name = "temp";
             t.frustumCulled = false;
-            this.temp = t;
-            Global.scene.add(this.temp);
+            this.tempResult = t;
+            Global.scene.add(this.tempResult);
         }
         if (this.beginPoint && this.middlePoint && !this.endPoint) {
-            if (this.temp) {
-                Global.scene.remove(this.temp);
+            if (this.tempResult) {
+                Global.scene.remove(this.tempResult);
             }
             let endPoint: Vector2 = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
             // 创建一个临时曲线段
@@ -82,8 +82,8 @@ class CreateCircle2ThreePointCom extends ComCreate {
             let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray);
             t.name = "temp";
             t.frustumCulled = false;
-            this.temp = t;
-            Global.scene.add(this.temp);
+            this.tempResult = t;
+            Global.scene.add(this.tempResult);
         }
     };
 }

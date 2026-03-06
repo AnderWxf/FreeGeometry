@@ -132,6 +132,12 @@ const ComOptionBar: React.FC = () => (
                 Global.select.isSnap = e.target.checked;
             }}
         >捕捉</Checkbox>
+        {/* <Checkbox
+            style={{ width: 100, position: 'fixed', top: 10, left: 75, zIndex: 1000, color: '#00A000' }}
+            onChange={(e) => {
+                Global.isShowAssists = e.target.checked;
+            }}
+        >控制</Checkbox> */}
     </Space>
 );
 
@@ -144,7 +150,7 @@ let CommandBarOnEnter = (value: string) => {
 };
 const CommandBar: React.FC = () => (
     <Space wrap>
-        <Input placeholder="请输入命令"
+        <Input id='CommandLine' placeholder="请输入命令"
             style={{ position: 'fixed', width: '100%', bottom: 0 }}
             onPressEnter={(e) => {
                 const value = (e.target as HTMLInputElement).value;
@@ -152,6 +158,7 @@ const CommandBar: React.FC = () => (
                 pos = inputs.length - 1;
                 (e.target as HTMLInputElement).value = '';
                 (e.target as HTMLInputElement).defaultValue = '';
+                e.stopPropagation();
                 if (CommandBarOnEnter) {
                     CommandBarOnEnter(value);
                 }

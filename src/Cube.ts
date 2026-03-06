@@ -27,6 +27,7 @@ import { Nurbs2Algo } from './geometry/algorithm/base/curve2/Nurbs2Algo';
 import { Select } from './helper/Select';
 import { Global } from './core/Global';
 import { CreateLine2Com } from './helper/command/coms/CreateLine2Com';
+// import App from './ui/PropsTrans';
 
 // import CommandBar from './ui/CommandBar';
 
@@ -36,6 +37,9 @@ export class Cube {
     const scene = new THREE.Scene();
     Global.scene = scene;
 
+    // const app = App();
+    // const ui: HTMLElement = document.getElementById('ui');
+    // ui.append(app.props);
     const cam = CamToolBar;
 
     const gpu: HTMLElement = document.getElementById('gpu');
@@ -52,8 +56,7 @@ export class Cube {
     // 设置渲染器的大小
     renderer.setSize(window.innerWidth, window.innerHeight);
     // 将渲染器的 DOM 元素添加到页面中
-    gpu.appendChild(renderer.domElement)
-
+    gpu.appendChild(renderer.domElement);
 
     cam.CamToolBarOnChange('前');
 
@@ -439,7 +442,6 @@ export class Cube {
         cam.orthographic.camera.bottom = cam.orthographic.camera.left * window.innerHeight / window.innerWidth; // 宽高比
       }
     });
-
 
     let v2 = new Vector2();
     let line = new Line2Data();

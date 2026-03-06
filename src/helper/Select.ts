@@ -10,13 +10,15 @@ class Select {
     private _scene: THREE.Scene;
     private _raycaster: THREE.Raycaster;
 
-    private _isMultiple: boolean = false;
-    private _isSnap: boolean = false;
+    private _isEditor: boolean = false;     // 编辑
+    private _isMultiple: boolean = false;   // 多选
+    private _isSnap: boolean = false;       // 捕捉
 
-    selectedObjects: THREE.Object3D[] = [];
-    overObjects: THREE.Object3D[] = [];
-    pickedPoint: THREE.Vector3;
-    overedPoint: THREE.Vector3;
+    selectedAssist: THREE.Object3D;         // 拾取辅助物体
+    selectedObjects: THREE.Object3D[] = []; // 拾取结果
+    overObjects: THREE.Object3D[] = [];     // 滑过结果
+    pickedPoint: THREE.Vector3;             // 拾取的坐标
+    overedPoint: THREE.Vector3;             // 滑过的坐标
     constructor(scene: THREE.Scene) {
         this._scene = scene;
         this._raycaster = new THREE.Raycaster();
@@ -40,6 +42,13 @@ class Select {
         this._isSnap = value;
     }
 
+    get isEditor(): boolean {
+        return this._isEditor;
+    }
+    set isEditor(value: boolean) {
+        this._isEditor = value;
+    }
+
     set camera(camera: THREE.Camera) {
         this._camera = camera;
         this.bind(window);
@@ -60,9 +69,11 @@ class Select {
                 (obj as any).material.color.copy(originalColor);
             }
         }
+        this.selectedAssist = null;
         this.selectedObjects = [];
         this.overObjects = [];
         this.pickedPoint = null;
+        this.overedPoint = null;
     }
 
     onKeyDown = (event: KeyboardEvent) => {
@@ -87,11 +98,11 @@ class Select {
                 if (originalColor) {
                     (obj as any).material.color.copy(originalColor);
                 }
-                obj.children.forEach(element => {
-                    if (element.userData.canPick) {
-                        element.visible = false;
-                    }
-                });
+                // obj.children.forEach(element => {
+                //     if (element.userData.canPick) {
+                //         element.visible = false;
+                //     }
+                // });
             }
             this.selectedObjects = [];
         }
@@ -111,46 +122,79 @@ class Select {
             for (let i = 0; i < intersects.length; i++) {
                 const obj = intersects[i].object;
                 this.pickedPoint = intersects[i].point; // 交点的世界坐标
-                if (obj.userData.canPick) {
-                    isCanPick = true;
-                    if (obj.userData.original instanceof Vector2) {
-                        this.pickedPoint.set(obj.userData.original.x, obj.userData.original.y, 0);
-                    }
-                    else if (obj.userData.original instanceof Vector3) {
-                        this.pickedPoint.set(obj.userData.original.x, obj.userData.original.y, obj.userData.original.z);
-                    }
-                    else if (obj.userData.original.p instanceof Vector2) {
-                        this.pickedPoint.set(obj.userData.original.p.x, obj.userData.original.p.y, 0);
-                    }
-                    else if (obj.userData.original.p instanceof Vector3) {
-                        this.pickedPoint.set(obj.userData.original.p.x, obj.userData.original.p.y, obj.userData.original.p.z);
-                    }
-                    if (!this.selectedObjects.includes(obj)) {
-                        if (this.overObjects.includes(obj)) {
-                            this.overObjects.splice(this.overObjects.indexOf(obj), 1);
-                        } else {
-                            if ((obj as any).material && (obj as any).material.color) {
-                                let originalColor = (obj as any).material.color as THREE.Color;
-                                obj.userData.originalColor = originalColor.clone();
-                                (obj as any).material.color.set(THREE.Color.NAMES.aqua);
+                // 编辑状态
+                if (this._isEditor) {
+                    if (obj.userData.canPick && obj.userData.isAssist) {
+                        isCanPick = true;
+                        //拾取的是一个存在的点对象
+                        this.pickedPoint.set(obj.position.x, obj.position.y, 0);
+                        if (this.selectedAssist != obj) {
+                            if (this.overObjects.includes(obj)) {
+                                this.overObjects.splice(this.overObjects.indexOf(obj), 1);
+                            } else {
+                                if ((obj as any).material && (obj as any).material.color) {
+                                    let originalColor = (obj as any).material.color as THREE.Color;
+                                    obj.userData.originalColor = originalColor.clone();
+                                    (obj as any).material.color.set(THREE.Color.NAMES.aqua);
+                                }
                             }
+                            this.selectedAssist = obj;
+                            // obj.children.forEach(element => {
+                            //     if (element.userData.canPick) {
+                            //         element.visible = true;
+                            //     }
+                            // });
                         }
-                        this.selectedObjects.push(obj);
-                        obj.children.forEach(element => {
-                            if (element.userData.canPick) {
-                                element.visible = true;
-                            }
-                        });
+                        return;
                     }
-                    return;
+
+                } else {
+                    if (obj.userData.canPick) {
+                        isCanPick = true;
+                        //拾取的是一个存在的点对象
+                        if (obj.userData.original instanceof Vector2) {
+                            this.pickedPoint.set(obj.userData.original.x, obj.userData.original.y, 0);
+                        }
+                        else if (obj.userData.original instanceof Vector3) {
+                            this.pickedPoint.set(obj.userData.original.x, obj.userData.original.y, obj.userData.original.z);
+                        }
+                        else if (obj.userData.original.p instanceof Vector2) {
+                            this.pickedPoint.set(obj.userData.original.p.x, obj.userData.original.p.y, 0);
+                        }
+                        else if (obj.userData.original.p instanceof Vector3) {
+                            this.pickedPoint.set(obj.userData.original.p.x, obj.userData.original.p.y, obj.userData.original.p.z);
+                        }
+                        if (!this.selectedObjects.includes(obj)) {
+                            if (this.overObjects.includes(obj)) {
+                                this.overObjects.splice(this.overObjects.indexOf(obj), 1);
+                            } else {
+                                if ((obj as any).material && (obj as any).material.color) {
+                                    let originalColor = (obj as any).material.color as THREE.Color;
+                                    obj.userData.originalColor = originalColor.clone();
+                                    (obj as any).material.color.set(THREE.Color.NAMES.aqua);
+                                }
+                            }
+                            this.selectedObjects.push(obj);
+                            // obj.children.forEach(element => {
+                            //     if (element.userData.canPick) {
+                            //         element.visible = true;
+                            //     }
+                            // });
+                        }
+                        return;
+                    }
                 }
+
             }
         } else {
             this.pickedPoint = raycaster.ray.origin; // 没有交点时，设置射线源点
         }
-        if (this._isSnap && !isCanPick) {
-            this.pickedPoint.x = Math.round(this.pickedPoint.x);
-            this.pickedPoint.y = Math.round(this.pickedPoint.y);
+        if (this._isSnap) {
+            // 没有得到一个可拾取对象
+            if (!isCanPick) {
+                this.pickedPoint.x = Math.round(this.pickedPoint.x);
+                this.pickedPoint.y = Math.round(this.pickedPoint.y);
+            }
         }
     };
     onMouseMove = (event: MouseEvent) => {
@@ -161,11 +205,11 @@ class Select {
             if (originalColor) {
                 (obj as any).material.color.copy(originalColor);
             }
-            obj.children.forEach(element => {
-                if (element.userData.canPick) {
-                    element.visible = false;
-                }
-            });
+            // obj.children.forEach(element => {
+            //     if (element.userData.canPick) {
+            //         element.visible = false;
+            //     }
+            // });
         }
         this.overObjects = [];
         // 创建射线投射器
@@ -193,20 +237,23 @@ class Select {
                             (obj as any).material.color.set(THREE.Color.NAMES.aqua);
                         }
                         this.overObjects.push(obj);
-                        obj.children.forEach(element => {
-                            if (element.userData.canPick) {
-                                element.visible = true;
-                            }
-                        });
+                        // obj.children.forEach(element => {
+                        //     if (element.userData.canPick) {
+                        //         element.visible = true;
+                        //     }
+                        // });
                     }
                 }
             }
         } else {
             this.overedPoint = raycaster.ray.origin; // 没有交点时，设置射线源点
         }
-        if (this._isSnap && !isCanPick) {
-            this.overedPoint.x = Math.round(this.overedPoint.x);
-            this.overedPoint.y = Math.round(this.overedPoint.y);
+        if (this._isSnap) {
+            // 没有得到一个可拾取对象
+            if (!isCanPick) {
+                this.pickedPoint.x = Math.round(this.pickedPoint.x);
+                this.pickedPoint.y = Math.round(this.pickedPoint.y);
+            }
         }
     };
 
