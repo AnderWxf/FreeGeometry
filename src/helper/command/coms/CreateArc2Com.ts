@@ -8,6 +8,7 @@ import { Brep2Builder } from "../../../geometry/algorithm/builder/Brep2Builder";
 import { Vector2 } from "../../../math/Math";
 import { BrepMeshBuilder } from "../../MeshBuilder";
 import type { CommandExecuter } from "../CommandExecuter";
+import { Curve2Type } from "../../../core/Constents";
 
 /**
  * Create command class.
@@ -24,7 +25,7 @@ class CreateArc2Com extends ComCreate {
         let str = this._text;
         let paras = str.split(' ');
         if (paras.length == 7) {
-            // 创建一个直线段
+            // 创建一个线段
             this.centerPoint = new Vector2(new Number(paras[1]).valueOf(), new Number(paras[2]).valueOf());
             this.beginPoint = new Vector2(new Number(paras[3]).valueOf(), new Number(paras[4]).valueOf());
             this.endPoint = new Vector2(new Number(paras[5]).valueOf(), new Number(paras[6]).valueOf());
@@ -36,25 +37,30 @@ class CreateArc2Com extends ComCreate {
             await act_pick_center.execute(context);
             if (this._isCancel) { this.cancel(); return; }
             this.centerPoint = new Vector2(act_pick_center.result.x, act_pick_center.result.y);
+            this.assists.push(this.createAssistPoint(this.centerPoint));
+            Global.scene.add(this.assists[this.assists.length - 1]);
 
             let act_pick_begin = new ActPickPoint2();
             await act_pick_begin.execute(context);
             if (this._isCancel) { this.cancel(); return; }
             this.beginPoint = new Vector2(act_pick_begin.result.x, act_pick_begin.result.y);
+            this.assists.push(this.createAssistPoint(this.beginPoint));
+            Global.scene.add(this.assists[this.assists.length - 1]);
 
             let act_pick_end = new ActPickPoint2();
             await act_pick_end.execute(context);
             if (this._isCancel) { this.cancel(); return; }
             this.endPoint = new Vector2(act_pick_end.result.x, act_pick_end.result.y);
+            this.assists.push(this.createAssistPoint(this.endPoint));
+            Global.scene.add(this.assists[this.assists.length - 1]);
+
             this._text = 'A' + ' ' + this.beginPoint.x + ' ' + this.beginPoint.y + ' ' + this.endPoint.x + ' ' + this.endPoint.y;
         }
         // 创建一个曲线段
         let edge = this.data = Brep2Builder.BuildCircleArcEdge2FromCenterBeginEndPoin(this.centerPoint, this.beginPoint, this.endPoint);
         let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
-        geo.name = "Arc2";
-        geo.frustumCulled = false;
+        geo.userData.type = Curve2Type.A;
         this.result = geo;
-        Global.scene.add(this.result);
         this.done();
     }
     onMouseMove = (event: MouseEvent) => {

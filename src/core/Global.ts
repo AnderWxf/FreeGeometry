@@ -19,3 +19,4 @@ export class Global {
 
     static isShowAssists: boolean = true;
 }
+

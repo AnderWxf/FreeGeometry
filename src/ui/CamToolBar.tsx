@@ -127,11 +127,17 @@ const CamToolBar: React.FC = () => (
 const ComOptionBar: React.FC = () => (
     <Space wrap>
         <Checkbox
-            style={{ width: 100, position: 'fixed', top: 10, left: 75, zIndex: 1000, color: '#00A000' }}
+            style={{ width: 100, position: 'fixed', top: 10, left: 75, zIndex: 1000, color: '#00A000', accentColor: '#00A000' }}
             onChange={(e) => {
                 Global.select.isSnap = e.target.checked;
             }}
         >捕捉</Checkbox>
+        <Checkbox
+            style={{ width: 100, position: 'fixed', top: 10, left: 150, zIndex: 1000, color: '#00A000' }}
+            onChange={(e) => {
+                Global.select.isSnapInter = e.target.checked;
+            }}
+        >捕捉交点</Checkbox>
         {/* <Checkbox
             style={{ width: 100, position: 'fixed', top: 10, left: 75, zIndex: 1000, color: '#00A000' }}
             onChange={(e) => {
@@ -151,7 +157,7 @@ let CommandBarOnEnter = (value: string) => {
 const CommandBar: React.FC = () => (
     <Space wrap>
         <Input id='CommandLine' placeholder="请输入命令"
-            style={{ position: 'fixed', width: '100%', bottom: 0 }}
+            style={{ position: 'fixed', width: '100%', bottom: 0, left: 0 }}
             onPressEnter={(e) => {
                 const value = (e.target as HTMLInputElement).value;
                 inputs.push(value);

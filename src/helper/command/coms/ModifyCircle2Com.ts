@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import { ComCreate } from "./ComCreate";
 import { ActionContext3D } from "../Active";
 import { Global } from "../../../core/Global";
 import { ActPickPoint2 } from "../acts/ActPickPoint2";
@@ -9,23 +8,20 @@ import { BrepMeshBuilder } from "../../MeshBuilder";
 import type { CommandExecuter } from "../CommandExecuter";
 import { ComModify } from "./ComModify";
 import { ActPickObject } from "../acts/ActPickObject";
-import { ActPickAssist } from "../acts/ActPickAssist";
 import { Edge2 } from "../../../geometry/data/brep/Brep2";
-import { Line2Data } from "../../../geometry/data/base/curve2/Line2Data";
+import { ActPickAssist } from "../acts/ActPickAssist";
+import { Arc2Data } from "../../../geometry/data/base/curve2/Arc2Data";
 import { Curve2Type } from "../../../core/Constents";
 
 /**
  * Modify command class.
  * 
  */
-class ModifyLine2Com extends ComModify {
-
+class ModifyCircle2Com extends ComModify {
     constructor(executer: CommandExecuter, text: string) {
         super(executer, text);
     }
-
     async exec(): Promise<void> {
-        Global.select.isEditor = false;
         let str = this._text;
         let paras = str.split(' ');
         let beginPoint: Vector2;
@@ -42,7 +38,7 @@ class ModifyLine2Com extends ComModify {
             await act_pick_data.execute(context);
             if (this._isCancel) { this.cancel(); return; }
             while (!act_pick_data.result.userData
-                || act_pick_data.result.userData.type != Curve2Type.L
+                || act_pick_data.result.userData.type != Curve2Type.C
             ) {
                 await act_pick_data.execute(context);
                 if (this._isCancel) { this.cancel(); return; }
@@ -50,6 +46,7 @@ class ModifyLine2Com extends ComModify {
             this.old = act_pick_data.result;
 
             Global.select.isEditor = true;
+
             let act_pick_assist = new ActPickAssist();
             await act_pick_assist.execute(context);
             this.assistIndex = this.getIndex(act_pick_assist.result);
@@ -74,15 +71,17 @@ class ModifyLine2Com extends ComModify {
                 endPoint.x = act_pick_new_pos.result.x;
                 endPoint.y = act_pick_new_pos.result.y;
             }
+
             this.assists[0] = this.createAssistPoint(beginPoint);
             this.assists[1] = this.createAssistPoint(endPoint);
 
-            this._text = 'L' + ' ' + beginPoint.x + ' ' + beginPoint.y + ' ' + endPoint.x + ' ' + endPoint.y;
+            this._text = 'C' + ' ' + beginPoint.x + ' ' + beginPoint.y + ' ' + endPoint.x + ' ' + endPoint.y;
+
         }
-        // 创建一个直线段
-        let edge = this.data = Brep2Builder.BuildLineEdge2FromBeginEndPoint(beginPoint, endPoint);
+        // 创建一个曲线段
+        let edge = this.data = Brep2Builder.BuildCircleEdge2FromCenterRadius(beginPoint, endPoint.distanceTo(beginPoint));
         let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
-        geo.userData.type = Curve2Type.L;
+        geo.userData.type = Curve2Type.C;
         this.result = geo;
         this.done();
     }
@@ -92,7 +91,6 @@ class ModifyLine2Com extends ComModify {
             if (this.tempResult) {
                 Global.scene.remove(this.tempResult);
             }
-
             let beginPoint = new Vector2(this.old.children[0].position.x, this.old.children[0].position.y);
             let endPoint = new Vector2(this.old.children[1].position.x, this.old.children[1].position.y);
 
@@ -102,9 +100,8 @@ class ModifyLine2Com extends ComModify {
             if (this.assistIndex == 1) {
                 endPoint = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
             }
-
-            // 创建一个临时直线段
-            let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(beginPoint, endPoint);
+            // 创建一个临时曲线段
+            let edge = Brep2Builder.BuildCircleEdge2FromCenterRadius(beginPoint, endPoint.distanceTo(beginPoint));
             let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray);
             t.name = "temp";
             t.frustumCulled = false;
@@ -112,6 +109,5 @@ class ModifyLine2Com extends ComModify {
             Global.scene.add(this.tempResult);
         }
     };
-
 }
-export { ModifyLine2Com };
+export { ModifyCircle2Com };

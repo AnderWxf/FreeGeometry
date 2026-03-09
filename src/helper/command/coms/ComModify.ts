@@ -16,7 +16,7 @@ class ComModify extends Command {
     protected tempResult: THREE.Object3D;
 
     protected assists: THREE.Object3D[];
-
+    protected assistIndex = -1;
     constructor(executer: CommandExecuter, text: string) {
         super(executer, text);
         this.assists = [];
@@ -31,9 +31,21 @@ class ComModify extends Command {
         }
         Global.select.isEditor = false;
     }
+
+    protected getIndex(pick: THREE.Object3D): number {
+        for (let i = 0; i < this.old.children.length; i++) {
+            if (pick.position.equals(this.old.children[i].position)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     override done() {
         super.done();
         this.unbind(window);
+        Global.scene.add(this.result);
+        Global.scene.remove(this.old);
         if (this.tempResult) {
             Global.scene.remove(this.tempResult);
         }

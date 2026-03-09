@@ -8,6 +8,7 @@ import { Brep2Builder } from "../../../geometry/algorithm/builder/Brep2Builder";
 import { Vector2 } from "../../../math/Math";
 import { BrepMeshBuilder } from "../../MeshBuilder";
 import type { CommandExecuter } from "../CommandExecuter";
+import { Curve2Type } from "../../../core/Constents";
 
 /**
  * Create command class.
@@ -23,7 +24,7 @@ class CreateCircle2Com extends ComCreate {
         let str = this._text;
         let paras = str.split(' ');
         if (paras.length == 5) {
-            // 创建一个直线段
+            // 创建一个线段
             this.beginPoint = new Vector2(new Number(paras[1]).valueOf(), new Number(paras[2]).valueOf());
             this.endPoint = new Vector2(new Number(paras[3]).valueOf(), new Number(paras[4]).valueOf());
         } else {
@@ -35,24 +36,22 @@ class CreateCircle2Com extends ComCreate {
             if (this._isCancel) { this.cancel(); return; }
             this.beginPoint = new Vector2(act_pick_begin.result.x, act_pick_begin.result.y);
             this.assists.push(this.createAssistPoint(this.beginPoint));
-            Global.scene.add(...this.assists);
+            Global.scene.add(this.assists[this.assists.length - 1]);
 
             let act_pick_end = new ActPickPoint2();
             await act_pick_end.execute(context);
             if (this._isCancel) { this.cancel(); return; }
             this.endPoint = new Vector2(act_pick_end.result.x, act_pick_end.result.y);
             this.assists.push(this.createAssistPoint(this.endPoint));
-            Global.scene.add(...this.assists);
+            Global.scene.add(this.assists[this.assists.length - 1]);
 
             this._text = 'C' + ' ' + this.beginPoint.x + ' ' + this.beginPoint.y + ' ' + this.endPoint.x + ' ' + this.endPoint.y;
         }
         // 创建一个曲线段
         let edge = this.data = Brep2Builder.BuildCircleEdge2FromCenterRadius(this.beginPoint, this.endPoint.distanceTo(this.beginPoint));
         let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
-        geo.name = "Circle2";
-        geo.frustumCulled = false;
+        geo.userData.type = Curve2Type.C;
         this.result = geo;
-        Global.scene.add(this.result);
         this.done();
     }
     onMouseMove = (event: MouseEvent) => {

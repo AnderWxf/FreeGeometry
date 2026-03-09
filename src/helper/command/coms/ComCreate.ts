@@ -13,7 +13,6 @@ class ComCreate extends Command {
     protected data: DataBase;
     protected result: THREE.Object3D;
     protected tempResult: THREE.Object3D;
-
     protected assists: THREE.Object3D[];
 
     constructor(executer: CommandExecuter, text: string) {
@@ -32,6 +31,7 @@ class ComCreate extends Command {
     override done() {
         super.done();
         this.unbind(window);
+        Global.scene.add(this.result);
         if (this.tempResult) {
             Global.scene.remove(this.tempResult);
         }

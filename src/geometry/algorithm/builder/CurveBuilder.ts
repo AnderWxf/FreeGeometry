@@ -1,4 +1,4 @@
-import { Vector2, type Vector3 } from "../../../math/Math";
+import { Matrix2, Vector2, type Vector3 } from "../../../math/Math";
 import { Arc2Data } from "../../data/base/curve2/Arc2Data";
 import { Parabola2Data } from "../../data/base/curve2/Parabola2Data";
 import { Line2Data } from "../../data/base/curve2/Line2Data";
@@ -91,9 +91,6 @@ class CurveBuilder {
      * build circle from bengin middle end point.
      * bengin middle end point on citcle.
      * 
-     * D = 2 * (x1 * (y2 - y3) + x2 * (y3 - y1) + x3 * (y1 - y2));
-     * Ux = [(x1^2 + y1^2)(y2-y3) + (x2^2 + y2^2)(y3-y1) + (x3^2 + y3^2)(y1-y2)]/D
-     * Uy = [(x1^2 + y1^2)(x3-x2) + (x2^2 + y2^2)(x1-x3) + (x3^2 + y3^2)(x2-x1)]/D
      * 
      * @param {Vector2} [b] - The bengin point.
      * @param {Vector2} [m] - The middle point.
@@ -101,18 +98,22 @@ class CurveBuilder {
      */
     static BuildCircle2FromBeginMiddleEndPoint(b: Vector2, m: Vector2, e: Vector2): Arc2Data {
         let x1 = b.x, y1 = b.y, x2 = m.x, y2 = m.y, x3 = e.x, y3 = e.y;
-        let D = 2 * (x1 * (y2 - y3) + x2 * (y3 - y1) + x3 * (y1 - y2));
-        if (D == 0) {
+        let mat = new Matrix2();
+        mat.set(
+            x1 - x3, y1 - y3,
+            x2 - x3, y2 - y3
+        )
+        let det = mat.determinant();
+        if (det == 0) {
             return null;
         }
-        let sqrt1 = b.lengthSq();
-        let sqrt2 = m.lengthSq();
-        let sqrt3 = e.lengthSq();
-        let Ux = (sqrt1 * (y2 - y3) + sqrt2 * (y3 - y2) + sqrt3 * (y1 - y2)) / D;
-        let Uy = (sqrt1 * (x3 - x2) + sqrt2 * (x1 - x3) + sqrt3 * (x2 - x1)) / D;
-        let c = new Vector2(Ux, Uy);
-        let r = c.distanceTo(b);
+        let v = new Vector2(x3 * x3 + y3 * y3 - x1 * x1 - y1 * y1, x3 * x3 + y3 * y3 - x2 * x2 - y2 * y2);
+        mat.invert();
+        v.applyMatrix2(mat);
+
         let ret = new Arc2Data();
+        let c = new Vector2(-v.x / 2, -v.y / 2);
+        let r = c.distanceTo(b);
         ret.trans.pos = c;
         ret.trans.rot = Math.atan2(b.y - c.y, b.x - c.x);
         ret.radius.set(r, r);

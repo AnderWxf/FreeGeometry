@@ -49,6 +49,7 @@ class BrepMeshBuilder {
         let ret = new THREE.Line(buff, materialline);
         ret.userData.canPick = true;
         ret.userData.original = edge;
+        ret.frustumCulled = false;
         return ret;
     }
 
@@ -89,6 +90,7 @@ class BrepMeshBuilder {
         const materialline = new THREE.MeshBasicMaterial({ color: color });
         let ret = new THREE.LineSegments(buff, materialline);
         ret.userData.original = edge;
+        ret.frustumCulled = false;
         return ret;
     }
 
@@ -132,6 +134,7 @@ class BrepMeshBuilder {
         const materialline = new THREE.MeshBasicMaterial({ color: color });
         let ret = new THREE.LineSegments(buff, materialline);
         ret.userData.original = edge;
+        ret.frustumCulled = false;
         return ret;
     }
 
@@ -168,6 +171,7 @@ class BrepMeshBuilder {
         let ret = new THREE.Line(buff, materialline);
         ret.userData.canPick = true;
         ret.userData.original = edge;
+        ret.frustumCulled = false;
         return ret;
     }
 
@@ -208,6 +212,7 @@ class BrepMeshBuilder {
         const materialline = new THREE.MeshBasicMaterial({ color: color });
         let ret = new THREE.LineSegments(buff, materialline);
         ret.userData.original = edge;
+        ret.frustumCulled = false;
         return ret;
     }
     /**
@@ -250,6 +255,7 @@ class BrepMeshBuilder {
         const materialline = new THREE.MeshBasicMaterial({ color: color });
         let ret = new THREE.LineSegments(buff, materialline);
         ret.userData.original = edge;
+        ret.frustumCulled = false;
         return ret;
     }
     /**

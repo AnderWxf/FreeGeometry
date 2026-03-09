@@ -61,9 +61,6 @@ class Brep2Builder {
      * build circle edge2 from bengin middle end point.
      * bengin middle end point on circle.
      * 
-     * D = 2 * (x1 * (y2 - y3) + x2 * (y3 - y1) + x3 * (y1 - y2));
-     * Ux = [(x1^2 + y1^2)(y2-y3) + (x2^2 + y2^2)(y3-y1) + (x3^2 + y3^2)(y1-y2)]/D
-     * Uy = [(x1^2 + y1^2)(x3-x2) + (x2^2 + y2^2)(x1-x3) + (x3^2 + y3^2)(x2-x1)]/D
      * 
      * @param {Vector2} [b] - The bengin point.
      * @param {Vector2} [m] - The middle point.
@@ -82,9 +79,6 @@ class Brep2Builder {
      * build arc edge2 from bengin middle end point.
      * bengin middle end point on circle.
      * 
-     * D = 2 * (x1 * (y2 - y3) + x2 * (y3 - y1) + x3 * (y1 - y2));
-     * Ux = [(x1^2 + y1^2)(y2-y3) + (x2^2 + y2^2)(y3-y1) + (x3^2 + y3^2)(y1-y2)]/D
-     * Uy = [(x1^2 + y1^2)(x3-x2) + (x2^2 + y2^2)(x1-x3) + (x3^2 + y3^2)(x2-x1)]/D
      * 
      * @param {Vector2} [b] - The bengin point.
      * @param {Vector2} [m] - The middle point.

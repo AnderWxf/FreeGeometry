@@ -7,6 +7,7 @@ import { Brep2Builder } from "../../../geometry/algorithm/builder/Brep2Builder";
 import { Vector2 } from "../../../math/Math";
 import { BrepMeshBuilder } from "../../MeshBuilder";
 import type { CommandExecuter } from "../CommandExecuter";
+import { Curve2Type } from "../../../core/Constents";
 
 /**
  * Create command class.
@@ -46,10 +47,8 @@ class CreateLine2Com extends ComCreate {
         // 创建一个直线段
         let edge = this.data = Brep2Builder.BuildLineEdge2FromBeginEndPoint(this.beginPoint, this.endPoint);
         let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
-        geo.name = "Line2";
-        geo.frustumCulled = false;
+        geo.userData.type = Curve2Type.L;
         this.result = geo;
-        Global.scene.add(this.result);
         this.done();
     }
     onMouseMove = (event: MouseEvent) => {

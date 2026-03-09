@@ -8,11 +8,14 @@ import { Vector2, Vector3 } from '../math/Math';
 class Select {
     private _camera: THREE.Camera;
     private _scene: THREE.Scene;
-    private _raycaster: THREE.Raycaster;
+
+    private _raycasterForSelect: THREE.Raycaster;
+    private _raycasterForOver: THREE.Raycaster;
 
     private _isEditor: boolean = false;     // 编辑
     private _isMultiple: boolean = false;   // 多选
     private _isSnap: boolean = false;       // 捕捉
+    private _isSnapInter: boolean = false;  // 捕捉交点
 
     selectedAssist: THREE.Object3D;         // 拾取辅助物体
     selectedObjects: THREE.Object3D[] = []; // 拾取结果
@@ -21,12 +24,19 @@ class Select {
     overedPoint: THREE.Vector3;             // 滑过的坐标
     constructor(scene: THREE.Scene) {
         this._scene = scene;
-        this._raycaster = new THREE.Raycaster();
-        this._raycaster.params.Points.threshold = 0.1;
-        this._raycaster.params.Line.threshold = 0.1;
-        this._raycaster.params.Mesh.threshold = 0.1;
-        this._raycaster.params.Sprite.threshold = 0.1;
-        this._raycaster.params.LOD.threshold = 0.1;
+        this._raycasterForSelect = new THREE.Raycaster();
+        this._raycasterForSelect.params.Points.threshold = 0.1;
+        this._raycasterForSelect.params.Line.threshold = 0.1;
+        this._raycasterForSelect.params.Mesh.threshold = 0.1;
+        this._raycasterForSelect.params.Sprite.threshold = 0.1;
+        this._raycasterForSelect.params.LOD.threshold = 0.1;
+
+        this._raycasterForOver = new THREE.Raycaster();
+        this._raycasterForOver.params.Points.threshold = 0.2;
+        this._raycasterForOver.params.Line.threshold = 0.2;
+        this._raycasterForOver.params.Mesh.threshold = 0.2;
+        this._raycasterForOver.params.Sprite.threshold = 0.2;
+        this._raycasterForOver.params.LOD.threshold = 0.2;
     }
     get isMultiple(): boolean {
         return this._isMultiple;
@@ -40,6 +50,13 @@ class Select {
     }
     set isSnap(value: boolean) {
         this._isSnap = value;
+    }
+
+    get isSnapInter(): boolean {
+        return this._isSnapInter;
+    }
+    set isSnapInter(value: boolean) {
+        this._isSnapInter = value;
     }
 
     get isEditor(): boolean {
@@ -107,7 +124,7 @@ class Select {
             this.selectedObjects = [];
         }
         // 创建射线投射器
-        const raycaster = this._raycaster;
+        const raycaster = this._raycasterForSelect;
         const mouse = new THREE.Vector2();
         // 计算鼠标在canvas上的位置
         mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -213,7 +230,7 @@ class Select {
         }
         this.overObjects = [];
         // 创建射线投射器
-        const raycaster = this._raycaster;
+        const raycaster = this._raycasterForOver;
         const mouse = new THREE.Vector2();
         // 计算鼠标在canvas上的位置
         mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -234,7 +251,7 @@ class Select {
                         if ((obj as any).material && (obj as any).material.color) {
                             let originalColor = (obj as any).material.color as THREE.Color;
                             obj.userData.originalColor = originalColor.clone();
-                            (obj as any).material.color.set(THREE.Color.NAMES.aqua);
+                            (obj as any).material.color.set(THREE.Color.NAMES.aquamarine);
                         }
                         this.overObjects.push(obj);
                         // obj.children.forEach(element => {
