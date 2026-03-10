@@ -25,6 +25,14 @@ class Curve2Data extends DataBase {
         super();
         this.trans = trans;
     }
+    /**
+     * Returns a new Curve2Data with copied values from this instance.
+     *
+     * @return {Curve2Data} A clone of this instance.
+     */
+    override clone() {
+        return new Curve2Data(this.trans.clone());
+    }
 }
 
 export { Curve2Data };

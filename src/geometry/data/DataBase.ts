@@ -9,6 +9,15 @@ class DataBase {
     constructor() {
         this.uuid = uuidv4();
     }
+
+    /**
+     * Returns a new DataBase with copied values from this instance.
+     *
+     * @return {DataBase} A clone of this instance.
+     */
+    clone() {
+        return new DataBase();
+    }
 }
 export {
     DataBase

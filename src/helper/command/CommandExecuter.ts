@@ -9,6 +9,11 @@ import { CreateCircle2ThreePointCom } from "./coms/CreateCircle2ThreePointCom";
 import { ModifyLine2Com } from "./coms/ModifyLine2Com";
 import { ModifyCircle2Com } from "./coms/ModifyCircle2Com";
 import { ModifyCircle2ThreePointCom } from "./coms/ModifyCircle2ThreePointCom";
+import { ModifyArc2Com } from "./coms/ModifyArc2Com";
+import { ModifyArc2ThreePointCom } from "./coms/ModifyArc2ThreePointCom";
+import { ComMove } from "./coms/ComMove";
+import { ComRotate } from "./coms/ComRotate";
+import { ComOffset } from "./coms/ComOffset";
 
 /**
  * Command executer base class.
@@ -101,20 +106,26 @@ class CommandExecuter {
                     break;
                 // F：倒圆角
                 // G：对象组合
-                // H：填充
                 // I：插入
                 // J：对接
                 // S：拉伸
-                // T：多行文本输入
-                // W：定义块并保存到硬盘中
+
 
 
                 // M：移动
+                case 'M':
+                    com = new ComMove(this, comstr);
+                    break;
+                // RO：旋转
+                case 'RO':
+                    com = new ComRotate(this, comstr);
+                    break;
                 // X：分解炸开
                 // V：设置当前坐标
-                // U：恢复上一次操作
                 // O：偏移
-                // P：移动
+                case 'O':
+                    com = new ComOffset(this, comstr);
+                    break;
                 // Z：缩放
                 // M...: 修改
                 // ML：修改直线
@@ -123,11 +134,11 @@ class CommandExecuter {
                     break;
                 // MA：修改圆弧
                 case 'MA':
-                    com = new ModifyCircle2Com(this, comstr);
+                    com = new ModifyArc2Com(this, comstr);
                     break;
                 // MA3：修改三点圆弧
                 case 'MA3':
-                    com = new CreateArc2ThreePointCom(this, comstr);
+                    com = new ModifyArc2ThreePointCom(this, comstr);
                     break;
                 // MC：修改圆
                 case 'MC':

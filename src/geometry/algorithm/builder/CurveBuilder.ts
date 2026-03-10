@@ -91,7 +91,6 @@ class CurveBuilder {
      * build circle from bengin middle end point.
      * bengin middle end point on citcle.
      * 
-     * 
      * @param {Vector2} [b] - The bengin point.
      * @param {Vector2} [m] - The middle point.
      * @param {Vector2} [e] - The end point.

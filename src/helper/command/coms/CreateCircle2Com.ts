@@ -45,7 +45,7 @@ class CreateCircle2Com extends ComCreate {
             this.assists.push(this.createAssistPoint(this.endPoint));
             Global.scene.add(this.assists[this.assists.length - 1]);
 
-            this._text = 'C' + ' ' + this.beginPoint.x + ' ' + this.beginPoint.y + ' ' + this.endPoint.x + ' ' + this.endPoint.y;
+            this._text = paras[0] + ' ' + this.beginPoint.x + ' ' + this.beginPoint.y + ' ' + this.endPoint.x + ' ' + this.endPoint.y;
         }
         // 创建一个曲线段
         let edge = this.data = Brep2Builder.BuildCircleEdge2FromCenterRadius(this.beginPoint, this.endPoint.distanceTo(this.beginPoint));

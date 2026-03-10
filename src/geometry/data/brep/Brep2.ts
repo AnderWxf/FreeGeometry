@@ -84,6 +84,21 @@ class Edge2 extends DataBase {
     constructor() {
         super();
     }
+
+    /**
+     * Returns a new Edge2 with copied values from this instance.
+     *
+     * @return {Edge2} A clone of this instance.
+     */
+    override clone() {
+        let result = new Edge2();
+        result.curve = this.curve?.clone();
+        result.u = this.u?.clone();
+        result.v0 = this.v0;
+        result.v1 = this.v1;
+        result.curveIndex = this.curveIndex;
+        return result;
+    }
 }
 
 /**

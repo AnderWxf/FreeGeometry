@@ -52,7 +52,10 @@ class Brep2Builder {
         let ret = new Edge2();
         let curve = CurveBuilder.BuildCircle2FromCenterBeginEndPoint(c, b);
         let algor = CurveBuilder.Algorithm2ByData(curve);
-        ret.u = new Vector2(0, algor.u(e));
+        let u1 = algor.u(e);
+        let p = algor.p(u1);
+        e.set(p.x, p.y);
+        ret.u = new Vector2(0, u1);
         ret.curve = curve;
         return ret;
     }
@@ -88,13 +91,18 @@ class Brep2Builder {
         let ret = new Edge2();
         let curve = CurveBuilder.BuildCircle2FromBeginMiddleEndPoint(b, m, e);
         let algor = CurveBuilder.Algorithm2ByData(curve);
-        ret.u = new Vector2(algor.u(b), algor.u(e));
+        let u1 = algor.u(e);
+        let um = algor.u(m);
+        if (um > u1) {
+            u1 = (Math.PI * 2 - u1) * -1;
+        }
+        ret.u = new Vector2(0, u1);
         ret.curve = curve;
         return ret;
     }
 
     /**
-     * build arc edge2 from bengin center end point.
+     * build ellipse edge2 from bengin center end point.
      *
      * @param {Vector2} [b] - The bengin point.
      * @param {Vector2} [c] - The center point.
@@ -104,6 +112,21 @@ class Brep2Builder {
         let ret = new Edge2();
         let curve = CurveBuilder.BuildEllipse2FromCenterBeginEndPoint(c, b, e);
         ret.u = new Vector2(0, Math.PI * 2);
+        ret.curve = curve;
+        return ret;
+    }
+
+    /**
+     * build ellipse edge2 from bengin center end point.
+     *
+     * @param {Vector2} [b] - The bengin point.
+     * @param {Vector2} [c] - The center point.
+     * @param {Vector2} [e] - The end point.
+     */
+    static BuildEllipseArcEdge2FromCenterBeginEndPoint(c: Vector2, b: Vector2, e: Vector2, u0: number = 0, u1: number = Math.PI * 2): Edge2 {
+        let ret = new Edge2();
+        let curve = CurveBuilder.BuildEllipse2FromCenterBeginEndPoint(c, b, e);
+        ret.u = new Vector2(u0, u1);
         ret.curve = curve;
         return ret;
     }

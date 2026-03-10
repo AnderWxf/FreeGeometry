@@ -34,6 +34,15 @@ class UvCurveData extends Curve3Data {
         this.curve = curve;
         this.surface = surface;
     }
+
+    /**
+     * Returns a new UvCurveData with copied values from this instance.
+     *
+     * @return {UvCurveData} A clone of this instance.
+     */
+    override clone() {
+        return new UvCurveData(this.curve.clone(), this.surface.clone());
+    }
 }
 
 export { UvCurveData };

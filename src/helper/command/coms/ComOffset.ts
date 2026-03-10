@@ -12,10 +12,10 @@ import type { CommandExecuter } from "../CommandExecuter";
 import * as THREE from "three";
 
 /**
- * Move command class.
+ * Offset command class.
  * 
  */
-class ComMove extends Command {
+class ComOffset extends Command {
     protected old: THREE.Object3D;
     protected data: DataBase;
     protected result: THREE.Object3D;
@@ -71,7 +71,9 @@ class ComMove extends Command {
             geo.userData.type = this.old.userData.type;
             for (let i = 0; i < this.old.children.length; i++) {
                 let child = this.old.children[i];
-                geo.children.push(this.createAssistPoint(new Vector2(child.position.x, child.position.y).add(offset)));
+                let p = new Vector2(child.position.x, child.position.y);
+                p.add(offset);
+                geo.children.push(this.createAssistPoint(p));
             }
             this.result = geo;
         }
@@ -85,6 +87,7 @@ class ComMove extends Command {
                 Global.scene.remove(this.tempResult);
             }
             let endPoint: Vector2 = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
+
             let offset = new Vector2().subVectors(endPoint, this.beginPoint);
             // 创建一个线段
             if (this.old.userData.original instanceof Edge2) {
@@ -101,6 +104,7 @@ class ComMove extends Command {
 
             this.tempResult.children.push(t2);
             Global.scene.add(this.tempResult);
+
         }
     };
 
@@ -116,7 +120,7 @@ class ComMove extends Command {
         super.done();
         this.unbind(window);
         Global.scene.add(this.result);
-        Global.scene.remove(this.old);
+        // Global.scene.remove(this.old);
         if (this.tempResult) {
             Global.scene.remove(this.tempResult);
         }
@@ -133,14 +137,14 @@ class ComMove extends Command {
     override undo() {
         if (this._isDone) {
             Global.scene.remove(this.result);
-            Global.scene.add(this.old);
+            // Global.scene.add(this.old);
         }
     }
     override redo() {
         if (this._isDone) {
             Global.scene.add(this.result);
-            Global.scene.remove(this.old);
+            // Global.scene.remove(this.old);
         }
     }
 }
-export { ComMove };
+export { ComOffset };

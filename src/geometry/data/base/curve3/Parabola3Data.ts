@@ -23,6 +23,15 @@ class Parabola3Data extends Curve3Data {
         super(trans);
         this.f = f;
     }
+
+    /**
+     * Returns a new Parabola3Data with copied values from this instance.
+     *
+     * @return {Parabola3Data} A clone of this instance.
+     */
+    override clone() {
+        return new Parabola3Data(this.trans.clone(), this.f);
+    }
 }
 
 export { Parabola3Data };

@@ -13,6 +13,15 @@ class Line2Data extends Curve2Data {
     constructor(trans = new Transform2()) {
         super(trans);
     }
+
+    /**
+     * Returns a new Line2Data with copied values from this instance.
+     *
+     * @return {Line2Data} A clone of this instance.
+     */
+    override clone() {
+        return new Line2Data(this.trans.clone());
+    }
 }
 
 export { Line2Data };

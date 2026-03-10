@@ -42,7 +42,7 @@ class CreateLine2Com extends ComCreate {
             if (this._isCancel) { this.cancel(); return; }
             this.endPoint = new Vector2(act_pick_end.result.x, act_pick_end.result.y);
             this.assists.push(this.createAssistPoint(this.endPoint));
-            this._text = 'L' + ' ' + this.beginPoint.x + ' ' + this.beginPoint.y + ' ' + this.endPoint.x + ' ' + this.endPoint.y;
+            this._text = paras[0] + ' ' + this.beginPoint.x + ' ' + this.beginPoint.y + ' ' + this.endPoint.x + ' ' + this.endPoint.y;
         }
         // 创建一个直线段
         let edge = this.data = Brep2Builder.BuildLineEdge2FromBeginEndPoint(this.beginPoint, this.endPoint);

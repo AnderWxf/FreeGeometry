@@ -23,6 +23,15 @@ class SurfaceData extends DataBase {
         super();
         this.trans = trans;
     }
+
+    /**
+     * Returns a new SurfaceData with copied values from this instance.
+     *
+     * @return {SurfaceData} A clone of this instance.
+     */
+    override clone() {
+        return new SurfaceData(this.trans.clone());
+    }
 }
 
 export { SurfaceData };

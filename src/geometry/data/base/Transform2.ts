@@ -90,6 +90,20 @@ class Transform2 {
         );
         return ret;
     }
+
+    /**
+     * comput 2D translation trans from matrix.
+     *
+     * @param {Matrix3} value reference to this matrix.
+     */
+    fromLocalMatrix(value: Matrix3): Transform2 {
+        let result = value.decompose();
+        this.pos = result.position;
+        this.rot = result.rotation;
+        this.scale = result.scale;
+        return this;
+    }
+
     /**
      * comput world matrix as a 2D translation trans.
      *
@@ -102,6 +116,15 @@ class Transform2 {
             matrix.multiply(world);
         }
         return matrix;
+    }
+
+    /**
+     * Returns a new Transform2 with copied values from this instance.
+     *
+     * @return {Transform2} A clone of this instance.
+     */
+    clone() {
+        return new Transform2(this.pos.clone(), this.rot, this.scale.clone(), this.parent);
     }
 }
 export { Transform2 };

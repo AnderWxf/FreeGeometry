@@ -114,5 +114,14 @@ class Transform3 {
         }
         return matrix;
     }
+
+    /**
+     * Returns a new Transform3 with copied values from this instance.
+     *
+     * @return {Transform3} A clone of this instance.
+     */
+    clone() {
+        return new Transform3(this.pos.clone(), this.rot.clone(), this.scale.clone(), this.parent);
+    }
 }
 export { Transform3 };

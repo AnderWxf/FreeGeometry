@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import { Command } from "../Command";
 import { ComCreate } from "./ComCreate";
 import { ActionContext3D } from "../Active";
 import { Global } from "../../../core/Global";
@@ -51,16 +50,18 @@ class CreateArc2Com extends ComCreate {
             await act_pick_end.execute(context);
             if (this._isCancel) { this.cancel(); return; }
             this.endPoint = new Vector2(act_pick_end.result.x, act_pick_end.result.y);
-            this.assists.push(this.createAssistPoint(this.endPoint));
-            Global.scene.add(this.assists[this.assists.length - 1]);
-
-            this._text = 'A' + ' ' + this.beginPoint.x + ' ' + this.beginPoint.y + ' ' + this.endPoint.x + ' ' + this.endPoint.y;
         }
         // 创建一个曲线段
         let edge = this.data = Brep2Builder.BuildCircleArcEdge2FromCenterBeginEndPoin(this.centerPoint, this.beginPoint, this.endPoint);
         let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
         geo.userData.type = Curve2Type.A;
+        edge.curve
         this.result = geo;
+
+        this.assists.push(this.createAssistPoint(this.endPoint));
+        Global.scene.add(this.assists[this.assists.length - 1]);
+        this._text = paras[0] + ' ' + this.centerPoint.x + ' ' + this.centerPoint.y + ' ' + this.beginPoint.x + ' ' + this.beginPoint.y + ' ' + this.endPoint.x + ' ' + this.endPoint.y;
+
         this.done();
     }
     onMouseMove = (event: MouseEvent) => {

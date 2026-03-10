@@ -23,6 +23,15 @@ class Arc3Data extends Curve3Data {
         super(trans);
         this.radius = radius;
     }
+
+    /**
+     * Returns a new Arc3Data with copied values from this instance.
+     *
+     * @return {Arc3Data} A clone of this instance.
+     */
+    override clone() {
+        return new Arc3Data(this.trans.clone(), this.radius.clone());
+    }
 }
 
 export { Arc3Data };

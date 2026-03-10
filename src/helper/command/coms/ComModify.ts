@@ -3,7 +3,6 @@ import { Command } from "../Command";
 import * as THREE from "three";
 import type { CommandExecuter } from "../CommandExecuter";
 import { Global } from "../../../core/Global";
-import type { Vector2 } from "../../../math/Math";
 
 /**
  * Modify command class.

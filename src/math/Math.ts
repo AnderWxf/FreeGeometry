@@ -5335,7 +5335,7 @@ class Matrix3 {
 
 		this.set(
 
-			c, - s, 0,
+			c, -s, 0,
 			s, c, 0,
 			0, 0, 1
 
@@ -5435,7 +5435,7 @@ class Matrix3 {
 		const b = te[3];
 		const d = te[4];
 
-		rotation = (Math.atan2(c, a) + Math.atan2(b, d)) * 0.5;
+		rotation = Math.atan2(c, a);
 
 		scale.x = sx;
 		scale.y = sy;

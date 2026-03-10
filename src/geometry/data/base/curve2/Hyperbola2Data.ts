@@ -23,6 +23,15 @@ class Hyperbola2Data extends Curve2Data {
         super(trans);
         this.radius = radius;
     }
+
+    /**
+     * Returns a new Hyperbola2Data with copied values from this instance.
+     *
+     * @return {Hyperbola2Data} A clone of this instance.
+     */
+    override clone() {
+        return new Hyperbola2Data(this.trans.clone(), this.radius.clone());
+    }
 }
 
 export { Hyperbola2Data };

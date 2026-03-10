@@ -22,6 +22,15 @@ class Parabola2Data extends Curve2Data {
         super(trans);
         this.f = f;
     }
+
+    /**
+     * Returns a new Parabola2Data with copied values from this instance.
+     *
+     * @return {Parabola2Data} A clone of this instance.
+     */
+    override clone() {
+        return new Parabola2Data(this.trans.clone(), this.f);
+    }
 }
 
 export { Parabola2Data };

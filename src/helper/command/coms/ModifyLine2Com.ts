@@ -77,7 +77,7 @@ class ModifyLine2Com extends ComModify {
             this.assists[0] = this.createAssistPoint(beginPoint);
             this.assists[1] = this.createAssistPoint(endPoint);
 
-            this._text = 'L' + ' ' + beginPoint.x + ' ' + beginPoint.y + ' ' + endPoint.x + ' ' + endPoint.y;
+            this._text = paras[0] + ' ' + beginPoint.x + ' ' + beginPoint.y + ' ' + endPoint.x + ' ' + endPoint.y;
         }
         // 创建一个直线段
         let edge = this.data = Brep2Builder.BuildLineEdge2FromBeginEndPoint(beginPoint, endPoint);
