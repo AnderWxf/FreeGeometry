@@ -38,14 +38,18 @@ class ComOffset extends Command {
             this.bind(window);
             let context: ActionContext3D = new ActionContext3D(Global.scene, Global.camera, Global.renderer, Global.select);
 
-            let act_pick_data = new ActPickObject();
-            await act_pick_data.execute(context);
-            if (this._isCancel) { this.cancel(); return; }
-            while (!act_pick_data.result.userData) {
+            if (context.select.selectedObjects.length == 0) {
+                let act_pick_data = new ActPickObject();
                 await act_pick_data.execute(context);
                 if (this._isCancel) { this.cancel(); return; }
+                while (!act_pick_data.result.userData) {
+                    await act_pick_data.execute(context);
+                    if (this._isCancel) { this.cancel(); return; }
+                }
+                this.old = act_pick_data.result;
+            } else {
+                this.old = context.select.selectedObjects[0];
             }
-            this.old = act_pick_data.result;
 
             let act_pick_begin = new ActPickPoint2();
             await act_pick_begin.execute(context);

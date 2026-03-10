@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { Global } from '../../core/Global';
 
 /**
  * Orthographic controller.
@@ -86,7 +87,8 @@ class OrthographicController {
                 this.KeyDDown = true;
                 break;
             case "KeyE":
-                this.KeyEDown = true;
+                if (Global.select.selectedObjects.length == 0)
+                    this.KeyEDown = true;
                 break;
             case "KeyQ":
                 this.KeyQDown = true;

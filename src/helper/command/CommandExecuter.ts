@@ -36,7 +36,23 @@ class CommandExecuter {
                 comline.focus();
                 break;
             case "Delete":
-                this.execute('E');
+                new DeleteObjectsCom(this, 'E').exec();
+                break;
+            // E：删除
+            case 'KeyE':
+                new DeleteObjectsCom(this, 'E').exec();
+                break;
+            // M：移动
+            case 'KeyM':
+                new ComMove(this, 'M').exec();
+                break;
+            // R：旋转
+            case 'KeyR':
+                new ComRotate(this, 'M').exec();
+                break;
+            // O：偏移
+            case 'KeyO':
+                new ComOffset(this, 'O').exec();
                 break;
             case "KeyZ":
                 if (this.KeyCtrlDown) {
@@ -98,8 +114,6 @@ class CommandExecuter {
                 // PL：多段线
 
                 // REC：矩形
-                // B：定义块                
-                // D：尺寸资源管理器
                 // E：删除
                 case 'E':
                     com = new DeleteObjectsCom(this, comstr);
@@ -116,8 +130,8 @@ class CommandExecuter {
                 case 'M':
                     com = new ComMove(this, comstr);
                     break;
-                // RO：旋转
-                case 'RO':
+                // R：旋转
+                case 'R':
                     com = new ComRotate(this, comstr);
                     break;
                 // X：分解炸开
