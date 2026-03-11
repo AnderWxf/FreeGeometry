@@ -75,7 +75,7 @@ class ActPickPoint2 extends Active {
     override async execute(context: ActionContext3D): Promise<void> {
         super.execute(context);
         this.bind(window);
-        context.select.clear();
+        context.select.pickedPoint = null;
         this.context = context;
         Global.scene.add(ActPickPoint2.PickCursor);
         while (!context.select.pickedPoint && !this._isCancel) {

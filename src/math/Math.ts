@@ -5262,7 +5262,8 @@ class Matrix3 {
 	 */
 	rotate(theta: number) {
 
-		this.premultiply(_m3.makeRotation(- theta));
+		// this.premultiply(_m3.makeRotation(- theta)); wxf update 20260311
+		this.premultiply(_m3.makeRotation(theta));
 
 		return this;
 

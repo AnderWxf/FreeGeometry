@@ -14,6 +14,8 @@ import { ModifyArc2ThreePointCom } from "./coms/ModifyArc2ThreePointCom";
 import { ComMove } from "./coms/ComMove";
 import { ComRotate } from "./coms/ComRotate";
 import { ComOffset } from "./coms/ComOffset";
+import { ComScale } from "./coms/ComScale";
+import { ComMirror } from "./coms/ComMirror";
 
 /**
  * Command executer base class.
@@ -42,17 +44,25 @@ class CommandExecuter {
             case 'KeyE':
                 new DeleteObjectsCom(this, 'E').exec();
                 break;
+            // I：镜像
+            case 'KeyI':
+                new ComMirror(this, 'I').exec();
+                break;
             // M：移动
             case 'KeyM':
                 new ComMove(this, 'M').exec();
                 break;
             // R：旋转
             case 'KeyR':
-                new ComRotate(this, 'M').exec();
+                new ComRotate(this, 'R').exec();
                 break;
             // O：偏移
             case 'KeyO':
                 new ComOffset(this, 'O').exec();
+                break;
+            // S：拉伸
+            case 'KeyS':
+                new ComScale(this, 'S').exec();
                 break;
             case "KeyZ":
                 if (this.KeyCtrlDown) {
@@ -120,12 +130,14 @@ class CommandExecuter {
                     break;
                 // F：倒圆角
                 // G：对象组合
-                // I：插入
+                // I：镜像
+                case 'I':
+                    com = new ComMirror(this, comstr);
                 // J：对接
                 // S：拉伸
-
-
-
+                case 'S':
+                    com = new ComScale(this, comstr);
+                    break;
                 // M：移动
                 case 'M':
                     com = new ComMove(this, comstr);
