@@ -131,11 +131,17 @@ const ComOptionBar: React.FC = () => (
             onChange={(e) => {
                 Global.select.isSnap = e.target.checked;
             }}
+            onClick={(e) => {
+                e.stopPropagation();
+            }}
         >捕捉</Checkbox>
         <Checkbox
             style={{ width: 100, position: 'fixed', top: 10, left: 150, zIndex: 1000, color: '#00A000' }}
             onChange={(e) => {
                 Global.select.isSnapInter = e.target.checked;
+            }}
+            onClick={(e) => {
+                e.stopPropagation();
             }}
         >捕捉交点</Checkbox>
         {/* <Checkbox

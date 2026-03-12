@@ -208,7 +208,7 @@ class Select {
         }
         if (this._isSnap) {
             // 没有得到一个可拾取对象
-            if (!isCanPick) {
+            if (!isCanPick && this.pickedPoint) {
                 this.pickedPoint.x = Math.round(this.pickedPoint.x);
                 this.pickedPoint.y = Math.round(this.pickedPoint.y);
             }
@@ -267,9 +267,9 @@ class Select {
         }
         if (this._isSnap) {
             // 没有得到一个可拾取对象
-            if (!isCanPick) {
-                this.pickedPoint.x = Math.round(this.pickedPoint.x);
-                this.pickedPoint.y = Math.round(this.pickedPoint.y);
+            if (this.overedPoint) {
+                this.overedPoint.x = Math.round(this.overedPoint.x);
+                this.overedPoint.y = Math.round(this.overedPoint.y);
             }
         }
     };

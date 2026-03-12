@@ -5420,8 +5420,14 @@ class Matrix3 {
 		let scale: Vector2 = new Vector2();
 		const te = this.elements;
 
-		let sx = _v1.set(te[0], te[1], 0).length();
-		const sy = _v1.set(te[3], te[4], 0).length();
+		// scale the rotation part
+		const a = te[0];
+		const c = te[1];
+		const b = te[3];
+		const d = te[4];
+
+		let sx = Math.sqrt(a * a + c * c);
+		let sy = Math.sqrt(b * b + d * d);
 
 		// if determine is negative, we need to invert one scale
 		const det = this.determinant();
@@ -5430,13 +5436,7 @@ class Matrix3 {
 		position.x = te[6];
 		position.y = te[7];
 
-		// scale the rotation part
-		const a = te[0];
-		const c = te[1];
-		const b = te[3];
-		const d = te[4];
-
-		rotation = Math.atan2(c, a);
+		rotation = Math.atan2(c / sx, a / sx);
 
 		scale.x = sx;
 		scale.y = sy;
