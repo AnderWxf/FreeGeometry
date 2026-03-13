@@ -2,9 +2,16 @@ const _lut = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '0a', 
 
 let _seed = 1234567;
 
+export const PI = Math.PI;
+export const PI2 = Math.PI * 2;
+export const PI_2 = Math.PI / 2;
+export const PI_3 = Math.PI / 3;
+export const PI_4 = Math.PI / 4;
+export const PI_6 = Math.PI / 6;
 
 const DEG2RAD = Math.PI / 180;
 const RAD2DEG = 180 / Math.PI;
+
 
 /**
  * Generate a [UUID]{@link https://en.wikipedia.org/wiki/Universally_unique_identifier}

@@ -81,7 +81,7 @@ class ModifyLine2Com extends ComModify {
             this._text = paras[0] + ' ' + beginPoint.x + ' ' + beginPoint.y + ' ' + endPoint.x + ' ' + endPoint.y;
         }
         // 创建一个直线段
-        let edge = this.data = Brep2Builder.BuildLineEdge2FromBeginEndPoint(beginPoint, endPoint);
+        let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(beginPoint, endPoint);
         let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
         geo.userData.type = Curve2Type.L;
         this.result = geo;

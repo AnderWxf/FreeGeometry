@@ -43,13 +43,13 @@ class CreateCircle2Com extends ComCreate {
             await act_pick_end.execute(context);
             if (this._isCancel) { this.cancel(); return; }
             this.beginPoint = new Vector2(act_pick_end.result.x, act_pick_end.result.y);
-            this.assists.push(this.createAssistPoint(this.beginPoint));
+            this.assists.push(this.createAssistPoint(this.beginPoint, THREE.Color.NAMES.limegreen));
             Global.scene.add(this.assists[this.assists.length - 1]);
 
             this._text = paras[0] + ' ' + this.centerPoint.x + ' ' + this.centerPoint.y + ' ' + this.beginPoint.x + ' ' + this.beginPoint.y;
         }
         // 创建一个曲线段
-        let edge = this.data = Brep2Builder.BuildCircleEdge2FromCenterRadius(this.centerPoint, this.beginPoint.distanceTo(this.centerPoint));
+        let edge = Brep2Builder.BuildCircleEdge2FromCenterRadius(this.centerPoint, this.beginPoint.distanceTo(this.centerPoint));
         let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
         geo.userData.type = Curve2Type.C;
         this.result = geo;
@@ -61,9 +61,9 @@ class CreateCircle2Com extends ComCreate {
             if (this.tempResult) {
                 Global.scene.remove(this.tempResult);
             }
-            let endPoint: Vector2 = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
+            let beginPoint: Vector2 = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
             // 创建一个临时曲线段
-            let edge = Brep2Builder.BuildCircleEdge2FromCenterRadius(this.centerPoint, endPoint.distanceTo(this.centerPoint));
+            let edge = Brep2Builder.BuildCircleEdge2FromCenterRadius(this.centerPoint, beginPoint.distanceTo(this.centerPoint));
             let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0, false);
             t.name = "temp";
             this.tempResult = t;

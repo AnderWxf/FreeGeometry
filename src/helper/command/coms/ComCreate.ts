@@ -1,6 +1,4 @@
 import { Global } from "../../../core/Global";
-import type { DataBase } from "../../../geometry/data/DataBase";
-import type { Vector2 } from "../../../math/Math";
 import { Command } from "../Command";
 import type { CommandExecuter } from "../CommandExecuter";
 import * as THREE from "three";
@@ -10,7 +8,6 @@ import * as THREE from "three";
  * 
  */
 class ComCreate extends Command {
-    protected data: DataBase;
     protected result: THREE.Object3D;
     protected tempResult: THREE.Object3D;
     protected assists: THREE.Object3D[];

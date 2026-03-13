@@ -32,7 +32,7 @@ class Command {
     }
 
     // 创建一个辅助点
-    protected createAssistPoint(p: Vector2, color: number = 0x0088ff): THREE.Mesh {
+    protected createAssistPoint(p: Vector2, color: number = THREE.Color.NAMES.darkblue): THREE.Mesh {
         const material = new THREE.MeshBasicMaterial({ color: color });
         const mesh = new THREE.Mesh(Command.geometry, material);
         mesh.position.x = p.x;

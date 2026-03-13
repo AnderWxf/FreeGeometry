@@ -38,7 +38,7 @@ class CreateCircle2ThreePointCom extends ComCreate {
             await act_pick_begin.execute(context);
             if (this._isCancel) { this.cancel(); return; }
             this.beginPoint = new Vector2(act_pick_begin.result.x, act_pick_begin.result.y);
-            this.assists.push(this.createAssistPoint(this.beginPoint));
+            this.assists.push(this.createAssistPoint(this.beginPoint, THREE.Color.NAMES.limegreen));
             Global.scene.add(this.assists[this.assists.length - 1]);
 
             let act_pick_middle = new ActPickPoint2();
@@ -57,7 +57,7 @@ class CreateCircle2ThreePointCom extends ComCreate {
             this._text = paras[0] + ' ' + this.beginPoint.x + ' ' + this.beginPoint.y + ' ' + this.endPoint.x + ' ' + this.endPoint.y;
         }
         // 创建一个曲线段
-        let edge = this.data = Brep2Builder.BuildCircleFromBeginMiddleEndPoint(this.beginPoint, this.middlePoint, this.endPoint);
+        let edge = Brep2Builder.BuildCircleFromBeginMiddleEndPoint(this.beginPoint, this.middlePoint, this.endPoint);
         let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
         geo.userData.type = Curve2Type.C3;
         this.result = geo;

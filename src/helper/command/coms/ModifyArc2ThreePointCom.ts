@@ -83,14 +83,14 @@ class ModifyArc2ThreePointCom extends ComModify {
                 endPoint.y = act_pick_new_pos.result.y;
             }
 
-            this.assists[0] = this.createAssistPoint(beginPoint);
+            this.assists[0] = this.createAssistPoint(beginPoint, THREE.Color.NAMES.limegreen);
             this.assists[1] = this.createAssistPoint(middlePoint);
             this.assists[2] = this.createAssistPoint(endPoint);
 
             this._text = paras[0] + ' ' + beginPoint.x + ' ' + beginPoint.y + ' ' + middlePoint.x + ' ' + middlePoint.y + ' ' + endPoint.x + ' ' + endPoint.y;
         }
         // 创建一个曲线段
-        let edge = this.data = Brep2Builder.BuildArcFromBeginMiddleEndPoint(beginPoint, middlePoint, endPoint);
+        let edge = Brep2Builder.BuildArcFromBeginMiddleEndPoint(beginPoint, middlePoint, endPoint);
         let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
         geo.userData.type = Curve2Type.A3;
         this.result = geo;

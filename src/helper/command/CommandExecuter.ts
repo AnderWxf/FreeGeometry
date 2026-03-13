@@ -16,6 +16,8 @@ import { ComRotate } from "./coms/ComRotate";
 import { ComOffset } from "./coms/ComOffset";
 import { ComScale } from "./coms/ComScale";
 import { ComMirror } from "./coms/ComMirror";
+import { CreateEllipse2Com } from "./coms/CreateEllipse2Com";
+import { CreateEllipseArc2Com } from "./coms/CreateEllipseArc2Com";
 
 /**
  * Command executer base class.
@@ -38,11 +40,7 @@ class CommandExecuter {
                 comline.focus();
                 break;
             case "Delete":
-                new DeleteObjectsCom(this, 'E').exec();
-                break;
-            // E：删除
-            case 'KeyE':
-                new DeleteObjectsCom(this, 'E').exec();
+                new DeleteObjectsCom(this, 'Delete').exec();
                 break;
             // I：镜像
             case 'KeyI':
@@ -121,13 +119,18 @@ class CommandExecuter {
                 case 'L':
                     com = new CreateLine2Com(this, comstr);
                     break;
+                // E：绘椭圆
+                case 'E':
+                    com = new CreateEllipse2Com(this, comstr);
+                    break;
+                // EA：绘椭圆弧
+                case 'EA':
+                    com = new CreateEllipseArc2Com(this, comstr);
+                    break;
                 // PL：多段线
 
                 // REC：矩形
-                // E：删除
-                case 'E':
-                    com = new DeleteObjectsCom(this, comstr);
-                    break;
+
                 // F：倒圆角
                 // G：对象组合
                 // I：镜像

@@ -74,13 +74,13 @@ class ModifyCircle2Com extends ComModify {
             }
 
             this.assists[0] = this.createAssistPoint(centerPoint, THREE.Color.NAMES.greenyellow);
-            this.assists[1] = this.createAssistPoint(beginPoint);
+            this.assists[1] = this.createAssistPoint(beginPoint, THREE.Color.NAMES.limegreen);
 
             this._text = paras[0] + ' ' + centerPoint.x + ' ' + centerPoint.y + ' ' + beginPoint.x + ' ' + beginPoint.y;
 
         }
         // 创建一个曲线段
-        let edge = this.data = Brep2Builder.BuildCircleEdge2FromCenterRadius(centerPoint, beginPoint.distanceTo(centerPoint));
+        let edge = Brep2Builder.BuildCircleEdge2FromCenterRadius(centerPoint, beginPoint.distanceTo(centerPoint));
         let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
         geo.userData.type = Curve2Type.C;
         this.result = geo;
