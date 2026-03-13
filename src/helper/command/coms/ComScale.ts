@@ -13,10 +13,12 @@ class ComScale extends ComTransform {
     }
     // 计算变换矩阵
     override makeTransfrom(begin: Vector2, end: Vector2): Matrix3 {
-        let offset = new Vector2().subVectors(end, begin).multiplyScalar(0.2);
+        let offset = new Vector2(0, 0).add(end).sub(begin).multiplyScalar(0.2);
+        let sx = offset.x == 0 ? 1 : offset.x;
+        let sy = offset.y == 0 ? 1 : offset.y;
         let ret = new Matrix3();
         ret.translate(-begin.x, -begin.y);
-        ret.scale(offset.x, offset.y);
+        ret.scale(sx, sy);
         ret.translate(begin.x, begin.y);
         return ret;
     }

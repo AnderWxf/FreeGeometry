@@ -16,7 +16,6 @@ export class Global {
     static gpu: HTMLElement;
     static canvas: HTMLCanvasElement;
 
-
     static isShowAssists: boolean = true;
 }
 

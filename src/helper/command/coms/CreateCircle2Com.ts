@@ -10,13 +10,14 @@ import { BrepMeshBuilder } from "../../MeshBuilder";
 import type { CommandExecuter } from "../CommandExecuter";
 import { Curve2Type } from "../../../core/Constents";
 
+
 /**
  * Create command class.
  * 
  */
 class CreateCircle2Com extends ComCreate {
+    centerPoint: Vector2;
     beginPoint: Vector2;
-    endPoint: Vector2;
     constructor(executer: CommandExecuter, text: string) {
         super(executer, text);
     }
@@ -25,8 +26,8 @@ class CreateCircle2Com extends ComCreate {
         let paras = str.split(' ');
         if (paras.length == 5) {
             // 创建一个线段
-            this.beginPoint = new Vector2(new Number(paras[1]).valueOf(), new Number(paras[2]).valueOf());
-            this.endPoint = new Vector2(new Number(paras[3]).valueOf(), new Number(paras[4]).valueOf());
+            this.centerPoint = new Vector2(new Number(paras[1]).valueOf(), new Number(paras[2]).valueOf());
+            this.beginPoint = new Vector2(new Number(paras[3]).valueOf(), new Number(paras[4]).valueOf());
         } else {
             this.bind(window);
             let context: ActionContext3D = new ActionContext3D(Global.scene, Global.camera, Global.renderer, Global.select);
@@ -34,21 +35,21 @@ class CreateCircle2Com extends ComCreate {
 
             await act_pick_begin.execute(context);
             if (this._isCancel) { this.cancel(); return; }
-            this.beginPoint = new Vector2(act_pick_begin.result.x, act_pick_begin.result.y);
-            this.assists.push(this.createAssistPoint(this.beginPoint));
+            this.centerPoint = new Vector2(act_pick_begin.result.x, act_pick_begin.result.y);
+            this.assists.push(this.createAssistPoint(this.centerPoint, THREE.Color.NAMES.greenyellow));
             Global.scene.add(this.assists[this.assists.length - 1]);
 
             let act_pick_end = new ActPickPoint2();
             await act_pick_end.execute(context);
             if (this._isCancel) { this.cancel(); return; }
-            this.endPoint = new Vector2(act_pick_end.result.x, act_pick_end.result.y);
-            this.assists.push(this.createAssistPoint(this.endPoint));
+            this.beginPoint = new Vector2(act_pick_end.result.x, act_pick_end.result.y);
+            this.assists.push(this.createAssistPoint(this.beginPoint));
             Global.scene.add(this.assists[this.assists.length - 1]);
 
-            this._text = paras[0] + ' ' + this.beginPoint.x + ' ' + this.beginPoint.y + ' ' + this.endPoint.x + ' ' + this.endPoint.y;
+            this._text = paras[0] + ' ' + this.centerPoint.x + ' ' + this.centerPoint.y + ' ' + this.beginPoint.x + ' ' + this.beginPoint.y;
         }
         // 创建一个曲线段
-        let edge = this.data = Brep2Builder.BuildCircleEdge2FromCenterRadius(this.beginPoint, this.endPoint.distanceTo(this.beginPoint));
+        let edge = this.data = Brep2Builder.BuildCircleEdge2FromCenterRadius(this.centerPoint, this.beginPoint.distanceTo(this.centerPoint));
         let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
         geo.userData.type = Curve2Type.C;
         this.result = geo;
@@ -56,16 +57,15 @@ class CreateCircle2Com extends ComCreate {
     }
     onMouseMove = (event: MouseEvent) => {
         if (this._isCancel) { this.cancel(); return; }
-        if (this.beginPoint && !this.endPoint) {
+        if (this.centerPoint && !this.beginPoint) {
             if (this.tempResult) {
                 Global.scene.remove(this.tempResult);
             }
             let endPoint: Vector2 = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
             // 创建一个临时曲线段
-            let edge = Brep2Builder.BuildCircleEdge2FromCenterRadius(this.beginPoint, endPoint.distanceTo(this.beginPoint));
-            let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray);
+            let edge = Brep2Builder.BuildCircleEdge2FromCenterRadius(this.centerPoint, endPoint.distanceTo(this.centerPoint));
+            let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0, false);
             t.name = "temp";
-            t.frustumCulled = false;
             this.tempResult = t;
             Global.scene.add(this.tempResult);
         }

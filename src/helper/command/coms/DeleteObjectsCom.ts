@@ -8,6 +8,7 @@ import { BrepMeshBuilder } from "../../MeshBuilder";
 import { ComDelete } from "./ComDelete";
 import type { CommandExecuter } from "../CommandExecuter";
 
+
 /**
  * Delete objets command class.
  * 

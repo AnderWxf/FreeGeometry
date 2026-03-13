@@ -1,7 +1,9 @@
 import { Global } from "../../core/Global";
+import { Brep2Builder } from "../../geometry/algorithm/builder/Brep2Builder";
 import type { DataBase } from "../../geometry/data/DataBase";
 import type { Vector2 } from "../../math/Math";
 import { bin } from "../../mathjs/lib/cjs/entry/pureFunctionsAny.generated";
+import { BrepMeshBuilder } from "../MeshBuilder";
 import type { CommandExecuter } from "./CommandExecuter";
 import * as THREE from "three";
 
@@ -10,7 +12,7 @@ import * as THREE from "three";
  * 
  */
 class Command {
-
+    static geometry = new THREE.SphereGeometry(0.1);
     protected _text: string;
     protected _isCancel: boolean = false;
     protected _isDone: boolean = false;
@@ -29,15 +31,16 @@ class Command {
         return this._isDone;
     }
 
-    protected createAssistPoint(p: Vector2): THREE.Mesh {
-        const geometry = new THREE.SphereGeometry(0.1);
-        const material = new THREE.MeshBasicMaterial({ color: 0x0088ff });
-        const mesh = new THREE.Mesh(geometry, material);
+    // 创建一个辅助点
+    protected createAssistPoint(p: Vector2, color: number = 0x0088ff): THREE.Mesh {
+        const material = new THREE.MeshBasicMaterial({ color: color });
+        const mesh = new THREE.Mesh(Command.geometry, material);
         mesh.position.x = p.x;
         mesh.position.y = p.y;
         mesh.name = "assist";
         mesh.userData.canPick = true;
         mesh.userData.isAssist = true;
+        mesh.userData.color = color;
         mesh.userData.original = p;
         return mesh;
     }

@@ -9,6 +9,7 @@ import { BrepMeshBuilder } from "../../MeshBuilder";
 import type { CommandExecuter } from "../CommandExecuter";
 import { Curve2Type } from "../../../core/Constents";
 
+
 /**
  * Create command class.
  * 
@@ -36,7 +37,7 @@ class CreateArc2Com extends ComCreate {
             await act_pick_center.execute(context);
             if (this._isCancel) { this.cancel(); return; }
             this.centerPoint = new Vector2(act_pick_center.result.x, act_pick_center.result.y);
-            this.assists.push(this.createAssistPoint(this.centerPoint));
+            this.assists.push(this.createAssistPoint(this.centerPoint, THREE.Color.NAMES.greenyellow));
             Global.scene.add(this.assists[this.assists.length - 1]);
 
             let act_pick_begin = new ActPickPoint2();
@@ -73,9 +74,8 @@ class CreateArc2Com extends ComCreate {
             let beginPoint: Vector2 = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
             // 创建一个临时曲线段
             let edge = Brep2Builder.BuildCircleEdge2FromCenterRadius(this.centerPoint, beginPoint.distanceTo(this.centerPoint));
-            let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray);
+            let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0, false);
             t.name = "temp";
-            t.frustumCulled = false;
             this.tempResult = t;
             Global.scene.add(this.tempResult);
         }
@@ -86,9 +86,8 @@ class CreateArc2Com extends ComCreate {
             let endPoint: Vector2 = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
             // 创建一个临时曲线段
             let edge = Brep2Builder.BuildCircleArcEdge2FromCenterBeginEndPoin(this.centerPoint, this.beginPoint, endPoint);
-            let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray);
+            let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0, false);
             t.name = "temp";
-            t.frustumCulled = false;
             this.tempResult = t;
             Global.scene.add(this.tempResult);
         }

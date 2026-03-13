@@ -15,6 +15,7 @@ import { Arc2Data } from "../../../geometry/data/base/curve2/Arc2Data";
 import { Curve2Type } from "../../../core/Constents";
 import { ActPickAssist } from "../acts/ActPickAssist";
 
+
 /**
  * Modify command class.
  * 
@@ -94,7 +95,7 @@ class ModifyCircle2ThreePointCom extends ComModify {
         let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
         geo.userData.type = Curve2Type.C3;
         this.result = geo;
-        this.assists.push(this.createAssistPoint(edge.curve.trans.pos));
+        this.assists.push(this.createAssistPoint(edge.curve.trans.pos, THREE.Color.NAMES.greenyellow));
         this.done();
     }
     onMouseMove = (event: MouseEvent) => {
@@ -119,9 +120,8 @@ class ModifyCircle2ThreePointCom extends ComModify {
             }
             // 创建一个临时曲线段
             let edge = Brep2Builder.BuildCircleFromBeginMiddleEndPoint(beginPoint, middlePoint, endPoint);
-            let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray);
+            let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0, false);
             t.name = "temp";
-            t.frustumCulled = false;
             this.tempResult = t;
             Global.scene.add(this.tempResult);
         }

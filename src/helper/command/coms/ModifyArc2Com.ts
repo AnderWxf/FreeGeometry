@@ -13,6 +13,7 @@ import { ComModify } from "./ComModify";
 import { ActPickAssist } from "../acts/ActPickAssist";
 import { ActPickObject } from "../acts/ActPickObject";
 
+
 /**
  * Modify command class.
  * 
@@ -88,7 +89,7 @@ class ModifyArc2Com extends ComModify {
         geo.userData.type = Curve2Type.A;
         this.result = geo;
 
-        this.assists[0] = this.createAssistPoint(centerPoint);
+        this.assists[0] = this.createAssistPoint(centerPoint, THREE.Color.NAMES.greenyellow);
         this.assists[1] = this.createAssistPoint(beginPoint);
         this.assists[2] = this.createAssistPoint(endPoint);
         this._text = paras[0] + ' ' + centerPoint.x + ' ' + centerPoint.y + ' ' + beginPoint.x + ' ' + beginPoint.y + ' ' + endPoint.x + ' ' + endPoint.y;
@@ -119,7 +120,6 @@ class ModifyArc2Com extends ComModify {
             let edge = Brep2Builder.BuildCircleArcEdge2FromCenterBeginEndPoin(centerPoint, beginPoint, endPoint);
             let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray);
             t.name = "temp";
-            t.frustumCulled = false;
             this.tempResult = t;
             Global.scene.add(this.tempResult);
         }

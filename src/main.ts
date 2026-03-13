@@ -2,21 +2,40 @@ import { Cube } from "./Cube";
 import verb from 'verb-nurbs';
 import * as THREE from 'three';
 import { Matrix3, Vector2 } from "./math/Math";
+import { Transform2 } from "./geometry/data/base/Transform2";
 
-let m = new Matrix3();
-m.compose(new Vector2(10, 20), 0.643501, new Vector2(2.5, 2.5));
-m.set(
-  2.0, -1.5, 10,
-  1.5, 2.0, 20,
-  0, 0, 1
-);
-let pos = new Vector2();
-let rot = 0;
-let scale = new Vector2();
-let result = m.decompose();
-pos = result.position;
-rot = result.rotation;
-scale = result.scale;
+{
+  let m = new Matrix3();
+  m.compose(new Vector2(10, 20), 0.643501, new Vector2(2.5, 2.5));
+  m.set(
+    2.0, -1.5, 10,
+    1.5, 2.0, 20,
+    0, 0, 1
+  );
+  let pos = new Vector2();
+  let rot = 0;
+  let scale = new Vector2();
+  let result = m.decompose();
+  pos = result.position;
+  rot = result.rotation;
+  scale = result.scale;
+}
+{
+  let lm = new Matrix3();
+  lm.elements = [-1.6, -1.2, 0, 1.2, -1.6, 0, 0, 0, 1];
+  let m = new Matrix3();
+  m.elements = [1.4000000000000001, 0, 0, 0, 0, 0, 0, 0, 1];
+  let trans = new Transform2(new Vector2(), -2.498091544796509, new Vector2(2, 2));
+  lm.premultiply(m);
+  trans.fromLocalMatrix(lm);
+  let lm2 = trans.makeLocalMatrix();
+  console.log(lm2);
+}
+
+
+
+
+
 
 let v = new THREE.Vector2(0, 0);
 // // 创建 NURBS 曲线

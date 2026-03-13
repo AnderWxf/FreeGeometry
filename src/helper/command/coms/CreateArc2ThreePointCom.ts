@@ -10,6 +10,7 @@ import { BrepMeshBuilder } from "../../MeshBuilder";
 import type { CommandExecuter } from "../CommandExecuter";
 import { Curve2Type } from "../../../core/Constents";
 
+
 /**
  * Create command class.
  * 
@@ -61,7 +62,7 @@ class CreateArc2ThreePointCom extends ComCreate {
         let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
         geo.userData.type = Curve2Type.A3;
         this.result = geo;
-        this.assists.push(this.createAssistPoint(edge.curve.trans.pos));
+        this.assists.push(this.createAssistPoint(edge.curve.trans.pos, THREE.Color.NAMES.greenyellow));
         this.done();
     }
     onMouseMove = (event: MouseEvent) => {
@@ -73,9 +74,8 @@ class CreateArc2ThreePointCom extends ComCreate {
             let middlePoint: Vector2 = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
             // 创建一个临时曲线段
             let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(this.beginPoint, middlePoint);
-            let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray);
+            let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0, false);
             t.name = "temp";
-            t.frustumCulled = false;
             this.tempResult = t;
             Global.scene.add(this.tempResult);
         }
@@ -86,9 +86,8 @@ class CreateArc2ThreePointCom extends ComCreate {
             let endPoint: Vector2 = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
             // 创建一个临时曲线段
             let edge = Brep2Builder.BuildArcFromBeginMiddleEndPoint(this.beginPoint, this.middlePoint, endPoint);
-            let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray);
+            let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0, false);
             t.name = "temp";
-            t.frustumCulled = false;
             this.tempResult = t;
             Global.scene.add(this.tempResult);
         }

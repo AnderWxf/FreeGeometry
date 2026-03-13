@@ -115,11 +115,6 @@ class Select {
                 if (originalColor) {
                     (obj as any).material.color.copy(originalColor);
                 }
-                // obj.children.forEach(element => {
-                //     if (element.userData.canPick) {
-                //         element.visible = false;
-                //     }
-                // });
             }
             this.selectedObjects = [];
         }
@@ -133,6 +128,8 @@ class Select {
         // 更新射线的起点和方向
         raycaster.setFromCamera(mouse, this._camera);
         let isCanPick = false;
+        // 默认的点
+        this.pickedPoint = raycaster.ray.origin; // 没有交点时，设置射线源点
         // 计算物体和射线的交点
         const intersects = raycaster.intersectObjects(this._scene.children);
         if (intersects.length > 0) {
@@ -203,12 +200,10 @@ class Select {
                 }
 
             }
-        } else {
-            this.pickedPoint = raycaster.ray.origin; // 没有交点时，设置射线源点
         }
         if (this._isSnap) {
             // 没有得到一个可拾取对象
-            if (!isCanPick && this.pickedPoint) {
+            if (!isCanPick) {
                 this.pickedPoint.x = Math.round(this.pickedPoint.x);
                 this.pickedPoint.y = Math.round(this.pickedPoint.y);
             }
@@ -222,11 +217,6 @@ class Select {
             if (originalColor) {
                 (obj as any).material.color.copy(originalColor);
             }
-            // obj.children.forEach(element => {
-            //     if (element.userData.canPick) {
-            //         element.visible = false;
-            //     }
-            // });
         }
         this.overObjects = [];
         // 创建射线投射器
@@ -239,13 +229,15 @@ class Select {
         // 更新射线的起点和方向
         raycaster.setFromCamera(mouse, this._camera);
         let isCanPick = false;
+        // 默认的点
+        this.overedPoint = raycaster.ray.origin; // 没有交点时，设置射线源点
         // 计算物体和射线的交点
         const intersects = raycaster.intersectObjects(this._scene.children);
         if (intersects.length > 0) {
             for (let i = intersects.length - 1; i >= 0; i--) {
                 const obj = intersects[i].object;
-                this.overedPoint = intersects[i].point; // 交点的世界坐标
                 if (obj.userData.canPick) {
+                    this.overedPoint = intersects[i].point; // 交点的世界坐标                    
                     isCanPick = true;
                     if (!this.overObjects.includes(obj) && !this.selectedObjects.includes(obj)) {
                         if ((obj as any).material && (obj as any).material.color) {
@@ -254,20 +246,13 @@ class Select {
                             (obj as any).material.color.set(THREE.Color.NAMES.aquamarine);
                         }
                         this.overObjects.push(obj);
-                        // obj.children.forEach(element => {
-                        //     if (element.userData.canPick) {
-                        //         element.visible = true;
-                        //     }
-                        // });
                     }
                 }
             }
-        } else {
-            this.overedPoint = raycaster.ray.origin; // 没有交点时，设置射线源点
         }
         if (this._isSnap) {
             // 没有得到一个可拾取对象
-            if (this.overedPoint) {
+            if (!isCanPick) {
                 this.overedPoint.x = Math.round(this.overedPoint.x);
                 this.overedPoint.y = Math.round(this.overedPoint.y);
             }

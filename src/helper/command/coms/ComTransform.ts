@@ -70,7 +70,7 @@ class ComTransform extends ComBatch {
                     let child = old.children[i];
                     let p = new Vector2(child.position.x, child.position.y);
                     p.applyMatrix3(trans);
-                    geo.children.push(this.createAssistPoint(p));
+                    geo.children.push(this.createAssistPoint(p, child.userData.color));
                 }
                 this.results.push(geo);
             }
@@ -105,18 +105,17 @@ class ComTransform extends ComBatch {
                 if (old.userData.original instanceof Edge2) {
                     let edge = (old.userData.original as Edge2).clone();
                     this.appTransfrom(edge.curve.trans, trans);
-                    let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray);
+                    let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0, false);
                     t.name = "temp";
-                    t.frustumCulled = false;
                     this.tempResults.push(t);
                 }
             }
 
             // 创建一个临时直线段
-            let edge2 = Brep2Builder.BuildLineEdge2FromBeginEndPoint(this.beginPoint, endPoint);
-            let t2 = BrepMeshBuilder.BuildEdge2Mesh(edge2, THREE.Color.NAMES.gray);
-
-            this.tempResults.push(t2);
+            let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(this.beginPoint, endPoint);
+            let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0, false);
+            t.name = "temp";
+            this.tempResults.push(t);
             Global.scene.add(...this.tempResults);
         }
     };

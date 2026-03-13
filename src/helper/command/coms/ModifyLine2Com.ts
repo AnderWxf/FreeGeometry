@@ -14,6 +14,7 @@ import { Edge2 } from "../../../geometry/data/brep/Brep2";
 import { Line2Data } from "../../../geometry/data/base/curve2/Line2Data";
 import { Curve2Type } from "../../../core/Constents";
 
+
 /**
  * Modify command class.
  * 
@@ -74,7 +75,7 @@ class ModifyLine2Com extends ComModify {
                 endPoint.x = act_pick_new_pos.result.x;
                 endPoint.y = act_pick_new_pos.result.y;
             }
-            this.assists[0] = this.createAssistPoint(beginPoint);
+            this.assists[0] = this.createAssistPoint(beginPoint, THREE.Color.NAMES.greenyellow);
             this.assists[1] = this.createAssistPoint(endPoint);
 
             this._text = paras[0] + ' ' + beginPoint.x + ' ' + beginPoint.y + ' ' + endPoint.x + ' ' + endPoint.y;
@@ -105,9 +106,8 @@ class ModifyLine2Com extends ComModify {
 
             // 创建一个临时直线段
             let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(beginPoint, endPoint);
-            let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray);
+            let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0, false);
             t.name = "temp";
-            t.frustumCulled = false;
             this.tempResult = t;
             Global.scene.add(this.tempResult);
         }

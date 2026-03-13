@@ -21,7 +21,7 @@ class BrepMeshBuilder {
      * @param {number} [segment] - The segment of edge2 object.
      * @param {number} [sub] - The sub type of edge2 object.
      */
-    static BuildEdge2Mesh(edge: Edge2, color: number, segment?: number, sub: number = 0): THREE.Line {
+    static BuildEdge2Mesh(edge: Edge2, color: number, segment?: number, sub: number = 0, canPick: boolean = true): THREE.Line {
         if (segment == undefined) {
             if (edge.curve instanceof Line2Data) {
                 segment = 1;
@@ -47,7 +47,7 @@ class BrepMeshBuilder {
 
         const materialline = new THREE.MeshBasicMaterial({ color: color });
         let ret = new THREE.Line(buff, materialline);
-        ret.userData.canPick = true;
+        ret.userData.canPick = canPick;
         ret.userData.original = edge;
         ret.frustumCulled = false;
         return ret;

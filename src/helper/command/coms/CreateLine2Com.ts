@@ -9,6 +9,7 @@ import { BrepMeshBuilder } from "../../MeshBuilder";
 import type { CommandExecuter } from "../CommandExecuter";
 import { Curve2Type } from "../../../core/Constents";
 
+
 /**
  * Create command class.
  * 
@@ -34,7 +35,7 @@ class CreateLine2Com extends ComCreate {
             await act_pick_begin.execute(context);
             if (this._isCancel) { this.cancel(); return; }
             this.beginPoint = new Vector2(act_pick_begin.result.x, act_pick_begin.result.y);
-            this.assists.push(this.createAssistPoint(this.beginPoint));
+            this.assists.push(this.createAssistPoint(this.beginPoint, THREE.Color.NAMES.greenyellow));
             Global.scene.add(this.assists[this.assists.length - 1]);
 
             let act_pick_end = new ActPickPoint2();
@@ -60,9 +61,8 @@ class CreateLine2Com extends ComCreate {
             let endPoint: Vector2 = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
             // 创建一个临时直线段
             let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(this.beginPoint, endPoint);
-            let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray);
+            let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0, false);
             t.name = "temp";
-            t.frustumCulled = false;
             this.tempResult = t;
             Global.scene.add(this.tempResult);
         }

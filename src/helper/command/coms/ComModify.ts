@@ -4,6 +4,7 @@ import * as THREE from "three";
 import type { CommandExecuter } from "../CommandExecuter";
 import { Global } from "../../../core/Global";
 
+
 /**
  * Modify command class.
  * 
