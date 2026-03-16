@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { Vector2, Vector3 } from '../math/Math';
+import { Global } from '../core/Global';
 
 /**
  * Select controller.
@@ -137,7 +138,7 @@ class Select {
                 const obj = intersects[i].object;
                 this.pickedPoint = intersects[i].point; // 交点的世界坐标
                 // 编辑状态
-                if (this._isEditor) {
+                if (0) {
                     if (obj.userData.canPick && obj.userData.isAssist) {
                         isCanPick = true;
                         //拾取的是一个存在的点对象
@@ -145,6 +146,9 @@ class Select {
                         if (this.selectedAssist != obj) {
                             if (this.overObjects.includes(obj)) {
                                 this.overObjects.splice(this.overObjects.indexOf(obj), 1);
+                                if ((obj as any).material && (obj as any).material.color) {
+                                    (obj as any).material.color.set(THREE.Color.NAMES.aqua);
+                                }
                             } else {
                                 if ((obj as any).material && (obj as any).material.color) {
                                     let originalColor = (obj as any).material.color as THREE.Color;
@@ -153,13 +157,8 @@ class Select {
                                 }
                             }
                             this.selectedAssist = obj;
-                            // obj.children.forEach(element => {
-                            //     if (element.userData.canPick) {
-                            //         element.visible = true;
-                            //     }
-                            // });
                         }
-                        return;
+                        break;
                     }
 
                 } else {
@@ -178,9 +177,31 @@ class Select {
                         else if (obj.userData.original.p instanceof Vector3) {
                             this.pickedPoint.set(obj.userData.original.p.x, obj.userData.original.p.y, obj.userData.original.p.z);
                         }
+                        if (obj.userData.isAssist) {
+                            //拾取的是一个存在的点对象
+                            this.pickedPoint.set(obj.position.x, obj.position.y, 0);
+                            if (this.selectedAssist != obj) {
+                                if (this.overObjects.includes(obj)) {
+                                    this.overObjects.splice(this.overObjects.indexOf(obj), 1);
+                                    if ((obj as any).material && (obj as any).material.color) {
+                                        (obj as any).material.color.set(THREE.Color.NAMES.aqua);
+                                    }
+                                } else {
+                                    if ((obj as any).material && (obj as any).material.color) {
+                                        let originalColor = (obj as any).material.color as THREE.Color;
+                                        obj.userData.originalColor = originalColor.clone();
+                                        (obj as any).material.color.set(THREE.Color.NAMES.aqua);
+                                    }
+                                }
+                                this.selectedAssist = obj;
+                            }
+                        }
                         if (!this.selectedObjects.includes(obj)) {
                             if (this.overObjects.includes(obj)) {
                                 this.overObjects.splice(this.overObjects.indexOf(obj), 1);
+                                if ((obj as any).material && (obj as any).material.color) {
+                                    (obj as any).material.color.set(THREE.Color.NAMES.aqua);
+                                }
                             } else {
                                 if ((obj as any).material && (obj as any).material.color) {
                                     let originalColor = (obj as any).material.color as THREE.Color;
@@ -189,13 +210,8 @@ class Select {
                                 }
                             }
                             this.selectedObjects.push(obj);
-                            // obj.children.forEach(element => {
-                            //     if (element.userData.canPick) {
-                            //         element.visible = true;
-                            //     }
-                            // });
                         }
-                        return;
+                        break;
                     }
                 }
 
@@ -208,7 +224,22 @@ class Select {
                 this.pickedPoint.y = Math.round(this.pickedPoint.y);
             }
         }
+        // 编辑模式
+        if (this._isEditor && this.selectedObjects.length > 0 && !this.selectedObjects[0].userData.isAssist) {
+            Global.comExector.onEidtor();
+        }
     };
+
+    pushSelectObject(obj: THREE.Object3D) {
+        if ((obj as any).material && (obj as any).material.color) {
+            let originalColor = (obj as any).material.color as THREE.Color;
+            obj.userData.originalColor = originalColor.clone();
+            (obj as any).material.color.set(THREE.Color.NAMES.aqua);
+        }
+        this.selectedObjects = this.selectedObjects.reverse();
+        this.selectedObjects.push(obj);
+        this.selectedObjects = this.selectedObjects.reverse();
+    }
     onMouseMove = (event: MouseEvent) => {
         // 可以在这里实现鼠标移动时的交互逻辑，例如高亮选中对象等
         for (let i = 0; i < this.overObjects.length; i++) {
@@ -243,7 +274,7 @@ class Select {
                         if ((obj as any).material && (obj as any).material.color) {
                             let originalColor = (obj as any).material.color as THREE.Color;
                             obj.userData.originalColor = originalColor.clone();
-                            (obj as any).material.color.set(THREE.Color.NAMES.aquamarine);
+                            (obj as any).material.color.set(THREE.Color.NAMES.cornflowerblue);
                         }
                         this.overObjects.push(obj);
                     }

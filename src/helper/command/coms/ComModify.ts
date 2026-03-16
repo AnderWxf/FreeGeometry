@@ -1,4 +1,3 @@
-import type { DataBase } from "../../../geometry/data/DataBase";
 import { Command } from "../Command";
 import * as THREE from "three";
 import type { CommandExecuter } from "../CommandExecuter";
@@ -20,7 +19,7 @@ class ComModify extends Command {
         super(executer, text);
         this.assists = [];
     }
-    onMouseMove = (event: MouseEvent) => {
+    onMouseMoveExec(event: MouseEvent) {
     };
 
     protected cancel() {
@@ -28,7 +27,11 @@ class ComModify extends Command {
         if (this.tempResult) {
             Global.scene.remove(this.tempResult);
         }
-        Global.select.isEditor = false;
+        this.assists.forEach(element => {
+            this.result.children.push(element);
+            element.visible = Global.isShowAssists;
+        });
+
     }
 
     protected getIndex(pick: THREE.Object3D): number {
@@ -52,7 +55,10 @@ class ComModify extends Command {
             this.result.children.push(element);
             element.visible = Global.isShowAssists;
         });
-        Global.select.isEditor = false;
+        if (Global.select.isEditor) {
+            Global.select.pushSelectObject(this.result);
+            Global.comExector.onEidtor();
+        }
     }
     override bind(window: Window) {
         super.bind(window);

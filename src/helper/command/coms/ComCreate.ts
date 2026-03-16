@@ -16,14 +16,19 @@ class ComCreate extends Command {
         super(executer, text);
         this.assists = [];
     }
-    onMouseMove = (event: MouseEvent) => {
-    };
+
 
     protected cancel() {
         this.unbind(window);
         if (this.tempResult) {
             Global.scene.remove(this.tempResult);
         }
+        this.assists.forEach(element => {
+            if (Global.scene.children.includes(element)) {
+                Global.scene.remove(element);
+            }
+            element.visible = Global.isShowAssists;
+        });
     }
     override done() {
         super.done();
@@ -40,14 +45,7 @@ class ComCreate extends Command {
             element.visible = Global.isShowAssists;
         });
     }
-    override bind(window: Window) {
-        super.bind(window);
-        window.addEventListener("mousemove", this.onMouseMove);
-    }
-    override unbind(window: Window) {
-        super.unbind(window);
-        window.removeEventListener("mousemove", this.onMouseMove);
-    }
+
     override undo() {
         if (this._isDone) {
             Global.scene.remove(this.result);

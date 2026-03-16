@@ -44,23 +44,43 @@ class Command {
         mesh.userData.original = p;
         return mesh;
     }
-
+    onMouseMove = (event: MouseEvent) => {
+        this.onMouseMoveExec(event);
+    };
+    onMouseMoveExec(event: MouseEvent) {
+    };
     onKeyDown = (event: KeyboardEvent) => {
+        this.onKeyDownExec(event);
+    }
+    onKeyDownExec(event: KeyboardEvent) {
         switch (event.code) {
             case "Escape":
                 this._isCancel = true;
                 break;
         }
     }
+    onKeyUp = (event: KeyboardEvent) => {
+        this.onKeyUpExec(event);
+    }
+    onKeyUpExec(event: KeyboardEvent) {
+    }
     bind(window: Window) {
         window.addEventListener("keydown", this.onKeyDown);
+        window.addEventListener("keyup", this.onKeyUp);
+        window.addEventListener("mousemove", this.onMouseMove);
     }
     unbind(window: Window) {
         window.removeEventListener("keydown", this.onKeyDown);
+        window.removeEventListener("keyup", this.onKeyUp);
+        window.removeEventListener("mousemove", this.onMouseMove);
     }
     undo() { }
     redo() { }
     exec() { }
+    cencle() {
+        this.unbind(window);
+        this._isCancel = true;
+    }
     done() {
         this.unbind(window);
         this._isDone = true;

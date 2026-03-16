@@ -134,47 +134,6 @@ class Parabola2Algo extends Curve2Algo {
      * @retun {A B C D E F} - General equation coefficients.
      */
     ge(): { A: MATHJS.BigNumber, B: MATHJS.BigNumber, C: MATHJS.BigNumber, D: MATHJS.BigNumber, E: MATHJS.BigNumber, F: MATHJS.BigNumber } {
-        // //设中心在 (x0,y0)，对称轴为 Y 轴正方向，旋转角为 φ（绕中心逆时针转）。
-        // // 曲线系数计算
-        // // A = cos²φ, 
-        // // B = sin2φ
-        // // C = sin²φ, 
-        // // D = 4 p sinφ - 2 A x0 - B y0
-        // // E = −4 p cosφ - B x0 - 2 C y0
-        // // F = A x0² + B x0 y0 + C y0² − 4 p sinφ x0 + 4 p cosφ y0     
-        // // 曲线的二元二次方程组
-        // // Ax² + Bxy + Cy² + Dx + Ey + F = 0
-        // const c = this.dat;
-        // const p = MATHJS.bignumber(c.f);
-        // const φ = MATHJS.bignumber(c.trans.rot);
-        // const x0 = MATHJS.bignumber(c.trans.pos.x);
-        // const y0 = MATHJS.bignumber(c.trans.pos.y);
-        // const sinφ = MATHJS.sin(φ);
-        // const cosφ = MATHJS.cos(φ);
-        // const sin2φ = MATHJS.sin(MATHJS.multiply(φ, 2) as MATHJS.BigNumber);
-
-        // const A = MATHJS.multiply(cosφ, cosφ) as MATHJS.BigNumber;
-        // const B = sin2φ;
-        // const C = MATHJS.multiply(sinφ, sinφ) as MATHJS.BigNumber;
-        // const D = MATHJS.add(
-        //     MATHJS.multiply(p, sinφ, 4),
-        //     MATHJS.unaryMinus(MATHJS.multiply(A, x0, 2)),
-        //     MATHJS.unaryMinus(MATHJS.multiply(B, y0))
-        // ) as MATHJS.BigNumber;
-        // const E = MATHJS.add(
-        //     MATHJS.unaryMinus(MATHJS.multiply(p, cosφ, 4)),
-        //     MATHJS.unaryMinus(MATHJS.multiply(B, x0)),
-        //     MATHJS.unaryMinus(MATHJS.multiply(C, y0, 2))
-        // ) as MATHJS.BigNumber;
-        // const F = MATHJS.add(
-        //     MATHJS.multiply(A, x0, x0),
-        //     MATHJS.multiply(B, x0, y0),
-        //     MATHJS.multiply(C, y0, y0),
-        //     MATHJS.unaryMinus(MATHJS.multiply(p, sinφ, x0, 4)),
-        //     MATHJS.multiply(p, cosφ, y0, 4),
-        // ) as MATHJS.BigNumber;
-        // return { A, B, C, D, E, F };
-
         // Qnew = T^-T * Qold * T^-1
         let dat = this.dat;
         let t_1 = dat.trans.makeLocalMatrix().invert();

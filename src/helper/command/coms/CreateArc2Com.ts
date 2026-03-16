@@ -65,7 +65,7 @@ class CreateArc2Com extends ComCreate {
 
         this.done();
     }
-    onMouseMove = (event: MouseEvent) => {
+    onMouseMoveExec(event: MouseEvent) {
         if (this._isCancel) { this.cancel(); return; }
         if (this.centerPoint && !this.beginPoint) {
             if (this.tempResult) {

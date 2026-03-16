@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import { ComCreate } from "./ComCreate";
 import { ActionContext3D } from "../Active";
 import { Global } from "../../../core/Global";
 import { ActPickPoint2 } from "../acts/ActPickPoint2";
@@ -10,8 +9,6 @@ import type { CommandExecuter } from "../CommandExecuter";
 import { ComModify } from "./ComModify";
 import { ActPickObject } from "../acts/ActPickObject";
 import { ActPickAssist } from "../acts/ActPickAssist";
-import { Edge2 } from "../../../geometry/data/brep/Brep2";
-import { Line2Data } from "../../../geometry/data/base/curve2/Line2Data";
 import { Curve2Type } from "../../../core/Constents";
 
 
@@ -26,7 +23,7 @@ class ModifyLine2Com extends ComModify {
     }
 
     async exec(): Promise<void> {
-        Global.select.isEditor = false;
+
         let str = this._text;
         let paras = str.split(' ');
         let beginPoint: Vector2;
@@ -50,7 +47,7 @@ class ModifyLine2Com extends ComModify {
             }
             this.old = act_pick_data.result;
 
-            Global.select.isEditor = true;
+
             let act_pick_assist = new ActPickAssist();
             await act_pick_assist.execute(context);
             this.assistIndex = this.getIndex(act_pick_assist.result);
@@ -87,7 +84,7 @@ class ModifyLine2Com extends ComModify {
         this.result = geo;
         this.done();
     }
-    onMouseMove = (event: MouseEvent) => {
+    onMouseMoveExec(event: MouseEvent) {
         if (this._isCancel) { this.cancel(); return; }
         if (this.assistIndex > -1) {
             if (this.tempResult) {

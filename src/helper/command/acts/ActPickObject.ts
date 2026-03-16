@@ -15,7 +15,6 @@ class ActPickObject extends Active {
     override async execute(context: ActionContext3D): Promise<void> {
         super.execute(context);
         this.bind(window);
-        context.select.clear();
         this.context = context;
         while (context.select.selectedObjects.length == 0 && !this._isCancel) {
             await new Promise(resolve => setTimeout(resolve, 10)); // 等待10ms

@@ -1,6 +1,7 @@
 import { Select } from '../helper/Select';
 import * as THREE from 'three';
 import * as WEBGPU from 'three/src/three.WebGPU';
+import type { CommandExecuter } from '../helper/command/CommandExecuter';
 
 export class Global {
     static version: string = "0.0.1";
@@ -17,5 +18,6 @@ export class Global {
     static canvas: HTMLCanvasElement;
 
     static isShowAssists: boolean = true;
+    static comExector: CommandExecuter;
 }
 

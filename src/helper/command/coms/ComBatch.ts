@@ -22,13 +22,13 @@ class ComBatch extends Command {
     async exec(): Promise<void> {
 
     }
-    onMouseMove = (event: MouseEvent) => {
+    onMouseMoveExec(event: MouseEvent) {
     };
 
     protected cancel() {
         this.unbind(window);
         Global.scene.remove(...this.tempResults);
-        Global.select.isEditor = false;
+
         this.olds = null;
         this.results = null;
         this.tempResults = null;
@@ -41,7 +41,7 @@ class ComBatch extends Command {
         if (this.isDeleteOld)
             Global.scene.remove(...this.olds);
         Global.scene.remove(...this.tempResults);
-        Global.select.isEditor = false;
+
         this.tempResults = [];
     }
     override bind(window: Window) {

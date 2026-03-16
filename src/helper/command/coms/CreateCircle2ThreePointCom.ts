@@ -64,7 +64,7 @@ class CreateCircle2ThreePointCom extends ComCreate {
         this.assists.push(this.createAssistPoint(edge.curve.trans.pos, THREE.Color.NAMES.greenyellow));
         this.done();
     }
-    onMouseMove = (event: MouseEvent) => {
+    onMouseMoveExec(event: MouseEvent) {
         if (this._isCancel) { this.cancel(); return; }
         if (this.beginPoint && !this.middlePoint) {
             if (this.tempResult) {

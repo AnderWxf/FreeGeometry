@@ -10,20 +10,20 @@ import { BrepMeshBuilder } from "../../MeshBuilder";
 import type { CommandExecuter } from "../CommandExecuter";
 import { Curve2Type } from "../../../core/Constents";
 import { CurveBuilder } from "../../../geometry/algorithm/builder/CurveBuilder";
-import { PI2, PI_2 } from "../../../math/MathUtils";
+import { PI, PI2, PI_2 } from "../../../math/MathUtils";
 
 
 /**
  * Create command class.
  * 
  */
-class CreateEllipseArc2Com extends ComCreate {
+class CreateHyperbola2Com extends ComCreate {
     centerPoint: Vector2;
     majorPoint: Vector2;
     minorPoint: Vector2;
     u0Point: Vector2;
     u1Point: Vector2;
-    private isForward: boolean = true;   // 默认正向弧(按下左shift表示画反向弧-正时针旋转)
+    private isRight: boolean = true;   // 默认右侧弧(按下左shift表示画左侧弧)
     constructor(executer: CommandExecuter, text: string) {
         super(executer, text);
     }
@@ -37,7 +37,7 @@ class CreateEllipseArc2Com extends ComCreate {
             this.minorPoint = new Vector2(new Number(paras[5]).valueOf(), new Number(paras[6]).valueOf());
             this.u0Point = new Vector2(new Number(paras[7]).valueOf(), new Number(paras[8]).valueOf());
             this.u1Point = new Vector2(new Number(paras[9]).valueOf(), new Number(paras[10]).valueOf());
-            this.isForward = new Boolean(paras[11]).valueOf();
+            this.isRight = new Boolean(paras[11]).valueOf();
         } else {
             this.bind(window);
             let context: ActionContext3D = new ActionContext3D(Global.scene, Global.camera, Global.renderer, Global.select);
@@ -76,14 +76,13 @@ class CreateEllipseArc2Com extends ComCreate {
                 + ' ' + this.minorPoint.x + ' ' + this.minorPoint.y
                 + ' ' + this.u0Point.x + ' ' + this.u0Point.y
                 + ' ' + this.u1Point.x + ' ' + this.u1Point.y
-                + ' ' + this.isForward;
+                + ' ' + this.isRight;
         }
         // 创建一个曲线段
-        let edge = Brep2Builder.BuildEllipseArcEdge2FromCenterBeginEndPoint(this.centerPoint, this.majorPoint, this.minorPoint);
+        let edge = Brep2Builder.BuildHyperbolaEdge2FromCenterABPoint(this.centerPoint, this.majorPoint, this.minorPoint);
 
         let alg = CurveBuilder.Algorithm2ByData(edge.curve);
 
-        this.minorPoint = alg.p(PI_2);
         this.assists.push(this.createAssistPoint(this.minorPoint, THREE.Color.NAMES.green));
         Global.scene.add(this.assists[this.assists.length - 1]);
 
@@ -98,17 +97,8 @@ class CreateEllipseArc2Com extends ComCreate {
         Global.scene.add(this.assists[this.assists.length - 1]);
 
         edge.u.set(u0, u1);
-        if (this.isForward) {
-            if (u1 < u0) {
-                edge.u.set(u0, u1 + PI2);
-            }
-        } else {
-            if (u0 < u1) {
-                edge.u.set(u0, u1 - PI2);
-            }
-        }
         let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
-        geo.userData.type = Curve2Type.EA;
+        geo.userData.type = Curve2Type.HY;
         this.result = geo;
 
         this.done();
@@ -121,7 +111,7 @@ class CreateEllipseArc2Com extends ComCreate {
             }
             let majorPoint: Vector2 = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
             // 创建一个临时曲线段
-            let edge = Brep2Builder.BuildCircleEdge2FromCenterRadius(this.centerPoint, majorPoint.distanceTo(this.centerPoint));
+            let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(this.centerPoint, majorPoint);
             let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0, false);
             t.name = "temp";
             this.tempResult = t;
@@ -134,7 +124,12 @@ class CreateEllipseArc2Com extends ComCreate {
             }
             let minorPoint: Vector2 = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
             // 创建一个临时曲线段
-            let edge = Brep2Builder.BuildEllipseEdge2FromCenterBeginEndPoint(this.centerPoint, this.majorPoint, minorPoint);
+            let edge = Brep2Builder.BuildHyperbolaEdge2FromCenterABPoint(this.centerPoint, this.majorPoint, minorPoint);
+            if (this.isRight) {
+                edge.u.set(-PI_2 + 1e-4, PI_2 - 1e-4);
+            } else {
+                edge.u.set(PI_2 + 1e-4, PI_2 + PI - 1e-4);
+            }
             let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0, false);
             t.name = "temp";
             this.tempResult = t;
@@ -147,10 +142,14 @@ class CreateEllipseArc2Com extends ComCreate {
             }
             let u0Point: Vector2 = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
             // 创建一个临时曲线段
-            let edge = Brep2Builder.BuildEllipseEdge2FromCenterBeginEndPoint(this.centerPoint, this.majorPoint, this.minorPoint);
+            let edge = Brep2Builder.BuildHyperbolaEdge2FromCenterABPoint(this.centerPoint, this.majorPoint, this.minorPoint);
             let alg = CurveBuilder.Algorithm2ByData(edge.curve);
             let u0 = alg.u(u0Point);
-            edge.u.x = u0;
+            if (this.isRight) {
+                edge.u.set(u0, PI_2 - 1e-4);
+            } else {
+                edge.u.set(u0, PI_2 + PI - 1e-4);
+            }
             let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0, false);
             t.name = "temp";
             this.tempResult = t;
@@ -163,50 +162,34 @@ class CreateEllipseArc2Com extends ComCreate {
             }
             let u1Point: Vector2 = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
             // 创建一个临时曲线段
-            let edge = Brep2Builder.BuildEllipseEdge2FromCenterBeginEndPoint(this.centerPoint, this.majorPoint, this.minorPoint);
+            let edge = Brep2Builder.BuildHyperbolaEdge2FromCenterABPoint(this.centerPoint, this.majorPoint, this.minorPoint);
             let alg = CurveBuilder.Algorithm2ByData(edge.curve);
             let u0 = alg.u(this.u0Point);
             let u1 = alg.u(u1Point);
             edge.u.set(u0, u1);
-            if (this.isForward) {
-                if (u1 < u0) {
-                    edge.u.set(u0, u1 + PI2);
-                }
-            } else {
-                if (u0 < u1) {
-                    edge.u.set(u0, u1 - PI2);
-                }
-            }
-
             let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0, false);
             t.name = "temp";
             this.tempResult = t;
             Global.scene.add(this.tempResult);
         }
     };
-    onKeyDown = (event: KeyboardEvent) => {
+
+    override onKeyDownExec(event: KeyboardEvent) {
+        super.onKeyDownExec(event);
         switch (event.code) {
             case "ShiftLeft":
-                this.isForward = false;
+                this.isRight = false;
                 break;
         }
     }
-    onKeyUp = (event: KeyboardEvent) => {
+    override onKeyUpExec(event: KeyboardEvent) {
+        super.onKeyUpExec(event);
         switch (event.code) {
             case "ShiftLeft":
-                this.isForward = true;
+                this.isRight = true;
                 break;
         }
     }
-    override bind(window: Window) {
-        super.bind(window);
-        window.addEventListener("keydown", this.onKeyDown);
-        window.addEventListener("keyup", this.onKeyUp);
-    }
-    override unbind(window: Window) {
-        super.unbind(window);
-        window.removeEventListener("keydown", this.onKeyDown);
-        window.removeEventListener("keyup", this.onKeyUp);
-    }
+
 }
-export { CreateEllipseArc2Com };
+export { CreateHyperbola2Com };

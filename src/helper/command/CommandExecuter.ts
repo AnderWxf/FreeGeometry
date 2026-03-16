@@ -18,6 +18,15 @@ import { ComScale } from "./coms/ComScale";
 import { ComMirror } from "./coms/ComMirror";
 import { CreateEllipse2Com } from "./coms/CreateEllipse2Com";
 import { CreateEllipseArc2Com } from "./coms/CreateEllipseArc2Com";
+import { ModifyEllipse2Com } from "./coms/ModifyEllipse2Com";
+import { ModifyEllipseArc2Com } from "./coms/ModifyEllipseArc2Com";
+import { Global } from "../../core/Global";
+import { Edge2 } from "../../geometry/data/brep/Brep2";
+import { Curve2Type } from "../../core/Constents";
+import { CreateParabola2Com } from "./coms/CreateParabola2Com";
+import { CreateHyperbola2Com } from "./coms/CreateHyperbola2Com";
+import { ModifyParabola2Com } from "./coms/ModifyParabola2Com";
+import { ModifyHyperbola2Com } from "./coms/ModifyHyperbola2Com";
 
 /**
  * Command executer base class.
@@ -28,40 +37,99 @@ class CommandExecuter {
     private _redos: Stack<Command>;
     private KeyShiftDown: Boolean = false;
     private KeyCtrlDown: Boolean = false;
+    private _curr: Command;
     constructor() {
         this._history = new Stack<Command>();
         this._redos = new Stack<Command>();
     }
 
+    onEidtor() {
+        let seleced = Global.select.selectedObjects[0];
+        let original = seleced.userData.original;
+        if (original instanceof Edge2) {
+            let type = seleced.userData.type;
+            let com: Command;
+            switch (type) {
+                case Curve2Type.L:        // 两点直线段
+                    com = new ModifyLine2Com(this, 'L');
+                    break;
+                case Curve2Type.A:        // 圆弧
+                    com = new ModifyArc2Com(this, 'A');
+                    break;
+                case Curve2Type.A3:       // 三点圆弧
+                    com = new ModifyArc2ThreePointCom(this, 'A3');
+                    break;
+                case Curve2Type.C:        // 圆
+                    com = new ModifyCircle2Com(this, 'C');
+                    break;
+                case Curve2Type.C3:       // 三点圆
+                    com = new ModifyCircle2ThreePointCom(this, 'C3');
+                    break;
+                case Curve2Type.E:        // 椭圆
+                    com = new ModifyEllipse2Com(this, 'E');
+                    break;
+                case Curve2Type.EA:       // 椭圆弧
+                    com = new ModifyEllipseArc2Com(this, 'EA');
+                    break;
+                case Curve2Type.HY:       // 双曲线
+                    com = new ModifyHyperbola2Com(this, 'HY');
+                    break;
+                case Curve2Type.PA:       // 抛物线
+                    com = new ModifyParabola2Com(this, 'PA');
+                    break;
+                case Curve2Type.PL:       // 多段线
+                    break;
+                case Curve2Type.NU:       // Nurbs    
+                    break;
+                case Curve2Type.REC:      // REC：矩形
+                    break;
+            }
+            if (com) {
+                if (this._curr && !this._curr.isDone) {
+                    this._curr.cencle();
+                }
+                this._curr = com;
+                this._curr.exec();
+            }
+        }
+    }
     onKeyDown = (event: KeyboardEvent) => {
+        let com: Command;
         switch (event.code) {
             case "Enter":
                 const comline: HTMLElement = document.getElementById('CommandLine');
                 comline.focus();
                 break;
             case "Delete":
-                new DeleteObjectsCom(this, 'Delete').exec();
+                com = new DeleteObjectsCom(this, 'Delete');
+                break;
+            // E：选中后编辑
+            case 'KeyE':
+                if (Global.select.selectedObjects.length > 0) {
+                    this.onEidtor();
+                }
                 break;
             // I：镜像
             case 'KeyI':
-                new ComMirror(this, 'I').exec();
+                com = new ComMirror(this, 'I');
                 break;
             // M：移动
             case 'KeyM':
-                new ComMove(this, 'M').exec();
+                com = new ComMove(this, 'M');
                 break;
             // R：旋转
             case 'KeyR':
-                new ComRotate(this, 'R').exec();
+                com = new ComRotate(this, 'R');
                 break;
             // O：偏移
             case 'KeyO':
-                new ComOffset(this, 'O').exec();
+                com = new ComOffset(this, 'O');
                 break;
             // S：拉伸
             case 'KeyS':
-                new ComScale(this, 'S').exec();
+                com = new ComScale(this, 'S');
                 break;
+            // Ctrl+Z Undo Shift+Z Redo
             case "KeyZ":
                 if (this.KeyCtrlDown) {
                     this.undo();
@@ -78,6 +146,13 @@ class CommandExecuter {
             case "ShiftLeft":
                 this.KeyShiftDown = true;
                 break;
+        }
+        if (com) {
+            if (this._curr && !this._curr.isDone) {
+                this._curr.cencle();
+            }
+            this._curr = com;
+            this._curr.exec();
         }
     }
 
@@ -127,9 +202,17 @@ class CommandExecuter {
                 case 'EA':
                     com = new CreateEllipseArc2Com(this, comstr);
                     break;
-                // PL：多段线
+                // HY：绘双曲线
+                case 'HY':
+                    com = new CreateHyperbola2Com(this, comstr);
+                    break;
+                // PA：绘抛物线                  
+                case 'PA':
+                    com = new CreateParabola2Com(this, comstr);
+                    break;
+                // PL：绘多段线
 
-                // REC：矩形
+                // REC：绘矩形
 
                 // F：倒圆角
                 // G：对象组合
@@ -177,9 +260,29 @@ class CommandExecuter {
                 case 'MC3':
                     com = new ModifyCircle2ThreePointCom(this, comstr);
                     break;
+                // ME：修改椭圆
+                case 'ME':
+                    com = new ModifyEllipse2Com(this, comstr);
+                    break;
+                // MEA：修改椭圆弧
+                case 'MEA':
+                    com = new ModifyEllipseArc2Com(this, comstr);
+                    break;
+                // MPA：绘抛物线                  
+                case 'MPA':
+                    com = new ModifyParabola2Com(this, comstr);
+                    break;
+                // MHY：双曲线
+                case 'MHY':       // 双曲线
+                    com = new ModifyHyperbola2Com(this, comstr);
+                    break;
             }
             if (com) {
-                com.exec();
+                if (this._curr && !this._curr.isDone) {
+                    this._curr.cencle();
+                }
+                this._curr = com;
+                this._curr.exec();
             }
         }
     }

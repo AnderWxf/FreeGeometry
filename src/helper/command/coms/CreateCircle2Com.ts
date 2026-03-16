@@ -55,7 +55,7 @@ class CreateCircle2Com extends ComCreate {
         this.result = geo;
         this.done();
     }
-    onMouseMove = (event: MouseEvent) => {
+    onMouseMoveExec(event: MouseEvent) {
         if (this._isCancel) { this.cancel(); return; }
         if (this.centerPoint && !this.beginPoint) {
             if (this.tempResult) {

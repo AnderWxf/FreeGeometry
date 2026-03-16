@@ -176,7 +176,7 @@ export class Cube {
       // geoHyperbolaLeftEdgeAb.name = "Hyperbola2_Left_Three_Point_Ab";
 
       // 根据两点创建一个抛物线
-      let parabolaEdge = Brep2Builder.BuildParabolaEdge2FromCenterABPoint(new Vector2(0, 0), new Vector2(0, 10), 50, -50);
+      let parabolaEdge = Brep2Builder.BuildParabolaEdge2FromCenterAPoint(new Vector2(0, 0), new Vector2(0, 10), 50, -50);
       let geoParabolaEdge = BrepMeshBuilder.BuildEdge2Mesh(parabolaEdge, THREE.Color.NAMES.coral);
       geoParabolaEdge.name = "Parabola2_Left_Three_Point";
 

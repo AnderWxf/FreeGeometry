@@ -80,21 +80,6 @@ class Line2Algo extends Curve2Algo {
      * @retun {A B C} - General equation coefficients.
      */
     ge(): { A: MATHJS.BigNumber, B: MATHJS.BigNumber, C: MATHJS.BigNumber } {
-        // // 直线系数计算
-        // // A = -sin(θ)
-        // // B = cos(θ)
-        // // C = - A*x0 - B*y0
-        // // 曲线的二元一次方程组
-        // // Ax + By + C = 0
-        // let c = this.dat;
-        // let θ = MATHJS.bignumber(c.trans.rot);
-        // let x0 = MATHJS.bignumber(c.trans.pos.x);
-        // let y0 = MATHJS.bignumber(c.trans.pos.y);
-        // let A = MATHJS.unaryMinus(MATHJS.sin(θ));
-        // let B = MATHJS.cos(θ);
-        // let C = MATHJS.add(MATHJS.multiply(MATHJS.unaryMinus(A), x0), MATHJS.multiply(MATHJS.unaryMinus(B), y0)) as MATHJS.BigNumber;
-        // return { A, B, C };
-
         // Qnew = T^-T * Qold * T^-1
         let dat = this.dat;
         let t_1 = dat.trans.makeLocalMatrix().invert();

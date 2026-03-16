@@ -86,14 +86,23 @@ class ActPickPoint2 extends Active {
         Global.scene.remove(ActPickPoint2.PickCursor);
         this.unbind(window);
     }
+    onKeyDown = (event: KeyboardEvent) => {
+        switch (event.code) {
+            case "Escape":
+                this._isCancel = true;
+                break;
+        }
+    }
     onMouseMove = (event: MouseEvent) => {
         if (this._isCancel) { return; }
         ActPickPoint2.PickCursor.position.set(this.context.select.overedPoint.x, this.context.select.overedPoint.y, 0);
     };
     bind(window: Window) {
+        window.addEventListener("keydown", this.onKeyDown);
         window.addEventListener("mousemove", this.onMouseMove);
     }
     unbind(window: Window) {
+        window.removeEventListener("keydown", this.onKeyDown);
         window.removeEventListener("mousemove", this.onMouseMove);
     }
 }

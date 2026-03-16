@@ -50,7 +50,7 @@ class ModifyCircle2ThreePointCom extends ComModify {
             }
             this.old = act_pick_data.result;
 
-            Global.select.isEditor = true;
+
 
             let act_pick_assist = new ActPickAssist();
             await act_pick_assist.execute(context);
@@ -98,7 +98,7 @@ class ModifyCircle2ThreePointCom extends ComModify {
         this.assists.push(this.createAssistPoint(edge.curve.trans.pos, THREE.Color.NAMES.greenyellow));
         this.done();
     }
-    onMouseMove = (event: MouseEvent) => {
+    onMouseMoveExec(event: MouseEvent) {
         if (this._isCancel) { this.cancel(); return; }
         if (this.assistIndex > -1) {
             if (this.tempResult) {

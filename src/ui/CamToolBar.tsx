@@ -141,6 +141,12 @@ const ComOptionBar: React.FC = () => (
                 Global.select.isSnapInter = e.target.checked;
             }}
         >捕捉交点</Checkbox>
+        <Checkbox
+            style={{ width: 100, position: 'fixed', top: 10, left: 250, zIndex: 1000, color: '#00A000' }}
+            onChange={(e) => {
+                Global.select.isEditor = e.target.checked;
+            }}
+        >编辑</Checkbox>
         {/* <Checkbox
             style={{ width: 100, position: 'fixed', top: 10, left: 75, zIndex: 1000, color: '#00A000' }}
             onChange={(e) => {
@@ -152,9 +158,12 @@ const ComOptionBar: React.FC = () => (
 
 let executer = new CommandExecuter();
 executer.bind(window);
+Global.comExector = executer;
 let inputs = new Array<string>();
 let pos = 0;
 let CommandBarOnEnter = (value: string) => {
+    const gpu: HTMLElement = document.getElementById('gpu');
+    gpu.focus();
     executer.execute(value);
 };
 const CommandBar: React.FC = () => (
@@ -186,12 +195,14 @@ const CommandBar: React.FC = () => (
                             pos--;
                             (e.target as HTMLInputElement).value = inputs[pos];
                         }
+                        e.stopPropagation();
                         break;
                     case 'ArrowDown':
                         if (pos < inputs.length - 1) {
                             pos++;
                             (e.target as HTMLInputElement).value = inputs[pos];
                         }
+
                         break;
                 };
                 e.stopPropagation();

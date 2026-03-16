@@ -18,7 +18,7 @@ class ComTransform extends ComBatch {
     beginPoint: Vector2;
     endPoint: Vector2;
     override async exec(): Promise<void> {
-        Global.select.isEditor = false;
+
         let str = this._text;
         let paras = str.split(' ');
         if (paras.length == 5) {
@@ -89,7 +89,7 @@ class ComTransform extends ComBatch {
         trans.fromLocalMatrix(lm);
         return m;
     }
-    override onMouseMove = (event: MouseEvent) => {
+    override onMouseMoveExec(event: MouseEvent) {
         if (this._isCancel) { this.cancel(); return; }
         if (this.beginPoint && !this.endPoint) {
             if (this.tempResults) {

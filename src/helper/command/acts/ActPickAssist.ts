@@ -16,6 +16,7 @@ class ActPickAssist extends Active {
         super.execute(context);
         this.bind(window);
         this.context = context;
+        this.context.select.selectedAssist = null;
         while (!context.select.selectedAssist && !this._isCancel) {
             await new Promise(resolve => setTimeout(resolve, 10)); // 等待10ms
         }
