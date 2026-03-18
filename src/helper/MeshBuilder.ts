@@ -13,6 +13,51 @@ import { Brep3Builder } from '../geometry/algorithm/builder/Brep3Builder';
  *
  */
 class BrepMeshBuilder {
+
+    /**
+     * build edge2 mesh WireframeGeometry.
+     *
+     * @param {Edge2} [edge] - The edge2 object.
+     * @param {number} [color] - The color of edge2 object.
+     * @param {number} [segment] - The segment of edge2 object.
+     * @param {number} [sub] - The sub type of edge2 object.
+     */
+    static BuildEdge2sMesh(edges: Edge2[], color: number, segment?: number, sub: number = 0, canPick: boolean = true): THREE.Line {
+        let vertices = new Array<number>;
+        for (let i = 0; i < edges.length; i++) {
+            let edge = edges[i];
+            if (segment == undefined) {
+                if (edge.curve instanceof Line2Data) {
+                    segment = 1;
+                } else {
+                    segment = Math.ceil(MathUtils.clamp(Brep2Builder.Length(edge, 1, 512), 64, 512));
+                }
+            }
+
+            let algor = CurveBuilder.Algorithm2ByData(edge.curve, sub);
+            let step = (edge.u.y - edge.u.x) / segment;
+
+            // let indices = Array<number>();
+            for (let u = edge.u.x, i = 0; i <= segment; u += step, i++) {
+                let p = algor.p(u);
+                vertices.push(p.x);
+                vertices.push(p.y);
+                vertices.push(0);
+                // indices.push(i);
+            }
+        }
+
+        let buff = new THREE.BufferGeometry()
+        // buff.setIndex(indices);
+        buff.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+
+        const materialline = new THREE.MeshBasicMaterial({ color: color });
+        let ret = new THREE.Line(buff, materialline);
+        ret.userData.canPick = canPick;
+        ret.userData.original = edges;
+        ret.frustumCulled = false;
+        return ret;
+    }
     /**
      * build edge2 mesh WireframeGeometry.
      *

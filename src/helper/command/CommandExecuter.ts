@@ -27,6 +27,10 @@ import { CreateParabola2Com } from "./coms/CreateParabola2Com";
 import { CreateHyperbola2Com } from "./coms/CreateHyperbola2Com";
 import { ModifyParabola2Com } from "./coms/ModifyParabola2Com";
 import { ModifyHyperbola2Com } from "./coms/ModifyHyperbola2Com";
+import { CreatePolyline2Com } from "./coms/CreatePolyline2Com";
+import { ModifyPolyline2Com } from "./coms/ModifyPolyline2Com";
+import { CreateRectangle2Com } from "./coms/CreateRectangle2Com";
+import { ModifyRectangle2Com } from "./coms/ModifyRectangle2Com";
 
 /**
  * Command executer base class.
@@ -77,11 +81,26 @@ class CommandExecuter {
                 case Curve2Type.PA:       // 抛物线
                     com = new ModifyParabola2Com(this, 'PA');
                     break;
-                case Curve2Type.PL:       // 多段线
-                    break;
                 case Curve2Type.NU:       // Nurbs    
                     break;
+            }
+            if (com) {
+                if (this._curr && !this._curr.isDone) {
+                    this._curr.cencle();
+                }
+                this._curr = com;
+                this._curr.exec();
+            }
+        }
+        if (original instanceof Array) {
+            let type = seleced.userData.type;
+            let com: Command;
+            switch (type) {
+                case Curve2Type.PL:       // 多段线
+                    com = new ModifyPolyline2Com(this, 'PL');
+                    break;
                 case Curve2Type.REC:      // REC：矩形
+                    com = new ModifyRectangle2Com(this, 'REC');
                     break;
             }
             if (com) {
@@ -211,8 +230,14 @@ class CommandExecuter {
                     com = new CreateParabola2Com(this, comstr);
                     break;
                 // PL：绘多段线
+                case 'PL':
+                    com = new CreatePolyline2Com(this, comstr);
+                    break;
 
                 // REC：绘矩形
+                case 'REC':
+                    com = new CreateRectangle2Com(this, comstr);
+                    break;
 
                 // F：倒圆角
                 // G：对象组合
@@ -273,8 +298,16 @@ class CommandExecuter {
                     com = new ModifyParabola2Com(this, comstr);
                     break;
                 // MHY：双曲线
-                case 'MHY':       // 双曲线
+                case 'MHY':
                     com = new ModifyHyperbola2Com(this, comstr);
+                    break;
+                // MPL：多段线
+                case 'MHY':
+                    com = new ModifyPolyline2Com(this, comstr);
+                    break;
+                // MREC：绘矩形
+                case 'MREC':
+                    com = new CreateRectangle2Com(this, comstr);
                     break;
             }
             if (com) {
