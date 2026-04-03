@@ -11,6 +11,7 @@ import { ActPickObject } from "../acts/ActPickObject";
 import { ActPickAssist } from "../acts/ActPickAssist";
 import { Curve2Type } from "../../../core/Constents";
 import type { Edge2 } from "../../../geometry/data/brep/Brep2";
+import type { Line2Data } from "../../../geometry/data/base/curve2/Line2Data";
 
 
 /**
@@ -78,6 +79,11 @@ class ModifyRectangle2Com extends ComModify {
 
             this._text = paras[0] + ' ' + beginPoint.x + ' ' + beginPoint.y + ' ' + endPoint.x + ' ' + endPoint.y;
         }
+        let m = this.old.userData.original[0].curve.trans.makeLocalMatrix();
+        let invert = m.clone().invert();
+        beginPoint.applyMatrix3(invert);
+        endPoint.applyMatrix3(invert);
+
         // 创建一个多段线
         let points: Vector2[] = [];
         let edges: Edge2[] = [];
@@ -89,6 +95,8 @@ class ModifyRectangle2Com extends ComModify {
         points.push(p1);
         points.push(p2);
         points.push(p3);
+        for (let i = 0; i < points.length; i++)
+            points[i].applyMatrix3(m);
 
         for (let i = 1; i < points.length; i++) {
             let beginPoint = points[i - 1];
@@ -121,6 +129,11 @@ class ModifyRectangle2Com extends ComModify {
                 endPoint = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
             }
 
+            let m = this.old.userData.original[0].curve.trans.makeLocalMatrix();
+            let invert = m.clone().invert();
+            beginPoint.applyMatrix3(invert);
+            endPoint.applyMatrix3(invert);
+
             // 创建一个临时直线段
             let points: Vector2[] = [];
             let edges: Edge2[] = [];
@@ -132,6 +145,8 @@ class ModifyRectangle2Com extends ComModify {
             points.push(p1);
             points.push(p2);
             points.push(p3);
+            for (let i = 0; i < points.length; i++)
+                points[i].applyMatrix3(m);
 
             for (let i = 1; i < points.length; i++) {
                 let beginPoint = points[i - 1];

@@ -110,14 +110,18 @@ class Select {
     }
     onMouseClick = (event: MouseEvent) => {
         if (!this.isMultiple) {
-            for (let i = 0; i < this.selectedObjects.length; i++) {
+            let array = Global.comExector.GetExecutingObjs();
+            for (let i = this.selectedObjects.length - 1; i >= 0; i--) {
                 let obj = this.selectedObjects[i] as THREE.Object3D;
+                if (array.includes(obj)) {
+                    continue;
+                }
                 let originalColor = obj.userData.originalColor as THREE.Color;
                 if (originalColor) {
                     (obj as any).material.color.copy(originalColor);
                 }
+                this.selectedObjects.splice(i, 1);
             }
-            this.selectedObjects = [];
         }
         // 创建射线投射器
         const raycaster = this._raycasterForSelect;
@@ -226,7 +230,9 @@ class Select {
         }
         // 编辑模式
         if (this._isEditor && this.selectedObjects.length > 0 && !this.selectedObjects[0].userData.isAssist) {
-            Global.comExector.onEidtor();
+            if (!Global.comExector.isExecuting()) {
+                Global.comExector.onEidtor();
+            }
         }
     };
 

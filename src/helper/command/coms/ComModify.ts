@@ -9,7 +9,7 @@ import { Global } from "../../../core/Global";
  * 
  */
 class ComModify extends Command {
-    protected old: THREE.Object3D;
+    public old: THREE.Object3D;
     protected result: THREE.Object3D;
     protected tempResult: THREE.Object3D;
 

@@ -8,7 +8,7 @@ import * as THREE from "three";
  * 
  */
 class ComBatch extends Command {
-    protected olds: THREE.Object3D[];
+    public olds: THREE.Object3D[];
     protected results: THREE.Object3D[];
     protected tempResults: THREE.Object3D[];
     protected isDeleteOld = true;

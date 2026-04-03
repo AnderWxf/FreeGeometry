@@ -13,6 +13,9 @@
     "uuid": "^13.0.0",
     "verb-nurbs": "^3.0.3"
   },
+  "scripts": {
+    "dev": "vite"
+  },  
   "devDependencies": {
     "@types/dat.gui": "^0.7.13",
     "@types/react": "^19.2.2",

@@ -31,6 +31,9 @@ import { CreatePolyline2Com } from "./coms/CreatePolyline2Com";
 import { ModifyPolyline2Com } from "./coms/ModifyPolyline2Com";
 import { CreateRectangle2Com } from "./coms/CreateRectangle2Com";
 import { ModifyRectangle2Com } from "./coms/ModifyRectangle2Com";
+import { ComModify } from "./coms/ComModify";
+import * as THREE from "three";
+import { ComBatch } from "./coms/ComBatch";
 
 /**
  * Command executer base class.
@@ -46,7 +49,29 @@ class CommandExecuter {
         this._history = new Stack<Command>();
         this._redos = new Stack<Command>();
     }
-
+    GetExecutingObjs(): Array<THREE.Object3D> {
+        let array = new Array<THREE.Object3D>();
+        if (this._curr instanceof ComModify) {
+            if (this._curr.old) {
+                array.push(this._curr.old);
+            }
+        }
+        if (this._curr instanceof ComBatch) {
+            if (this._curr.olds.length > 0) {
+                array.push(...this._curr.olds);
+            }
+        }
+        return array;
+    }
+    clear() {
+        this._curr = null;
+    }
+    isExecutingMe(curr: Command): boolean {
+        return this._curr === curr;
+    }
+    isExecuting(): boolean {
+        return this._curr != null && !this._curr.isDone && !this._curr.isCancel;
+    }
     onEidtor() {
         let seleced = Global.select.selectedObjects[0];
         let original = seleced.userData.original;
@@ -82,6 +107,12 @@ class CommandExecuter {
                     com = new ModifyParabola2Com(this, 'PA');
                     break;
                 case Curve2Type.NU:       // Nurbs    
+                    break;
+                case Curve2Type.PL:       // 多段线   
+                    com = new ModifyPolyline2Com(this, 'PL');
+                    break;
+                case Curve2Type.REC:       // 矩形   
+                    com = new ModifyRectangle2Com(this, 'REC');
                     break;
             }
             if (com) {
@@ -302,12 +333,12 @@ class CommandExecuter {
                     com = new ModifyHyperbola2Com(this, comstr);
                     break;
                 // MPL：多段线
-                case 'MHY':
+                case 'MPL':
                     com = new ModifyPolyline2Com(this, comstr);
                     break;
                 // MREC：绘矩形
                 case 'MREC':
-                    com = new CreateRectangle2Com(this, comstr);
+                    com = new ModifyRectangle2Com(this, comstr);
                     break;
             }
             if (com) {

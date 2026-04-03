@@ -31,6 +31,7 @@ class Command {
         return this._isDone;
     }
 
+
     // 创建一个辅助点
     protected createAssistPoint(p: Vector2, color: number = THREE.Color.NAMES.darkblue): THREE.Mesh {
         const material = new THREE.MeshBasicMaterial({ color: color });
@@ -56,6 +57,9 @@ class Command {
         switch (event.code) {
             case "Escape":
                 this._isCancel = true;
+                if (this._executer.isExecutingMe(this)) {
+                    this._executer.clear();
+                }
                 break;
         }
     }
