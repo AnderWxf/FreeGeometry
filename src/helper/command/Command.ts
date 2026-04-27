@@ -81,7 +81,7 @@ class Command {
     undo() { }
     redo() { }
     exec() { }
-    cencle() {
+    cancel() {
         this.unbind(window);
         this._isCancel = true;
     }

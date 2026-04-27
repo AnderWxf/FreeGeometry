@@ -188,9 +188,9 @@ class Brep2Builder {
      *
      * @param {Array<Vector2>} [points] - The fitting points.
      */
-    static BuildEdge2FromFittingPoints(points: Array<Vector2>): Edge2 {
+    static BuildEdge2FromFittingPoints(points: Array<Vector2>, degree: number = 3): Edge2 {
         let ret = new Edge2();
-        let curve = CurveBuilder.BuildNurbs2FromFittingPoints(points);
+        let curve = CurveBuilder.BuildNurbs2FromFittingPoints(points, degree);
         ret.u = new Vector2(0, 1);
         ret.curve = curve;
         return ret;

@@ -185,8 +185,8 @@ class CurveBuilder {
      *
      * @param {Array<Vector2>} [points] - The fitting points.
      */
-    static BuildNurbs2FromFittingPoints(points: Array<Vector2>): Nurbs2Data {
-        const curve = Nurbs2Algo.Fit(points, 3);
+    static BuildNurbs2FromFittingPoints(points: Array<Vector2>, degree: number = 3): Nurbs2Data {
+        const curve = Nurbs2Algo.Fit(points, degree);
         return curve;
     }
 

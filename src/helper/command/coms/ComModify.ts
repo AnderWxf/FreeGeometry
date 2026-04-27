@@ -22,7 +22,8 @@ class ComModify extends Command {
     onMouseMoveExec(event: MouseEvent) {
     };
 
-    protected cancel() {
+    override cancel() {
+        super.cancel();
         this.unbind(window);
         if (this.tempResult) {
             Global.scene.remove(this.tempResult);

@@ -25,7 +25,8 @@ class ComBatch extends Command {
     onMouseMoveExec(event: MouseEvent) {
     };
 
-    protected cancel() {
+    override cancel() {
+        super.cancel();
         this.unbind(window);
         Global.scene.remove(...this.tempResults);
 

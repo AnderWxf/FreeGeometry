@@ -28,7 +28,7 @@ class DeleteObjectsCom extends ComDelete {
         }
         this.done();
     }
-    protected cancel() {
+    override cancel() {
         this.unbind(window);
     }
 

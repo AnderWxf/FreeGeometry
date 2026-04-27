@@ -34,6 +34,10 @@ import { ModifyRectangle2Com } from "./coms/ModifyRectangle2Com";
 import { ComModify } from "./coms/ComModify";
 import * as THREE from "three";
 import { ComBatch } from "./coms/ComBatch";
+import { CreateNurbs2FitCom } from "./coms/CreateNurbs2FitCom";
+import { CreateNurbs2CtrlCom } from "./coms/CreateNurbs2CtrlCom";
+import { ModifyNurbs2FitCom } from "./coms/ModifyNurbs2FitCom";
+import { ModifyNurbs2CtrlCom } from "./coms/ModifyNurbs2CtrlCom";
 
 /**
  * Command executer base class.
@@ -106,7 +110,11 @@ class CommandExecuter {
                 case Curve2Type.PA:       // 抛物线
                     com = new ModifyParabola2Com(this, 'PA');
                     break;
-                case Curve2Type.NU:       // Nurbs    
+                case Curve2Type.NUF:       // Nurbs fitting
+                    com = new ModifyNurbs2FitCom(this, 'NUF');
+                    break;
+                case Curve2Type.NUC:       // Nurbs control
+                    com = new ModifyNurbs2CtrlCom(this, 'NUC');
                     break;
                 case Curve2Type.PL:       // 多段线   
                     com = new ModifyPolyline2Com(this, 'PL');
@@ -117,7 +125,7 @@ class CommandExecuter {
             }
             if (com) {
                 if (this._curr && !this._curr.isDone) {
-                    this._curr.cencle();
+                    this._curr.cancel();
                 }
                 this._curr = com;
                 this._curr.exec();
@@ -136,7 +144,7 @@ class CommandExecuter {
             }
             if (com) {
                 if (this._curr && !this._curr.isDone) {
-                    this._curr.cencle();
+                    this._curr.cancel();
                 }
                 this._curr = com;
                 this._curr.exec();
@@ -199,7 +207,7 @@ class CommandExecuter {
         }
         if (com) {
             if (this._curr && !this._curr.isDone) {
-                this._curr.cencle();
+                this._curr.cancel();
             }
             this._curr = com;
             this._curr.exec();
@@ -268,6 +276,14 @@ class CommandExecuter {
                 // REC：绘矩形
                 case 'REC':
                     com = new CreateRectangle2Com(this, comstr);
+                    break;
+                // NUF：绘Nurbs曲线
+                case 'NUF':
+                    com = new CreateNurbs2FitCom(this, comstr);
+                    break;
+                // NUC：绘Nurbs曲线
+                case 'NUC':
+                    com = new CreateNurbs2CtrlCom(this, comstr);
                     break;
 
                 // F：倒圆角
@@ -343,7 +359,7 @@ class CommandExecuter {
             }
             if (com) {
                 if (this._curr && !this._curr.isDone) {
-                    this._curr.cencle();
+                    this._curr.cancel();
                 }
                 this._curr = com;
                 this._curr.exec();

@@ -17,7 +17,8 @@ enum Curve2Type {
     HY = 'HY',      // 双曲线
     PA = 'PA',      // 抛物线
     PL = 'PL',      // 多段线
-    NU = 'NU',      // Nurbs    
+    NUF = 'NUF',      // Nurbs fitting
+    NUC = 'NUC',    // Nurbs control
     REC = 'REC',    // REC：矩形
 }
 
