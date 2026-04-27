@@ -17,12 +17,23 @@ enum Curve2Type {
     HY = 'HY',      // 双曲线
     PA = 'PA',      // 抛物线
     PL = 'PL',      // 多段线
-    NUF = 'NUF',      // Nurbs fitting
+    NUF = 'NUF',    // Nurbs fitting
     NUC = 'NUC',    // Nurbs control
     REC = 'REC',    // REC：矩形
 }
 
+// 二维Face类型
+enum Face2Type {
+    C = 'C',        // 圆
+    C3 = 'C3',      // 三点圆
+    E = 'E',        // 椭圆
+    PL = 'PL',      // 多边形
+    REC = 'REC',    // REC：矩形
+    NOR = 'NOR',    // NOR：一般图形
+}
+
 export {
     DisplayLayers,
-    Curve2Type
+    Curve2Type,
+    Face2Type
 }

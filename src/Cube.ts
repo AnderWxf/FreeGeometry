@@ -26,7 +26,7 @@ import verb from 'verb-nurbs';
 import { Nurbs2Algo } from './geometry/algorithm/base/curve2/Nurbs2Algo';
 import { Select } from './helper/Select';
 import { Global } from './core/Global';
-import { CreateLine2Com } from './helper/command/coms/CreateLine2Com';
+import { CreateLine2Com } from './helper/command/coms/edge/CreateLine2Com';
 // import App from './ui/PropsTrans';
 
 // import CommandBar from './ui/CommandBar';

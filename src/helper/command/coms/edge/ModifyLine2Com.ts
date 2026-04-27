@@ -1,15 +1,15 @@
 import * as THREE from "three";
-import { ActionContext3D } from "../Active";
-import { Global } from "../../../core/Global";
-import { ActPickPoint2 } from "../acts/ActPickPoint2";
-import { Brep2Builder } from "../../../geometry/algorithm/builder/Brep2Builder";
-import { Vector2 } from "../../../math/Math";
-import { BrepMeshBuilder } from "../../MeshBuilder";
-import type { CommandExecuter } from "../CommandExecuter";
-import { ComModify } from "./ComModify";
-import { ActPickObject } from "../acts/ActPickObject";
-import { ActPickAssist } from "../acts/ActPickAssist";
-import { Curve2Type } from "../../../core/Constents";
+import { ActionContext3D } from "../../Active";
+import { Global } from "../../../../core/Global";
+import { ActPickPoint2 } from "../../acts/ActPickPoint2";
+import { Brep2Builder } from "../../../../geometry/algorithm/builder/Brep2Builder";
+import { Vector2 } from "../../../../math/Math";
+import { BrepMeshBuilder } from "../../../MeshBuilder";
+import type { CommandExecuter } from "../../CommandExecuter";
+import { ComModify } from "../ComModify";
+import { ActPickObject } from "../../acts/ActPickObject";
+import { ActPickAssist } from "../../acts/ActPickAssist";
+import { Curve2Type } from "../../../../core/Constents";
 
 
 /**

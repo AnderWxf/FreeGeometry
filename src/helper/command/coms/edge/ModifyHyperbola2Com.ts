@@ -1,29 +1,29 @@
 import * as THREE from "three";
-import { Command } from "../Command";
-import { ComCreate } from "./ComCreate";
-import { ActionContext3D } from "../Active";
-import { Global } from "../../../core/Global";
-import { ActPickPoint2 } from "../acts/ActPickPoint2";
-import { Brep2Builder } from "../../../geometry/algorithm/builder/Brep2Builder";
-import { Vector2 } from "../../../math/Math";
-import { BrepMeshBuilder } from "../../MeshBuilder";
-import type { CommandExecuter } from "../CommandExecuter";
-import { ComModify } from "./ComModify";
-import { ActPickObject } from "../acts/ActPickObject";
-import { Edge2 } from "../../../geometry/data/brep/Brep2";
-import { Arc2Data } from "../../../geometry/data/base/curve2/Arc2Data";
-import { Curve2Type } from "../../../core/Constents";
-import { ActPickAssist } from "../acts/ActPickAssist";
-import { CurveBuilder } from "../../../geometry/algorithm/builder/CurveBuilder";
-import { PI2, PI_2 } from "../../../math/MathUtils";
+import { Command } from "../../Command";
+import { ComCreate } from "../ComCreate";
+import { ActionContext3D } from "../../Active";
+import { Global } from "../../../../core/Global";
+import { ActPickPoint2 } from "../../acts/ActPickPoint2";
+import { Brep2Builder } from "../../../../geometry/algorithm/builder/Brep2Builder";
+import { Vector2 } from "../../../../math/Math";
+import { BrepMeshBuilder } from "../../../MeshBuilder";
+import type { CommandExecuter } from "../../CommandExecuter";
+import { ComModify } from "../ComModify";
+import { ActPickObject } from "../../acts/ActPickObject";
+import { Edge2 } from "../../../../geometry/data/brep/Brep2";
+import { Arc2Data } from "../../../../geometry/data/base/curve2/Arc2Data";
+import { Curve2Type } from "../../../../core/Constents";
+import { ActPickAssist } from "../../acts/ActPickAssist";
+import { CurveBuilder } from "../../../../geometry/algorithm/builder/CurveBuilder";
+import { PI2, PI_2 } from "../../../../math/MathUtils";
 
 
 /**
  * Modify command class.
  * 
  */
-class ModifyEllipseArc2Com extends ComModify {
-    private isForward: boolean = true;   // 默认正向弧(按下左shift表示画反向弧-正时针旋转)
+class ModifyHyperbola2Com extends ComModify {
+    private isRight: boolean = true;   // 默认右侧弧(按下左shift表示画左侧弧)
     constructor(executer: CommandExecuter, text: string) {
         super(executer, text);
     }
@@ -42,7 +42,7 @@ class ModifyEllipseArc2Com extends ComModify {
             minorPoint = new Vector2(new Number(paras[5]).valueOf(), new Number(paras[6]).valueOf());
             u0Point = new Vector2(new Number(paras[7]).valueOf(), new Number(paras[8]).valueOf());
             u1Point = new Vector2(new Number(paras[9]).valueOf(), new Number(paras[10]).valueOf());
-            this.isForward = new Boolean(paras[11]).valueOf();
+            this.isRight = new Boolean(paras[11]).valueOf();
         } else {
             this.bind(window);
             let context: ActionContext3D = new ActionContext3D(Global.scene, Global.camera, Global.renderer, Global.select);
@@ -51,7 +51,7 @@ class ModifyEllipseArc2Com extends ComModify {
             await act_pick_data.execute(context);
             if (this._isCancel) { this.cancel(); return; }
             while (!act_pick_data.result.userData
-                || act_pick_data.result.userData.type != Curve2Type.EA
+                || act_pick_data.result.userData.type != Curve2Type.HY
             ) {
                 await act_pick_data.execute(context);
                 if (this._isCancel) { this.cancel(); return; }
@@ -103,11 +103,9 @@ class ModifyEllipseArc2Com extends ComModify {
 
         }
         // 创建一个曲线段
-        let edge = Brep2Builder.BuildEllipseEdge2FromCenterBeginEndPoint(centerPoint, majorPoint, minorPoint);
+        let edge = Brep2Builder.BuildHyperbolaEdge2FromCenterABPoint(centerPoint, majorPoint, minorPoint);
 
         let alg = CurveBuilder.Algorithm2ByData(edge.curve);
-
-        minorPoint = alg.p(PI_2);
 
         let u0 = alg.u(u0Point);
         u0Point = alg.p(u0);
@@ -126,22 +124,13 @@ class ModifyEllipseArc2Com extends ComModify {
             + ' ' + minorPoint.x + ' ' + minorPoint.y
             + ' ' + u0Point.x + ' ' + u0Point.y
             + ' ' + u1Point.x + ' ' + u1Point.y
-            + ' ' + this.isForward
+            + ' ' + this.isRight
             ;
 
         edge.u.set(u0, u1);
-        if (this.isForward) {
-            if (u1 < u0) {
-                edge.u.set(u0, u1 + PI2);
-            }
-        } else {
-            if (u0 < u1) {
-                edge.u.set(u0, u1 - PI2);
-            }
-        }
 
         let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
-        geo.userData.type = Curve2Type.EA;
+        geo.userData.type = Curve2Type.HY;
         this.result = geo;
         this.done();
     }
@@ -174,26 +163,15 @@ class ModifyEllipseArc2Com extends ComModify {
                 u1Point = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
             }
             // 创建一个临时曲线段
-            let edge = Brep2Builder.BuildEllipseEdge2FromCenterBeginEndPoint(centerPoint, majorPoint, minorPoint);
+            let edge = Brep2Builder.BuildHyperbolaEdge2FromCenterABPoint(centerPoint, majorPoint, minorPoint);
             let alg = CurveBuilder.Algorithm2ByData(edge.curve);
 
-            minorPoint = alg.p(PI_2);
             let u0 = alg.u(u0Point);
             u0Point = alg.p(u0);
 
             let u1 = alg.u(u1Point);
             u1Point = alg.p(u1);
             edge.u.set(u0, u1);
-
-            if (this.isForward) {
-                if (u1 < u0) {
-                    edge.u.set(u0, u1 + PI2);
-                }
-            } else {
-                if (u0 < u1) {
-                    edge.u.set(u0, u1 - PI2);
-                }
-            }
 
             let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0, false);
             t.name = "temp";
@@ -205,14 +183,14 @@ class ModifyEllipseArc2Com extends ComModify {
     onKeyDown = (event: KeyboardEvent) => {
         switch (event.code) {
             case "ShiftLeft":
-                this.isForward = false;
+                this.isRight = false;
                 break;
         }
     }
     onKeyUp = (event: KeyboardEvent) => {
         switch (event.code) {
             case "ShiftLeft":
-                this.isForward = true;
+                this.isRight = true;
                 break;
         }
     }
@@ -227,4 +205,4 @@ class ModifyEllipseArc2Com extends ComModify {
         window.removeEventListener("keyup", this.onKeyUp);
     }
 }
-export { ModifyEllipseArc2Com };
+export { ModifyHyperbola2Com };

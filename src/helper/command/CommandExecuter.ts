@@ -1,43 +1,43 @@
 import { Command } from "./Command";
 import { Stack } from "../../core/Stack";
-import { CreateLine2Com } from "./coms/CreateLine2Com";
+import { CreateLine2Com } from "./coms/edge/CreateLine2Com";
 import { DeleteObjectsCom } from "./coms/DeleteObjectsCom";
-import { CreateCircle2Com } from "./coms/CreateCircle2Com";
-import { CreateArc2Com } from "./coms/CreateArc2Com";
-import { CreateArc2ThreePointCom } from "./coms/CreateArc2ThreePointCom";
-import { CreateCircle2ThreePointCom } from "./coms/CreateCircle2ThreePointCom";
-import { ModifyLine2Com } from "./coms/ModifyLine2Com";
-import { ModifyCircle2Com } from "./coms/ModifyCircle2Com";
-import { ModifyCircle2ThreePointCom } from "./coms/ModifyCircle2ThreePointCom";
-import { ModifyArc2Com } from "./coms/ModifyArc2Com";
-import { ModifyArc2ThreePointCom } from "./coms/ModifyArc2ThreePointCom";
+import { CreateCircle2Com } from "./coms/edge/CreateCircle2Com";
+import { CreateArc2Com } from "./coms/edge/CreateArc2Com";
+import { CreateArc2ThreePointCom } from "./coms/edge/CreateArc2ThreePointCom";
+import { CreateCircle2ThreePointCom } from "./coms/edge/CreateCircle2ThreePointCom";
+import { ModifyLine2Com } from "./coms/edge/ModifyLine2Com";
+import { ModifyCircle2Com } from "./coms/edge/ModifyCircle2Com";
+import { ModifyCircle2ThreePointCom } from "./coms/edge/ModifyCircle2ThreePointCom";
+import { ModifyArc2Com } from "./coms/edge/ModifyArc2Com";
+import { ModifyArc2ThreePointCom } from "./coms/edge/ModifyArc2ThreePointCom";
 import { ComMove } from "./coms/ComMove";
 import { ComRotate } from "./coms/ComRotate";
 import { ComOffset } from "./coms/ComOffset";
 import { ComScale } from "./coms/ComScale";
 import { ComMirror } from "./coms/ComMirror";
-import { CreateEllipse2Com } from "./coms/CreateEllipse2Com";
-import { CreateEllipseArc2Com } from "./coms/CreateEllipseArc2Com";
-import { ModifyEllipse2Com } from "./coms/ModifyEllipse2Com";
-import { ModifyEllipseArc2Com } from "./coms/ModifyEllipseArc2Com";
+import { CreateEllipse2Com } from "./coms/edge/CreateEllipse2Com";
+import { CreateEllipseArc2Com } from "./coms/edge/CreateEllipseArc2Com";
+import { ModifyEllipse2Com } from "./coms/edge/ModifyEllipse2Com";
+import { ModifyEllipseArc2Com } from "./coms/edge/ModifyEllipseArc2Com";
 import { Global } from "../../core/Global";
 import { Edge2 } from "../../geometry/data/brep/Brep2";
 import { Curve2Type } from "../../core/Constents";
-import { CreateParabola2Com } from "./coms/CreateParabola2Com";
-import { CreateHyperbola2Com } from "./coms/CreateHyperbola2Com";
-import { ModifyParabola2Com } from "./coms/ModifyParabola2Com";
-import { ModifyHyperbola2Com } from "./coms/ModifyHyperbola2Com";
-import { CreatePolyline2Com } from "./coms/CreatePolyline2Com";
-import { ModifyPolyline2Com } from "./coms/ModifyPolyline2Com";
-import { CreateRectangle2Com } from "./coms/CreateRectangle2Com";
-import { ModifyRectangle2Com } from "./coms/ModifyRectangle2Com";
+import { CreateParabola2Com } from "./coms/edge/CreateParabola2Com";
+import { CreateHyperbola2Com } from "./coms/edge/CreateHyperbola2Com";
+import { ModifyParabola2Com } from "./coms/edge/ModifyParabola2Com";
+import { ModifyHyperbola2Com } from "./coms/edge/ModifyHyperbola2Com";
+import { CreatePolyline2Com } from "./coms/edge/CreatePolyline2Com";
+import { ModifyPolyline2Com } from "./coms/edge/ModifyPolyline2Com";
+import { CreateRectangle2Com } from "./coms/edge/CreateRectangle2Com";
+import { ModifyRectangle2Com } from "./coms/edge/ModifyRectangle2Com";
 import { ComModify } from "./coms/ComModify";
 import * as THREE from "three";
 import { ComBatch } from "./coms/ComBatch";
-import { CreateNurbs2FitCom } from "./coms/CreateNurbs2FitCom";
-import { CreateNurbs2CtrlCom } from "./coms/CreateNurbs2CtrlCom";
-import { ModifyNurbs2FitCom } from "./coms/ModifyNurbs2FitCom";
-import { ModifyNurbs2CtrlCom } from "./coms/ModifyNurbs2CtrlCom";
+import { CreateNurbs2FitCom } from "./coms/edge/CreateNurbs2FitCom";
+import { CreateNurbs2CtrlCom } from "./coms/edge/CreateNurbs2CtrlCom";
+import { ModifyNurbs2FitCom } from "./coms/edge/ModifyNurbs2FitCom";
+import { ModifyNurbs2CtrlCom } from "./coms/edge/ModifyNurbs2CtrlCom";
 
 /**
  * Command executer base class.
@@ -347,6 +347,14 @@ class CommandExecuter {
                 // MHY：双曲线
                 case 'MHY':
                     com = new ModifyHyperbola2Com(this, comstr);
+                    break;
+                // MNUF：Nurbs拟合曲线
+                case 'MNUF':       // Nurbs fitting
+                    com = new ModifyNurbs2FitCom(this, 'NUF');
+                    break;
+                // MNUC：Nurbs控制点曲线
+                case 'MNUC':       // Nurbs control
+                    com = new ModifyNurbs2CtrlCom(this, 'NUC');
                     break;
                 // MPL：多段线
                 case 'MPL':

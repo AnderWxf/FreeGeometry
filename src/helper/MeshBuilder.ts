@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+// import * as polyDecomp from 'poly-decomp'
 import type { Edge2, Face2 } from '../geometry/data/brep/Brep2';
 import type { Edge3, Face3 } from '../geometry/data/brep/Brep3';
 import { CurveBuilder } from '../geometry/algorithm/builder/CurveBuilder';
@@ -309,8 +310,8 @@ class BrepMeshBuilder {
      *
      * @param {Face2} [face] - The face2 object.
      */
-    static BuildFace2Mesh(face: Face2): THREE.BufferGeometry {
-        debugger;
+    static BuildFace2Mesh(face: Face2, color: number, segment?: number): THREE.BufferGeometry {
+        // polyDecomp.setEpsilon(1e-10);
         return null;
     }
 

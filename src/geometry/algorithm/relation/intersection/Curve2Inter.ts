@@ -2,16 +2,16 @@ import type { BigNumber } from '../../../../mathjs';
 import { Vector2 } from "../../../../math/Math";
 import * as MATHJS from '../../../../mathjs';
 import { Arc2Data } from "../../../data/base/curve2/Arc2Data";
-import type { Line2Data } from "../../../data/base/curve2/Line2Data";
-import type { Nurbs2Data } from "../../../data/base/curve2/Nurbs2Data";
+import { Line2Data } from "../../../data/base/curve2/Line2Data";
+import { Nurbs2Data } from "../../../data/base/curve2/Nurbs2Data";
 import type { Curve2Data } from "../../../data/base/Curve2Data";
 import { Arc2Algo } from "../../base/curve2/Arc2Algo";
 import { Line2Algo } from "../../base/curve2/Line2Algo";
 import { CurveBuilder } from "../../builder/CurveBuilder";
 import { SolveEquation } from "../../base/SolveEquation";
-import type { Hyperbola2Data } from "../../../data/base/curve2/Hyperbola2Data";
+import { Hyperbola2Data } from "../../../data/base/curve2/Hyperbola2Data";
 import { Hyperbola2Algo } from "../../base/curve2/Hyperbola2Algo";
-import type { Parabola2Data } from "../../../data/base/curve2/Parabola2Data";
+import { Parabola2Data } from "../../../data/base/curve2/Parabola2Data";
 import { Parabola2Algo } from "../../base/curve2/Parabola2Algo";
 import type { Curve2Algo } from "../../base/Curve2Algo";
 import verb from 'verb-nurbs';
@@ -593,88 +593,6 @@ class Curve2Inter {
                     }
                 }
             }
-            // // svd分解
-            // if (isSVD && ret.length < n) {
-            //     // console.log("SVD分解");
-            //     const m = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
-            //     m[0][0] = B[0][0].toNumber();
-            //     m[0][1] = B[0][1].toNumber();
-            //     m[0][2] = B[0][2].toNumber();
-            //     m[1][0] = B[1][0].toNumber();
-            //     m[1][1] = B[1][1].toNumber();
-            //     m[1][2] = B[1][2].toNumber();
-            //     m[2][0] = B[2][0].toNumber();
-            //     m[2][1] = B[2][1].toNumber();
-            //     m[2][2] = B[2][2].toNumber();
-
-            //     const svd = SVD.SVD(m);
-            //     const S: number[] = svd.q;
-            //     const U: number[][] = svd.u;
-            //     const V: number[][] = svd.v;
-            //     // 4.1. 找到零奇异值索引
-            //     const zeroIndices: number[] = [];
-            //     for (let i = 0; i < S.length; i++) {
-            //         if (Math.abs(S[i]) < 1e-10) {
-            //             zeroIndices.push(i);
-            //         }
-            //     }
-
-            //     // 4.3. 提取非零奇异值对应的向量
-            //     const nonZeroIndices = [0, 1, 2].filter(i => !zeroIndices.includes(i));
-            //     if (nonZeroIndices.length > 0) {
-            //         const lines: MATHJS.BigNumber[][] = [];
-            //         // 4.3.1只有一个非零奇异值，说明两条直线重合，退化情况未处理
-            //         if (nonZeroIndices.length < 2) {
-            //             const vec1: MATHJS.BigNumber[] = [];
-            //             for (let row = 0; row < 3; row++) {
-            //                 vec1.push(MATHJS.bignumber(U[row][nonZeroIndices[0]]));
-            //             }
-            //             // 4.4. 构造一条直线
-            //             const l0 = vec1;
-            //             lines.push(l0);
-            //         }
-            //         // 4.3.2有两个非零奇异值，说明两条直线不同
-            //         else {
-            //             const vec1: MATHJS.BigNumber[] = [], vec2: MATHJS.BigNumber[] = [];
-            //             for (let row = 0; row < 3; row++) {
-            //                 vec1.push(MATHJS.bignumber(U[row][nonZeroIndices[0]]));
-            //                 vec2.push(MATHJS.bignumber(U[row][nonZeroIndices[1]]));
-            //             }
-
-            //             // 4.4. 构造两条直线
-            //             const sqrt_s1 = MATHJS.sqrt(MATHJS.bignumber(MATHJS.abs(S[nonZeroIndices[0]]))) as MATHJS.BigNumber;
-            //             const sqrt_s2 = MATHJS.sqrt(MATHJS.bignumber(MATHJS.abs(S[nonZeroIndices[1]]))) as MATHJS.BigNumber;
-
-            //             let p = MATHJS.multiply(sqrt_s1, vec1) as MATHJS.BigNumber[];
-            //             let q = MATHJS.multiply(sqrt_s2, vec2) as MATHJS.BigNumber[];
-
-            //             // 调整符号
-            //             // if (S[nonZeroIndices[0]] * S[nonZeroIndices[1]] < 0) {
-            //             //     if (S[nonZeroIndices[1]] < 0) {
-            //             //         q = MATHJS.unaryMinus(q) as MATHJS.BigNumber[];
-            //             //     }
-            //             // }
-            //             q = MATHJS.unaryMinus(q) as MATHJS.BigNumber[];
-            //             const l0 = MATHJS.add(p, q);
-            //             const l1 = MATHJS.subtract(p, q);
-            //             lines.push(l0, l1);
-            //         }
-            //         // 5. 每条直线与原二次曲线之一求交（解二次方程），得到候选交点。
-            //         for (let j = 0; j < lines.length; j++) {
-            //             const l = lines[j];
-            //             let inters = Curve2Inter.LineXConic({ A: l[0], B: l[1], C: l[2] }, c0, null, c0a, tol0, tol1, 2);
-            //             checkAndPush(inters);
-            //             if (ret.length >= n) {
-            //                 break;
-            //             }
-            //             inters = Curve2Inter.LineXConic({ A: l[0], B: l[1], C: l[2] }, c0, null, c0a, tol0, tol1, 2);
-            //             checkAndPush(inters);
-            //             if (ret.length >= n) {
-            //                 break;
-            //             }
-            //         }
-            //     }
-            // }
         }
         return ret;
     }
@@ -980,6 +898,58 @@ class Curve2Inter {
         }
         Curve2Inter.totaltimes += times;
         return ret;
+    }
+
+    /**
+     * compute curve to curve intersection point.
+     *
+     * @param {Curve2Data} [c0] - The frist curve , binary search curve.
+     * @param {Curve2Data} [c1] - The second curve , general equation curve.
+     * @param {number} [tol0] - The tolerance of geometric.
+     * @param {number} [tol1] - The tolerance of algebraic.
+     */
+    public static X(c0: Curve2Data, c1: Curve2Data, tol0: number, tol1: number): Array<InterOfCurve2> {
+        let inters: Array<InterOfCurve2> = [];
+        if (c0 instanceof Line2Data) {
+            if (c1 instanceof Line2Data) {
+                inters.push(...Curve2Inter.LineXLine(c0, c1, 1e-4, 1e-10));
+            }
+            else if (c1 instanceof Arc2Data) {
+                inters.push(...Curve2Inter.LineXArc(c0, c1, 1e-4, 1e-10));
+            }
+            else if (c1 instanceof Hyperbola2Data) {
+                inters.push(...Curve2Inter.LineXHyperbola(c0, c1, 1e-4, 1e-10));
+            }
+            else if (c1 instanceof Parabola2Data) {
+                inters.push(...Curve2Inter.LineXParabola(c0, c1, 1e-4, 1e-10));
+            }
+            else if (c1 instanceof Nurbs2Data) {
+                inters.push(...Curve2Inter.LineXNurbs(c0, c1, 1e-4, 1e-10));
+            }
+        }
+        else if (c0 instanceof Arc2Data || c0 instanceof Hyperbola2Data || c0 instanceof Parabola2Data) {
+            if (c0 instanceof Arc2Data && c1 instanceof Arc2Data) {
+                if (c0.radius.x === c0.radius.y && c1.radius.x === c1.radius.y) {
+                    inters.push(...Curve2Inter.QuadraticXQuadratic(c0, c1, 1e-4, 1e-10, 2));
+                } else {
+                    inters.push(...Curve2Inter.QuadraticXQuadratic(c0, c1, 1e-4, 1e-10, 4));
+                }
+            }
+            else if (c1 instanceof Arc2Data || c1 instanceof Hyperbola2Data || c1 instanceof Parabola2Data) {
+                inters.push(...Curve2Inter.QuadraticXQuadratic(c0, c1, 1e-4, 1e-10));
+            }
+            else if (c1 instanceof Nurbs2Data) {
+                inters.push(...Curve2Inter.QuadraticXNurbs(c0, c1, 1e-4, 1e-10));
+            }
+        }
+        else if (c0 instanceof Nurbs2Data) {
+            if (c1 instanceof Nurbs2Data) {
+                inters.push(...Curve2Inter.NurbsXNurbs(c0, c1, 1e-4, 1e-10));
+            }
+        } else {
+            inters.push(...Curve2Inter.CurveXCurve(c1, c0, 512, tol0, tol1));
+        }
+        return inters;
     }
 }
 
