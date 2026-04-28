@@ -22,7 +22,7 @@ import { ModifyEllipse2Com } from "./coms/edge/ModifyEllipse2Com";
 import { ModifyEllipseArc2Com } from "./coms/edge/ModifyEllipseArc2Com";
 import { Global } from "../../core/Global";
 import { Edge2 } from "../../geometry/data/brep/Brep2";
-import { Curve2Type } from "../../core/Constents";
+import { GeomType } from "../../core/Constents";
 import { CreateParabola2Com } from "./coms/edge/CreateParabola2Com";
 import { CreateHyperbola2Com } from "./coms/edge/CreateHyperbola2Com";
 import { ModifyParabola2Com } from "./coms/edge/ModifyParabola2Com";
@@ -38,6 +38,7 @@ import { CreateNurbs2FitCom } from "./coms/edge/CreateNurbs2FitCom";
 import { CreateNurbs2CtrlCom } from "./coms/edge/CreateNurbs2CtrlCom";
 import { ModifyNurbs2FitCom } from "./coms/edge/ModifyNurbs2FitCom";
 import { ModifyNurbs2CtrlCom } from "./coms/edge/ModifyNurbs2CtrlCom";
+import { CreateSectionCom } from "./coms/face/CreateSectionCom";
 
 /**
  * Command executer base class.
@@ -83,43 +84,43 @@ class CommandExecuter {
             let type = seleced.userData.type;
             let com: Command;
             switch (type) {
-                case Curve2Type.L:        // 两点直线段
+                case GeomType.L:        // 两点直线段
                     com = new ModifyLine2Com(this, 'L');
                     break;
-                case Curve2Type.A:        // 圆弧
+                case GeomType.A:        // 圆弧
                     com = new ModifyArc2Com(this, 'A');
                     break;
-                case Curve2Type.A3:       // 三点圆弧
+                case GeomType.A3:       // 三点圆弧
                     com = new ModifyArc2ThreePointCom(this, 'A3');
                     break;
-                case Curve2Type.C:        // 圆
+                case GeomType.C:        // 圆
                     com = new ModifyCircle2Com(this, 'C');
                     break;
-                case Curve2Type.C3:       // 三点圆
+                case GeomType.C3:       // 三点圆
                     com = new ModifyCircle2ThreePointCom(this, 'C3');
                     break;
-                case Curve2Type.E:        // 椭圆
+                case GeomType.E:        // 椭圆
                     com = new ModifyEllipse2Com(this, 'E');
                     break;
-                case Curve2Type.EA:       // 椭圆弧
+                case GeomType.EA:       // 椭圆弧
                     com = new ModifyEllipseArc2Com(this, 'EA');
                     break;
-                case Curve2Type.HY:       // 双曲线
+                case GeomType.HY:       // 双曲线
                     com = new ModifyHyperbola2Com(this, 'HY');
                     break;
-                case Curve2Type.PA:       // 抛物线
+                case GeomType.PA:       // 抛物线
                     com = new ModifyParabola2Com(this, 'PA');
                     break;
-                case Curve2Type.NUF:       // Nurbs fitting
+                case GeomType.NUF:       // Nurbs fitting
                     com = new ModifyNurbs2FitCom(this, 'NUF');
                     break;
-                case Curve2Type.NUC:       // Nurbs control
+                case GeomType.NUC:       // Nurbs control
                     com = new ModifyNurbs2CtrlCom(this, 'NUC');
                     break;
-                case Curve2Type.PL:       // 多段线   
+                case GeomType.PL:       // 多段线   
                     com = new ModifyPolyline2Com(this, 'PL');
                     break;
-                case Curve2Type.REC:       // 矩形   
+                case GeomType.REC:       // 矩形   
                     com = new ModifyRectangle2Com(this, 'REC');
                     break;
             }
@@ -135,10 +136,10 @@ class CommandExecuter {
             let type = seleced.userData.type;
             let com: Command;
             switch (type) {
-                case Curve2Type.PL:       // 多段线
+                case GeomType.PL:       // 多段线
                     com = new ModifyPolyline2Com(this, 'PL');
                     break;
-                case Curve2Type.REC:      // REC：矩形
+                case GeomType.REC:      // REC：矩形
                     com = new ModifyRectangle2Com(this, 'REC');
                     break;
             }
@@ -155,6 +156,7 @@ class CommandExecuter {
         let com: Command;
         switch (event.code) {
             case "Enter":
+            case "NumpadEnter":
                 const comline: HTMLElement = document.getElementById('CommandLine');
                 comline.focus();
                 break;
@@ -284,6 +286,11 @@ class CommandExecuter {
                 // NUC：绘Nurbs曲线
                 case 'NUC':
                     com = new CreateNurbs2CtrlCom(this, comstr);
+                    break;
+
+                // SEC：绘截面
+                case 'SEC':
+                    com = new CreateSectionCom(this, comstr);
                     break;
 
                 // F：倒圆角

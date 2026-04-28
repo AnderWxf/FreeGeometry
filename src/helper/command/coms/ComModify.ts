@@ -2,6 +2,7 @@ import { Command } from "../Command";
 import * as THREE from "three";
 import type { CommandExecuter } from "../CommandExecuter";
 import { Global } from "../../../core/Global";
+import type { GeomType } from "../../../core/Constents";
 
 
 /**
@@ -10,6 +11,7 @@ import { Global } from "../../../core/Global";
  */
 class ComModify extends Command {
     public old: THREE.Object3D;
+    protected type: GeomType;
     protected result: THREE.Object3D;
     protected tempResult: THREE.Object3D;
 

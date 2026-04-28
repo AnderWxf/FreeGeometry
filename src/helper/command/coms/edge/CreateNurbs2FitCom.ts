@@ -5,9 +5,9 @@ import { Global } from "../../../../core/Global";
 import { ActPickPoint2 } from "../../acts/ActPickPoint2";
 import { Brep2Builder } from "../../../../geometry/algorithm/builder/Brep2Builder";
 import { Vector2 } from "../../../../math/Math";
-import { BrepMeshBuilder } from "../../../MeshBuilder";
+import { BrepMeshBuilder } from "../../../BrepMeshBuilder";
 import type { CommandExecuter } from "../../CommandExecuter";
-import { Curve2Type } from "../../../../core/Constents";
+import { GeomType } from "../../../../core/Constents";
 import type { Edge2 } from "../../../../geometry/data/brep/Brep2";
 
 
@@ -20,6 +20,7 @@ class CreateNurbs2FitCom extends ComCreate {
     constructor(executer: CommandExecuter, text: string) {
         super(executer, text);
         this.points = [];
+        this.type = GeomType.NUF;
     }
     async exec(): Promise<void> {
         let str = this._text;
@@ -55,7 +56,7 @@ class CreateNurbs2FitCom extends ComCreate {
         if (this.points.length > 2) {
             let edge = Brep2Builder.BuildEdge2FromFittingPoints(this.points, this.points.length == 3 ? 2 : 3);
             let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
-            geo.userData.type = Curve2Type.NUF;
+            geo.userData.type = this.type;
             this.result = geo;
             this.done();
         } else {

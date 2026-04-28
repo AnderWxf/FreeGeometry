@@ -31,7 +31,7 @@ class BrepMeshBuilder {
                 if (edge.curve instanceof Line2Data) {
                     segment = 1;
                 } else {
-                    segment = Math.ceil(MathUtils.clamp(Brep2Builder.Length(edge, 1, 512), 64, 512));
+                    segment = Math.ceil(MathUtils.clamp(Brep2Builder.Length(edge.curve, edge.u, 1, 512), 64, 512));
                 }
             }
 
@@ -72,7 +72,7 @@ class BrepMeshBuilder {
             if (edge.curve instanceof Line2Data) {
                 segment = 1;
             } else {
-                let l = Brep2Builder.Length(edge, 1, 1024);
+                let l = Brep2Builder.Length(edge.curve, edge.u, 1, 1024);
                 segment = Math.ceil(MathUtils.clamp(l, 64, 1024));
             }
         }
@@ -110,7 +110,7 @@ class BrepMeshBuilder {
             if (edge.curve instanceof Line2Data) {
                 segment = 1;
             } else {
-                segment = Math.ceil(MathUtils.clamp(Brep2Builder.Length(edge, 1), 32, 512));
+                segment = Math.ceil(MathUtils.clamp(Brep2Builder.Length(edge.curve, edge.u, 1, 512), 32, 512));
             }
         }
 
@@ -151,7 +151,7 @@ class BrepMeshBuilder {
             if (edge.curve instanceof Line2Data) {
                 segment = 1;
             } else {
-                segment = Math.ceil(MathUtils.clamp(Brep2Builder.Length(edge, 1), 32, 512));
+                segment = Math.ceil(MathUtils.clamp(Brep2Builder.Length(edge.curve, edge.u, 1, 512), 32, 512));
             }
         }
 
@@ -310,9 +310,113 @@ class BrepMeshBuilder {
      *
      * @param {Face2} [face] - The face2 object.
      */
-    static BuildFace2Mesh(face: Face2, color: number, segment?: number): THREE.BufferGeometry {
-        // polyDecomp.setEpsilon(1e-10);
-        return null;
+    static BuildFace2Mesh(face: Face2, color: number, segment?: number, canPick: boolean = true, drawOutLine: boolean = true): THREE.Mesh {
+        let points = new Array<THREE.Vector2>();
+        let holes = new Array<THREE.Path>();
+        face.border.coedges.forEach(coedge => {
+            let edge = coedge.e;
+            let curve = edge.curve;
+            if (curve == null) {
+                curve = face.curves[edge.curveIndex];
+            }
+            let edgeSegment = segment;
+            if (edgeSegment == undefined) {
+                if (curve instanceof Line2Data) {
+                    edgeSegment = 1;
+                } else {
+                    edgeSegment = Math.ceil(MathUtils.clamp(Brep2Builder.Length(curve, edge.u, 1, 512), 64, 512));
+                }
+            }
+
+            let algor = CurveBuilder.Algorithm2ByData(curve);
+            let ub = edge.u.x;
+            let ue = edge.u.y;
+            if (!coedge.isForward) {
+                [ub, ue] = [ue, ub];
+            }
+            let step = (ue - ub) / edgeSegment;
+            for (let u = ub, i = 0; i <= edgeSegment; u += step, i++) {
+                let p = algor.p(u);
+                points.push(new THREE.Vector2(p.x, p.y));
+            }
+        });
+        face.holes.forEach(hole => {
+            let holePoints = new Array<THREE.Vector2>();
+            hole.coedges.forEach(coedge => {
+                let edge = coedge.e;
+                let curve = edge.curve;
+                if (curve == null) {
+                    curve = face.curves[edge.curveIndex];
+                }
+                let edgeSegment = segment;
+                if (edgeSegment == undefined) {
+                    if (curve instanceof Line2Data) {
+                        edgeSegment = 1;
+                    } else {
+                        edgeSegment = Math.ceil(MathUtils.clamp(Brep2Builder.Length(curve, edge.u, 1, 512), 64, 512));
+                    }
+                }
+                let algor = CurveBuilder.Algorithm2ByData(curve);
+                let ub = edge.u.x;
+                let ue = edge.u.y;
+                if (!coedge.isForward) {
+                    [ub, ue] = [ue, ub];
+                }
+                let step = (ue - ub) / edgeSegment;
+                for (let u = ub, i = 0; i <= edgeSegment; u += step, i++) {
+                    let p = algor.p(u);
+                    holePoints.push(new THREE.Vector2(p.x, p.y));
+                }
+            });
+            holes.push(new THREE.Path(holePoints));
+        });
+        let shape = new THREE.Shape(points);
+        shape.holes = holes;
+        const material = new THREE.MeshBasicMaterial({ color: color, opacity: 0.25, transparent: true });
+        let buff = new THREE.ShapeGeometry(shape);
+        let ret = new THREE.Mesh(buff, material);
+        ret.userData.canPick = canPick;
+        ret.userData.original = face;
+        ret.frustumCulled = false;
+
+        // 绘制边界线
+        if (drawOutLine) {
+            let vertices = new Array<number>;
+            for (let i = 0; i < points.length; i++) {
+                let p = points[i];
+                vertices.push(p.x);
+                vertices.push(p.y);
+                vertices.push(0);
+            }
+            let p = points[0];
+            vertices.push(p.x);
+            vertices.push(p.y);
+            vertices.push(0);
+            let borderbuff = new THREE.BufferGeometry()
+            borderbuff.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+            const materialline = new THREE.MeshBasicMaterial({ color: color });
+            let borderMesh = new THREE.Line(borderbuff, materialline);
+            borderMesh.frustumCulled = false;
+            ret.children.push(borderMesh);
+            holes.forEach(hole => {
+                let vertices = new Array<number>;
+                hole.getPoints().forEach(p => {
+                    vertices.push(p.x);
+                    vertices.push(p.y);
+                    vertices.push(0);
+                });
+                let p = points[0];
+                vertices.push(p.x);
+                vertices.push(p.y);
+                vertices.push(0);
+                let holeBuff = new THREE.BufferGeometry()
+                holeBuff.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+                let holeMesh = new THREE.Line(holeBuff, materialline);
+                holeMesh.frustumCulled = false;
+                ret.children.push(holeMesh);
+            });
+        }
+        return ret;
     }
 
     /**

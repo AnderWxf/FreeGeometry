@@ -5,9 +5,9 @@ import { Global } from "../../../../core/Global";
 import { ActPickPoint2 } from "../../acts/ActPickPoint2";
 import { Brep2Builder } from "../../../../geometry/algorithm/builder/Brep2Builder";
 import { Vector2 } from "../../../../math/Math";
-import { BrepMeshBuilder } from "../../../MeshBuilder";
+import { BrepMeshBuilder } from "../../../BrepMeshBuilder";
 import type { CommandExecuter } from "../../CommandExecuter";
-import { Curve2Type } from "../../../../core/Constents";
+import { GeomType } from "../../../../core/Constents";
 import type { Edge2 } from "../../../../geometry/data/brep/Brep2";
 
 
@@ -20,6 +20,7 @@ class CreateRectangle2Com extends ComCreate {
     endPoint: Vector2;
     constructor(executer: CommandExecuter, text: string) {
         super(executer, text);
+        this.type = GeomType.REC;
     }
     async exec(): Promise<void> {
         let str = this._text;
@@ -68,7 +69,7 @@ class CreateRectangle2Com extends ComCreate {
         edges.push(edge);
 
         let geo = BrepMeshBuilder.BuildEdge2sMesh(edges, THREE.Color.NAMES.red);
-        geo.userData.type = Curve2Type.REC;
+        geo.userData.type = this.type;
         this.result = geo;
         this.done();
     }

@@ -270,23 +270,23 @@ class Brep2Builder {
      * @param {number} [u ∈ [0,a]] - the u parameter of curve.
      * @retun {Matrix2}
      */
-    static Length(e: Edge2, tol = 0.0001, min: number = 0): number {
-        if (e.curve instanceof Line2Data) {
-            return Math.abs(e.u.y - e.u.x);
+    static Length(curve: Curve2Data, u: Vector2, tol = 0.0001, min: number = 0): number {
+        if (curve instanceof Line2Data) {
+            return Math.abs(u.y - u.x);
         }
-        else if (e.curve instanceof Arc2Data) {
-            if (e.curve.radius.x == e.curve.radius.y) {
-                return 2 * Math.abs(e.u.y - e.u.x) * e.curve.radius.x
-            } else if (e.u.x - e.u.y == Math.PI * 2) {
+        else if (curve instanceof Arc2Data) {
+            if (curve.radius.x == curve.radius.y) {
+                return 2 * Math.abs(u.y - u.x) * curve.radius.x
+            } else if (u.x - u.y == Math.PI * 2) {
                 //该公式发明人周钰承
-                let a = e.curve.radius.x;
-                let b = e.curve.radius.y;
+                let a = curve.radius.x;
+                let b = curve.radius.y;
                 //pi*(a+b)*(1+3*((a-b)/(a+b))^2/(10+sqrt(4-3*((a-b)/(a+b))^2))+(4/pi-14/11)*((a-b)/(a+b))^(14.233+13.981*((a-b)/(a+b))**6.42))
                 return Math.PI * (a + b) * (1 + 3 * ((a - b) / (a + b)) ** 2 / (10 + Math.sqrt(4 - 3 * ((a - b) / (a + b)) ** 2)) + (4 / Math.PI - 14 / 11) * ((a - b) / (a + b)) ** (14.233 + 13.981 * ((a - b) / (a + b)) ** 6.42))
             }
         }
-        else if (e.curve instanceof Nurbs2Data) {
-            let nurbsAlgo = new Nurbs2Algo(e.curve as Nurbs2Data);
+        else if (curve instanceof Nurbs2Data) {
+            let nurbsAlgo = new Nurbs2Algo(curve as Nurbs2Data);
             // let start = new Date().getTime();
             let nurbsLength = nurbsAlgo.length();
             // let end = new Date().getTime();
@@ -294,18 +294,18 @@ class Brep2Builder {
             return nurbsLength;
         }
         // 细分求和
-        let algor = CurveBuilder.Algorithm2ByData(e.curve);
+        let algor = CurveBuilder.Algorithm2ByData(curve);
         // let start = new Date().getTime();
         let length = 0;
         let ps = new Array<{ u: number, p: Vector2 }>();
-        ps.push({ u: e.u.x, p: algor.p(e.u.x) });
-        ps.push({ u: e.u.x + (e.u.y - e.u.x) * 1 / 8, p: algor.p(e.u.x + (e.u.y - e.u.x) * 1 / 8) });
-        ps.push({ u: e.u.x + (e.u.y - e.u.x) * 2 / 8, p: algor.p(e.u.x + (e.u.y - e.u.x) * 2 / 8) });
-        ps.push({ u: e.u.x + (e.u.y - e.u.x) * 3 / 8, p: algor.p(e.u.x + (e.u.y - e.u.x) * 3 / 8) });
-        ps.push({ u: e.u.x + (e.u.y - e.u.x) * 4 / 8, p: algor.p(e.u.x + (e.u.y - e.u.x) * 4 / 8) });
-        ps.push({ u: e.u.x + (e.u.y - e.u.x) * 5 / 8, p: algor.p(e.u.x + (e.u.y - e.u.x) * 5 / 8) });
-        ps.push({ u: e.u.x + (e.u.y - e.u.x) * 6 / 8, p: algor.p(e.u.x + (e.u.y - e.u.x) * 6 / 8) });
-        ps.push({ u: e.u.y, p: algor.p(e.u.y) });
+        ps.push({ u: u.x, p: algor.p(u.x) });
+        ps.push({ u: u.x + (u.y - u.x) * 1 / 8, p: algor.p(u.x + (u.y - u.x) * 1 / 8) });
+        ps.push({ u: u.x + (u.y - u.x) * 2 / 8, p: algor.p(u.x + (u.y - u.x) * 2 / 8) });
+        ps.push({ u: u.x + (u.y - u.x) * 3 / 8, p: algor.p(u.x + (u.y - u.x) * 3 / 8) });
+        ps.push({ u: u.x + (u.y - u.x) * 4 / 8, p: algor.p(u.x + (u.y - u.x) * 4 / 8) });
+        ps.push({ u: u.x + (u.y - u.x) * 5 / 8, p: algor.p(u.x + (u.y - u.x) * 5 / 8) });
+        ps.push({ u: u.x + (u.y - u.x) * 6 / 8, p: algor.p(u.x + (u.y - u.x) * 6 / 8) });
+        ps.push({ u: u.y, p: algor.p(u.y) });
         length = ps[0].p.distanceTo(ps[1].p);
         length = length + ps[1].p.distanceTo(ps[2].p);
         length = length + ps[2].p.distanceTo(ps[3].p);

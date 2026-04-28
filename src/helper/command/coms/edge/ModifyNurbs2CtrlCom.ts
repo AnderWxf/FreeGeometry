@@ -6,13 +6,13 @@ import { Global } from "../../../../core/Global";
 import { ActPickPoint2 } from "../../acts/ActPickPoint2";
 import { Brep2Builder } from "../../../../geometry/algorithm/builder/Brep2Builder";
 import { Vector2, Vector3 } from "../../../../math/Math";
-import { BrepMeshBuilder } from "../../../MeshBuilder";
+import { BrepMeshBuilder } from "../../../BrepMeshBuilder";
 import type { CommandExecuter } from "../../CommandExecuter";
 import { ComModify } from "../ComModify";
 import { ActPickObject } from "../../acts/ActPickObject";
 import { Edge2 } from "../../../../geometry/data/brep/Brep2";
 import { Arc2Data } from "../../../../geometry/data/base/curve2/Arc2Data";
-import { Curve2Type } from "../../../../core/Constents";
+import { GeomType } from "../../../../core/Constents";
 import { ActPickAssist } from "../../acts/ActPickAssist";
 import { CurveBuilder } from "../../../../geometry/algorithm/builder/CurveBuilder";
 import { Nurbs2Data } from "../../../../geometry/data/base/curve2/Nurbs2Data";
@@ -26,6 +26,7 @@ import { Transform2 } from "../../../../geometry/data/base/Transform2";
 class ModifyNurbs2CtrlCom extends ComModify {
     constructor(executer: CommandExecuter, text: string) {
         super(executer, text);
+        this.type = GeomType.NUC;
     }
     async exec(): Promise<void> {
         let str = this._text;
@@ -45,7 +46,7 @@ class ModifyNurbs2CtrlCom extends ComModify {
             await act_pick_data.execute(context);
             if (this._isCancel) { this.cancel(); return; }
             while (!act_pick_data.result.userData
-                || act_pick_data.result.userData.type != Curve2Type.NUC
+                || act_pick_data.result.userData.type != this.type
             ) {
                 await act_pick_data.execute(context);
                 if (this._isCancel) { this.cancel(); return; }
@@ -104,7 +105,7 @@ class ModifyNurbs2CtrlCom extends ComModify {
             let nurbsData = new Nurbs2Data(new Transform2(), controls, knots, degree);
             let edge = Brep2Builder.BuildEdge2FromCurve2(nurbsData, 0, 1);
             let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
-            geo.userData.type = Curve2Type.NUC;
+            geo.userData.type = this.type;
             this.result = geo;
             this.done();
         } else {

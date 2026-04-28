@@ -9,7 +9,7 @@ import { CurveBuilder } from './geometry/algorithm/builder/CurveBuilder';
 import { SurfaceBulder } from './geometry/algorithm/builder/SurfaceBulder';
 import { PlaneSurfaceData } from './geometry/data/base/surface/PlaneSurfaceData';
 import { Brep2Builder } from './geometry/algorithm/builder/Brep2Builder';
-import { BrepMeshBuilder } from './helper/MeshBuilder';
+import { BrepMeshBuilder } from './helper/BrepMeshBuilder';
 import { MathUtils } from './math/MathUtils';
 import { Curve2Inter, type InterOfCurve2 } from './geometry/algorithm/relation/intersection/Curve2Inter';
 import { SolveEquation } from './geometry/algorithm/base/SolveEquation';
@@ -354,7 +354,7 @@ export class Cube {
           for (let j = i + 1; j < edges.length; j++) {
             let e1 = edges[j];
             let beginij = new Date().getTime();
-            inters.push(...Curve2Inter.CurveXCurve(e0.curve, e1.curve, MathUtils.clamp(Math.round(Brep2Builder.Length(e0)), 32, 256), 1e-4, 1e-10, e0.u.x, e0.u.y));
+            inters.push(...Curve2Inter.CurveXCurve(e0.curve, e1.curve, MathUtils.clamp(Math.round(Brep2Builder.Length(e0.curve, e0.u)), 32, 256), 1e-4, 1e-10, e0.u.x, e0.u.y));
             let end = new Date().getTime();
             console.warn("i j: " + i + " " + j + " 单次耗时：" + (end - beginij) + " ms，共找到交点数量：" + inters.length);
           }

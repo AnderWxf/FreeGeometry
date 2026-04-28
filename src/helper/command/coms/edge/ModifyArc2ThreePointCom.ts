@@ -6,9 +6,9 @@ import { Global } from "../../../../core/Global";
 import { ActPickPoint2 } from "../../acts/ActPickPoint2";
 import { Brep2Builder } from "../../../../geometry/algorithm/builder/Brep2Builder";
 import { Vector2 } from "../../../../math/Math";
-import { BrepMeshBuilder } from "../../../MeshBuilder";
+import { BrepMeshBuilder } from "../../../BrepMeshBuilder";
 import type { CommandExecuter } from "../../CommandExecuter";
-import { Curve2Type } from "../../../../core/Constents";
+import { GeomType } from "../../../../core/Constents";
 import { ComModify } from "../ComModify";
 import { ActPickObject } from "../../acts/ActPickObject";
 import { ActPickAssist } from "../../acts/ActPickAssist";
@@ -22,6 +22,7 @@ class ModifyArc2ThreePointCom extends ComModify {
 
     constructor(executer: CommandExecuter, text: string) {
         super(executer, text);
+        this.type = GeomType.A3;
     }
     async exec(): Promise<void> {
         let str = this._text;
@@ -42,13 +43,12 @@ class ModifyArc2ThreePointCom extends ComModify {
             await act_pick_data.execute(context);
             if (this._isCancel) { this.cancel(); return; }
             while (!act_pick_data.result.userData
-                || act_pick_data.result.userData.type != Curve2Type.A3
+                || act_pick_data.result.userData.type != this.type
             ) {
                 await act_pick_data.execute(context);
                 if (this._isCancel) { this.cancel(); return; }
             }
             this.old = act_pick_data.result;
-
 
 
             let act_pick_assist = new ActPickAssist();
@@ -92,7 +92,7 @@ class ModifyArc2ThreePointCom extends ComModify {
         // 创建一个曲线段
         let edge = Brep2Builder.BuildArcFromBeginMiddleEndPoint(beginPoint, middlePoint, endPoint);
         let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
-        geo.userData.type = Curve2Type.A3;
+        geo.userData.type = this.type;
         this.result = geo;
         this.assists.push(this.createAssistPoint(edge.curve.trans.pos, THREE.Color.NAMES.greenyellow));
         this.done();

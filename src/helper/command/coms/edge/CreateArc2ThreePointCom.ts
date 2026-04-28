@@ -6,9 +6,9 @@ import { Global } from "../../../../core/Global";
 import { ActPickPoint2 } from "../../acts/ActPickPoint2";
 import { Brep2Builder } from "../../../../geometry/algorithm/builder/Brep2Builder";
 import { Vector2 } from "../../../../math/Math";
-import { BrepMeshBuilder } from "../../../MeshBuilder";
+import { BrepMeshBuilder } from "../../../BrepMeshBuilder";
 import type { CommandExecuter } from "../../CommandExecuter";
-import { Curve2Type } from "../../../../core/Constents";
+import { GeomType } from "../../../../core/Constents";
 
 
 /**
@@ -21,6 +21,7 @@ class CreateArc2ThreePointCom extends ComCreate {
     endPoint: Vector2;
     constructor(executer: CommandExecuter, text: string) {
         super(executer, text);
+        this.type = GeomType.A3;
     }
     async exec(): Promise<void> {
         let str = this._text;
@@ -60,7 +61,7 @@ class CreateArc2ThreePointCom extends ComCreate {
         // 创建一个曲线段
         let edge = Brep2Builder.BuildArcFromBeginMiddleEndPoint(this.beginPoint, this.middlePoint, this.endPoint);
         let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
-        geo.userData.type = Curve2Type.A3;
+        geo.userData.type = this.type;
         this.result = geo;
         this.assists.push(this.createAssistPoint(edge.curve.trans.pos, THREE.Color.NAMES.greenyellow));
         this.done();

@@ -4,7 +4,7 @@ import { Global } from "../../../core/Global";
 import { ActPickPoint2 } from "../acts/ActPickPoint2";
 import { Brep2Builder } from "../../../geometry/algorithm/builder/Brep2Builder";
 import { Vector2 } from "../../../math/Math";
-import { BrepMeshBuilder } from "../../MeshBuilder";
+import { BrepMeshBuilder } from "../../BrepMeshBuilder";
 import { ComDelete } from "./ComDelete";
 import type { CommandExecuter } from "../CommandExecuter";
 

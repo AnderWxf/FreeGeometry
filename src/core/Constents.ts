@@ -1,39 +1,36 @@
 enum DisplayLayers {
     Point,
     Curve,
-    Face,
-    Sloid,
+    Surface,
+    Solid,
 }
 
-// 二维曲线类型
-enum Curve2Type {
-    L = 'L',        // 两点直线段
-    A = 'A',        // 圆弧
-    A3 = 'A3',      // 三点圆弧
-    C = 'C',        // 圆
-    C3 = 'C3',      // 三点圆
-    E = 'E',        // 椭圆
-    EA = 'EA',      // 椭圆弧
-    HY = 'HY',      // 双曲线
-    PA = 'PA',      // 抛物线
-    PL = 'PL',      // 多段线
-    NUF = 'NUF',    // Nurbs fitting
-    NUC = 'NUC',    // Nurbs control
-    REC = 'REC',    // REC：矩形
+
+enum GeomType {
+    // 二维曲线类型
+    L = 0,       // 两点直线段
+    A = 1,       // 圆弧
+    A3 = 2,      // 三点圆弧
+    C = 3,       // 圆
+    C3 = 4,      // 三点圆
+    E = 5,       // 椭圆
+    EA = 6,      // 椭圆弧
+    HY = 7,      // 双曲线
+    PA = 8,      // 抛物线
+    PL = 9,      // 多段线
+    NUF = 10,    // Nurbs fitting
+    NUC = 11,    // Nurbs control
+    REC = 12,    // REC：矩形
+
+    // 二维曲面类型
+    PLA = 20,     // 二维平面
+    SEC = 21,     // 二维剖面
 }
 
-// 二维Face类型
-enum Face2Type {
-    C = 'C',        // 圆
-    C3 = 'C3',      // 三点圆
-    E = 'E',        // 椭圆
-    PL = 'PL',      // 多边形
-    REC = 'REC',    // REC：矩形
-    NOR = 'NOR',    // NOR：一般图形
-}
+
 
 export {
     DisplayLayers,
-    Curve2Type,
-    Face2Type
-}
+    GeomType,
+    // Surface2Type
+};

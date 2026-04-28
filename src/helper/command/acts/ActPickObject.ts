@@ -1,4 +1,3 @@
-import type { DataBase } from "../../../geometry/data/DataBase";
 import { ActionContext3D, Active } from "../Active";
 import * as THREE from "three";
 

@@ -3,7 +3,7 @@ import { Brep2Builder } from "../../geometry/algorithm/builder/Brep2Builder";
 import type { DataBase } from "../../geometry/data/DataBase";
 import type { Vector2 } from "../../math/Math";
 import { bin } from "../../mathjs/lib/cjs/entry/pureFunctionsAny.generated";
-import { BrepMeshBuilder } from "../MeshBuilder";
+import { BrepMeshBuilder } from "../BrepMeshBuilder";
 import type { CommandExecuter } from "./CommandExecuter";
 import * as THREE from "three";
 

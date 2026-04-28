@@ -1,6 +1,6 @@
 import type { Vector2 } from "../../../math/Math";
 import type { Curve2Data } from "../base/Curve2Data";
-import type { Transform2 } from "../base/Transform2";
+import { Transform2 } from "../base/Transform2";
 import { DataBase } from "../DataBase";
 /**
  * Brep data on xy space;
@@ -16,17 +16,18 @@ import { DataBase } from "../DataBase";
  */
 class Vertice2 extends DataBase {
     /**
+     * Edges of Vertice.
+     */
+    edges: Array<Edge2>;
+
+    /**
      * Constructs a Vertice.
      *
      */
     constructor() {
         super();
+        this.edges = [];
     }
-
-    /**
-     * Edges of Vertice.
-     */
-    edges: Array<Edge2>;
 }
 
 /**
@@ -113,11 +114,28 @@ class Coedge2 extends DataBase {
     e: Edge2;
 
     /**
+     * Direction of Coedge.
+     *
+     */
+    isForward: boolean = true;
+
+    /**
      * Constructs a Coedge.
      *
      */
     constructor() {
         super();
+    }
+    /**
+     * Returns a new Loop2 with copied values from this instance.
+     *
+     * @return {Coedge2} A clone of this instance.
+     */
+    override clone() {
+        let result = new Coedge2();
+        result.e = this.e.clone();
+        result.isForward = this.isForward;
+        return result;
     }
 }
 
@@ -129,7 +147,7 @@ class Loop2 extends DataBase {
     /**
      * Coedges of Loop.
      */
-    coedges: Array<Edge2>;
+    coedges: Array<Coedge2>;
 
     /**
      * Constructs a Loop.
@@ -137,6 +155,17 @@ class Loop2 extends DataBase {
      */
     constructor() {
         super();
+        this.coedges = [];
+    }
+    /**
+     * Returns a new Loop2 with copied values from this instance.
+     *
+     * @return {Loop2} A clone of this instance.
+     */
+    override clone() {
+        let result = new Loop2();
+        result.coedges = this.coedges?.map((c) => c.clone());
+        return result;
     }
 }
 
@@ -153,9 +182,9 @@ class Face2 extends DataBase {
     curves: Array<Curve2Data>;
 
     /**
-     * transform of Body.
+     *  vertices of Face.
      */
-    transform: Transform2;
+    vertice2s: Array<Vertice2>;
 
     /**
      * border of Face.
@@ -173,7 +202,43 @@ class Face2 extends DataBase {
      */
     constructor() {
         super();
+        this.curves = [];
+        this.vertice2s = [];
+        this.border = new Loop2();
+        this.holes = [];
     }
+    /**
+     * Returns a new Face2 with copied values from this instance.
+     *
+     * @return {Face2} A clone of this instance.
+     */
+    override clone() {
+        let result = new Face2();
+        result.curves = this.curves?.map((c) => c.clone());
+        // result.vertice2s = this.vertice2s?.map((v) => v.clone());
+        result.border = this.border?.clone();
+        result.holes = this.holes?.map((h) => h.clone());
+        return result;
+    }
+
+    /**
+     * Returns all edges from the face.
+     *
+     * @return {[Edge2]} .
+     */
+    get edges(): Edge2[] {
+        let result: Edge2[] = [];
+        this.border.coedges.forEach(coedge => {
+            result.push(coedge.e);
+        });
+        this.holes.forEach(hole => {
+            hole.coedges.forEach(coedge => {
+                result.push(coedge.e);
+            });
+        });
+        return result;
+    }
+
 }
 
 export {

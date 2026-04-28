@@ -1,6 +1,6 @@
 import { Global } from "../../../core/Global";
 import { Vector2 } from "../../../math/Math";
-import { BrepMeshBuilder } from "../../MeshBuilder";
+import { BrepMeshBuilder } from "../../BrepMeshBuilder";
 import { ActionContext3D, Active } from "../Active";
 import * as THREE from "three";
 

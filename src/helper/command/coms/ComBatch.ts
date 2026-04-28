@@ -42,7 +42,7 @@ class ComBatch extends Command {
         if (this.isDeleteOld)
             Global.scene.remove(...this.olds);
         Global.scene.remove(...this.tempResults);
-
+        Global.select.clear();
         this.tempResults = [];
     }
     override bind(window: Window) {

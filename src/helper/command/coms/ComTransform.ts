@@ -1,7 +1,7 @@
 import { Global } from "../../../core/Global";
-import { Edge2 } from "../../../geometry/data/brep/Brep2";
+import { Edge2, Face2 } from "../../../geometry/data/brep/Brep2";
 import { Matrix3, Vector2, type Matrix4 } from "../../../math/Math";
-import { BrepMeshBuilder } from "../../MeshBuilder";
+import { BrepMeshBuilder } from "../../BrepMeshBuilder";
 import { ActionContext3D } from "../Active";
 import { ActPickObject } from "../acts/ActPickObject";
 import { ActPickPoint2 } from "../acts/ActPickPoint2";
@@ -9,6 +9,7 @@ import * as THREE from "three";
 import { ComBatch } from "./ComBatch";
 import { Brep2Builder } from "../../../geometry/algorithm/builder/Brep2Builder";
 import type { Transform2 } from "../../../geometry/data/base/Transform2";
+import { GeomType } from "../../../core/Constents";
 
 /**
  * Transform command class.
@@ -60,32 +61,54 @@ class ComTransform extends ComBatch {
         // 创建n个线段
         for (let i = 0; i < this.olds.length; i++) {
             let old = this.olds[i];
-            // 创建一个线段
-            if (old.userData.original instanceof Edge2) {
-                let edge = (old.userData.original as Edge2).clone();
-                this.appTransfrom(edge.curve.trans, trans);
-                let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
-                geo.userData.type = old.userData.type;
-                for (let i = 0; i < old.children.length; i++) {
-                    let child = old.children[i];
-                    let p = new Vector2(child.position.x, child.position.y);
-                    p.applyMatrix3(trans);
-                    geo.children.push(this.createAssistPoint(p, child.userData.color));
-                }
-                this.results.push(geo);
-            }
-            // 创建多个线段
-            if (old.userData.original instanceof Array) {
-                let array = old.userData.original as Array<any>;
-                let edges: Edge2[] = [];
-                for (let i = 0; i < array.length; i++) {
-                    if (array[i] instanceof Edge2) {
-                        let edge = (array[i] as Edge2).clone();
-                        this.appTransfrom(edge.curve.trans, trans);
-                        edges.push(edge);
+            // 线
+            if (old.userData.type < GeomType.PLA) {
+                if (old.userData.type == GeomType.PL || old.userData.type == GeomType.REC) {
+                    // 数组
+                    if (old.userData.original instanceof Array) {
+                        let array = old.userData.original as Array<any>;
+                        let edges: Edge2[] = [];
+                        for (let i = 0; i < array.length; i++) {
+                            if (array[i] instanceof Edge2) {
+                                let edge = (array[i] as Edge2).clone();
+                                this.appTransfrom(edge.curve.trans, trans);
+                                edges.push(edge);
+                            }
+                        }
+                        let geo = BrepMeshBuilder.BuildEdge2sMesh(edges, THREE.Color.NAMES.red);
+                        geo.userData.type = old.userData.type;
+                        for (let i = 0; i < old.children.length; i++) {
+                            let child = old.children[i];
+                            let p = new Vector2(child.position.x, child.position.y);
+                            p.applyMatrix3(trans);
+                            geo.children.push(this.createAssistPoint(p, child.userData.color));
+                        }
+                        this.results.push(geo);
                     }
                 }
-                let geo = BrepMeshBuilder.BuildEdge2sMesh(edges, THREE.Color.NAMES.red);
+                // 单例
+                else {
+                    let edge = (old.userData.original as Edge2).clone();
+                    this.appTransfrom(edge.curve.trans, trans);
+                    let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
+                    geo.userData.type = old.userData.type;
+                    for (let i = 0; i < old.children.length; i++) {
+                        let child = old.children[i];
+                        let p = new Vector2(child.position.x, child.position.y);
+                        p.applyMatrix3(trans);
+                        geo.children.push(this.createAssistPoint(p, child.userData.color));
+                    }
+                    this.results.push(geo);
+                }
+            }
+            // 面
+            else if (old.userData.type >= GeomType.PLA) {
+                let face = (old.userData.original as Face2).clone() as Face2;
+                for (let i = 0; i < face.curves.length; i++) {
+                    this.appTransfrom(face.curves[i].trans, trans);
+                }
+
+                let geo = BrepMeshBuilder.BuildFace2Mesh(face, THREE.Color.NAMES.blue, undefined, true, false);
                 geo.userData.type = old.userData.type;
                 for (let i = 0; i < old.children.length; i++) {
                     let child = old.children[i];
@@ -122,34 +145,55 @@ class ComTransform extends ComBatch {
             let trans = this.makeTransfrom(this.beginPoint, endPoint);
             for (let i = 0; i < this.olds.length; i++) {
                 let old = this.olds[i];
-                // 创建一个线段
-                if (old.userData.original instanceof Edge2) {
-                    let edge = (old.userData.original as Edge2).clone();
-                    this.appTransfrom(edge.curve.trans, trans);
-                    let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0, false);
-                    t.name = "temp";
-                    this.tempResults.push(t);
-                }
-                // 创建多个线段
-                if (old.userData.original instanceof Array) {
-                    let array = old.userData.original as Array<any>;
-                    let edges: Edge2[] = [];
-                    for (let i = 0; i < array.length; i++) {
-                        if (array[i] instanceof Edge2) {
-                            let edge = (array[i] as Edge2).clone();
-                            this.appTransfrom(edge.curve.trans, trans);
-                            edges.push(edge);
-                        }
+                // 线
+                if (old.userData.type < GeomType.PLA) {
+                    // 创建一个线段
+                    if (old.userData.original instanceof Edge2) {
+                        let edge = (old.userData.original as Edge2).clone();
+                        this.appTransfrom(edge.curve.trans, trans);
+                        let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0, false);
+                        t.name = "temp";
+                        this.tempResults.push(t);
                     }
-                    let geo = BrepMeshBuilder.BuildEdge2sMesh(edges, THREE.Color.NAMES.gray, undefined, 0, false);
-                    geo.userData.type = old.userData.type;
+                    // 创建多个线段
+                    if (old.userData.original instanceof Array) {
+                        let array = old.userData.original as Array<any>;
+                        let edges: Edge2[] = [];
+                        for (let i = 0; i < array.length; i++) {
+                            if (array[i] instanceof Edge2) {
+                                let edge = (array[i] as Edge2).clone();
+                                this.appTransfrom(edge.curve.trans, trans);
+                                edges.push(edge);
+                            }
+                        }
+                        let t = BrepMeshBuilder.BuildEdge2sMesh(edges, THREE.Color.NAMES.gray, undefined, 0, false);
+                        t.userData.type = old.userData.type;
+                        t.name = "temp";
+                        for (let i = 0; i < old.children.length; i++) {
+                            let child = old.children[i];
+                            let p = new Vector2(child.position.x, child.position.y);
+                            p.applyMatrix3(trans);
+                            t.children.push(this.createAssistPoint(p, child.userData.color));
+                        }
+                        this.tempResults.push(t);
+                    }
+                }
+                // 面
+                else if (old.userData.type >= GeomType.PLA) {
+                    let face = (old.userData.original as Face2).clone() as Face2;
+                    for (let i = 0; i < face.curves.length; i++) {
+                        this.appTransfrom(face.curves[i].trans, trans);
+                    }
+
+                    let t = BrepMeshBuilder.BuildFace2Mesh(face, THREE.Color.NAMES.gray, undefined, false, false);
+                    t.name = "temp";
                     for (let i = 0; i < old.children.length; i++) {
                         let child = old.children[i];
                         let p = new Vector2(child.position.x, child.position.y);
                         p.applyMatrix3(trans);
-                        geo.children.push(this.createAssistPoint(p, child.userData.color));
+                        t.children.push(this.createAssistPoint(p, child.userData.color));
                     }
-                    this.tempResults.push(geo);
+                    this.tempResults.push(t);
                 }
             }
 

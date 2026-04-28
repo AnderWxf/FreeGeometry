@@ -1,3 +1,4 @@
+import type { GeomType } from "../../../core/Constents";
 import { Global } from "../../../core/Global";
 import { Command } from "../Command";
 import type { CommandExecuter } from "../CommandExecuter";
@@ -8,6 +9,7 @@ import * as THREE from "three";
  * 
  */
 class ComCreate extends Command {
+    protected type: GeomType;
     protected result: THREE.Object3D;
     protected tempResult: THREE.Object3D;
     protected assists: THREE.Object3D[];

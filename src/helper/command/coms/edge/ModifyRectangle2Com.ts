@@ -4,12 +4,12 @@ import { Global } from "../../../../core/Global";
 import { ActPickPoint2 } from "../../acts/ActPickPoint2";
 import { Brep2Builder } from "../../../../geometry/algorithm/builder/Brep2Builder";
 import { Vector2 } from "../../../../math/Math";
-import { BrepMeshBuilder } from "../../../MeshBuilder";
+import { BrepMeshBuilder } from "../../../BrepMeshBuilder";
 import type { CommandExecuter } from "../../CommandExecuter";
 import { ComModify } from "../ComModify";
 import { ActPickObject } from "../../acts/ActPickObject";
 import { ActPickAssist } from "../../acts/ActPickAssist";
-import { Curve2Type } from "../../../../core/Constents";
+import { GeomType } from "../../../../core/Constents";
 import type { Edge2 } from "../../../../geometry/data/brep/Brep2";
 import type { Line2Data } from "../../../../geometry/data/base/curve2/Line2Data";
 
@@ -22,6 +22,7 @@ class ModifyRectangle2Com extends ComModify {
 
     constructor(executer: CommandExecuter, text: string) {
         super(executer, text);
+        this.type = GeomType.REC;
     }
 
     async exec(): Promise<void> {
@@ -42,7 +43,7 @@ class ModifyRectangle2Com extends ComModify {
             await act_pick_data.execute(context);
             if (this._isCancel) { this.cancel(); return; }
             while (!act_pick_data.result.userData
-                || act_pick_data.result.userData.type != Curve2Type.REC
+                || act_pick_data.result.userData.type != this.type
             ) {
                 await act_pick_data.execute(context);
                 if (this._isCancel) { this.cancel(); return; }
@@ -108,7 +109,7 @@ class ModifyRectangle2Com extends ComModify {
         edges.push(edge);
 
         let geo = BrepMeshBuilder.BuildEdge2sMesh(edges, THREE.Color.NAMES.red);
-        geo.userData.type = Curve2Type.REC;
+        geo.userData.type = this.type;
         this.result = geo;
         this.done();
     }

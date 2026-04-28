@@ -5,9 +5,9 @@ import { Global } from "../../../../core/Global";
 import { ActPickPoint2 } from "../../acts/ActPickPoint2";
 import { Brep2Builder } from "../../../../geometry/algorithm/builder/Brep2Builder";
 import { Vector2, Vector3 } from "../../../../math/Math";
-import { BrepMeshBuilder } from "../../../MeshBuilder";
+import { BrepMeshBuilder } from "../../../BrepMeshBuilder";
 import type { CommandExecuter } from "../../CommandExecuter";
-import { Curve2Type } from "../../../../core/Constents";
+import { GeomType } from "../../../../core/Constents";
 import type { Edge2 } from "../../../../geometry/data/brep/Brep2";
 import { Nurbs2Data } from "../../../../geometry/data/base/curve2/Nurbs2Data";
 import { Transform2 } from "../../../../geometry/data/base/Transform2";
@@ -22,6 +22,7 @@ class CreateNurbs2CtrlCom extends ComCreate {
     constructor(executer: CommandExecuter, text: string) {
         super(executer, text);
         this.points = [];
+        this.type = GeomType.NUC;
     }
     async exec(): Promise<void> {
         let str = this._text;
@@ -74,7 +75,7 @@ class CreateNurbs2CtrlCom extends ComCreate {
             let nurbsData = new Nurbs2Data(new Transform2(), controls, knots, degree);
             let edge = Brep2Builder.BuildEdge2FromCurve2(nurbsData, 0, 1);
             let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
-            geo.userData.type = Curve2Type.NUC;
+            geo.userData.type = this.type;
             this.result = geo;
             this.done();
         } else {

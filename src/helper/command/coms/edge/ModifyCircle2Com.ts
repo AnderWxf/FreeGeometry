@@ -4,14 +4,14 @@ import { Global } from "../../../../core/Global";
 import { ActPickPoint2 } from "../../acts/ActPickPoint2";
 import { Brep2Builder } from "../../../../geometry/algorithm/builder/Brep2Builder";
 import { Vector2 } from "../../../../math/Math";
-import { BrepMeshBuilder } from "../../../MeshBuilder";
+import { BrepMeshBuilder } from "../../../BrepMeshBuilder";
 import type { CommandExecuter } from "../../CommandExecuter";
 import { ComModify } from "../ComModify";
 import { ActPickObject } from "../../acts/ActPickObject";
 import { Edge2 } from "../../../../geometry/data/brep/Brep2";
 import { ActPickAssist } from "../../acts/ActPickAssist";
 import { Arc2Data } from "../../../../geometry/data/base/curve2/Arc2Data";
-import { Curve2Type } from "../../../../core/Constents";
+import { GeomType } from "../../../../core/Constents";
 
 
 /**
@@ -21,6 +21,7 @@ import { Curve2Type } from "../../../../core/Constents";
 class ModifyCircle2Com extends ComModify {
     constructor(executer: CommandExecuter, text: string) {
         super(executer, text);
+        this.type = GeomType.C;
     }
     async exec(): Promise<void> {
         let str = this._text;
@@ -39,12 +40,13 @@ class ModifyCircle2Com extends ComModify {
             await act_pick_data.execute(context);
             if (this._isCancel) { this.cancel(); return; }
             while (!act_pick_data.result.userData
-                || act_pick_data.result.userData.type != Curve2Type.C
+                || act_pick_data.result.userData.type != this.type
             ) {
                 await act_pick_data.execute(context);
                 if (this._isCancel) { this.cancel(); return; }
             }
             this.old = act_pick_data.result;
+
 
             let act_pick_assist = new ActPickAssist();
             await act_pick_assist.execute(context);
@@ -80,7 +82,7 @@ class ModifyCircle2Com extends ComModify {
         // 创建一个曲线段
         let edge = Brep2Builder.BuildCircleEdge2FromCenterRadius(centerPoint, beginPoint.distanceTo(centerPoint));
         let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
-        geo.userData.type = Curve2Type.C;
+        geo.userData.type = this.type;
         this.result = geo;
         this.done();
     }
