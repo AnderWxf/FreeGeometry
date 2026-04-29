@@ -11,6 +11,7 @@ import type { CommandExecuter } from "../../CommandExecuter";
 import { GeomType } from "../../../../core/Constents";
 import { CurveBuilder } from "../../../../geometry/algorithm/builder/CurveBuilder";
 import { PI, PI2, PI_2 } from "../../../../math/MathUtils";
+import { CreateGeomUserData, type UserData } from "../../../UserData";
 
 
 /**
@@ -31,6 +32,7 @@ class CreateHyperbola2Com extends ComCreate {
     async exec(): Promise<void> {
         let str = this._text;
         let paras = str.split(' ');
+        let userData = CreateGeomUserData(this.type);
         if (paras.length == 12) {
             // 创建一个线段
             this.centerPoint = new Vector2(new Number(paras[1]).valueOf(), new Number(paras[2]).valueOf());
@@ -47,14 +49,16 @@ class CreateHyperbola2Com extends ComCreate {
             await act_pick_center.execute(context);
             if (this._isCancel) { this.cancel(); return; }
             this.centerPoint = new Vector2(act_pick_center.result.x, act_pick_center.result.y);
-            this.assists.push(this.createAssistPoint(this.centerPoint, THREE.Color.NAMES.greenyellow));
+            userData.assistPoints.push({ p: this.centerPoint, c: THREE.Color.NAMES.greenyellow });
+            this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
             Global.scene.add(this.assists[this.assists.length - 1]);
 
             let act_pick_major = new ActPickPoint2();
             await act_pick_major.execute(context);
             if (this._isCancel) { this.cancel(); return; }
             this.majorPoint = new Vector2(act_pick_major.result.x, act_pick_major.result.y);
-            this.assists.push(this.createAssistPoint(this.majorPoint, THREE.Color.NAMES.limegreen));
+            userData.assistPoints.push({ p: this.majorPoint, c: THREE.Color.NAMES.limegreen });
+            this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
             Global.scene.add(this.assists[this.assists.length - 1]);
 
             let act_pick_minor = new ActPickPoint2();
@@ -84,24 +88,27 @@ class CreateHyperbola2Com extends ComCreate {
 
         let alg = CurveBuilder.Algorithm2ByData(edge.curve);
 
-        this.assists.push(this.createAssistPoint(this.minorPoint, THREE.Color.NAMES.green));
+        userData.assistPoints.push({ p: this.minorPoint, c: THREE.Color.NAMES.green });
+        this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
         Global.scene.add(this.assists[this.assists.length - 1]);
 
         let u0 = alg.u(this.u0Point);
         this.u0Point = alg.p(u0);
-        this.assists.push(this.createAssistPoint(this.u0Point, THREE.Color.NAMES.deepskyblue));
+        userData.assistPoints.push({ p: this.u0Point, c: THREE.Color.NAMES.deepskyblue });
+        this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
         Global.scene.add(this.assists[this.assists.length - 1]);
 
         let u1 = alg.u(this.u1Point);
         this.u1Point = alg.p(u1);
-        this.assists.push(this.createAssistPoint(this.u1Point));
+        userData.assistPoints.push({ p: this.u1Point, c: THREE.Color.NAMES.darkblue });
+        this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
         Global.scene.add(this.assists[this.assists.length - 1]);
 
         edge.u.set(u0, u1);
         let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
-        geo.userData.type = this.type;
+        userData.original = edge;
+        geo.userData = userData;
         this.result = geo;
-
         this.done();
     }
     onMouseMoveExec(event: MouseEvent) {

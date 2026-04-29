@@ -9,6 +9,7 @@ import type { CommandExecuter } from "../../CommandExecuter";
 import { GeomType } from "../../../../core/Constents";
 import { Coedge2, Edge2, Face2, Vertice2 } from "../../../../geometry/data/brep/Brep2";
 import { ActPickObjects } from "../../acts/ActPickObjects";
+import { CreateGeomUserData } from "../../../UserData";
 
 
 /**
@@ -25,6 +26,8 @@ class CreateSectionCom extends ComCreate {
     async exec(): Promise<void> {
         let str = this._text;
         let paras = str.split(' ');
+        let userData = CreateGeomUserData(this.type);
+
         if (paras.length > 5) {
             // 创建一个面
             let points: Vector2[] = [];
@@ -53,7 +56,8 @@ class CreateSectionCom extends ComCreate {
                 }
 
                 let geo = BrepMeshBuilder.BuildFace2Mesh(face, THREE.Color.NAMES.blue);
-                geo.userData.type = this.type;
+                userData.original = face;
+                geo.userData = userData;
                 this.result = geo;
                 this.done();
             } else {
@@ -97,7 +101,8 @@ class CreateSectionCom extends ComCreate {
                     edge.curveIndex = i;
                 }
                 let geo = BrepMeshBuilder.BuildFace2Mesh(face, THREE.Color.NAMES.blue);
-                geo.userData.type = this.type;
+                userData.original = face;
+                geo.userData = userData;
                 this.result = geo;
                 this.done();
             } else {

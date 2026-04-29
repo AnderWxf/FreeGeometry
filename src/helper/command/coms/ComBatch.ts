@@ -32,7 +32,7 @@ class ComBatch extends Command {
 
         this.olds = null;
         this.results = null;
-        this.tempResults = null;
+        this.tempResults = [];
     }
 
     override done() {

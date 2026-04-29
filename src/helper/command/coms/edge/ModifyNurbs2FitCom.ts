@@ -15,6 +15,7 @@ import { Arc2Data } from "../../../../geometry/data/base/curve2/Arc2Data";
 import { GeomType } from "../../../../core/Constents";
 import { ActPickAssist } from "../../acts/ActPickAssist";
 import { CurveBuilder } from "../../../../geometry/algorithm/builder/CurveBuilder";
+import { CloneUserData, CopyUserData, CreateGeomUserData, type UserData } from "../../../UserData";
 
 
 /**
@@ -29,6 +30,8 @@ class ModifyNurbs2FitCom extends ComModify {
     async exec(): Promise<void> {
         let str = this._text;
         let paras = str.split(' ');
+        let userData = CreateGeomUserData(this.type);
+
         let points: Vector2[] = [];
         if (paras.length > 5) {
             // 创建一个多段线
@@ -50,6 +53,7 @@ class ModifyNurbs2FitCom extends ComModify {
                 if (this._isCancel) { this.cancel(); return; }
             }
             this.old = act_pick_data.result;
+            CopyUserData(this.old.userData as UserData, userData);
 
             let act_pick_assist = new ActPickAssist();
             await act_pick_assist.execute(context);
@@ -64,11 +68,11 @@ class ModifyNurbs2FitCom extends ComModify {
             await act_pick_new_pos.execute(context);
             if (this._isCancel) { this.cancel(); return; }
 
-            for (let i = 0; i < this.old.children.length; i++) {
-                let point = new Vector2(this.old.children[i].position.x, this.old.children[i].position.y);
-                points.push(point);
+            userData.assistPoints[this.assistIndex].p.set(act_pick_new_pos.result.x, act_pick_new_pos.result.y);
+
+            for (let i = 0; i < userData.assistPoints.length; i++) {
+                points.push(userData.assistPoints[i].p as Vector2);
             }
-            points[this.assistIndex] = act_pick_new_pos.result;
         }
 
         this._text = paras[0];
@@ -79,14 +83,10 @@ class ModifyNurbs2FitCom extends ComModify {
 
         // 创建一个曲线段
         if (points.length > 2) {
-            for (let i = 0; i < points.length; i++) {
-                let point = points[i];
-                this.assists.push(this.createAssistPoint(point, THREE.Color.NAMES.greenyellow));
-            }
-
             let edge = Brep2Builder.BuildEdge2FromFittingPoints(points, points.length == 3 ? 2 : 3);
             let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
-            geo.userData.type = this.type;
+            userData.original = edge;
+            geo.userData = userData;
             this.result = geo;
             this.done();
         } else {
@@ -99,13 +99,16 @@ class ModifyNurbs2FitCom extends ComModify {
             if (this.tempResult) {
                 Global.scene.remove(this.tempResult);
             }
-            let points: Vector2[] = [];
-            for (let i = 0; i < this.old.children.length; i++) {
-                let point = new Vector2(this.old.children[i].position.x, this.old.children[i].position.y);
-                points.push(point);
-            }
-            points[this.assistIndex] = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
+            let userData = CloneUserData(this.old.userData as UserData);
 
+            userData.assistPoints[this.assistIndex].p = Global.select.overedPoint
+                ? userData.assistPoints[this.assistIndex].p.set(Global.select.overedPoint.x, Global.select.overedPoint.y)
+                : userData.assistPoints[this.assistIndex].p.set(0, 0);
+
+            let points: Vector2[] = [];
+            for (let i = 0; i < userData.assistPoints.length; i++) {
+                points.push(userData.assistPoints[i].p as Vector2);
+            }
             // 创建一个临时曲线段
             if (points.length > 2) {
                 let edge_fit = Brep2Builder.BuildEdge2FromFittingPoints(points, points.length == 3 ? 2 : 3);

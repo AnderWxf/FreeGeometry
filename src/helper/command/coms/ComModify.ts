@@ -3,6 +3,7 @@ import * as THREE from "three";
 import type { CommandExecuter } from "../CommandExecuter";
 import { Global } from "../../../core/Global";
 import type { GeomType } from "../../../core/Constents";
+import type { UserData } from "../../UserData";
 
 
 /**
@@ -54,9 +55,12 @@ class ComModify extends Command {
         if (this.tempResult) {
             Global.scene.remove(this.tempResult);
         }
-        this.assists.forEach(element => {
-            this.result.children.push(element);
-            element.visible = Global.isShowAssists;
+        let userData = this.result.userData as UserData;
+        userData.assistPoints?.forEach(ap => {
+            let assist = this.createAssistPoint({ p: ap.p.clone(), c: ap.c });
+            this.assists.push(assist);
+            this.result.children.push(assist);
+            assist.visible = Global.isShowAssists;
         });
         if (Global.select.isEditor) {
             Global.select.pushSelectObject(this.result);

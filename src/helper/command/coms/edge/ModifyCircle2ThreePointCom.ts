@@ -14,6 +14,7 @@ import { Edge2 } from "../../../../geometry/data/brep/Brep2";
 import { Arc2Data } from "../../../../geometry/data/base/curve2/Arc2Data";
 import { GeomType } from "../../../../core/Constents";
 import { ActPickAssist } from "../../acts/ActPickAssist";
+import { CloneUserData, CopyUserData, CreateGeomUserData, type UserData } from "../../../UserData";
 
 
 /**
@@ -28,6 +29,8 @@ class ModifyCircle2ThreePointCom extends ComModify {
     async exec(): Promise<void> {
         let str = this._text;
         let paras = str.split(' ');
+        let userData = CreateGeomUserData(this.type);
+
         let beginPoint: Vector2;
         let middlePoint: Vector2;
         let endPoint: Vector2;
@@ -50,7 +53,7 @@ class ModifyCircle2ThreePointCom extends ComModify {
                 if (this._isCancel) { this.cancel(); return; }
             }
             this.old = act_pick_data.result;
-
+            CopyUserData(this.old.userData as UserData, userData);
 
             let act_pick_assist = new ActPickAssist();
             await act_pick_assist.execute(context);
@@ -66,36 +69,21 @@ class ModifyCircle2ThreePointCom extends ComModify {
             if (this._isCancel) { this.cancel(); return; }
 
 
-            beginPoint = new Vector2(this.old.children[0].position.x, this.old.children[0].position.y);
-            middlePoint = new Vector2(this.old.children[1].position.x, this.old.children[1].position.y);
-            endPoint = new Vector2(this.old.children[2].position.x, this.old.children[2].position.y);
+            beginPoint = userData.assistPoints[0].p as Vector2;
+            middlePoint = userData.assistPoints[1].p as Vector2;
+            endPoint = userData.assistPoints[2].p as Vector2;
 
-
-            if (this.assistIndex == 0) {
-                beginPoint.x = act_pick_new_pos.result.x;
-                beginPoint.y = act_pick_new_pos.result.y;
-            }
-            if (this.assistIndex == 1) {
-                middlePoint.x = act_pick_new_pos.result.x;
-                middlePoint.y = act_pick_new_pos.result.y;
-            }
-            if (this.assistIndex == 2) {
-                endPoint.x = act_pick_new_pos.result.x;
-                endPoint.y = act_pick_new_pos.result.y;
-            }
-
-            this.assists[0] = this.createAssistPoint(beginPoint, THREE.Color.NAMES.limegreen);
-            this.assists[1] = this.createAssistPoint(middlePoint);
-            this.assists[2] = this.createAssistPoint(endPoint);
+            userData.assistPoints[this.assistIndex].p.set(act_pick_new_pos.result.x, act_pick_new_pos.result.y);
 
             this._text = paras[0] + ' ' + beginPoint.x + ' ' + beginPoint.y + ' ' + endPoint.x + ' ' + endPoint.y;
         }
         // 创建一个曲线段
         let edge = Brep2Builder.BuildCircleFromBeginMiddleEndPoint(beginPoint, middlePoint, endPoint);
         let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
-        geo.userData.type = this.type;
+        userData.original = edge;
+        geo.userData = userData;
         this.result = geo;
-        this.assists.push(this.createAssistPoint(edge.curve.trans.pos, THREE.Color.NAMES.greenyellow));
+        userData.assistPoints[3].p.set(edge.curve.trans.pos.x, edge.curve.trans.pos.y);
         this.done();
     }
     onMouseMoveExec(event: MouseEvent) {
@@ -104,20 +92,16 @@ class ModifyCircle2ThreePointCom extends ComModify {
             if (this.tempResult) {
                 Global.scene.remove(this.tempResult);
             }
+            let userData = CloneUserData(this.old.userData as UserData);
 
-            let beginPoint = new Vector2(this.old.children[0].position.x, this.old.children[0].position.y);
-            let middlePoint = new Vector2(this.old.children[1].position.x, this.old.children[1].position.y);
-            let endPoint = new Vector2(this.old.children[2].position.x, this.old.children[2].position.y);
+            let beginPoint = userData.assistPoints[0].p as Vector2;
+            let middlePoint = userData.assistPoints[1].p as Vector2;
+            let endPoint = userData.assistPoints[2].p as Vector2;
 
-            if (this.assistIndex == 0) {
-                beginPoint = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
-            }
-            if (this.assistIndex == 1) {
-                middlePoint = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
-            }
-            if (this.assistIndex == 2) {
-                endPoint = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
-            }
+            userData.assistPoints[this.assistIndex].p = Global.select.overedPoint
+                ? userData.assistPoints[this.assistIndex].p.set(Global.select.overedPoint.x, Global.select.overedPoint.y)
+                : userData.assistPoints[this.assistIndex].p.set(0, 0);
+
             // 创建一个临时曲线段
             let edge = Brep2Builder.BuildCircleFromBeginMiddleEndPoint(beginPoint, middlePoint, endPoint);
             let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0, false);

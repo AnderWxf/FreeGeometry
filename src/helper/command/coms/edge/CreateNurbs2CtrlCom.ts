@@ -11,6 +11,7 @@ import { GeomType } from "../../../../core/Constents";
 import type { Edge2 } from "../../../../geometry/data/brep/Brep2";
 import { Nurbs2Data } from "../../../../geometry/data/base/curve2/Nurbs2Data";
 import { Transform2 } from "../../../../geometry/data/base/Transform2";
+import { CreateGeomUserData, type UserData } from "../../../UserData";
 
 
 /**
@@ -27,6 +28,7 @@ class CreateNurbs2CtrlCom extends ComCreate {
     async exec(): Promise<void> {
         let str = this._text;
         let paras = str.split(' ');
+        let userData = CreateGeomUserData(this.type);
         if (paras.length > 5) {
             // 创建一个多段线
             for (let i = 1; i < paras.length; i++) {
@@ -44,7 +46,8 @@ class CreateNurbs2CtrlCom extends ComCreate {
                 if (this.isDone) { break; }
                 let point = new Vector2(act_pick_begin.result.x, act_pick_begin.result.y);
                 this.points.push(point);
-                this.assists.push(this.createAssistPoint(point, THREE.Color.NAMES.greenyellow));
+                userData.assistPoints.push({ p: point, c: THREE.Color.NAMES.greenyellow });
+                this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
                 Global.scene.add(this.assists[this.assists.length - 1]);
             }
             this._text = paras[0];
@@ -75,7 +78,8 @@ class CreateNurbs2CtrlCom extends ComCreate {
             let nurbsData = new Nurbs2Data(new Transform2(), controls, knots, degree);
             let edge = Brep2Builder.BuildEdge2FromCurve2(nurbsData, 0, 1);
             let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
-            geo.userData.type = this.type;
+            userData.original = edge;
+            geo.userData = userData;
             this.result = geo;
             this.done();
         } else {

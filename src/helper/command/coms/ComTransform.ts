@@ -10,6 +10,7 @@ import { ComBatch } from "./ComBatch";
 import { Brep2Builder } from "../../../geometry/algorithm/builder/Brep2Builder";
 import type { Transform2 } from "../../../geometry/data/base/Transform2";
 import { GeomType } from "../../../core/Constents";
+import { CloneUserData, CopyUserData, type UserData } from "../../UserData";
 
 /**
  * Transform command class.
@@ -61,6 +62,7 @@ class ComTransform extends ComBatch {
         // 创建n个线段
         for (let i = 0; i < this.olds.length; i++) {
             let old = this.olds[i];
+            let userData = CloneUserData(old.userData as UserData);
             // 线
             if (old.userData.type < GeomType.PLA) {
                 if (old.userData.type == GeomType.PL || old.userData.type == GeomType.REC) {
@@ -75,14 +77,13 @@ class ComTransform extends ComBatch {
                                 edges.push(edge);
                             }
                         }
+                        userData.original = edges;
                         let geo = BrepMeshBuilder.BuildEdge2sMesh(edges, THREE.Color.NAMES.red);
-                        geo.userData.type = old.userData.type;
-                        for (let i = 0; i < old.children.length; i++) {
-                            let child = old.children[i];
-                            let p = new Vector2(child.position.x, child.position.y);
-                            p.applyMatrix3(trans);
-                            geo.children.push(this.createAssistPoint(p, child.userData.color));
-                        }
+                        userData.assistPoints.forEach((ap) => {
+                            ap.p.applyMatrix3(trans);
+                            geo.children.push(this.createAssistPoint(ap));
+                        });
+                        geo.userData = userData;
                         this.results.push(geo);
                     }
                 }
@@ -90,14 +91,13 @@ class ComTransform extends ComBatch {
                 else {
                     let edge = (old.userData.original as Edge2).clone();
                     this.appTransfrom(edge.curve.trans, trans);
+                    userData.original = edge;
                     let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
-                    geo.userData.type = old.userData.type;
-                    for (let i = 0; i < old.children.length; i++) {
-                        let child = old.children[i];
-                        let p = new Vector2(child.position.x, child.position.y);
-                        p.applyMatrix3(trans);
-                        geo.children.push(this.createAssistPoint(p, child.userData.color));
-                    }
+                    userData.assistPoints.forEach((ap) => {
+                        ap.p.applyMatrix3(trans);
+                        geo.children.push(this.createAssistPoint(ap));
+                    });
+                    geo.userData = userData;
                     this.results.push(geo);
                 }
             }
@@ -107,15 +107,13 @@ class ComTransform extends ComBatch {
                 for (let i = 0; i < face.curves.length; i++) {
                     this.appTransfrom(face.curves[i].trans, trans);
                 }
-
+                userData.original = face;
                 let geo = BrepMeshBuilder.BuildFace2Mesh(face, THREE.Color.NAMES.blue, undefined, true, false);
-                geo.userData.type = old.userData.type;
-                for (let i = 0; i < old.children.length; i++) {
-                    let child = old.children[i];
-                    let p = new Vector2(child.position.x, child.position.y);
-                    p.applyMatrix3(trans);
-                    geo.children.push(this.createAssistPoint(p, child.userData.color));
-                }
+                userData.assistPoints.forEach((ap) => {
+                    ap.p.applyMatrix3(trans);
+                    geo.children.push(this.createAssistPoint(ap));
+                });
+                geo.userData = userData;
                 this.results.push(geo);
             }
         }
@@ -140,11 +138,14 @@ class ComTransform extends ComBatch {
                 Global.scene.remove(...this.tempResults);
                 this.tempResults = [];
             }
+
+
             let endPoint: Vector2 = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
 
             let trans = this.makeTransfrom(this.beginPoint, endPoint);
             for (let i = 0; i < this.olds.length; i++) {
                 let old = this.olds[i];
+                let userData = CloneUserData(old.userData as UserData);
                 // 线
                 if (old.userData.type < GeomType.PLA) {
                     // 创建一个线段
@@ -153,6 +154,10 @@ class ComTransform extends ComBatch {
                         this.appTransfrom(edge.curve.trans, trans);
                         let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0, false);
                         t.name = "temp";
+                        userData.assistPoints.forEach((ap) => {
+                            ap.p.applyMatrix3(trans);
+                            t.children.push(this.createAssistPoint(ap));
+                        });
                         this.tempResults.push(t);
                     }
                     // 创建多个线段
@@ -169,12 +174,10 @@ class ComTransform extends ComBatch {
                         let t = BrepMeshBuilder.BuildEdge2sMesh(edges, THREE.Color.NAMES.gray, undefined, 0, false);
                         t.userData.type = old.userData.type;
                         t.name = "temp";
-                        for (let i = 0; i < old.children.length; i++) {
-                            let child = old.children[i];
-                            let p = new Vector2(child.position.x, child.position.y);
-                            p.applyMatrix3(trans);
-                            t.children.push(this.createAssistPoint(p, child.userData.color));
-                        }
+                        userData.assistPoints.forEach((ap) => {
+                            ap.p.applyMatrix3(trans);
+                            t.children.push(this.createAssistPoint(ap));
+                        });
                         this.tempResults.push(t);
                     }
                 }
@@ -187,12 +190,10 @@ class ComTransform extends ComBatch {
 
                     let t = BrepMeshBuilder.BuildFace2Mesh(face, THREE.Color.NAMES.gray, undefined, false, false);
                     t.name = "temp";
-                    for (let i = 0; i < old.children.length; i++) {
-                        let child = old.children[i];
-                        let p = new Vector2(child.position.x, child.position.y);
-                        p.applyMatrix3(trans);
-                        t.children.push(this.createAssistPoint(p, child.userData.color));
-                    }
+                    userData.assistPoints.forEach((ap) => {
+                        ap.p.applyMatrix3(trans);
+                        t.children.push(this.createAssistPoint(ap));
+                    });
                     this.tempResults.push(t);
                 }
             }

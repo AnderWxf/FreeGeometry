@@ -11,6 +11,7 @@ import type { CommandExecuter } from "../../CommandExecuter";
 import { GeomType } from "../../../../core/Constents";
 import { CurveBuilder } from "../../../../geometry/algorithm/builder/CurveBuilder";
 import { PI_2 } from "../../../../math/MathUtils";
+import { CreateGeomUserData, type UserData } from "../../../UserData";
 
 
 /**
@@ -28,6 +29,7 @@ class CreateEllipse2Com extends ComCreate {
     async exec(): Promise<void> {
         let str = this._text;
         let paras = str.split(' ');
+        let userData = CreateGeomUserData(this.type);
         if (paras.length == 7) {
             // 创建一个线段
             this.centerPoint = new Vector2(new Number(paras[1]).valueOf(), new Number(paras[2]).valueOf());
@@ -41,14 +43,16 @@ class CreateEllipse2Com extends ComCreate {
             await act_pick_center.execute(context);
             if (this._isCancel) { this.cancel(); return; }
             this.centerPoint = new Vector2(act_pick_center.result.x, act_pick_center.result.y);
-            this.assists.push(this.createAssistPoint(this.centerPoint, THREE.Color.NAMES.greenyellow));
+            userData.assistPoints.push({ p: this.centerPoint, c: THREE.Color.NAMES.greenyellow });
+            this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
             Global.scene.add(this.assists[this.assists.length - 1]);
 
             let act_pick_major = new ActPickPoint2();
             await act_pick_major.execute(context);
             if (this._isCancel) { this.cancel(); return; }
             this.majorPoint = new Vector2(act_pick_major.result.x, act_pick_major.result.y);
-            this.assists.push(this.createAssistPoint(this.majorPoint, THREE.Color.NAMES.limegreen));
+            userData.assistPoints.push({ p: this.majorPoint, c: THREE.Color.NAMES.limegreen });
+            this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
             Global.scene.add(this.assists[this.assists.length - 1]);
 
             let act_pick_minor = new ActPickPoint2();
@@ -56,17 +60,21 @@ class CreateEllipse2Com extends ComCreate {
             if (this._isCancel) { this.cancel(); return; }
             this.minorPoint = new Vector2(act_pick_minor.result.x, act_pick_minor.result.y);
 
-            this._text = paras[0] + ' ' + this.centerPoint.x + ' ' + this.centerPoint.y + ' ' + this.majorPoint.x + ' ' + this.majorPoint.y + ' ' + this.minorPoint.x + ' ' + this.minorPoint.y;
         }
         // 创建一个曲线段
         let edge = Brep2Builder.BuildEllipseEdge2FromCenterBeginEndPoint(this.centerPoint, this.majorPoint, this.minorPoint);
         let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
-        geo.userData.type = this.type;
+        userData.original = edge;
+        geo.userData = userData;
         this.result = geo;
 
         let alg = CurveBuilder.Algorithm2ByData(edge.curve);
-        this.minorPoint = alg.p(PI_2);
-        this.assists.push(this.createAssistPoint(this.minorPoint, THREE.Color.NAMES.darkblue));
+        let minorPoint = alg.p(edge.u.x);
+        this.minorPoint.set(minorPoint.x, minorPoint.y);
+        this._text = paras[0] + ' ' + this.centerPoint.x + ' ' + this.centerPoint.y + ' ' + this.majorPoint.x + ' ' + this.majorPoint.y + ' ' + this.minorPoint.x + ' ' + this.minorPoint.y;
+
+        userData.assistPoints.push({ p: this.minorPoint, c: THREE.Color.NAMES.darkblue });
+        this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
         Global.scene.add(this.assists[this.assists.length - 1]);
 
         this.done();

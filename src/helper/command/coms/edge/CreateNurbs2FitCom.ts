@@ -9,6 +9,7 @@ import { BrepMeshBuilder } from "../../../BrepMeshBuilder";
 import type { CommandExecuter } from "../../CommandExecuter";
 import { GeomType } from "../../../../core/Constents";
 import type { Edge2 } from "../../../../geometry/data/brep/Brep2";
+import { CreateGeomUserData, type UserData } from "../../../UserData";
 
 
 /**
@@ -25,6 +26,7 @@ class CreateNurbs2FitCom extends ComCreate {
     async exec(): Promise<void> {
         let str = this._text;
         let paras = str.split(' ');
+        let userData = CreateGeomUserData(this.type);
         if (paras.length > 5) {
             // 创建一个多段线
             for (let i = 1; i < paras.length; i++) {
@@ -42,7 +44,8 @@ class CreateNurbs2FitCom extends ComCreate {
                 if (this.isDone) { break; }
                 let point = new Vector2(act_pick_begin.result.x, act_pick_begin.result.y);
                 this.points.push(point);
-                this.assists.push(this.createAssistPoint(point, THREE.Color.NAMES.greenyellow));
+                userData.assistPoints.push({ p: point, c: THREE.Color.NAMES.greenyellow });
+                this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
                 Global.scene.add(this.assists[this.assists.length - 1]);
             }
             this._text = paras[0];
@@ -56,7 +59,8 @@ class CreateNurbs2FitCom extends ComCreate {
         if (this.points.length > 2) {
             let edge = Brep2Builder.BuildEdge2FromFittingPoints(this.points, this.points.length == 3 ? 2 : 3);
             let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
-            geo.userData.type = this.type;
+            userData.original = edge;
+            geo.userData = userData;
             this.result = geo;
             this.done();
         } else {

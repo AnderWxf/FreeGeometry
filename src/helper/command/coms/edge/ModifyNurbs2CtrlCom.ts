@@ -17,6 +17,7 @@ import { ActPickAssist } from "../../acts/ActPickAssist";
 import { CurveBuilder } from "../../../../geometry/algorithm/builder/CurveBuilder";
 import { Nurbs2Data } from "../../../../geometry/data/base/curve2/Nurbs2Data";
 import { Transform2 } from "../../../../geometry/data/base/Transform2";
+import { CloneUserData, CopyUserData, CreateGeomUserData, type UserData } from "../../../UserData";
 
 
 /**
@@ -31,6 +32,8 @@ class ModifyNurbs2CtrlCom extends ComModify {
     async exec(): Promise<void> {
         let str = this._text;
         let paras = str.split(' ');
+        let userData = CreateGeomUserData(this.type);
+
         let points: Vector2[] = [];
         if (paras.length > 5) {
             // 创建一个多段线
@@ -52,6 +55,7 @@ class ModifyNurbs2CtrlCom extends ComModify {
                 if (this._isCancel) { this.cancel(); return; }
             }
             this.old = act_pick_data.result;
+            CopyUserData(this.old.userData as UserData, userData);
 
             let act_pick_assist = new ActPickAssist();
             await act_pick_assist.execute(context);
@@ -81,10 +85,6 @@ class ModifyNurbs2CtrlCom extends ComModify {
 
         // 创建一个曲线段
         if (points.length > 2) {
-            for (let i = 0; i < points.length; i++) {
-                let point = points[i];
-                this.assists.push(this.createAssistPoint(point, THREE.Color.NAMES.greenyellow));
-            }
 
             let controls = new Array<Vector3>();
             let knots = new Array<number>();
@@ -105,7 +105,8 @@ class ModifyNurbs2CtrlCom extends ComModify {
             let nurbsData = new Nurbs2Data(new Transform2(), controls, knots, degree);
             let edge = Brep2Builder.BuildEdge2FromCurve2(nurbsData, 0, 1);
             let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
-            geo.userData.type = this.type;
+            userData.original = edge;
+            geo.userData = userData;
             this.result = geo;
             this.done();
         } else {
@@ -118,14 +119,16 @@ class ModifyNurbs2CtrlCom extends ComModify {
             if (this.tempResult) {
                 Global.scene.remove(this.tempResult);
             }
+            let userData = CloneUserData(this.old.userData as UserData);
+
+            userData.assistPoints[this.assistIndex].p = Global.select.overedPoint
+                ? userData.assistPoints[this.assistIndex].p.set(Global.select.overedPoint.x, Global.select.overedPoint.y)
+                : userData.assistPoints[this.assistIndex].p.set(0, 0);
 
             let points: Vector2[] = [];
-            for (let i = 0; i < this.old.children.length; i++) {
-                let point = new Vector2(this.old.children[i].position.x, this.old.children[i].position.y);
-                points.push(point);
+            for (let i = 0; i < userData.assistPoints.length; i++) {
+                points.push(userData.assistPoints[i].p as Vector2);
             }
-            points[this.assistIndex] = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
-
             this.tempResult = new THREE.Object3D();
             // 创建一个临时多段线
             let edges: Edge2[] = [];

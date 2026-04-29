@@ -9,6 +9,7 @@ import { BrepMeshBuilder } from "../../../BrepMeshBuilder";
 import type { CommandExecuter } from "../../CommandExecuter";
 import { GeomType } from "../../../../core/Constents";
 import { CurveBuilder } from "../../../../geometry/algorithm/builder/CurveBuilder";
+import { CreateGeomUserData, type UserData } from "../../../UserData";
 
 
 /**
@@ -26,6 +27,8 @@ class CreateParabola2Com extends ComCreate {
     async exec(): Promise<void> {
         let str = this._text;
         let paras = str.split(' ');
+        let userData = CreateGeomUserData(this.type);
+
         if (paras.length == 7) {
             // 创建一个线段
             this.centerPoint = new Vector2(new Number(paras[1]).valueOf(), new Number(paras[2]).valueOf());
@@ -39,14 +42,16 @@ class CreateParabola2Com extends ComCreate {
             await act_pick_center.execute(context);
             if (this._isCancel) { this.cancel(); return; }
             this.centerPoint = new Vector2(act_pick_center.result.x, act_pick_center.result.y);
-            this.assists.push(this.createAssistPoint(this.centerPoint, THREE.Color.NAMES.greenyellow));
+            userData.assistPoints.push({ p: this.centerPoint, c: THREE.Color.NAMES.greenyellow });
+            this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
             Global.scene.add(this.assists[this.assists.length - 1]);
 
             let act_pick_begin = new ActPickPoint2();
             await act_pick_begin.execute(context);
             if (this._isCancel) { this.cancel(); return; }
             this.focusPoint = new Vector2(act_pick_begin.result.x, act_pick_begin.result.y);
-            this.assists.push(this.createAssistPoint(this.focusPoint, THREE.Color.NAMES.limegreen));
+            userData.assistPoints.push({ p: this.focusPoint, c: THREE.Color.NAMES.limegreen });
+            this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
             Global.scene.add(this.assists[this.assists.length - 1]);
 
             let act_pick_end = new ActPickPoint2();
@@ -59,11 +64,14 @@ class CreateParabola2Com extends ComCreate {
         let alg = CurveBuilder.Algorithm2ByData(edge.curve);
         this.beginPoint = alg.p(edge.u.x);
         let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
-        geo.userData.type = this.type;
+        userData.original = edge;
+        geo.userData = userData;
         this.result = geo;
 
-        this.assists.push(this.createAssistPoint(this.beginPoint));
+        userData.assistPoints.push({ p: this.beginPoint, c: THREE.Color.NAMES.greenyellow });
+        this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
         Global.scene.add(this.assists[this.assists.length - 1]);
+
         this._text = paras[0] + ' ' + this.centerPoint.x + ' ' + this.centerPoint.y + ' ' + this.focusPoint.x + ' ' + this.focusPoint.y + ' ' + this.beginPoint.x + ' ' + this.beginPoint.y;
 
         this.done();

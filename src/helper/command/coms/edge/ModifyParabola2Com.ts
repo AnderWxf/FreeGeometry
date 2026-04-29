@@ -15,6 +15,7 @@ import { Arc2Data } from "../../../../geometry/data/base/curve2/Arc2Data";
 import { GeomType } from "../../../../core/Constents";
 import { ActPickAssist } from "../../acts/ActPickAssist";
 import { CurveBuilder } from "../../../../geometry/algorithm/builder/CurveBuilder";
+import { CloneUserData, CopyUserData, CreateGeomUserData, type UserData } from "../../../UserData";
 
 
 /**
@@ -29,6 +30,8 @@ class ModifyParabola2Com extends ComModify {
     async exec(): Promise<void> {
         let str = this._text;
         let paras = str.split(' ');
+        let userData = CreateGeomUserData(this.type);
+
         let centerPoint: Vector2;
         let focusPoint: Vector2;
         let beginPoint: Vector2;
@@ -51,7 +54,7 @@ class ModifyParabola2Com extends ComModify {
                 if (this._isCancel) { this.cancel(); return; }
             }
             this.old = act_pick_data.result;
-
+            CopyUserData(this.old.userData as UserData, userData);
 
 
             let act_pick_assist = new ActPickAssist();
@@ -68,37 +71,21 @@ class ModifyParabola2Com extends ComModify {
             if (this._isCancel) { this.cancel(); return; }
 
 
-            centerPoint = new Vector2(this.old.children[0].position.x, this.old.children[0].position.y);
-            focusPoint = new Vector2(this.old.children[1].position.x, this.old.children[1].position.y);
-            beginPoint = new Vector2(this.old.children[2].position.x, this.old.children[2].position.y);
+            centerPoint = userData.assistPoints[0].p as Vector2;
+            focusPoint = userData.assistPoints[1].p as Vector2;
+            beginPoint = userData.assistPoints[2].p as Vector2;
 
-
-            if (this.assistIndex == 0) {
-                centerPoint.x = act_pick_new_pos.result.x;
-                centerPoint.y = act_pick_new_pos.result.y;
-            }
-            if (this.assistIndex == 1) {
-                focusPoint.x = act_pick_new_pos.result.x;
-                focusPoint.y = act_pick_new_pos.result.y;
-            }
-            if (this.assistIndex == 2) {
-                beginPoint.x = act_pick_new_pos.result.x;
-                beginPoint.y = act_pick_new_pos.result.y;
-            }
-
-
+            userData.assistPoints[this.assistIndex].p.set(act_pick_new_pos.result.x, act_pick_new_pos.result.y);
         }
         // 创建一个曲线段
         let edge = Brep2Builder.BuildParabolaEdge2FromCenterABPoint(centerPoint, focusPoint, beginPoint);
         let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
-        geo.userData.type = this.type;
+        userData.original = edge;
+        geo.userData = userData;
         this.result = geo;
         let alg = CurveBuilder.Algorithm2ByData(edge.curve);
-        beginPoint = alg.p(edge.u.x);
-
-        this.assists[0] = this.createAssistPoint(centerPoint, THREE.Color.NAMES.greenyellow);
-        this.assists[1] = this.createAssistPoint(focusPoint, THREE.Color.NAMES.limegreen);
-        this.assists[2] = this.createAssistPoint(beginPoint);
+        let ubp = alg.p(edge.u.x)
+        beginPoint.set(ubp.x, ubp.y);
 
         this._text = paras[0] + ' ' + centerPoint.x + ' ' + centerPoint.y + ' ' + focusPoint.x + ' ' + focusPoint.y + ' ' + beginPoint.x + ' ' + beginPoint.y;
 
@@ -110,20 +97,16 @@ class ModifyParabola2Com extends ComModify {
             if (this.tempResult) {
                 Global.scene.remove(this.tempResult);
             }
+            let userData = CloneUserData(this.old.userData as UserData);
 
-            let centerPoint = new Vector2(this.old.children[0].position.x, this.old.children[0].position.y);
-            let focusPoint = new Vector2(this.old.children[1].position.x, this.old.children[1].position.y);
-            let beginPoint = new Vector2(this.old.children[2].position.x, this.old.children[2].position.y);
+            let centerPoint = userData.assistPoints[0].p as Vector2;
+            let focusPoint = userData.assistPoints[1].p as Vector2;
+            let beginPoint = userData.assistPoints[2].p as Vector2;
 
-            if (this.assistIndex == 0) {
-                centerPoint = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
-            }
-            if (this.assistIndex == 1) {
-                focusPoint = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
-            }
-            if (this.assistIndex == 2) {
-                beginPoint = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
-            }
+            userData.assistPoints[this.assistIndex].p = Global.select.overedPoint
+                ? userData.assistPoints[this.assistIndex].p.set(Global.select.overedPoint.x, Global.select.overedPoint.y)
+                : userData.assistPoints[this.assistIndex].p.set(0, 0);
+
             // 创建一个临时曲线段
             let edge = Brep2Builder.BuildParabolaEdge2FromCenterABPoint(centerPoint, focusPoint, beginPoint);
             let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0, false);

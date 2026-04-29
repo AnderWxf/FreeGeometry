@@ -9,6 +9,7 @@ import { BrepMeshBuilder } from "../../../BrepMeshBuilder";
 import type { CommandExecuter } from "../../CommandExecuter";
 import { GeomType } from "../../../../core/Constents";
 import type { Edge2 } from "../../../../geometry/data/brep/Brep2";
+import { CreateGeomUserData, type UserData } from "../../../UserData";
 
 
 /**
@@ -25,6 +26,7 @@ class CreateRectangle2Com extends ComCreate {
     async exec(): Promise<void> {
         let str = this._text;
         let paras = str.split(' ');
+        let userData = CreateGeomUserData(this.type);
         if (paras.length == 5) {
             // 创建一个多段线
             this.beginPoint = new Vector2(new Number(paras[1]).valueOf(), new Number(paras[2]).valueOf());
@@ -37,14 +39,18 @@ class CreateRectangle2Com extends ComCreate {
             await act_pick_begin.execute(context);
             if (this._isCancel) { this.cancel(); return; }
             this.beginPoint = new Vector2(act_pick_begin.result.x, act_pick_begin.result.y);
-            this.assists.push(this.createAssistPoint(this.beginPoint, THREE.Color.NAMES.greenyellow));
+            userData.assistPoints.push({ p: this.beginPoint, c: THREE.Color.NAMES.greenyellow });
+            this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
             Global.scene.add(this.assists[this.assists.length - 1]);
 
             let act_pick_end = new ActPickPoint2();
             await act_pick_end.execute(context);
             if (this._isCancel) { this.cancel(); return; }
             this.endPoint = new Vector2(act_pick_end.result.x, act_pick_end.result.y);
-            this.assists.push(this.createAssistPoint(this.endPoint));
+            userData.assistPoints.push({ p: this.endPoint, c: THREE.Color.NAMES.darkblue });
+            this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
+            Global.scene.add(this.assists[this.assists.length - 1]);
+
             this._text = paras[0] + ' ' + this.beginPoint.x + ' ' + this.beginPoint.y + ' ' + this.endPoint.x + ' ' + this.endPoint.y;
         }
         // 创建一个多段线
@@ -69,7 +75,8 @@ class CreateRectangle2Com extends ComCreate {
         edges.push(edge);
 
         let geo = BrepMeshBuilder.BuildEdge2sMesh(edges, THREE.Color.NAMES.red);
-        geo.userData.type = this.type;
+        userData.original = edges;
+        geo.userData = userData;
         this.result = geo;
         this.done();
     }

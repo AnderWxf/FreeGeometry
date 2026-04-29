@@ -9,6 +9,7 @@ import { BrepMeshBuilder } from "../../../BrepMeshBuilder";
 import type { CommandExecuter } from "../../CommandExecuter";
 import { GeomType } from "../../../../core/Constents";
 import type { Edge2 } from "../../../../geometry/data/brep/Brep2";
+import { CreateGeomUserData, type UserData } from "../../../UserData";
 
 
 /**
@@ -25,6 +26,8 @@ class CreatePolyline2Com extends ComCreate {
     async exec(): Promise<void> {
         let str = this._text;
         let paras = str.split(' ');
+        let userData = CreateGeomUserData(this.type);
+
         if (paras.length > 5) {
             // 创建一个多段线
             for (let i = 1; i < paras.length; i++) {
@@ -42,7 +45,8 @@ class CreatePolyline2Com extends ComCreate {
                 if (this.isDone) { break; }
                 let point = new Vector2(act_pick_begin.result.x, act_pick_begin.result.y);
                 this.points.push(point);
-                this.assists.push(this.createAssistPoint(point, THREE.Color.NAMES.greenyellow));
+                userData.assistPoints.push({ p: point, c: THREE.Color.NAMES.greenyellow });
+                this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
                 Global.scene.add(this.assists[this.assists.length - 1]);
             }
             this._text = paras[0];
@@ -60,7 +64,8 @@ class CreatePolyline2Com extends ComCreate {
             edges.push(edge);
         }
         let geo = BrepMeshBuilder.BuildEdge2sMesh(edges, THREE.Color.NAMES.red);
-        geo.userData.type = this.type;
+        userData.original = edges;
+        geo.userData = userData;
         this.result = geo;
         this.done();
     }

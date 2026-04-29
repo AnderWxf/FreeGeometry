@@ -14,6 +14,7 @@ import { Edge2 } from "../../../../geometry/data/brep/Brep2";
 import { Arc2Data } from "../../../../geometry/data/base/curve2/Arc2Data";
 import { GeomType } from "../../../../core/Constents";
 import { ActPickAssist } from "../../acts/ActPickAssist";
+import { CloneUserData, CopyUserData, CreateGeomUserData, type UserData } from "../../../UserData";
 
 
 /**
@@ -28,6 +29,8 @@ class ModifyEllipse2Com extends ComModify {
     async exec(): Promise<void> {
         let str = this._text;
         let paras = str.split(' ');
+        let userData = CreateGeomUserData(this.type);
+
         let centerPoint: Vector2;
         let majorPoint: Vector2;
         let minorPoint: Vector2;
@@ -50,7 +53,7 @@ class ModifyEllipse2Com extends ComModify {
                 if (this._isCancel) { this.cancel(); return; }
             }
             this.old = act_pick_data.result;
-
+            CopyUserData(this.old.userData as UserData, userData);
 
             let act_pick_assist = new ActPickAssist();
             await act_pick_assist.execute(context);
@@ -65,36 +68,19 @@ class ModifyEllipse2Com extends ComModify {
             await act_pick_new_pos.execute(context);
             if (this._isCancel) { this.cancel(); return; }
 
+            centerPoint = userData.assistPoints[0].p as Vector2;
+            majorPoint = userData.assistPoints[1].p as Vector2;
+            minorPoint = userData.assistPoints[2].p as Vector2;
 
-            centerPoint = new Vector2(this.old.children[0].position.x, this.old.children[0].position.y);
-            majorPoint = new Vector2(this.old.children[1].position.x, this.old.children[1].position.y);
-            minorPoint = new Vector2(this.old.children[2].position.x, this.old.children[2].position.y);
-
-
-            if (this.assistIndex == 0) {
-                centerPoint.x = act_pick_new_pos.result.x;
-                centerPoint.y = act_pick_new_pos.result.y;
-            }
-            if (this.assistIndex == 1) {
-                majorPoint.x = act_pick_new_pos.result.x;
-                majorPoint.y = act_pick_new_pos.result.y;
-            }
-            if (this.assistIndex == 2) {
-                minorPoint.x = act_pick_new_pos.result.x;
-                minorPoint.y = act_pick_new_pos.result.y;
-            }
-
-
+            userData.assistPoints[this.assistIndex].p.set(act_pick_new_pos.result.x, act_pick_new_pos.result.y);
         }
         // 创建一个曲线段
         let edge = Brep2Builder.BuildEllipseEdge2FromCenterBeginEndPoint(centerPoint, majorPoint, minorPoint);
         let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
-        geo.userData.type = this.type;
+        userData.original = edge;
+        geo.userData = userData;
         this.result = geo;
 
-        this.assists[0] = this.createAssistPoint(centerPoint, THREE.Color.NAMES.greenyellow);
-        this.assists[1] = this.createAssistPoint(majorPoint, THREE.Color.NAMES.limegreen);
-        this.assists[2] = this.createAssistPoint(minorPoint);
         this._text = paras[0] + ' ' + centerPoint.x + ' ' + centerPoint.y + ' ' + majorPoint.x + ' ' + majorPoint.y + ' ' + minorPoint.x + ' ' + minorPoint.y;
 
         this.done();
@@ -105,20 +91,16 @@ class ModifyEllipse2Com extends ComModify {
             if (this.tempResult) {
                 Global.scene.remove(this.tempResult);
             }
+            let userData = CloneUserData(this.old.userData as UserData);
 
-            let centerPoint = new Vector2(this.old.children[0].position.x, this.old.children[0].position.y);
-            let majorPoint = new Vector2(this.old.children[1].position.x, this.old.children[1].position.y);
-            let minorPoint = new Vector2(this.old.children[2].position.x, this.old.children[2].position.y);
+            let centerPoint = userData.assistPoints[0].p as Vector2;
+            let majorPoint = userData.assistPoints[1].p as Vector2;
+            let minorPoint = userData.assistPoints[2].p as Vector2;
 
-            if (this.assistIndex == 0) {
-                centerPoint = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
-            }
-            if (this.assistIndex == 1) {
-                majorPoint = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
-            }
-            if (this.assistIndex == 2) {
-                minorPoint = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
-            }
+            userData.assistPoints[this.assistIndex].p = Global.select.overedPoint
+                ? userData.assistPoints[this.assistIndex].p.set(Global.select.overedPoint.x, Global.select.overedPoint.y)
+                : userData.assistPoints[this.assistIndex].p.set(0, 0);
+
             // 创建一个临时曲线段
             let edge = Brep2Builder.BuildEllipseEdge2FromCenterBeginEndPoint(centerPoint, majorPoint, minorPoint);
             let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0, false);

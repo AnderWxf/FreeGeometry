@@ -16,6 +16,7 @@ import { GeomType } from "../../../../core/Constents";
 import { ActPickAssist } from "../../acts/ActPickAssist";
 import { CurveBuilder } from "../../../../geometry/algorithm/builder/CurveBuilder";
 import { PI2, PI_2 } from "../../../../math/MathUtils";
+import { CloneUserData, CopyUserData, CreateGeomUserData, type UserData } from "../../../UserData";
 
 
 /**
@@ -31,6 +32,8 @@ class ModifyHyperbola2Com extends ComModify {
     async exec(): Promise<void> {
         let str = this._text;
         let paras = str.split(' ');
+        let userData = CreateGeomUserData(this.type);
+
         let centerPoint: Vector2;
         let majorPoint: Vector2;
         let minorPoint: Vector2;
@@ -58,8 +61,7 @@ class ModifyHyperbola2Com extends ComModify {
                 if (this._isCancel) { this.cancel(); return; }
             }
             this.old = act_pick_data.result;
-
-
+            CopyUserData(this.old.userData as UserData, userData);
 
             let act_pick_assist = new ActPickAssist();
             await act_pick_assist.execute(context);
@@ -74,34 +76,13 @@ class ModifyHyperbola2Com extends ComModify {
             await act_pick_new_pos.execute(context);
             if (this._isCancel) { this.cancel(); return; }
 
-            centerPoint = new Vector2(this.old.children[0].position.x, this.old.children[0].position.y);
-            majorPoint = new Vector2(this.old.children[1].position.x, this.old.children[1].position.y);
-            minorPoint = new Vector2(this.old.children[2].position.x, this.old.children[2].position.y);
-            u0Point = new Vector2(this.old.children[3].position.x, this.old.children[3].position.y);
-            u1Point = new Vector2(this.old.children[4].position.x, this.old.children[4].position.y);
+            centerPoint = userData.assistPoints[0].p as Vector2;
+            majorPoint = userData.assistPoints[1].p as Vector2;
+            minorPoint = userData.assistPoints[2].p as Vector2;
+            u0Point = userData.assistPoints[3].p as Vector2;
+            u1Point = userData.assistPoints[4].p as Vector2;
 
-            if (this.assistIndex == 0) {
-                centerPoint.x = act_pick_new_pos.result.x;
-                centerPoint.y = act_pick_new_pos.result.y;
-            }
-            if (this.assistIndex == 1) {
-                majorPoint.x = act_pick_new_pos.result.x;
-                majorPoint.y = act_pick_new_pos.result.y;
-            }
-            if (this.assistIndex == 2) {
-                minorPoint.x = act_pick_new_pos.result.x;
-                minorPoint.y = act_pick_new_pos.result.y;
-            }
-            if (this.assistIndex == 3) {
-                u0Point.x = act_pick_new_pos.result.x;
-                u0Point.y = act_pick_new_pos.result.y;
-            }
-            if (this.assistIndex == 4) {
-                u1Point.x = act_pick_new_pos.result.x;
-                u1Point.y = act_pick_new_pos.result.y;
-            }
-
-
+            userData.assistPoints[this.assistIndex].p.set(act_pick_new_pos.result.x, act_pick_new_pos.result.y);
         }
         // 创建一个曲线段
         let edge = Brep2Builder.BuildHyperbolaEdge2FromCenterABPoint(centerPoint, majorPoint, minorPoint);
@@ -109,16 +90,12 @@ class ModifyHyperbola2Com extends ComModify {
         let alg = CurveBuilder.Algorithm2ByData(edge.curve);
 
         let u0 = alg.u(u0Point);
-        u0Point = alg.p(u0);
+        let u0p = alg.p(u0);
+        u0Point.set(u0p.x, u0p.y);
 
         let u1 = alg.u(u1Point);
-        u1Point = alg.p(u1);
-
-        this.assists[0] = this.createAssistPoint(centerPoint, THREE.Color.NAMES.greenyellow);
-        this.assists[1] = this.createAssistPoint(majorPoint, THREE.Color.NAMES.limegreen);
-        this.assists[2] = this.createAssistPoint(minorPoint, THREE.Color.NAMES.green);
-        this.assists[3] = this.createAssistPoint(u0Point, THREE.Color.NAMES.deepskyblue);
-        this.assists[4] = this.createAssistPoint(u1Point);
+        let u1p = alg.p(u1);
+        u1Point.set(u1p.x, u1p.y);
 
         this._text = paras[0] + ' ' + centerPoint.x + ' ' + centerPoint.y
             + ' ' + majorPoint.x + ' ' + majorPoint.y
@@ -131,7 +108,8 @@ class ModifyHyperbola2Com extends ComModify {
         edge.u.set(u0, u1);
 
         let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
-        geo.userData.type = this.type;
+        userData.original = edge;
+        geo.userData = userData;
         this.result = geo;
         this.done();
     }
@@ -141,28 +119,18 @@ class ModifyHyperbola2Com extends ComModify {
             if (this.tempResult) {
                 Global.scene.remove(this.tempResult);
             }
+            let userData = CloneUserData(this.old.userData as UserData);
 
-            let centerPoint = new Vector2(this.old.children[0].position.x, this.old.children[0].position.y);
-            let majorPoint = new Vector2(this.old.children[1].position.x, this.old.children[1].position.y);
-            let minorPoint = new Vector2(this.old.children[2].position.x, this.old.children[2].position.y);
-            let u0Point = new Vector2(this.old.children[3].position.x, this.old.children[3].position.y);
-            let u1Point = new Vector2(this.old.children[4].position.x, this.old.children[4].position.y);
+            let centerPoint = userData.assistPoints[0].p as Vector2;
+            let majorPoint = userData.assistPoints[1].p as Vector2;
+            let minorPoint = userData.assistPoints[2].p as Vector2;
+            let u0Point = userData.assistPoints[3].p as Vector2;
+            let u1Point = userData.assistPoints[4].p as Vector2;
 
-            if (this.assistIndex == 0) {
-                centerPoint = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
-            }
-            if (this.assistIndex == 1) {
-                majorPoint = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
-            }
-            if (this.assistIndex == 2) {
-                minorPoint = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
-            }
-            if (this.assistIndex == 3) {
-                u0Point = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
-            }
-            if (this.assistIndex == 4) {
-                u1Point = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
-            }
+            userData.assistPoints[this.assistIndex].p = Global.select.overedPoint
+                ? userData.assistPoints[this.assistIndex].p.set(Global.select.overedPoint.x, Global.select.overedPoint.y)
+                : userData.assistPoints[this.assistIndex].p.set(0, 0);
+
             // 创建一个临时曲线段
             let edge = Brep2Builder.BuildHyperbolaEdge2FromCenterABPoint(centerPoint, majorPoint, minorPoint);
             let alg = CurveBuilder.Algorithm2ByData(edge.curve);

@@ -12,6 +12,8 @@ import { GeomType } from "../../../../core/Constents";
 import { ComModify } from "../ComModify";
 import { ActPickAssist } from "../../acts/ActPickAssist";
 import { ActPickObject } from "../../acts/ActPickObject";
+import { CloneUserData, CopyUserData, CreateGeomUserData, type UserData } from "../../../UserData";
+import { PI2 } from "../../../../math/MathUtils";
 
 
 /**
@@ -19,7 +21,7 @@ import { ActPickObject } from "../../acts/ActPickObject";
  * 
  */
 class ModifyArc2Com extends ComModify {
-
+    private isForward: boolean = true;
     constructor(executer: CommandExecuter, text: string) {
         super(executer, text);
         this.type = GeomType.A;
@@ -27,6 +29,8 @@ class ModifyArc2Com extends ComModify {
     async exec(): Promise<void> {
         let str = this._text;
         let paras = str.split(' ');
+        let userData = CreateGeomUserData(this.type);
+
         let centerPoint: Vector2;
         let beginPoint: Vector2;
         let endPoint: Vector2;
@@ -49,7 +53,7 @@ class ModifyArc2Com extends ComModify {
                 if (this._isCancel) { this.cancel(); return; }
             }
             this.old = act_pick_data.result;
-
+            CopyUserData(this.old.userData as UserData, userData);
 
             let act_pick_assist = new ActPickAssist();
             await act_pick_assist.execute(context);
@@ -65,35 +69,21 @@ class ModifyArc2Com extends ComModify {
             if (this._isCancel) { this.cancel(); return; }
 
 
-            centerPoint = new Vector2(this.old.children[0].position.x, this.old.children[0].position.y);
-            beginPoint = new Vector2(this.old.children[1].position.x, this.old.children[1].position.y);
-            endPoint = new Vector2(this.old.children[2].position.x, this.old.children[2].position.y);
+            centerPoint = userData.assistPoints[0].p as Vector2;
+            beginPoint = userData.assistPoints[1].p as Vector2;
+            endPoint = userData.assistPoints[2].p as Vector2;
 
-
-            if (this.assistIndex == 0) {
-                centerPoint.x = act_pick_new_pos.result.x;
-                centerPoint.y = act_pick_new_pos.result.y;
-            }
-            if (this.assistIndex == 1) {
-                beginPoint.x = act_pick_new_pos.result.x;
-                beginPoint.y = act_pick_new_pos.result.y;
-            }
-            if (this.assistIndex == 2) {
-                endPoint.x = act_pick_new_pos.result.x;
-                endPoint.y = act_pick_new_pos.result.y;
-            }
+            userData.assistPoints[this.assistIndex].p.set(act_pick_new_pos.result.x, act_pick_new_pos.result.y);
         }
         // 创建一个曲线段
         let edge = Brep2Builder.BuildCircleArcEdge2FromCenterBeginEndPoin(centerPoint, beginPoint, endPoint);
+        edge.u.y = this.isForward ? edge.u.y : edge.u.y - PI2;
         let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
-        geo.userData.type = this.type;
+        userData.original = edge;
+        geo.userData = userData;
         this.result = geo;
 
-        this.assists[0] = this.createAssistPoint(centerPoint, THREE.Color.NAMES.greenyellow);
-        this.assists[1] = this.createAssistPoint(beginPoint, THREE.Color.NAMES.limegreen);
-        this.assists[2] = this.createAssistPoint(endPoint);
         this._text = paras[0] + ' ' + centerPoint.x + ' ' + centerPoint.y + ' ' + beginPoint.x + ' ' + beginPoint.y + ' ' + endPoint.x + ' ' + endPoint.y;
-
         this.done();
     }
     onMouseMoveExec(event: MouseEvent) {
@@ -103,26 +93,51 @@ class ModifyArc2Com extends ComModify {
             if (this.tempResult) {
                 Global.scene.remove(this.tempResult);
             }
-            let centerPoint = new Vector2(this.old.children[0].position.x, this.old.children[0].position.y);
-            let beginPoint = new Vector2(this.old.children[1].position.x, this.old.children[1].position.y);
-            let endPoint = new Vector2(this.old.children[2].position.x, this.old.children[2].position.y);
+            let userData = CloneUserData(this.old.userData as UserData);
 
-            if (this.assistIndex == 0) {
-                centerPoint = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
-            }
-            if (this.assistIndex == 1) {
-                beginPoint = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
-            }
-            if (this.assistIndex == 2) {
-                endPoint = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
-            }
+            let centerPoint = userData.assistPoints[0].p as Vector2;
+            let beginPoint = userData.assistPoints[1].p as Vector2;
+            let endPoint = userData.assistPoints[2].p as Vector2;
+
+            userData.assistPoints[this.assistIndex].p = Global.select.overedPoint
+                ? userData.assistPoints[this.assistIndex].p.set(Global.select.overedPoint.x, Global.select.overedPoint.y)
+                : userData.assistPoints[this.assistIndex].p.set(0, 0);
+
             // 创建一个临时曲线段
             let edge = Brep2Builder.BuildCircleArcEdge2FromCenterBeginEndPoin(centerPoint, beginPoint, endPoint);
+            edge.u.y = this.isForward ? edge.u.y : edge.u.y - PI2;
             let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray);
             t.name = "temp";
             this.tempResult = t;
             Global.scene.add(this.tempResult);
         }
     };
+
+    onKeyDown = (event: KeyboardEvent) => {
+        super.onKeyDownExec(event);
+        switch (event.code) {
+            case "ShiftLeft":
+                this.isForward = false;
+                break;
+        }
+    }
+    onKeyUp = (event: KeyboardEvent) => {
+        super.onKeyUpExec(event);
+        switch (event.code) {
+            case "ShiftLeft":
+                this.isForward = true;
+                break;
+        }
+    }
+    override bind(window: Window) {
+        super.bind(window);
+        window.addEventListener("keydown", this.onKeyDown);
+        window.addEventListener("keyup", this.onKeyUp);
+    }
+    override unbind(window: Window) {
+        super.unbind(window);
+        window.removeEventListener("keydown", this.onKeyDown);
+        window.removeEventListener("keyup", this.onKeyUp);
+    }
 }
 export { ModifyArc2Com };

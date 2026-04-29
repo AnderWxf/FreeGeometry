@@ -12,6 +12,7 @@ import { ActPickAssist } from "../../acts/ActPickAssist";
 import { GeomType } from "../../../../core/Constents";
 import type { Edge2 } from "../../../../geometry/data/brep/Brep2";
 import type { Line2Data } from "../../../../geometry/data/base/curve2/Line2Data";
+import { CloneUserData, CopyUserData, CreateGeomUserData, type UserData } from "../../../UserData";
 
 
 /**
@@ -29,6 +30,9 @@ class ModifyRectangle2Com extends ComModify {
 
         let str = this._text;
         let paras = str.split(' ');
+        let userData = CreateGeomUserData(this.type);
+
+
         let beginPoint: Vector2;
         let endPoint: Vector2;
         if (paras.length == 5) {
@@ -49,7 +53,7 @@ class ModifyRectangle2Com extends ComModify {
                 if (this._isCancel) { this.cancel(); return; }
             }
             this.old = act_pick_data.result;
-
+            CopyUserData(this.old.userData as UserData, userData);
 
             let act_pick_assist = new ActPickAssist();
             await act_pick_assist.execute(context);
@@ -64,19 +68,10 @@ class ModifyRectangle2Com extends ComModify {
             await act_pick_new_pos.execute(context);
             if (this._isCancel) { this.cancel(); return; }
 
-            beginPoint = new Vector2(this.old.children[0].position.x, this.old.children[0].position.y);
-            endPoint = new Vector2(this.old.children[1].position.x, this.old.children[1].position.y);
+            beginPoint = userData.assistPoints[0].p as Vector2;
+            endPoint = userData.assistPoints[1].p as Vector2;
 
-            if (this.assistIndex == 0) {
-                beginPoint.x = act_pick_new_pos.result.x;
-                beginPoint.y = act_pick_new_pos.result.y;
-            }
-            if (this.assistIndex == 1) {
-                endPoint.x = act_pick_new_pos.result.x;
-                endPoint.y = act_pick_new_pos.result.y;
-            }
-            this.assists[0] = this.createAssistPoint(beginPoint, THREE.Color.NAMES.greenyellow);
-            this.assists[1] = this.createAssistPoint(endPoint);
+            userData.assistPoints[this.assistIndex].p.set(act_pick_new_pos.result.x, act_pick_new_pos.result.y);
 
             this._text = paras[0] + ' ' + beginPoint.x + ' ' + beginPoint.y + ' ' + endPoint.x + ' ' + endPoint.y;
         }
@@ -109,7 +104,8 @@ class ModifyRectangle2Com extends ComModify {
         edges.push(edge);
 
         let geo = BrepMeshBuilder.BuildEdge2sMesh(edges, THREE.Color.NAMES.red);
-        geo.userData.type = this.type;
+        userData.original = edges;
+        geo.userData = userData;
         this.result = geo;
         this.done();
     }
@@ -120,15 +116,14 @@ class ModifyRectangle2Com extends ComModify {
                 Global.scene.remove(this.tempResult);
             }
 
-            let beginPoint = new Vector2(this.old.children[0].position.x, this.old.children[0].position.y);
-            let endPoint = new Vector2(this.old.children[1].position.x, this.old.children[1].position.y);
+            let userData = CloneUserData(this.old.userData as UserData);
 
-            if (this.assistIndex == 0) {
-                beginPoint = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
-            }
-            if (this.assistIndex == 1) {
-                endPoint = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
-            }
+            let beginPoint = userData.assistPoints[0].p as Vector2;
+            let endPoint = userData.assistPoints[1].p as Vector2;
+
+            userData.assistPoints[this.assistIndex].p = Global.select.overedPoint
+                ? userData.assistPoints[this.assistIndex].p.set(Global.select.overedPoint.x, Global.select.overedPoint.y)
+                : userData.assistPoints[this.assistIndex].p.set(0, 0);
 
             let m = this.old.userData.original[0].curve.trans.makeLocalMatrix();
             let invert = m.clone().invert();
