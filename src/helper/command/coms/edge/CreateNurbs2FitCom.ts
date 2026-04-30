@@ -21,7 +21,7 @@ class CreateNurbs2FitCom extends ComCreate {
     constructor(executer: CommandExecuter, text: string) {
         super(executer, text);
         this.points = [];
-        this.type = GeomType.NUF;
+        this.type = GeomType.NF;
     }
     async exec(): Promise<void> {
         let str = this._text;

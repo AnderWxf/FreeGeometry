@@ -65,7 +65,7 @@ class ComTransform extends ComBatch {
             let userData = CloneUserData(old.userData as UserData);
             // 线
             if (old.userData.type < GeomType.PLA) {
-                if (old.userData.type == GeomType.PL || old.userData.type == GeomType.REC) {
+                if (old.userData.type == GeomType.PO || old.userData.type == GeomType.RC) {
                     // 数组
                     if (old.userData.original instanceof Array) {
                         let array = old.userData.original as Array<any>;

@@ -69,7 +69,7 @@ class CreateEllipse2Com extends ComCreate {
         this.result = geo;
 
         let alg = CurveBuilder.Algorithm2ByData(edge.curve);
-        let minorPoint = alg.p(edge.u.x);
+        let minorPoint = alg.p(PI_2);
         this.minorPoint.set(minorPoint.x, minorPoint.y);
         this._text = paras[0] + ' ' + this.centerPoint.x + ' ' + this.centerPoint.y + ' ' + this.majorPoint.x + ' ' + this.majorPoint.y + ' ' + this.minorPoint.x + ' ' + this.minorPoint.y;
 

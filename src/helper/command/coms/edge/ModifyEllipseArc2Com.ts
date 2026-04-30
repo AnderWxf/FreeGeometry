@@ -88,8 +88,8 @@ class ModifyEllipseArc2Com extends ComModify {
         let edge = Brep2Builder.BuildEllipseEdge2FromCenterBeginEndPoint(centerPoint, majorPoint, minorPoint);
 
         let alg = CurveBuilder.Algorithm2ByData(edge.curve);
-
-        minorPoint = alg.p(PI_2);
+        let minorP = alg.p(PI_2);
+        minorPoint.set(minorP.x, minorP.y);
 
         let u0 = alg.u(u0Point);
         let u0p = alg.p(u0);
@@ -147,12 +147,18 @@ class ModifyEllipseArc2Com extends ComModify {
             let edge = Brep2Builder.BuildEllipseEdge2FromCenterBeginEndPoint(centerPoint, majorPoint, minorPoint);
             let alg = CurveBuilder.Algorithm2ByData(edge.curve);
 
-            minorPoint = alg.p(PI_2);
+            let minorP = alg.p(PI_2);
+            minorPoint.set(minorP.x, minorP.y);
+
+
             let u0 = alg.u(u0Point);
-            u0Point = alg.p(u0);
+            let u0p = alg.p(u0);
+            u0Point.set(u0p.x, u0p.y);
 
             let u1 = alg.u(u1Point);
-            u1Point = alg.p(u1);
+            let u1p = alg.p(u1);
+            u1Point.set(u1p.x, u1p.y);
+
             edge.u.set(u0, u1);
 
             if (this.isForward) {

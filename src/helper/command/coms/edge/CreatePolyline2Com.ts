@@ -21,7 +21,7 @@ class CreatePolyline2Com extends ComCreate {
     constructor(executer: CommandExecuter, text: string) {
         super(executer, text);
         this.points = [];
-        this.type = GeomType.PL;
+        this.type = GeomType.PO;
     }
     async exec(): Promise<void> {
         let str = this._text;

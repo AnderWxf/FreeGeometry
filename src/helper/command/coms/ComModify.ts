@@ -65,6 +65,8 @@ class ComModify extends Command {
         if (Global.select.isEditor) {
             Global.select.pushSelectObject(this.result);
             Global.comExector.onEidtor();
+        } else {
+            Global.select.clear();
         }
     }
     override bind(window: Window) {

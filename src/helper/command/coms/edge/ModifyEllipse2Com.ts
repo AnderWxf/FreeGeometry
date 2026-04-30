@@ -15,6 +15,8 @@ import { Arc2Data } from "../../../../geometry/data/base/curve2/Arc2Data";
 import { GeomType } from "../../../../core/Constents";
 import { ActPickAssist } from "../../acts/ActPickAssist";
 import { CloneUserData, CopyUserData, CreateGeomUserData, type UserData } from "../../../UserData";
+import { PI_2 } from "../../../../math/MathUtils";
+import { CurveBuilder } from "../../../../geometry/algorithm/builder/CurveBuilder";
 
 
 /**
@@ -80,6 +82,9 @@ class ModifyEllipse2Com extends ComModify {
         userData.original = edge;
         geo.userData = userData;
         this.result = geo;
+        let alg = CurveBuilder.Algorithm2ByData(edge.curve);
+        let minorP = alg.p(PI_2);
+        minorPoint.set(minorP.x, minorP.y);
 
         this._text = paras[0] + ' ' + centerPoint.x + ' ' + centerPoint.y + ' ' + majorPoint.x + ' ' + majorPoint.y + ' ' + minorPoint.x + ' ' + minorPoint.y;
 

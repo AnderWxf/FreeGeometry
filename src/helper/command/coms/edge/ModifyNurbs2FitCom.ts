@@ -25,7 +25,7 @@ import { CloneUserData, CopyUserData, CreateGeomUserData, type UserData } from "
 class ModifyNurbs2FitCom extends ComModify {
     constructor(executer: CommandExecuter, text: string) {
         super(executer, text);
-        this.type = GeomType.NUF;
+        this.type = GeomType.NF;
     }
     async exec(): Promise<void> {
         let str = this._text;

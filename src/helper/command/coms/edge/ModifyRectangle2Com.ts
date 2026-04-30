@@ -23,7 +23,7 @@ class ModifyRectangle2Com extends ComModify {
 
     constructor(executer: CommandExecuter, text: string) {
         super(executer, text);
-        this.type = GeomType.REC;
+        this.type = GeomType.RC;
     }
 
     async exec(): Promise<void> {

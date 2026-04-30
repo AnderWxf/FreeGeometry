@@ -1,7 +1,7 @@
+import * as THREE from "three";
 import { Command } from "./Command";
 import { Stack } from "../../core/Stack";
 import { CreateLine2Com } from "./coms/edge/CreateLine2Com";
-import { DeleteObjectsCom } from "./coms/DeleteObjectsCom";
 import { CreateCircle2Com } from "./coms/edge/CreateCircle2Com";
 import { CreateArc2Com } from "./coms/edge/CreateArc2Com";
 import { CreateArc2ThreePointCom } from "./coms/edge/CreateArc2ThreePointCom";
@@ -22,7 +22,7 @@ import { ModifyEllipse2Com } from "./coms/edge/ModifyEllipse2Com";
 import { ModifyEllipseArc2Com } from "./coms/edge/ModifyEllipseArc2Com";
 import { Global } from "../../core/Global";
 import { Edge2 } from "../../geometry/data/brep/Brep2";
-import { GeomType } from "../../core/Constents";
+import { CommandType, GeomType } from "../../core/Constents";
 import { CreateParabola2Com } from "./coms/edge/CreateParabola2Com";
 import { CreateHyperbola2Com } from "./coms/edge/CreateHyperbola2Com";
 import { ModifyParabola2Com } from "./coms/edge/ModifyParabola2Com";
@@ -32,19 +32,21 @@ import { ModifyPolyline2Com } from "./coms/edge/ModifyPolyline2Com";
 import { CreateRectangle2Com } from "./coms/edge/CreateRectangle2Com";
 import { ModifyRectangle2Com } from "./coms/edge/ModifyRectangle2Com";
 import { ComModify } from "./coms/ComModify";
-import * as THREE from "three";
 import { ComBatch } from "./coms/ComBatch";
 import { CreateNurbs2FitCom } from "./coms/edge/CreateNurbs2FitCom";
 import { CreateNurbs2CtrlCom } from "./coms/edge/CreateNurbs2CtrlCom";
 import { ModifyNurbs2FitCom } from "./coms/edge/ModifyNurbs2FitCom";
 import { ModifyNurbs2CtrlCom } from "./coms/edge/ModifyNurbs2CtrlCom";
 import { CreateSectionCom } from "./coms/face/CreateSectionCom";
+import { ComDelete } from "./coms/ComDelete";
+import type { UserData } from "../UserData";
 
 /**
  * Command executer base class.
  * 
  */
 class CommandExecuter {
+    private _commands = new Map<string, Function>();
     private _history: Stack<Command>;
     private _redos: Stack<Command>;
     private KeyShiftDown: Boolean = false;
@@ -53,7 +55,52 @@ class CommandExecuter {
     constructor() {
         this._history = new Stack<Command>();
         this._redos = new Stack<Command>();
+        this.InitCommand();
     }
+    private InitCommand() {
+        this._commands.set(CommandType.CREATE_LINE, CreateLine2Com);
+        this._commands.set(CommandType.CREATE_CIRCLE, CreateCircle2Com);
+        this._commands.set(CommandType.CREATE_ARC, CreateArc2Com);
+        this._commands.set(CommandType.CREATE_ARC_THREE_POINT, CreateArc2ThreePointCom);
+        this._commands.set(CommandType.CREATE_CIRCLE_THREE_POINT, CreateCircle2ThreePointCom);
+        this._commands.set(CommandType.CREATE_ELLIPSE, CreateEllipse2Com);
+        this._commands.set(CommandType.CREATE_ELLIPSE_ARC, CreateEllipseArc2Com);
+        this._commands.set(CommandType.CREATE_PARABOLA, CreateParabola2Com);
+        this._commands.set(CommandType.CREATE_HYPERBOLA, CreateHyperbola2Com);
+        this._commands.set(CommandType.CREATE_POLYLINE, CreatePolyline2Com);
+        this._commands.set(CommandType.CREATE_RECTANGLE, CreateRectangle2Com);
+        this._commands.set(CommandType.CREATE_NURBS_FITTING, CreateNurbs2FitCom);
+        this._commands.set(CommandType.CREATE_NURBS_CONTROL, CreateNurbs2CtrlCom);
+        this._commands.set(CommandType.CREATE_SECTION, CreateSectionCom);
+
+        this._commands.set(CommandType.MODIFY_LINE, ModifyLine2Com);
+        this._commands.set(CommandType.MODIFY_CIRCLE, ModifyCircle2Com);
+        this._commands.set(CommandType.MODIFY_ARC, ModifyArc2Com);
+        this._commands.set(CommandType.MODIFY_ARC_THREE_POINT, ModifyArc2ThreePointCom);
+        this._commands.set(CommandType.MODIFY_CIRCLE_THREE_POINT, ModifyCircle2ThreePointCom);
+        this._commands.set(CommandType.MODIFY_ELLIPSE, ModifyEllipse2Com);
+        this._commands.set(CommandType.MODIFY_ELLIPSE_ARC, ModifyEllipseArc2Com);
+        this._commands.set(CommandType.MODIFY_PARABOLA, ModifyParabola2Com);
+        this._commands.set(CommandType.MODIFY_HYPERBOLA, ModifyHyperbola2Com);
+        this._commands.set(CommandType.MODIFY_POLYLINE, ModifyPolyline2Com);
+        this._commands.set(CommandType.MODIFY_NURBS_FITTING, ModifyNurbs2FitCom);
+        this._commands.set(CommandType.MODIFY_NURBS_CONTROL, ModifyNurbs2CtrlCom);
+        this._commands.set(CommandType.MODIFY_RECTANGLE, ModifyRectangle2Com);
+
+        this._commands.set(CommandType.OTHER_DELETE, ComDelete);
+        this._commands.set(CommandType.OTHER_MOVE, ComMove);
+        this._commands.set(CommandType.OTHER_ROTATE, ComRotate);
+        this._commands.set(CommandType.OTHER_SCALE, ComScale);
+        this._commands.set(CommandType.OTHER_MIRROR, ComMirror);
+        this._commands.set(CommandType.OTHER_OFFSET, ComOffset);
+        // this._commands.set(CommandType.OTHER_GROUP, ComGroup);
+        // this._commands.set(CommandType.OTHER_UNGROUP, ComUngroup);
+    }
+
+    RegisterCommand(type: string, com: Function) {
+        this._commands.set(type, com);
+    }
+
     GetExecutingObjs(): Array<THREE.Object3D> {
         let array = new Array<THREE.Object3D>();
         if (this._curr instanceof ComModify) {
@@ -68,6 +115,7 @@ class CommandExecuter {
         }
         return array;
     }
+
     clear() {
         this._curr = null;
     }
@@ -79,71 +127,14 @@ class CommandExecuter {
     }
     onEidtor() {
         let seleced = Global.select.selectedObjects[0];
-        let original = seleced.userData.original;
-        if (original instanceof Edge2) {
-            let type = seleced.userData.type;
-            let com: Command;
-            switch (type) {
-                case GeomType.L:        // 两点直线段
-                    com = new ModifyLine2Com(this, 'L');
-                    break;
-                case GeomType.A:        // 圆弧
-                    com = new ModifyArc2Com(this, 'A');
-                    break;
-                case GeomType.A3:       // 三点圆弧
-                    com = new ModifyArc2ThreePointCom(this, 'A3');
-                    break;
-                case GeomType.C:        // 圆
-                    com = new ModifyCircle2Com(this, 'C');
-                    break;
-                case GeomType.C3:       // 三点圆
-                    com = new ModifyCircle2ThreePointCom(this, 'C3');
-                    break;
-                case GeomType.E:        // 椭圆
-                    com = new ModifyEllipse2Com(this, 'E');
-                    break;
-                case GeomType.EA:       // 椭圆弧
-                    com = new ModifyEllipseArc2Com(this, 'EA');
-                    break;
-                case GeomType.HY:       // 双曲线
-                    com = new ModifyHyperbola2Com(this, 'HY');
-                    break;
-                case GeomType.PA:       // 抛物线
-                    com = new ModifyParabola2Com(this, 'PA');
-                    break;
-                case GeomType.NUF:       // Nurbs fitting
-                    com = new ModifyNurbs2FitCom(this, 'NUF');
-                    break;
-                case GeomType.NUC:       // Nurbs control
-                    com = new ModifyNurbs2CtrlCom(this, 'NUC');
-                    break;
-                case GeomType.PL:       // 多段线   
-                    com = new ModifyPolyline2Com(this, 'PL');
-                    break;
-                case GeomType.REC:       // 矩形   
-                    com = new ModifyRectangle2Com(this, 'REC');
-                    break;
-            }
-            if (com) {
-                if (this._curr && !this._curr.isDone) {
-                    this._curr.cancel();
-                }
-                this._curr = com;
-                this._curr.exec();
-            }
-        }
-        if (original instanceof Array) {
-            let type = seleced.userData.type;
-            let com: Command;
-            switch (type) {
-                case GeomType.PL:       // 多段线
-                    com = new ModifyPolyline2Com(this, 'PL');
-                    break;
-                case GeomType.REC:      // REC：矩形
-                    com = new ModifyRectangle2Com(this, 'REC');
-                    break;
-            }
-            if (com) {
+        let userData = seleced.userData as UserData;
+        let type = userData.type;
+        let typeName = GeomType[type] as string;
+        if (typeName) {
+            let command = 'M' + typeName;
+            let c = this._commands.get(command) as Function;
+            if (c) {
+                let com: Command = new (<any>c)(this, command);
                 if (this._curr && !this._curr.isDone) {
                     this._curr.cancel();
                 }
@@ -152,6 +143,21 @@ class CommandExecuter {
             }
         }
     }
+    /*
+    ********快捷键********
+    * 'Esc'                命令取消
+    * 'Enter','NumpadEnter'进入命令行
+    * 'M',                 平移
+    * 'R',                 旋转
+    * 'S',                 缩放
+    * 'I',                 镜像，产生新对象
+    * 'O',                 偏移，产生新对象
+    * 'DELETE',            删除
+    * 'G',                 组合
+    * 'ControlLeft' + 'G', 解组
+    * 'ControlLeft' + 'Z', UNDO
+    * 'ShiftLeft' + 'Z',   REDO
+    */
     onKeyDown = (event: KeyboardEvent) => {
         let com: Command;
         switch (event.code) {
@@ -161,7 +167,7 @@ class CommandExecuter {
                 comline.focus();
                 break;
             case "Delete":
-                com = new DeleteObjectsCom(this, 'Delete');
+                com = new ComDelete(this, 'Delete');
                 break;
             // E：选中后编辑
             case 'KeyE':
@@ -233,151 +239,20 @@ class CommandExecuter {
             let command = s[0];
 
             command = command.toUpperCase();
-            let com: Command;
-            switch (command) {
-                // A：绘圆弧
-                case 'A':
-                    com = new CreateArc2Com(this, comstr);
-                    break;
-                // A3：三点绘圆弧
-                case 'A3':
-                    com = new CreateArc2ThreePointCom(this, comstr);
-                    break;
-                // C：画圆
-                case 'C':
-                    com = new CreateCircle2Com(this, comstr);
-                    break;
-                // C3：三点画圆
-                case 'C3':
-                    com = new CreateCircle2ThreePointCom(this, comstr);
-                    break;
-                case 'L':
-                    com = new CreateLine2Com(this, comstr);
-                    break;
-                // E：绘椭圆
-                case 'E':
-                    com = new CreateEllipse2Com(this, comstr);
-                    break;
-                // EA：绘椭圆弧
-                case 'EA':
-                    com = new CreateEllipseArc2Com(this, comstr);
-                    break;
-                // HY：绘双曲线
-                case 'HY':
-                    com = new CreateHyperbola2Com(this, comstr);
-                    break;
-                // PA：绘抛物线                  
-                case 'PA':
-                    com = new CreateParabola2Com(this, comstr);
-                    break;
-                // PL：绘多段线
-                case 'PL':
-                    com = new CreatePolyline2Com(this, comstr);
-                    break;
-
-                // REC：绘矩形
-                case 'REC':
-                    com = new CreateRectangle2Com(this, comstr);
-                    break;
-                // NUF：绘Nurbs曲线
-                case 'NUF':
-                    com = new CreateNurbs2FitCom(this, comstr);
-                    break;
-                // NUC：绘Nurbs曲线
-                case 'NUC':
-                    com = new CreateNurbs2CtrlCom(this, comstr);
-                    break;
-
-                // SEC：绘截面
-                case 'SEC':
-                    com = new CreateSectionCom(this, comstr);
-                    break;
-
-                // F：倒圆角
-                // G：对象组合
-                // I：镜像
-                case 'I':
-                    com = new ComMirror(this, comstr);
-                // J：对接
-                // S：拉伸
-                case 'S':
-                    com = new ComScale(this, comstr);
-                    break;
-                // M：移动
-                case 'M':
-                    com = new ComMove(this, comstr);
-                    break;
-                // R：旋转
-                case 'R':
-                    com = new ComRotate(this, comstr);
-                    break;
-                // X：分解炸开
-                // V：设置当前坐标
-                // O：偏移
-                case 'O':
-                    com = new ComOffset(this, comstr);
-                    break;
-                // Z：缩放
-                // M...: 修改
-                // ML：修改直线
-                case 'ML':
-                    com = new ModifyLine2Com(this, comstr);
-                    break;
-                // MA：修改圆弧
-                case 'MA':
-                    com = new ModifyArc2Com(this, comstr);
-                    break;
-                // MA3：修改三点圆弧
-                case 'MA3':
-                    com = new ModifyArc2ThreePointCom(this, comstr);
-                    break;
-                // MC：修改圆
-                case 'MC':
-                    com = new ModifyCircle2Com(this, comstr);
-                    break;
-                // MC3：修改三点圆
-                case 'MC3':
-                    com = new ModifyCircle2ThreePointCom(this, comstr);
-                    break;
-                // ME：修改椭圆
-                case 'ME':
-                    com = new ModifyEllipse2Com(this, comstr);
-                    break;
-                // MEA：修改椭圆弧
-                case 'MEA':
-                    com = new ModifyEllipseArc2Com(this, comstr);
-                    break;
-                // MPA：绘抛物线                  
-                case 'MPA':
-                    com = new ModifyParabola2Com(this, comstr);
-                    break;
-                // MHY：双曲线
-                case 'MHY':
-                    com = new ModifyHyperbola2Com(this, comstr);
-                    break;
-                // MNUF：Nurbs拟合曲线
-                case 'MNUF':       // Nurbs fitting
-                    com = new ModifyNurbs2FitCom(this, 'NUF');
-                    break;
-                // MNUC：Nurbs控制点曲线
-                case 'MNUC':       // Nurbs control
-                    com = new ModifyNurbs2CtrlCom(this, 'NUC');
-                    break;
-                // MPL：多段线
-                case 'MPL':
-                    com = new ModifyPolyline2Com(this, comstr);
-                    break;
-                // MREC：绘矩形
-                case 'MREC':
-                    com = new ModifyRectangle2Com(this, comstr);
-                    break;
-            }
-            if (com) {
-                if (this._curr && !this._curr.isDone) {
-                    this._curr.cancel();
+            if (command == CommandType.OTHER_UNDO) {
+                this.undo
+            } else if (command == CommandType.OTHER_REDO) {
+                this.redo();
+            } else {
+                let c = this._commands.get(command) as Function;
+                if (c) {
+                    let com: Command = new (<any>c)(this, comstr);
+                    if (this._curr && !this._curr.isDone) {
+                        this._curr.cancel();
+                    }
+                    this._curr = com;
+                    this._curr.exec();
                 }
-                this._curr = com;
-                this._curr.exec();
             }
         }
     }

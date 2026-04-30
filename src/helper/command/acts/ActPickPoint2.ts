@@ -78,6 +78,7 @@ class ActPickPoint2 extends Active {
         context.select.pickedPoint = null;
         this.context = context;
         Global.scene.add(ActPickPoint2.PickCursor);
+        await new Promise(resolve => setTimeout(resolve, 10)); // 等待10ms
         while (!context.select.pickedPoint && !this._isCancel) {
             await new Promise(resolve => setTimeout(resolve, 10)); // 等待10ms
         }

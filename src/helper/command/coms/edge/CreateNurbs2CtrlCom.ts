@@ -23,7 +23,7 @@ class CreateNurbs2CtrlCom extends ComCreate {
     constructor(executer: CommandExecuter, text: string) {
         super(executer, text);
         this.points = [];
-        this.type = GeomType.NUC;
+        this.type = GeomType.NC;
     }
     async exec(): Promise<void> {
         let str = this._text;

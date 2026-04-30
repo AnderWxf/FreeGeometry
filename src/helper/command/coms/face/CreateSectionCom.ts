@@ -75,7 +75,7 @@ class CreateSectionCom extends ComCreate {
             for (let i = 0; i < act_pick_objs.results.length; i++) {
                 let geo = act_pick_objs.results[i];
                 if (geo.userData.type < GeomType.PLA) {
-                    if (geo.userData.type == GeomType.PL || geo.userData.type == GeomType.REC) {
+                    if (geo.userData.type == GeomType.PO || geo.userData.type == GeomType.RC) {
                         let original = geo.userData.original as Array<Edge2>;
                         this.edges.push(...original);
                     } else {

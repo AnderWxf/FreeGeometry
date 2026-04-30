@@ -18,7 +18,7 @@ class ActPickObjects extends Active {
         this.context = context;
         this.results = [];
         context.select.clear();
-
+        await new Promise(resolve => setTimeout(resolve, 10)); // 等待10ms
         // 等待用户选择对象完成
         while (!this._isDone && !this._isCancel) {
             await new Promise(resolve => setTimeout(resolve, 10)); // 等待10ms

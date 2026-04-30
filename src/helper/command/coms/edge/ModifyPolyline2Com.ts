@@ -25,7 +25,7 @@ import { CloneUserData, CopyUserData, CreateGeomUserData, type UserData } from "
 class ModifyPolyline2Com extends ComModify {
     constructor(executer: CommandExecuter, text: string) {
         super(executer, text);
-        this.type = GeomType.PL;
+        this.type = GeomType.PO;
     }
     async exec(): Promise<void> {
         let str = this._text;
