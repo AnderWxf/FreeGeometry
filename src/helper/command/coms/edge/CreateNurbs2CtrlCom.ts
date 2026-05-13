@@ -142,6 +142,7 @@ class CreateNurbs2CtrlCom extends ComCreate {
         super.onKeyDownExec(event);
         switch (event.code) {
             case "Enter":
+            case "NumpadEnter":
                 this._isDone = true;
                 break;
         }

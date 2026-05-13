@@ -79,10 +79,12 @@ class ComTransform extends ComBatch {
                         }
                         userData.original = edges;
                         let geo = BrepMeshBuilder.BuildEdge2sMesh(edges, THREE.Color.NAMES.red);
-                        userData.assistPoints.forEach((ap) => {
-                            ap.p.applyMatrix3(trans);
-                            geo.children.push(this.createAssistPoint(ap));
-                        });
+                        if (userData.assistPoints) {
+                            userData.assistPoints.forEach((ap) => {
+                                ap.p.applyMatrix3(trans);
+                                geo.children.push(this.createAssistPoint(ap));
+                            });
+                        }
                         geo.userData = userData;
                         this.results.push(geo);
                     }
@@ -93,10 +95,12 @@ class ComTransform extends ComBatch {
                     this.appTransfrom(edge.curve.trans, trans);
                     userData.original = edge;
                     let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
-                    userData.assistPoints.forEach((ap) => {
-                        ap.p.applyMatrix3(trans);
-                        geo.children.push(this.createAssistPoint(ap));
-                    });
+                    if (userData.assistPoints) {
+                        userData.assistPoints.forEach((ap) => {
+                            ap.p.applyMatrix3(trans);
+                            geo.children.push(this.createAssistPoint(ap));
+                        });
+                    }
                     geo.userData = userData;
                     this.results.push(geo);
                 }
@@ -109,10 +113,12 @@ class ComTransform extends ComBatch {
                 }
                 userData.original = face;
                 let geo = BrepMeshBuilder.BuildFace2Mesh(face, THREE.Color.NAMES.blue, undefined, true, false);
-                userData.assistPoints.forEach((ap) => {
-                    ap.p.applyMatrix3(trans);
-                    geo.children.push(this.createAssistPoint(ap));
-                });
+                if (userData.assistPoints) {
+                    userData.assistPoints.forEach((ap) => {
+                        ap.p.applyMatrix3(trans);
+                        geo.children.push(this.createAssistPoint(ap));
+                    });
+                }
                 geo.userData = userData;
                 this.results.push(geo);
             }

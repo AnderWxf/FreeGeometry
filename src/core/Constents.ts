@@ -161,17 +161,21 @@ enum CommandType {
     MODIFY_SWEEP_BODY = 'MSWEP',         // 扫掠体
     MODIFY_LOFT_BODY = 'MLOFT',          // 放样体
 
+
+    //操作
+    OPERATION_EDGE_INTERSECTION = 'OEI', // 边交点(多选对象组中的第一个与后面所有对象间的交点)
+    OPERATION_EDGE_CUTTING = 'OEC',      // 边切分(多选对象组中的第一个分割后面所有对象)
+
     // 其他
     OTHER_DELETE = 'D',                   // 删除
-    OTHER_UNDO = 'U',                     // 撤销
-    OTHER_REDO = 'R',                     // 重做
+    OTHER_UNDO = 'UD',                    // 撤销
+    OTHER_REDO = 'RD',                    // 重做
     OTHER_MOVE = 'M',                     // 移动
     OTHER_ROTATE = 'R',                   // 旋转
     OTHER_SCALE = 'S',                    // 缩放
     OTHER_OFFSET = 'O',                   // 偏移，产生新对象
     OTHER_MIRROR = 'I',                   // 镜像，产生新对象   
-    OTHER_GROUP = 'G',                    // 组合
-    OTHER_UNGROUP = 'UG',                 // 取消组合
+    OTHER_GROUP_OR_UNGROUP = 'G',         // 组合/取消组合
 }
 
 

@@ -912,42 +912,68 @@ class Curve2Inter {
         let inters: Array<InterOfCurve2> = [];
         if (c0 instanceof Line2Data) {
             if (c1 instanceof Line2Data) {
-                inters.push(...Curve2Inter.LineXLine(c0, c1, 1e-4, 1e-10));
+                inters.push(...Curve2Inter.LineXLine(c0, c1, tol0, tol1));
             }
             else if (c1 instanceof Arc2Data) {
-                inters.push(...Curve2Inter.LineXArc(c0, c1, 1e-4, 1e-10));
+                inters.push(...Curve2Inter.LineXArc(c0, c1, tol0, tol1));
             }
             else if (c1 instanceof Hyperbola2Data) {
-                inters.push(...Curve2Inter.LineXHyperbola(c0, c1, 1e-4, 1e-10));
+                inters.push(...Curve2Inter.LineXHyperbola(c0, c1, tol0, tol1));
             }
             else if (c1 instanceof Parabola2Data) {
-                inters.push(...Curve2Inter.LineXParabola(c0, c1, 1e-4, 1e-10));
+                inters.push(...Curve2Inter.LineXParabola(c0, c1, tol0, tol1));
             }
             else if (c1 instanceof Nurbs2Data) {
-                inters.push(...Curve2Inter.LineXNurbs(c0, c1, 1e-4, 1e-10));
+                inters.push(...Curve2Inter.LineXNurbs(c0, c1, tol0, tol1));
+            }
+        }
+        else if (c1 instanceof Line2Data) {
+            if (c0 instanceof Arc2Data) {
+                let rinters = Curve2Inter.LineXArc(c1, c0, tol0, tol1);
+                rinters.forEach((i) => {
+                    let t = i.u0; i.u0 = i.u1; i.u1 = t; inters.push(i);
+                });
+            }
+            else if (c0 instanceof Hyperbola2Data) {
+                let rinters = Curve2Inter.LineXHyperbola(c1, c0, tol0, tol1);
+                rinters.forEach((i) => {
+                    let t = i.u0; i.u0 = i.u1; i.u1 = t; inters.push(i);
+                });
+            }
+            else if (c0 instanceof Parabola2Data) {
+                let rinters = Curve2Inter.LineXParabola(c1, c0, tol0, tol1);
+                rinters.forEach((i) => {
+                    let t = i.u0; i.u0 = i.u1; i.u1 = t; inters.push(i);
+                });
+            }
+            else if (c0 instanceof Nurbs2Data) {
+                let rinters = Curve2Inter.LineXNurbs(c1, c0, tol0, tol1);
+                rinters.forEach((i) => {
+                    let t = i.u0; i.u0 = i.u1; i.u1 = t; inters.push(i);
+                });
             }
         }
         else if (c0 instanceof Arc2Data || c0 instanceof Hyperbola2Data || c0 instanceof Parabola2Data) {
             if (c0 instanceof Arc2Data && c1 instanceof Arc2Data) {
                 if (c0.radius.x === c0.radius.y && c1.radius.x === c1.radius.y) {
-                    inters.push(...Curve2Inter.QuadraticXQuadratic(c0, c1, 1e-4, 1e-10, 2));
+                    inters.push(...Curve2Inter.QuadraticXQuadratic(c0, c1, tol0, tol1, 2));
                 } else {
-                    inters.push(...Curve2Inter.QuadraticXQuadratic(c0, c1, 1e-4, 1e-10, 4));
+                    inters.push(...Curve2Inter.QuadraticXQuadratic(c0, c1, tol0, tol1, 4));
                 }
             }
             else if (c1 instanceof Arc2Data || c1 instanceof Hyperbola2Data || c1 instanceof Parabola2Data) {
-                inters.push(...Curve2Inter.QuadraticXQuadratic(c0, c1, 1e-4, 1e-10));
+                inters.push(...Curve2Inter.QuadraticXQuadratic(c0, c1, tol0, tol1));
             }
             else if (c1 instanceof Nurbs2Data) {
-                inters.push(...Curve2Inter.QuadraticXNurbs(c0, c1, 1e-4, 1e-10));
+                inters.push(...Curve2Inter.QuadraticXNurbs(c0, c1, tol0, tol1));
             }
         }
         else if (c0 instanceof Nurbs2Data) {
             if (c1 instanceof Nurbs2Data) {
-                inters.push(...Curve2Inter.NurbsXNurbs(c0, c1, 1e-4, 1e-10));
+                inters.push(...Curve2Inter.NurbsXNurbs(c0, c1, tol0, tol1));
             }
         } else {
-            inters.push(...Curve2Inter.CurveXCurve(c1, c0, 512, tol0, tol1));
+            inters.push(...Curve2Inter.CurveXCurve(c0, c1, 512, tol0, tol1));
         }
         return inters;
     }

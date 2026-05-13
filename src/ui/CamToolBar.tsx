@@ -5,7 +5,6 @@ import { Input, Select, Space, Checkbox } from 'antd';
 import { PerspectiveController } from '../helper/camera/PerspectiveController';
 import { OrthographicController } from '../helper/camera/OrthographicController';
 import { Grid } from '../helper/Grid';
-import { CommandExecuter } from '../helper/command/CommandExecuter';
 import { Global } from '../core/Global';
 
 
@@ -103,7 +102,7 @@ let CamToolBarOnChange = (value: string) => {
 const CamToolBar: React.FC = () => (
     <Space wrap>
         <Select
-            defaultValue="前"
+            value="前"
             style={{ width: 50, position: 'fixed', top: 10, left: 10, zIndex: 1000 }}
             onChange={(value: string) => {
                 if (CamToolBarOnChange) {
@@ -156,34 +155,29 @@ const ComOptionBar: React.FC = () => (
     </Space>
 );
 
-let executer = new CommandExecuter();
-executer.bind(window);
-Global.comExector = executer;
+
 let inputs = new Array<string>();
 let pos = 0;
 let CommandBarOnEnter = (value: string) => {
-    const gpu: HTMLElement = document.getElementById('gpu');
-    gpu.focus();
-    executer.execute(value);
+    Global.gpu.focus();
+    Global.comExector.execute(value.toUpperCase());
 };
 const CommandBar: React.FC = () => (
     <Space wrap>
         <Input id='CommandLine' placeholder="请输入命令"
             style={{ position: 'fixed', width: '100%', bottom: 0, left: 0 }}
             onPressEnter={(e) => {
-                const value = (e.target as HTMLInputElement).value;
+                e.stopPropagation();
+                let element = (e.target as HTMLInputElement);
+                element.disabled = true;
+                const value = element.value;
                 inputs.push(value);
                 pos = inputs.length - 1;
-                (e.target as HTMLInputElement).value = '';
-                (e.target as HTMLInputElement).defaultValue = '';
-                e.stopPropagation();
-                if (CommandBarOnEnter) {
-                    CommandBarOnEnter(value);
-                }
+                CommandBarOnEnter(value);
             }}
-            onFocus={(e) => {
-                (e.target as HTMLInputElement).value = '';
-                e.stopPropagation();
+            onBlur={(e) => {
+                let element = (e.target as HTMLInputElement);
+                element.disabled = true;
             }}
             onKeyUp={(e) => {
                 e.stopPropagation();
@@ -195,14 +189,12 @@ const CommandBar: React.FC = () => (
                             pos--;
                             (e.target as HTMLInputElement).value = inputs[pos];
                         }
-                        e.stopPropagation();
                         break;
                     case 'ArrowDown':
                         if (pos < inputs.length - 1) {
                             pos++;
                             (e.target as HTMLInputElement).value = inputs[pos];
                         }
-
                         break;
                 };
                 e.stopPropagation();
@@ -211,18 +203,6 @@ const CommandBar: React.FC = () => (
     </Space>
 );
 
-// const gpu: HTMLElement = document.getElementById('gpu');
-// let onFocus = () => {
-//     perspective.setActive(false);
-//     orthographic.setActive(false);
-// };
-// let onFocusCapture = () => {
-//     perspective.setActive(true);
-//     orthographic.setActive(true);
-// }
-
-// gpu.addEventListener("focus", onFocus);
-// gpu.addEventListener("unfocus", onFocus);
 export default { perspective, orthographic, grid_xz, grid_xy, grid_yz, CamToolBarOnChange };
 
 const root = ReactDOM.createRoot(document.getElementById('ui'));

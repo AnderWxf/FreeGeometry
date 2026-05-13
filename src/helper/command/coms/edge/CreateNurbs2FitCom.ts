@@ -105,6 +105,7 @@ class CreateNurbs2FitCom extends ComCreate {
         super.onKeyDownExec(event);
         switch (event.code) {
             case "Enter":
+            case "NumpadEnter":
                 this._isDone = true;
                 break;
         }

@@ -12,7 +12,7 @@ import { Curve2Inter, type InterOfCurve2 } from "./Curve2Inter";
  *
  */
 export type InterOfFace2 = {
-    is: Array<InterOfCurve2>; // Position of intersection point.
+    is: Array<InterOfCurve2>; // Position of intersection point on curve.
     c0: Curve2Data; // The curve of face0.
     c1: Curve2Data; // The curve of face1.
 }
@@ -29,9 +29,17 @@ class Brep2Inter {
     public static EdgeXEdge(e0: Edge2, e1: Edge2, tol0: number, tol1: number): Array<InterOfCurve2> {
         let c0 = e0.curve;
         let c1 = e1.curve;
-        let inters: Array<InterOfCurve2> = [];
-        inters.push(...Curve2Inter.X(c0, c1, tol0, tol1));
-        return inters;
+        let result: Array<InterOfCurve2> = [];
+        let inters = Curve2Inter.X(c0, c1, tol0, tol1);
+        for (let i = 0; i < inters.length; i++) {
+            let inter = inters[i];
+            if (inter.u0 >= e0.u.x && inter.u0 <= e0.u.y &&
+                inter.u1 >= e1.u.x && inter.u1 <= e1.u.y
+            ) {
+                result.push(inter);
+            }
+        }
+        return result;
     }
 
     /**

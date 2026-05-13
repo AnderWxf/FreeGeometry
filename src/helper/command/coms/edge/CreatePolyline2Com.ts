@@ -98,9 +98,11 @@ class CreatePolyline2Com extends ComCreate {
         super.onKeyDownExec(event);
         switch (event.code) {
             case "Enter":
+            case "NumpadEnter":
                 this._isDone = true;
                 break;
         }
     }
+
 }
 export { CreatePolyline2Com };

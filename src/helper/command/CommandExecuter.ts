@@ -40,6 +40,8 @@ import { ModifyNurbs2CtrlCom } from "./coms/edge/ModifyNurbs2CtrlCom";
 import { CreateSectionCom } from "./coms/face/CreateSectionCom";
 import { ComDelete } from "./coms/ComDelete";
 import type { UserData } from "../UserData";
+import { EdgeIntersectionCom } from "./coms/operation/EdgeIntersectionCom";
+import { EdgeCuttingCom } from "./coms/operation/EdgeCuttingCom";
 
 /**
  * Command executer base class.
@@ -86,6 +88,11 @@ class CommandExecuter {
         this._commands.set(CommandType.MODIFY_NURBS_FITTING, ModifyNurbs2FitCom);
         this._commands.set(CommandType.MODIFY_NURBS_CONTROL, ModifyNurbs2CtrlCom);
         this._commands.set(CommandType.MODIFY_RECTANGLE, ModifyRectangle2Com);
+
+
+        this._commands.set(CommandType.OPERATION_EDGE_INTERSECTION, EdgeIntersectionCom);
+        this._commands.set(CommandType.OPERATION_EDGE_CUTTING, EdgeCuttingCom);
+
 
         this._commands.set(CommandType.OTHER_DELETE, ComDelete);
         this._commands.set(CommandType.OTHER_MOVE, ComMove);
@@ -146,7 +153,7 @@ class CommandExecuter {
     /*
     ********快捷键********
     * 'Esc'                命令取消
-    * 'Enter','NumpadEnter'进入命令行
+    * 'Enter','NumpadEnter'进入命令行,命令执行。选择结果确认。
     * 'M',                 平移
     * 'R',                 旋转
     * 'S',                 缩放
@@ -156,15 +163,20 @@ class CommandExecuter {
     * 'G',                 组合
     * 'ControlLeft' + 'G', 解组
     * 'ControlLeft' + 'Z', UNDO
-    * 'ShiftLeft' + 'Z',   REDO
+    * 'ControlLeft' + 'Y', REDO
     */
     onKeyDown = (event: KeyboardEvent) => {
+        event.stopPropagation();
         let com: Command;
         switch (event.code) {
             case "Enter":
             case "NumpadEnter":
-                const comline: HTMLElement = document.getElementById('CommandLine');
-                comline.focus();
+                if (!this.isExecuting()) {
+                    const comline: HTMLInputElement = document.getElementById('CommandLine') as HTMLInputElement;
+                    comline.disabled = false;
+                    comline.focus();
+                    return;
+                }
                 break;
             case "Delete":
                 com = new ComDelete(this, 'Delete');
@@ -173,6 +185,7 @@ class CommandExecuter {
             case 'KeyE':
                 if (Global.select.selectedObjects.length > 0) {
                     this.onEidtor();
+                    return;
                 }
                 break;
             // I：镜像
@@ -195,15 +208,18 @@ class CommandExecuter {
             case 'KeyS':
                 com = new ComScale(this, 'S');
                 break;
-            // Ctrl+Z Undo Shift+Z Redo
+            // Ctrl+Z Undo
             case "KeyZ":
                 if (this.KeyCtrlDown) {
                     this.undo();
-                    event.stopPropagation();
+                    return;
                 };
-                if (this.KeyShiftDown) {
+                break;
+            // Ctrl+Y Redo
+            case "KeyY":
+                if (this.KeyCtrlDown) {
                     this.redo();
-                    event.stopPropagation();
+                    return;
                 };
                 break;
             case "ControlLeft":

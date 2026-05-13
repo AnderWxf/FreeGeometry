@@ -90,7 +90,8 @@ class ActPickPoint2 extends Active {
     onKeyDown = (event: KeyboardEvent) => {
         switch (event.code) {
             case "Escape":
-            case "Enter":
+                // case "Enter":
+                // case "NumpadEnter":
                 this._isCancel = true;
                 break;
         }
