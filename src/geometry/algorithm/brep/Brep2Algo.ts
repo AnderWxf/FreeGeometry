@@ -1,6 +1,6 @@
 import { Vector2 } from "../../../math/Math";
 import { Line2Data } from "../../data/base/curve2/Line2Data";
-import type { Coedge2, Edge2, Face2, Loop2 } from "../../data/brep/Brep2";
+import type { Coedge2, Digraph2, Edge2, Face2, Loop2, Vertice2 } from "../../data/brep/Brep2";
 import type { Curve2Algo } from "../base/Curve2Algo";
 import { CurveBuilder } from "../builder/CurveBuilder";
 import { Curve2Inter } from "../relation/intersection/Curve2Inter";
@@ -13,38 +13,42 @@ class Coedge2Algo {
     this._algo = CurveBuilder.Algorithm2ByData(c.e.curve);
   }
   GetBeginPoint(): Vector2 {
-    if (this._c.isForward) {
-      return this._algo.p(this._c.e.u.x);
-    } else {
-      return this._algo.p(this._c.e.u.y);
-    }
+    return this.p(this.u.y);
   }
   GetEndPoint(): Vector2 {
-    if (this._c.isForward) {
-      return this._algo.p(this._c.e.u.y);
-    } else {
-      return this._algo.p(this._c.e.u.x);
-    }
+    return this.p(this.u.x);
   }
   GetBeginTangent(): Vector2 {
-    if (this._c.isForward) {
-      return this._algo.t(this._c.e.u.x);
-    } else {
-      return this._algo.t(this._c.e.u.y);
-    }
+    return this.t(this.u.x);
   }
   GetEndTangent(): Vector2 {
-    if (this._c.isForward) {
-      return this._algo.t(this._c.e.u.y);
-    } else {
-      return this._algo.t(this._c.e.u.x);
-    }
+    return this.t(this.u.y);
+  }
+  p(u: number): Vector2 {
+    return this._algo.p(u);
   }
   t(u: number): Vector2 {
+    return this._c.isPositive() ? this._algo.t(u) : this._algo.t(u).negate();
+  }
+  get v0(): Vertice2 {
     if (this._c.isForward) {
-      return this._algo.t(u);
+      return this._c.e.v0;
     } else {
-      return this._algo.t(u).negate();
+      return this._c.e.v1;
+    }
+  }
+  get v1(): Vertice2 {
+    if (this._c.isForward) {
+      return this._c.e.v1;
+    } else {
+      return this._c.e.v0;
+    }
+  }
+  get u(): Vector2 {
+    if (this._c.isForward) {
+      return this._c.e.u.clone();
+    } else {
+      return new Vector2(this._c.e.u.y, this._c.e.u.x);
     }
   }
 }
@@ -316,6 +320,18 @@ class Brep2Algo {
   }
 
 }
+class Digraph2Algo {
+  private _g: Digraph2;
+  private _algos: Coedge2Algo[];
+  constructor(g: Digraph2) {
+    this._g = g;
+    this._algos = [];
+    for (let i = 0; i < g.coedges.length; i++) {
+      this._algos.push(new Coedge2Algo(g.coedges[i]));
+    }
+  }
+}
 export {
-  Brep2Algo
+  Brep2Algo,
+  Digraph2Algo
 }
