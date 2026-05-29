@@ -157,16 +157,15 @@ class Parabola2Algo extends Curve2Algo {
   }
 
   /**
-   * the da(tn rotation matrix) function return directed area from u0 to u1 parameter.
-   * Use Green's theorem to calculate the area of the curve between u0 and u1.
+   * the green's function return the directed area from u0 to u1 parameter.
    * A = 0.5 * ∫(x dy - y dx) = 0.5 * ∫(x y' - y x') du
    * (2ft,ft2)=> t= x/2f
    * Green's formula integral in standard formula:1/3 * f^2 (t1^3​ − t0^3​)
    * @param {number} [u0 ∈ [0,a]] - the u0 parameter of curve.
-   * @param {number} [u1 ∈ [0,a]] - the u1 parameter of curve.* 
-   * @retun {number} 
+   * @param {number} [u1 ∈ [0,a]] - the u1 parameter of curve.*
+   * @retun {number}
    */
-  da(u0: number, u1: number): number {
+  green(u0: number, u1: number): number {
     let t1 = u1 / (2 * this.dat.f);
     let t0 = u0 / (2 * this.dat.f);
     let ret = 1 / 3 * this.dat.f * this.dat.f * (t1 * t1 * t1 - t0 * t0 * t0);

@@ -114,7 +114,7 @@ class Line2Algo extends Curve2Algo {
    * Use Green's theorem to calculate the area of the curve between u0 and u1.
    * A = 0.5 * ∫(x dy - y dx) = 0.5 * ∫(x y' - y x') du
    * 带有仿射变换：X=Mx+T 的曲线段：0.5​ (x1y2​ − x2y1)
-    * @param {number} [u0 ∈ [0,a]] - the u0 parameter of curve.
+   * @param {number} [u0 ∈ [0,a]] - the u0 parameter of curve.
    * @param {number} [u1 ∈ [0,a]] - the u1 parameter of curve.* 
    * @retun {number} 
    */

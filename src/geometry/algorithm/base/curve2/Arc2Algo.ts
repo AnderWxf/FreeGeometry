@@ -151,7 +151,7 @@ class Arc2Algo extends Curve2Algo {
   }
 
   /**
-   * Calculate the integral of the second type curve using Green's formula
+   *  the green's function return the directed area from u0 to u1 parameter.
    * I = 0.5 * ∫(x dy - y dx) = 0.5 * ∫(x y' - y x') du
    * Green's formula integral in standard formula:0.5 * abΔθ
    * @param {number} [u0 ∈ [0,a]] - the u0 parameter of curve.

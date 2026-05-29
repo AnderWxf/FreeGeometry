@@ -454,15 +454,15 @@ class Hyperbola2Algo extends Curve2Algo {
   }
 
   /**
-   * the da(tn rotation matrix) function return directed area from u0 to u1 parameter.
+   * the green's function return the directed area from u0 to u1 parameter.
    * Use Green's theorem to calculate the area of the curve between u0 and u1.
    * A = 0.5 * ∫(x dy - y dx) = 0.5 * ∫(x y' - y x') du
    * Green's formula integral in standard formula:0.5 * abln|(sec(u1) + tan(u1)) / (sec(u0) + tan(u0))|.
    * @param {number} [u0 ∈ [0,a]] - the u0 parameter of curve.
-   * @param {number} [u1 ∈ [0,a]] - the u1 parameter of curve.* 
-   * @retun {number} 
+   * @param {number} [u1 ∈ [0,a]] - the u1 parameter of curve.*
+   * @retun {number}
    */
-  da(u0: number, u1: number): number {
+  green(u0: number, u1: number): number {
     return 0.5 * this.dat.radius.x * this.dat.radius.y * MATHJS.log(MATHJS.abs((MATHJS.sec(u1) + MATHJS.tan(u1)) / (MATHJS.sec(u0) + MATHJS.tan(u0))));
   }
 }

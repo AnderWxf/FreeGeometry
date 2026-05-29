@@ -143,7 +143,7 @@ class Curve2Algo {
   }
 
   /**
-   * Calculate the integral of the second type curve using Green's formula
+   * the green's function return the directed area from u0 to u1 parameter.
    * I = 0.5 * ∫(x dy - y dx) = 0.5 * ∫(x y' - y x') du
    * @param {number} [u0 ∈ [0,a]] - the u0 parameter of curve.
    * @param {number} [u1 ∈ [0,a]] - the u1 parameter of curve.* 
