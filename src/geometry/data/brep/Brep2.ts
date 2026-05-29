@@ -171,6 +171,7 @@ class Loop2 extends DataBase {
     result.coedges = this.coedges?.map((c) => c.clone());
     return result;
   }
+
 }
 
 /**

@@ -1,5 +1,6 @@
 import { Vector2 } from "../../../math/Math";
 import { Line2Data } from "../../data/base/curve2/Line2Data";
+import type { Curve2Data } from "../../data/base/Curve2Data";
 import type { Coedge2, Digraph2, Edge2, Face2, Loop2, Vertice2 } from "../../data/brep/Brep2";
 import type { Curve2Algo } from "../base/Curve2Algo";
 import { CurveBuilder } from "../builder/CurveBuilder";
@@ -8,9 +9,14 @@ import { Curve2Inter } from "../relation/intersection/Curve2Inter";
 class Coedge2Algo {
   private _c: Coedge2;
   private _algo: Curve2Algo;
-  constructor(c: Coedge2) {
+  constructor(c: Coedge2, face?: Face2) {
     this._c = c;
-    this._algo = CurveBuilder.Algorithm2ByData(c.e.curve);
+    let curveData: Curve2Data | undefined;
+    if (face && c.e.curveIndex != -1) {
+      // Use the curve data from the face if available
+      curveData = face.curves[c.e.curveIndex];
+    }
+    this._algo = CurveBuilder.Algorithm2ByData(curveData || c.e.curve);
   }
   GetBeginPoint(): Vector2 {
     return this.p(this.u.y);
@@ -51,7 +57,80 @@ class Coedge2Algo {
       return new Vector2(this._c.e.u.y, this._c.e.u.x);
     }
   }
+  /**
+   * Use Green's theorem to calculate the area of the curve between u0 and u1.
+   * @retun {number} 
+   */
+  da(): number {
+    let u = this.u;
+    return this._algo.da(u.x, u.y);
+  }
 }
+
+class Loop2Algo {
+  private _l: Loop2;
+  private _algos: Coedge2Algo[];
+  constructor(l: Loop2, face?: Face2) {
+    this._l = l;
+    this._algos = [];
+    for (let i = 0; i < l.coedges.length; i++) {
+      this._algos.push(new Coedge2Algo(l.coedges[i], face));
+    }
+  }
+
+  /**
+   * Use Green's theorem to calculate the directed area of the curve loop.
+   * S = 1/2∮C(xdy − ydx)
+   * Area = 1/2 segments∑​ ∫ t0​ t1​ (x(t)dy/dt​ − y(t)dx/dt)dt
+   * @retun {number} 
+   */
+  area(): number {
+    let area = 0;
+    let algos = this._algos;
+    let count = algos.length;
+    for (let i = 0; i < count; i++) {
+      area += algos[i].da();
+    }
+    return area;
+  }
+
+  /**
+   * directed area > 0? 
+   */
+  isPositive() {
+    return this.area() > 0;
+  }
+}
+
+class Face2Algo {
+  private _f: Face2;
+  private _balgo: Loop2Algo;
+  private _hlgos: Loop2Algo[];
+  constructor(f: Face2) {
+    this._f = f;
+    this._balgo = new Loop2Algo(f.border, f);
+    this._hlgos = [];
+    for (let i = 0; i < f.holes.length; i++) {
+      this._hlgos.push(new Loop2Algo(f.holes[i], f));
+    }
+  }
+
+  /**
+   * Use Green's theorem to calculate the directed area of the curve loop.
+   * Area = ∑​ |loop[i].area()| - ∑​ |hole[i].area()|;
+   * @retun {number} 
+   */
+  area(): number {
+    let area = Math.abs(this._balgo.area());
+    let algos = this._hlgos;
+    let count = algos.length;
+    for (let i = 0; i < count; i++) {
+      area -= Math.abs(algos[i].area());
+    }
+    return area;
+  }
+}
+
 class Brep2Algo {
   /**
    * compute edge to edge intersection point.
@@ -320,6 +399,7 @@ class Brep2Algo {
   }
 
 }
+
 class Digraph2Algo {
   private _g: Digraph2;
   private _algos: Coedge2Algo[];
@@ -333,5 +413,8 @@ class Digraph2Algo {
 }
 export {
   Brep2Algo,
-  Digraph2Algo
+  Digraph2Algo,
+  Loop2Algo,
+  Coedge2Algo,
+  Face2Algo
 }

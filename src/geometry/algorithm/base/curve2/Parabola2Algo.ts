@@ -10,151 +10,168 @@ import verb from 'verb-nurbs';
  * 4fy = x²
  */
 class Parabola2Algo extends Curve2Algo {
-    /**
-     * The data struct of this 2D Parabola algorithm.
-     *
-     * @type {Parabola2Data}
-     */
-    protected dat_: Parabola2Data;
-    public get dat(): Parabola2Data {
-        return this.dat_;
-    }
-    public set dat(dat: Parabola2Data) {
-        this.dat_ = dat;
-    }
-    /**
-     * Constructs a 2D Parabola algorithm.
-     *
-     * @param {Curve2Data} [dat=Parabola2Data] - The data struct of this 2D Parabola algorithm.
-     */
-    constructor(dat = new Parabola2Data()) {
-        super(dat);
-        this.dat = dat;
-    }
+  /**
+   * The data struct of this 2D Parabola algorithm.
+   *
+   * @type {Parabola2Data}
+   */
+  protected dat_: Parabola2Data;
+  public get dat(): Parabola2Data {
+    return this.dat_;
+  }
+  public set dat(dat: Parabola2Data) {
+    this.dat_ = dat;
+  }
+  /**
+   * Constructs a 2D Parabola algorithm.
+   *
+   * @param {Curve2Data} [dat=Parabola2Data] - The data struct of this 2D Parabola algorithm.
+   */
+  constructor(dat = new Parabola2Data()) {
+    super(dat);
+    this.dat = dat;
+  }
 
-    /**
-     * to ver-nurbs object.
-     * @retun {any}
-     */
-    vernurbs(u: Vector2 = new Vector2(-1000, 1000)): Array<any> {
-        let a = 1 / (this.dat.f * 4);
-        let um = (u.x + u.y) * 0.5;
-        let u0 = u.x;
-        let u1 = u.y;
-        // 二次贝塞尔曲线控制点
-        // P0​=(u0 ,au0^2​)
-        // P1=(um,au0u1),其中um = (u0+u1)/2
-        // P2=(u1,au1^2)
-        let p0 = new Vector2(u0, a * u0 * u0);
-        let p1 = new Vector2(um, a * u0 * u1);
-        let p2 = new Vector2(u1, a * u1 * u1);
-        let m = this.dat.trans.makeLocalMatrix();
-        p0.applyMatrix3(m);
-        p1.applyMatrix3(m);
-        p2.applyMatrix3(m);
-        let pts: number[][] = [[p0.x, p0.y, 1], [p1.x, p1.y, 1], [p2.x, p2.y, 1]];
-        const nurbs = new verb.geom.NurbsCurve({ controlPoints: pts, knots: [0, 0, 0, 1, 1, 1], degree: 2 })
-        return [nurbs];
-    }
+  /**
+   * to ver-nurbs object.
+   * @retun {any}
+   */
+  vernurbs(u: Vector2 = new Vector2(-1000, 1000)): Array<any> {
+    let a = 1 / (this.dat.f * 4);
+    let um = (u.x + u.y) * 0.5;
+    let u0 = u.x;
+    let u1 = u.y;
+    // 二次贝塞尔曲线控制点
+    // P0​=(u0 ,au0^2​)
+    // P1=(um,au0u1),其中um = (u0+u1)/2
+    // P2=(u1,au1^2)
+    let p0 = new Vector2(u0, a * u0 * u0);
+    let p1 = new Vector2(um, a * u0 * u1);
+    let p2 = new Vector2(u1, a * u1 * u1);
+    let m = this.dat.trans.makeLocalMatrix();
+    p0.applyMatrix3(m);
+    p1.applyMatrix3(m);
+    p2.applyMatrix3(m);
+    let pts: number[][] = [[p0.x, p0.y, 1], [p1.x, p1.y, 1], [p2.x, p2.y, 1]];
+    const nurbs = new verb.geom.NurbsCurve({ controlPoints: pts, knots: [0, 0, 0, 1, 1, 1], degree: 2 })
+    return [nurbs];
+  }
 
-    /**
-     * the U function return u parameter at a position .
-     * @param {Vector2} [point] - the point on curve.
-     * @retun {number}
-     */
-    u(point: Vector2): number {
-        let v = point.clone();
-        v.applyMatrix3(this.dat.trans.makeWorldMatrix().invert());
-        return v.x;
-    }
+  /**
+   * the U function return u parameter at a position .
+   * @param {Vector2} [point] - the point on curve.
+   * @retun {number}
+   */
+  u(point: Vector2): number {
+    let v = point.clone();
+    v.applyMatrix3(this.dat.trans.makeWorldMatrix().invert());
+    return v.x;
+  }
 
-    /**
-     * the D(derivative) function return r-order derivative vector at u parameter.
-     * @param {number} [u ∈ [0,a]] - the u parameter of curve.
-     * @param {number} [r ∈ [0,1,2...]] - r-order.
-     * @retun {Vector2}
-     */
-    override d(u: number, r: number = 0): Vector2 {
-        const x = MATHJS.bignumber(u);
-        const m = this.dat.trans.makeLocalMatrix();
-        const f4_ = MATHJS.divide(MATHJS.bignumber(1), MATHJS.multiply(MATHJS.bignumber(this.dat.f), 4)) as MATHJS.BigNumber;
-        switch (r) {
-            case 0:
-                {
-                    // y = x²/4f         
-                    const y = MATHJS.multiply(x, x, f4_) as MATHJS.BigNumber;
-                    const ret = new Vector2(x.toNumber(), y.toNumber());
-                    ret.applyMatrix3(m);
-                    return ret;
-                }
-            case 1:
-                {
-                    // y' = 2x/4f           
-                    const y = MATHJS.add(x, x, f4_, 2) as MATHJS.BigNumber;
-                    const ret = new Vector2(x.toNumber(), y.toNumber());
-                    ret.applyMatrix3(m);
-                    return ret;
-                }
-            case 2:
-                {
-                    // y'' = 2/4f     
-                    const ret = new Vector2(u, f4_.toNumber() * 2);
-                    ret.applyMatrix3(m);
-                    return ret;
-                }
-            default:
-                debugger;
-                return;
+  /**
+   * the D(derivative) function return r-order derivative vector at u parameter.
+   * @param {number} [u ∈ [0,a]] - the u parameter of curve.
+   * @param {number} [r ∈ [0,1,2...]] - r-order.
+   * @retun {Vector2}
+   */
+  override d(u: number, r: number = 0): Vector2 {
+    const x = MATHJS.bignumber(u);
+    const m = this.dat.trans.makeLocalMatrix();
+    const f4_ = MATHJS.divide(MATHJS.bignumber(1), MATHJS.multiply(MATHJS.bignumber(this.dat.f), 4)) as MATHJS.BigNumber;
+    switch (r) {
+      case 0:
+        {
+          // y = x²/4f         
+          const y = MATHJS.multiply(x, x, f4_) as MATHJS.BigNumber;
+          const ret = new Vector2(x.toNumber(), y.toNumber());
+          ret.applyMatrix3(m);
+          return ret;
         }
+      case 1:
+        {
+          // y' = 2x/4f           
+          const y = MATHJS.add(x, x, f4_, 2) as MATHJS.BigNumber;
+          const ret = new Vector2(x.toNumber(), y.toNumber());
+          ret.applyMatrix3(m);
+          return ret;
+        }
+      case 2:
+        {
+          // y'' = 2/4f     
+          const ret = new Vector2(u, f4_.toNumber() * 2);
+          ret.applyMatrix3(m);
+          return ret;
+        }
+      default:
+        debugger;
+        return;
     }
+  }
 
-    /**
-     * the G(general) function return the value of the general equation for the curve.
-     * if point on curve then the return value is zero.
-     * f(x,y) = 0
-     * 4fy - x² = 0
-     * @param {Vector2} [point] - the point baout curve. 
-     * @retun {number}
-     */
-    g(point: Vector2): number {
-        let v = point.clone();
-        v.applyMatrix3(this.dat.trans.makeWorldMatrix().invert());
-        const x = MATHJS.bignumber(v.x);
-        const y = MATHJS.bignumber(v.y);
-        let f = MATHJS.bignumber(this.dat.f);
-        return (MATHJS.add(
-            MATHJS.multiply(y, f, 4),
-            MATHJS.unaryMinus(MATHJS.multiply(x, x))
-        ) as MATHJS.BigNumber).toNumber();
-    }
+  /**
+   * the G(general) function return the value of the general equation for the curve.
+   * if point on curve then the return value is zero.
+   * f(x,y) = 0
+   * 4fy - x² = 0
+   * @param {Vector2} [point] - the point baout curve. 
+   * @retun {number}
+   */
+  g(point: Vector2): number {
+    let v = point.clone();
+    v.applyMatrix3(this.dat.trans.makeWorldMatrix().invert());
+    const x = MATHJS.bignumber(v.x);
+    const y = MATHJS.bignumber(v.y);
+    let f = MATHJS.bignumber(this.dat.f);
+    return (MATHJS.add(
+      MATHJS.multiply(y, f, 4),
+      MATHJS.unaryMinus(MATHJS.multiply(x, x))
+    ) as MATHJS.BigNumber).toNumber();
+  }
 
-    /**
-     * the GE function return general equation coefficients of 2D Hyperbola.
-     * @param {Hyperbola2Data} [c = Hyperbola2Data] - The data struct of 2D Hyperbola.
-     * @retun {A B C D E F} - General equation coefficients.
-     */
-    ge(): { A: MATHJS.BigNumber, B: MATHJS.BigNumber, C: MATHJS.BigNumber, D: MATHJS.BigNumber, E: MATHJS.BigNumber, F: MATHJS.BigNumber } {
-        // Qnew = T^-T * Qold * T^-1
-        let dat = this.dat;
-        let t_1 = dat.trans.makeLocalMatrix().invert();
-        let t_t = t_1.clone().transpose();
-        let a = -1;
-        let e = 2 * dat.f;
-        let Qold = new Matrix3().set(
-            a, 0, 0,
-            0, 0, e,
-            0, e, 0
-        )
-        let Qnew = t_t.multiply(Qold).multiply(t_1);
-        return {
-            A: MATHJS.bignumber(Qnew.elements[0]),
-            B: MATHJS.bignumber(Qnew.elements[1] + Qnew.elements[3]),
-            C: MATHJS.bignumber(Qnew.elements[4]),
-            D: MATHJS.bignumber(Qnew.elements[2] + Qnew.elements[6]),
-            E: MATHJS.bignumber(Qnew.elements[5] + Qnew.elements[7]),
-            F: MATHJS.bignumber(Qnew.elements[8])
-        };
-    }
+  /**
+   * the GE function return general equation coefficients of 2D Hyperbola.
+   * @param {Hyperbola2Data} [c = Hyperbola2Data] - The data struct of 2D Hyperbola.
+   * @retun {A B C D E F} - General equation coefficients.
+   */
+  ge(): { A: MATHJS.BigNumber, B: MATHJS.BigNumber, C: MATHJS.BigNumber, D: MATHJS.BigNumber, E: MATHJS.BigNumber, F: MATHJS.BigNumber } {
+    // Qnew = T^-T * Qold * T^-1
+    let dat = this.dat;
+    let t_1 = dat.trans.makeLocalMatrix().invert();
+    let t_t = t_1.clone().transpose();
+    let a = -1;
+    let e = 2 * dat.f;
+    let Qold = new Matrix3().set(
+      a, 0, 0,
+      0, 0, e,
+      0, e, 0
+    )
+    let Qnew = t_t.multiply(Qold).multiply(t_1);
+    return {
+      A: MATHJS.bignumber(Qnew.elements[0]),
+      B: MATHJS.bignumber(Qnew.elements[1] + Qnew.elements[3]),
+      C: MATHJS.bignumber(Qnew.elements[4]),
+      D: MATHJS.bignumber(Qnew.elements[2] + Qnew.elements[6]),
+      E: MATHJS.bignumber(Qnew.elements[5] + Qnew.elements[7]),
+      F: MATHJS.bignumber(Qnew.elements[8])
+    };
+  }
+
+  /**
+   * the da(tn rotation matrix) function return directed area from u0 to u1 parameter.
+   * Use Green's theorem to calculate the area of the curve between u0 and u1.
+   * A = 0.5 * ∫(x dy - y dx) = 0.5 * ∫(x y' - y x') du
+   * (2ft,ft2)=> t= x/2f
+   * Green's formula integral in standard formula:1/3 * f^2 (t1^3​ − t0^3​)
+   * @param {number} [u0 ∈ [0,a]] - the u0 parameter of curve.
+   * @param {number} [u1 ∈ [0,a]] - the u1 parameter of curve.* 
+   * @retun {number} 
+   */
+  da(u0: number, u1: number): number {
+    let t1 = u1 / (2 * this.dat.f);
+    let t0 = u0 / (2 * this.dat.f);
+    let ret = 1 / 3 * this.dat.f * this.dat.f * (t1 * t1 * t1 - t0 * t0 * t0);
+    return ret;
+  }
 }
 
 export { Parabola2Algo };

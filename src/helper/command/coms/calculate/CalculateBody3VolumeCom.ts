@@ -13,10 +13,10 @@ import { CreateGeomUserData } from "../../../UserData";
 
 
 /**
- * Create command class.
+ * Calculate body volume command class. TODO
  * 
  */
-class CreateSectionCom extends ComCreate {
+class CalculateBody3VolumeCom extends ComCreate {
   edges: Edge2[];
   constructor(executer: CommandExecuter, text: string) {
     super(executer, text);
@@ -120,4 +120,4 @@ class CreateSectionCom extends ComCreate {
   //     }
   // }
 }
-export { CreateSectionCom };
+export { CalculateBody3VolumeCom };

@@ -10,128 +10,140 @@ import verb from 'verb-nurbs';
  *
  */
 class Nurbs2Algo extends Curve2Algo {
-    /**
-     * The data struct of this nurbs algorithm.
-     *
-     * @type {Nurbs2Data}
-     */
-    protected override dat_: Nurbs2Data;
-    private curve_: any;
+  /**
+   * The data struct of this nurbs algorithm.
+   *
+   * @type {Nurbs2Data}
+   */
+  protected override dat_: Nurbs2Data;
+  private curve_: any;
 
-    public override get dat(): Nurbs2Data {
-        return this.dat_;
+  public override get dat(): Nurbs2Data {
+    return this.dat_;
+  }
+
+  public override set dat(dat: Nurbs2Data) {
+    this.dat_ = dat;
+    let controls: number[][] = [];
+    for (let i = 0; i < dat.controls.length; i++) {
+      controls.push([dat.controls[i].x, dat.controls[i].y, dat.controls[i].z]);
+    }
+    this.curve_ = new verb.geom.NurbsCurve({
+      degree: dat.degree, // 维度
+      knots: dat.knots, // 节点向量
+      controlPoints: controls
+    }
+    );
+  }
+  /**
+   * Constructs a nurbs algorithm.
+   *
+   * @param {Curve2Data} [dat=Nurbs2Data] - The data struct of this nurbs algorithm.
+   */
+  constructor(dat: Nurbs2Data) {
+    super(dat);
+    this.dat = dat;
+  }
+
+  /**
+   * the U function return u parameter at a position .
+   * @param {Vector2} [point] - the point on curve.
+   * @retun {number}
+   */
+  u(point: Vector2): number {
+    let v = point.clone();
+    v.applyMatrix3(this.dat.trans.makeWorldMatrix().invert());
+    let u = verb.eval.Analyze.rationalCurveClosestParam(this.curve_._data, [v.x, v.y]) as number;
+    return u;
+  }
+
+  /**
+   * the D(derivative) function return r-order derivative vector at u parameter.
+   * @param {number} [u ∈ [0,a]] - the u parameter of curve.
+   * @param {number} [r ∈ [0,1,2...]] - r-order.
+   * @retun {Vector2}
+   */
+  override d(u: number, r: number = 0): Vector2 {
+    if (r === 0) {
+      let points = verb.eval.Eval.curvePoint(this.curve_._data, u) as number[];
+      // let points = verb.eval.Eval.rationalCurvePoint(this.curve_._data, u) as number[];
+      return new Vector2(points[0] / points[2], points[1] / points[2]);
+    } else {
+      let points = verb.eval.Eval.rationalCurveDerivatives(this.curve_._data, u, r) as number[][];
+      return new Vector2(points[1][0], points[1][1]);
+    }
+  }
+
+  /**
+   * the G(general) function return the value of the general equation for the curve.
+   * if point on curve then the return value is zero.
+   * @param {Vector2} [point] - the point baout curve. 
+   * @retun {number}
+   */
+  g(point: Vector2): number {
+    let v = point.clone();
+    v.applyMatrix3(this.dat.trans.makeWorldMatrix().invert());
+    let u = verb.eval.Analyze.rationalCurveClosestParam(this.curve_._data, [v.x, v.y]) as number;
+    let d_ = verb.eval.Eval.rationalCurveDerivatives(this.curve_._data, u, 1) as number[][];
+    let p = new Vector2(d_[0][0], d_[0][1]);
+    let v0 = new Vector2(d_[1][0], d_[1][1]); // 切向量
+    let v1 = v.sub(p);          // 投影点到目标点方向
+    let ret = v1.length();
+    let d = v1.cross(v0);
+    // 叉乘>0,则v1在v0右侧，返回值取负数，反之取正数。
+    if (d > 0) {
+      ret = -ret;
+    }
+    return ret;
+  }
+
+  /**
+   * 曲线弧长
+   */
+  public length(): number {
+    return verb.eval.Analyze.rationalCurveArcLength(this.curve_._data, 1);
+    // return this.curve_.length();
+  }
+
+  /**
+   * 使用正则化最小二乘法拟合 NURBS 曲线
+   */
+  public static Fit(
+    points: Vector2[],  // [[x1,y1], [x2,y2], ...]
+    degree: number,
+    // numControlPoints: number,
+    // lambda: number = 0.1  // 正则化参数
+  ): Nurbs2Data {
+    let pts: number[][] = [];
+    for (let i = 0; i < points.length; i++) {
+      pts.push([points[i].x, points[i].y]);
     }
 
-    public override set dat(dat: Nurbs2Data) {
-        this.dat_ = dat;
-        let controls: number[][] = [];
-        for (let i = 0; i < dat.controls.length; i++) {
-            controls.push([dat.controls[i].x, dat.controls[i].y, dat.controls[i].z]);
-        }
-        this.curve_ = new verb.geom.NurbsCurve({
-            degree: dat.degree, // 维度
-            knots: dat.knots, // 节点向量
-            controlPoints: controls
-        }
-        );
-    }
-    /**
-     * Constructs a nurbs algorithm.
-     *
-     * @param {Curve2Data} [dat=Nurbs2Data] - The data struct of this nurbs algorithm.
-     */
-    constructor(dat: Nurbs2Data) {
-        super(dat);
-        this.dat = dat;
-    }
+    // const curveData = verb.eval.Make.rational_interp_curve(pts, degree, false, null, null);
+    const curveData = verb.eval.Make.rationalInterpCurve(pts, degree, false, null, null);
+    const controlPoints = curveData.controlPoints.map((point: any) => new Vector3(point[0], point[1], point[2]));
+    return new Nurbs2Data(new Transform2(), controlPoints, curveData.knots, degree);
+  }
 
-    /**
-     * the U function return u parameter at a position .
-     * @param {Vector2} [point] - the point on curve.
-     * @retun {number}
-     */
-    u(point: Vector2): number {
-        let v = point.clone();
-        v.applyMatrix3(this.dat.trans.makeWorldMatrix().invert());
-        let u = verb.eval.Analyze.rationalCurveClosestParam(this.curve_._data, [v.x, v.y]) as number;
-        return u;
-    }
+  /**
+   * 使用正则化最小二乘法拟合 NURBS 曲线
+   */
+  public static FromVerb(dat: any): Nurbs2Data {
+    const controlPoints = dat.controlPoints.map((point: any) => new Vector3(point[0], point[1], point[2]));
+    return new Nurbs2Data(new Transform2(), controlPoints, dat.knots, dat.degree);
+  }
 
-    /**
-     * the D(derivative) function return r-order derivative vector at u parameter.
-     * @param {number} [u ∈ [0,a]] - the u parameter of curve.
-     * @param {number} [r ∈ [0,1,2...]] - r-order.
-     * @retun {Vector2}
-     */
-    override d(u: number, r: number = 0): Vector2 {
-        if (r === 0) {
-            let points = verb.eval.Eval.curvePoint(this.curve_._data, u) as number[];
-            // let points = verb.eval.Eval.rationalCurvePoint(this.curve_._data, u) as number[];
-            return new Vector2(points[0] / points[2], points[1] / points[2]);
-        } else {
-            let points = verb.eval.Eval.rationalCurveDerivatives(this.curve_._data, u, r) as number[][];
-            return new Vector2(points[1][0], points[1][1]);
-        }
-    }
-
-    /**
-     * the G(general) function return the value of the general equation for the curve.
-     * if point on curve then the return value is zero.
-     * @param {Vector2} [point] - the point baout curve. 
-     * @retun {number}
-     */
-    g(point: Vector2): number {
-        let v = point.clone();
-        v.applyMatrix3(this.dat.trans.makeWorldMatrix().invert());
-        let u = verb.eval.Analyze.rationalCurveClosestParam(this.curve_._data, [v.x, v.y]) as number;
-        let d_ = verb.eval.Eval.rationalCurveDerivatives(this.curve_._data, u, 1) as number[][];
-        let p = new Vector2(d_[0][0], d_[0][1]);
-        let v0 = new Vector2(d_[1][0], d_[1][1]); // 切向量
-        let v1 = v.sub(p);          // 投影点到目标点方向
-        let ret = v1.length();
-        let d = v1.cross(v0);
-        // 叉乘>0,则v1在v0右侧，返回值取负数，反之取正数。
-        if (d > 0) {
-            ret = -ret;
-        }
-        return ret;
-    }
-
-    /**
-     * 曲线弧长
-     */
-    public length(): number {
-        return verb.eval.Analyze.rationalCurveArcLength(this.curve_._data, 1);
-        // return this.curve_.length();
-    }
-
-    /**
-     * 使用正则化最小二乘法拟合 NURBS 曲线
-     */
-    public static Fit(
-        points: Vector2[],  // [[x1,y1], [x2,y2], ...]
-        degree: number,
-        // numControlPoints: number,
-        // lambda: number = 0.1  // 正则化参数
-    ): Nurbs2Data {
-        let pts: number[][] = [];
-        for (let i = 0; i < points.length; i++) {
-            pts.push([points[i].x, points[i].y]);
-        }
-
-        // const curveData = verb.eval.Make.rational_interp_curve(pts, degree, false, null, null);
-        const curveData = verb.eval.Make.rationalInterpCurve(pts, degree, false, null, null);
-        const controlPoints = curveData.controlPoints.map((point: any) => new Vector3(point[0], point[1], point[2]));
-        return new Nurbs2Data(new Transform2(), controlPoints, curveData.knots, degree);
-    }
-
-    /**
-     * 使用正则化最小二乘法拟合 NURBS 曲线
-     */
-    public static FromVerb(dat: any): Nurbs2Data {
-        const controlPoints = dat.controlPoints.map((point: any) => new Vector3(point[0], point[1], point[2]));
-        return new Nurbs2Data(new Transform2(), controlPoints, dat.knots, dat.degree);
-    }
+  /**
+   * the da(tn rotation matrix) function return directed area from u0 to u1 parameter.
+   * Use Green's theorem to calculate the area of the curve between u0 and u1.
+   * A = 0.5 * ∫(x dy - y dx) = 0.5 * ∫(x y' - y x') du
+   * @param {number} [u0 ∈ [0,a]] - the u0 parameter of curve.
+   * @param {number} [u1 ∈ [0,a]] - the u1 parameter of curve.* 
+   * @retun {number} 
+   */
+  da(u0: number, u1: number): number {
+    return 0;
+  }
 }
 
 /**

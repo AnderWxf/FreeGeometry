@@ -13,10 +13,10 @@ import { CreateGeomUserData } from "../../../UserData";
 
 
 /**
- * Create command class.
+ * Calculate loop length command class. TODO
  * 
  */
-class CreateSectionCom extends ComCreate {
+class CalculateLoop3LengthCom extends ComCreate {
   edges: Edge2[];
   constructor(executer: CommandExecuter, text: string) {
     super(executer, text);
@@ -120,4 +120,4 @@ class CreateSectionCom extends ComCreate {
   //     }
   // }
 }
-export { CreateSectionCom };
+export { CalculateLoop3LengthCom };
