@@ -11,6 +11,7 @@ npm install -save webpack
 
 npm install -save antd
 
+
 # 核心数学方程
 
 ## 一、二次曲线的一般方程系数，计算二次曲线交点。
@@ -20,7 +21,6 @@ npm install -save antd
 
 以下是完整的数学推导和计算步骤。
 
----
 
 ### 1. 问题建模
 
@@ -28,6 +28,7 @@ npm install -save antd
 ```math
 \mathbf{x}^T \mathbf{Q} \mathbf{x} = 0
 ```
+
 其中 $\mathbf{x} = \begin{bmatrix} x \\ y \\ 1 \end{bmatrix}$ 是齐次坐标，$\mathbf{Q}$ 是一个 $3 \times 3$ 的对称矩阵，包含了二次项、一次项和常数项的系数。
 
 例如，对于中心在原点的椭圆 $\frac{x^2}{a^2} + \frac{y^2}{b^2} = 1$（等价于 $\frac{x^2}{a^2} + \frac{y^2}{b^2} - 1 = 0$），其矩阵形式为：
@@ -195,5 +196,3 @@ I = \frac{1}{2} \int_{t_1}^{t_2} \left( x \frac{dy}{dt} - y \frac{dx}{dt} \right
 | 抛物线 $x^2=4py$ | $(2pt,\ pt^2)$ | $\frac{p^2}{3}(t_2^3 - t_1^3)$ |
 | 双曲线（双曲函数） | $(a\cosh u,\ b\sinh u)$ | $\frac{ab}{2}(u_2 - u_1)$ |
 | 双曲线（正割/正切） | $(a\sec\phi,\ b\tan\phi)$ | $\frac{ab}{2} \ln\|\frac{\sec\phi_2 + \tan\phi_2}{\sec\phi_1 + \tan\phi_1} \|$ |
-
-
