@@ -25,9 +25,11 @@ npm install -save antd
 ### 1. 问题建模
 
 假设我们有一个标准二次曲线，通常写成矩阵形式：
+```math
 \[
 \mathbf{x}^T \mathbf{Q} \mathbf{x} = 0
 \]
+```
 其中 \(\mathbf{x} = \begin{bmatrix} x \\ y \\ 1 \end{bmatrix}\) 是齐次坐标，\(\mathbf{Q}\) 是一个 \(3 \times 3\) 的对称矩阵，包含了二次项、一次项和常数项的系数。
 
 例如，对于中心在原点的椭圆 \(\frac{x^2}{a^2} + \frac{y^2}{b^2} = 1\)（等价于 \(\frac{x^2}{a^2} + \frac{y^2}{b^2} - 1 = 0\)），其矩阵形式为：
