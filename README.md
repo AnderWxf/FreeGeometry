@@ -26,9 +26,9 @@ npm install -save antd
 
 假设我们有一个标准二次曲线，通常写成矩阵形式：
 ```math
-\[
+% \[
 \mathbf{x}^T \mathbf{Q} \mathbf{x} = 0
-\]
+% \]
 ```
 其中 \(\mathbf{x} = \begin{bmatrix} x \\ y \\ 1 \end{bmatrix}\) 是齐次坐标，\(\mathbf{Q}\) 是一个 \(3 \times 3\) 的对称矩阵，包含了二次项、一次项和常数项的系数。
 
