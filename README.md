@@ -180,7 +180,7 @@ c & d & t_y \\
 ```math
 \mathbf{M} = \begin{pmatrix} a & b \\ c & d \end{pmatrix}  
 ```
-行列式 $ \Delta = ad - bc$  。
+行列式 $\Delta = ad - bc$ 。
 
 **分段计算公式：**
 ```math
