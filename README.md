@@ -48,14 +48,14 @@ npm install -save antd
 
 现在，我们想对这个曲线上的每个点施加一个变换矩阵 $\mathbf{T}$（ $3 \times 3$ 的仿射变换矩阵，包含平移、旋转、缩放、反射）。
 
-设原曲线上的点为 '$\mathbf{x}_{old}$' ，变换后的点为 $\mathbf{x}\_{new}$ ，则有：
+设原曲线上的点为 $\mathbf{x}\_{old}$ ，变换后的点为 $\mathbf{x}\_{new}$ ，则有：
 ```math
 \mathbf{x}_{old} = \mathbf{T}^{-1} \mathbf{x}_{new}
 ```
 
 ### 2. 核心推导：系数矩阵的变换规律
 
-将 $\mathbf{x}_{old} = \mathbf{T}^{-1} \mathbf{x}_{new}$ 代入原方程：
+将 $\mathbf{x}\_{old} = \mathbf{T}^{-1} \mathbf{x}\_{new}$ 代入原方程：
 ```math
 (\mathbf{T}^{-1} \mathbf{x}_{new})^T \mathbf{Q}_{old} (\mathbf{T}^{-1} \mathbf{x}_{new}) = 0
 ```
@@ -72,14 +72,14 @@ npm install -save antd
 \boxed{\mathbf{Q}_{new} = \mathbf{T}^{-T} \mathbf{Q}_{old} \mathbf{T}^{-1}}
 ```
 
--   $\mathbf{Q}_{old}$：原曲线的系数矩阵（已知）。
+-   $\mathbf{Q}\_{old}$：原曲线的系数矩阵（已知）。
 -   $\mathbf{T}$：你定义的变换矩阵（已知，$3 \times 3$ 仿射矩阵）。
 -   $\mathbf{T}^{-T}$：先求逆，再转置（或者先转置再求逆，结果一样）。
--   $\mathbf{Q}_{new}$：新曲线的系数矩阵。
+-   $\mathbf{Q}\_{new}$：新曲线的系数矩阵。
 
 ### 3. 计算步骤
 
-假设你有一个变换 $\mathbf{T}$，将旧坐标 $(x_{old}, y_{old})$ 映射到新坐标 $(x_{new}, y_{new})$：
+假设你有一个变换 $\mathbf{T}$ ，将旧坐标 $(x\_{old}, y\_{old})$ 映射到新坐标 $(x_{new}, y_{new})$：
 
 ```math
 \begin{bmatrix} x_{new} \\ y_{new} \\ 1 \end{bmatrix} =
@@ -92,7 +92,7 @@ c & d & t_y \\
 \begin{bmatrix} x_{old} \\ y_{old} \\ 1 \end{bmatrix}
 ```
 
-其中 $\begin{bmatrix} a & b \\ c & d \end{bmatrix}$ 部分包含了**旋转、不等比缩放、反射**，$(t_x, t_y)$ 是**平移**。
+其中 $\begin{bmatrix} a & b \\ c & d \end{bmatrix}$ 部分包含了**旋转、不等比缩放、反射**，$(t\_x, t\_y)$ 是**平移**。
 
 #### 步骤 1：写出原曲线矩阵 $\mathbf{Q}_{old}$
 假设原曲线是：
@@ -127,11 +127,11 @@ c & d & t_y \\
 ```
 其中 $\Delta = ad - bc$（线性部分的行列式）。
 
-#### 步骤 3：计算 $\mathbf{Q}_{new} = \mathbf{T}^{-T} \mathbf{Q}_{old} \mathbf{T}^{-1}$
+#### 步骤 3：计算 $\mathbf{Q}\_{new} = \mathbf{T}^{-T} \mathbf{Q}\_{old} \mathbf{T}^{-1}$
 这是一个 $3 \times 3$ 矩阵乘法。结果 $\mathbf{Q}_{new}$ 将是一个对称矩阵。
 
 #### 步骤 4：提取新系数
-根据 $\mathbf{Q}_{new}$ 的对应位置提取新方程的系数：
+根据 $\mathbf{Q}\_{new}$ 的对应位置提取新方程的系数：
 
 -   $A_{new} = \mathbf{Q}_{new}[1,1]$
 -   $B_{new} = 2 \times \mathbf{Q}_{new}[1,2]$ （因为矩阵的 (1,2) 项存储的是 $B/2$）
