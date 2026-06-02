@@ -92,11 +92,11 @@ c & d & t_y \\
 \begin{bmatrix} x_{old} \\ y_{old} \\ 1 \end{bmatrix}
 ```
 
-其中 
+其中
 ```math
 \begin{bmatrix} a & b \\ c & d \end{bmatrix}
 ``` 
-部分包含了**旋转、不等比缩放、反射**，$(t\_x, t\_y)$ 是**平移**。
+部分包含了**旋转、不等比缩放、反射**，$(t_x, t_y)$ 是**平移**。
 
 #### 步骤 1：写出原曲线矩阵 $\mathbf{Q}_{old}$
 假设原曲线是：
@@ -112,7 +112,7 @@ B_{old}/2 & C_{old} & E_{old}/2 \\
 D_{old}/2 & E_{old}/2 & F_{old}
 \end{bmatrix}
 ```
-*注意：矩阵中的系数对应关系是，当展开 $\mathbf{x}^T\mathbf{Q}\mathbf{x}$ 时，二次项系数正确出现。*
+注意：矩阵中的系数对应关系是，当展开 $\mathbf{x}^T\mathbf{Q}\mathbf{x}$ 时，二次项系数正确出现。
 
 #### 步骤 2：求变换矩阵的逆 $\mathbf{T}^{-1}$
 对于仿射矩阵，逆矩阵公式为：
@@ -147,7 +147,7 @@ c & d & t_y \\
 
 ### 总结
 1.  **使用齐次坐标**和 $3\times 3$ 矩阵 $\mathbf{Q}$ 来表示二次曲线。
-2.  **变换公式**：$\mathbf{Q}\_{new} = \mathbf{T}^{-T} \mathbf{Q}\_{old} \mathbf{T}^{-1}$ 。
+2.  **变换公式**： $\mathbf{Q}\_{new} = \mathbf{T}^{-T} \mathbf{Q}\_{old} \mathbf{T}^{-1}$  。
 3.  无论变换多么复杂（平移、旋转、不等比缩放、反射），这个公式都能直接给出新的一般方程系数。
 
 
