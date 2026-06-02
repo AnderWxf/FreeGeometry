@@ -79,7 +79,7 @@ npm install -save antd
 
 ### 3. 计算步骤
 
-假设你有一个变换 $\mathbf{T}$ ，将旧坐标 $(x\_{old}, y\_{old})$ 映射到新坐标 $(x_{new}, y_{new})$：
+假设你有一个变换 $\mathbf{T}$ ，将旧坐标 $(x\_{old}, y\_{old})$ 映射到新坐标 $(x\_{new}, y\_{new})$：
 
 ```math
 \begin{bmatrix} x_{new} \\ y_{new} \\ 1 \end{bmatrix} =
@@ -92,7 +92,9 @@ c & d & t_y \\
 \begin{bmatrix} x_{old} \\ y_{old} \\ 1 \end{bmatrix}
 ```
 
-其中 $\begin{bmatrix} a & b \\ c & d \end{bmatrix}$ 部分包含了**旋转、不等比缩放、反射**，$(t\_x, t\_y)$ 是**平移**。
+其中 
+$$\begin{bmatrix} a & b \\ c & d \end{bmatrix}$$ 
+部分包含了**旋转、不等比缩放、反射**，$(t\_x, t\_y)$ 是**平移**。
 
 #### 步骤 1：写出原曲线矩阵 $\mathbf{Q}_{old}$
 假设原曲线是：
