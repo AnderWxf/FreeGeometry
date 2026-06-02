@@ -93,7 +93,9 @@ c & d & t_y \\
 ```
 
 其中 
-$$\begin{bmatrix} a & b \\ c & d \end{bmatrix}$$ 
+```math
+\begin{bmatrix} a & b \\ c & d \end{bmatrix}
+``` 
 部分包含了**旋转、不等比缩放、反射**，$(t\_x, t\_y)$ 是**平移**。
 
 #### 步骤 1：写出原曲线矩阵 $\mathbf{Q}_{old}$
@@ -145,7 +147,7 @@ c & d & t_y \\
 
 ### 总结
 1.  **使用齐次坐标**和 $3\times 3$ 矩阵 $\mathbf{Q}$ 来表示二次曲线。
-2.  **变换公式**：$\mathbf{Q}_{new} = \mathbf{T}^{-T} \mathbf{Q}_{old} \mathbf{T}^{-1}$。
+2.  **变换公式**：$\mathbf{Q}\_{new} = \mathbf{T}^{-T} \mathbf{Q}\_{old} \mathbf{T}^{-1}$ 。
 3.  无论变换多么复杂（平移、旋转、不等比缩放、反射），这个公式都能直接给出新的一般方程系数。
 
 
