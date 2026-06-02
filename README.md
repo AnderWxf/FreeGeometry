@@ -176,7 +176,11 @@ c & d & t_y \\
 \boxed{I_{\text{total}} = \sum_{i=1}^{n} \det(\mathbf{M}_i) \cdot I_{\text{local},i}}
 ```
 
-其中， $ \mathbf{M} = \begin{pmatrix} a & b \\ c & d \end{pmatrix} $ ， 行列式 $ \Delta = ad - bc $ 。
+其中， 
+```math
+\mathbf{M} = \begin{pmatrix} a & b \\ c & d \end{pmatrix}  
+```
+行列式 $ \Delta = ad - bc $ 。
 
 **分段计算公式：**
 ```math
