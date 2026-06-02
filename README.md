@@ -48,7 +48,7 @@ npm install -save antd
 
 现在，我们想对这个曲线上的每个点施加一个变换矩阵 $\mathbf{T}$（ $3 \times 3$ 的仿射变换矩阵，包含平移、旋转、缩放、反射）。
 
-设原曲线上的点为 $\mathbf{x}_{old}$ ，变换后的点为 $\mathbf{x}_{new}$ ，则有：
+设原曲线上的点为 $'\mathbf{x}_{old}'$ ，变换后的点为 $'\mathbf{x}_{new}'$ ，则有：
 ```math
 \mathbf{x}_{old} = \mathbf{T}^{-1} \mathbf{x}_{new}
 ```
