@@ -1,6 +1,5 @@
 import type { Vector2 } from "../../../math/Math";
 import type { Curve2Data } from "../base/Curve2Data";
-import { Transform2 } from "../base/Transform2";
 import { DataBase } from "../DataBase";
 /**
  * Brep data on xy space;
@@ -16,9 +15,10 @@ import { DataBase } from "../DataBase";
  */
 class Vertice2 extends DataBase {
   /**
-   * Edges of Vertice.
+   * point of Vertice.
+   *
    */
-  edges: Array<Edge2>;
+  p: Vector2;
 
   /**
    * Constructs a Vertice.
@@ -26,7 +26,6 @@ class Vertice2 extends DataBase {
    */
   constructor() {
     super();
-    this.edges = [];
   }
 }
 
@@ -36,12 +35,12 @@ class Vertice2 extends DataBase {
  */
 class Edge2 extends DataBase {
   /**
-   * v0 of Edge.
+   * v0 of Edge. being.
    *
    */
   v0: Vertice2;
   /**
-   * v1 of Edge.
+   * v1 of Edge. end.
    *
    */
   v1: Vertice2;
@@ -241,6 +240,18 @@ class Face2 extends DataBase {
         result.push(coedge.e);
       });
     });
+    return result;
+  }
+
+  /**
+   * Returns all Loop from the face.
+   *
+   * @return {[Loop2]} .
+   */
+  get loops(): Loop2[] {
+    let result: Loop2[] = [];
+    result.push(this.border);
+    result.push(...this.holes);
     return result;
   }
 

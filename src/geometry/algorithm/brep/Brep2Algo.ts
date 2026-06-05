@@ -1,14 +1,143 @@
 import { Vector2 } from "../../../math/Math";
 import { Line2Data } from "../../data/base/curve2/Line2Data";
 import type { Curve2Data } from "../../data/base/Curve2Data";
-import type { Coedge2, Digraph2, Edge2, Face2, Loop2, Vertice2 } from "../../data/brep/Brep2";
+import { Loop2, Vertice2, type Coedge2, type Digraph2, type Edge2, type Face2 } from "../../data/brep/Brep2";
 import type { Curve2Algo } from "../base/Curve2Algo";
 import { CurveBuilder } from "../builder/CurveBuilder";
 import { Curve2Inter } from "../relation/intersection/Curve2Inter";
 
+class Edge2Algo {
+  private _e: Edge2;
+  private _algo: Curve2Algo;
+  constructor(e: Edge2) {
+    this._e = e;
+    this._algo = CurveBuilder.Algorithm2ByData(e.curve);
+  }
+
+  /**
+   * point on ? (at boder or at inner)
+   *
+   * @param {Vector2} [p] - The eoint.
+   * @param {number} [tol0] - The tolerance of geometric.
+   * @param {number} [tol1] - The tolerance of algebraic.
+   */
+  isPointOn(p: Vector2, tol0: number, tol1: number): boolean {
+    if (!this.isSpacePoint(p, tol0, tol1)) {
+      return false;
+    }
+    if (this.isPointAtBoder(p, tol0, tol1)) {
+      return true;
+    }
+
+    if (this.isPointAtInner(p, tol0, tol1)) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * point in curve space ?
+   *
+   * @param {Vector2} [p] - The eoint.
+   * @param {number} [tol0] - The tolerance of geometric.
+   * @param {number} [tol1] - The tolerance of algebraic.
+   */
+  isSpacePoint(p: Vector2, tol0: number, tol1: number): boolean {
+    let u = this._algo.u(p);
+    let p_ = this._algo.p(u);
+
+    return p.distanceTo(p_) <= tol0;
+  }
+
+  /**
+   * point on ? (at boder or at inner)
+   *
+   * @param {Vector2} [p] - The eoint.
+   * @param {number} [tol0] - The tolerance of geometric.
+   * @param {number} [tol1] - The tolerance of algebraic.
+   */
+  isPointAtInner(p: Vector2, tol0: number, tol1: number): boolean {
+    let u = this._algo.u(p);
+    let umin = Math.min(this._e.u.x, this._e.u.y);
+    let umax = Math.max(this._e.u.x, this._e.u.y);
+    return (u > umin && u < umax);
+  }
+
+  /**
+   * point at boder?
+   *
+   * @param {Vector2} [p] - The eoint.
+   * @param {number} [tol0] - The tolerance of geometric.
+   */
+  isPointAtBoder(p: Vector2, tol0: number, tol1: number): boolean {
+    let begin = this.getBeginPoint();
+    if (p.distanceTo(begin) <= tol0) {
+      return true;
+    }
+
+    let end = this.getEndPoint();
+    if (p.distanceTo(end) <= tol0) {
+      return true;
+    }
+    return false;
+  }
+  getBeginPoint(): Vector2 {
+    return this.p(this.u.y);
+  }
+  getEndPoint(): Vector2 {
+    return this.p(this.u.x);
+  }
+  getBeginTangent(): Vector2 {
+    return this.t(this.u.x);
+  }
+  getEndTangent(): Vector2 {
+    return this.t(this.u.y);
+  }
+  p(u: number): Vector2 {
+    return this._algo.p(u);
+  }
+  t(u: number): Vector2 {
+    return this._e.isPositive() ? this._algo.t(u) : this._algo.t(u).negate();
+  }
+  d(u: number): Vector2 {
+    return this._e.isPositive() ? this._algo.d(u) : this._algo.d(u).negate();
+  }
+  get e(): Edge2 {
+    return this._e;
+  }
+  /**
+   * v0 of Coedge. being.
+   *
+   */
+  get v0(): Vertice2 {
+    return this._e.v0;
+  }
+
+  /**
+   * v1 of Coedge. end.
+   *
+   */
+  get v1(): Vertice2 {
+    return this._e.v1;
+  }
+  get u(): Vector2 {
+    return this._e.u.clone();
+  }
+  /**
+   * Use Green's theorem to calculate the area of the curve between u0 and u1.
+   * @retun {number} 
+   */
+  da(): number {
+    let u = this.u;
+    return this._algo.da(u.x, u.y);
+  }
+}
 class Coedge2Algo {
   private _c: Coedge2;
   private _algo: Curve2Algo;
+  private _ins: Coedge2Algo[];
+  private _outs: Coedge2Algo[];
   constructor(c: Coedge2, face?: Face2) {
     this._c = c;
     let curveData: Curve2Data | undefined;
@@ -18,16 +147,116 @@ class Coedge2Algo {
     }
     this._algo = CurveBuilder.Algorithm2ByData(curveData || c.e.curve);
   }
-  GetBeginPoint(): Vector2 {
-    return this.p(this.u.y);
+  // Get the next coedge in the loop, return null if no next coedge or all next coedges have been visited.
+  GetNext(visited: Coedge2Algo[] = []): Coedge2Algo {
+    let ret: Coedge2Algo = null;
+    let min = Number.MAX_VALUE;
+    let t0 = this.t(this.u.y);
+    this._outs.forEach(out => {
+      if (!visited.includes(out)) {
+        if (!ret) {
+          ret = out;
+        } else {
+          let t1 = out.t(out.u.x);
+          let angle = t0.angleTo(t1);
+          if (angle < min) {
+            min = angle;
+            ret = out;
+          }
+        }
+      }
+    });
+    return ret;
   }
-  GetEndPoint(): Vector2 {
+
+  /**
+   * point on ? (at boder or at inner)
+   *
+   * @param {Vector2} [p] - The eoint.
+   * @param {number} [tol0] - The tolerance of geometric.
+   * @param {number} [tol1] - The tolerance of algebraic.
+   */
+  isPointOn(p: Vector2, tol0: number, tol1: number): boolean {
+    if (!this.isSpacePoint(p, tol0, tol1)) {
+      return false;
+    }
+    if (this.isPointAtBoder(p, tol0, tol1)) {
+      return true;
+    }
+
+    if (this.isPointAtInner(p, tol0, tol1)) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * point in curve space ?
+   *
+   * @param {Vector2} [p] - The eoint.
+   * @param {number} [tol0] - The tolerance of geometric.
+   * @param {number} [tol1] - The tolerance of algebraic.
+   */
+  isSpacePoint(p: Vector2, tol0: number, tol1: number): boolean {
+    let u = this._algo.u(p);
+    let p_ = this._algo.p(u);
+
+    return p.distanceTo(p_) <= tol0;
+  }
+
+  /**
+   * point on ? (at boder or at inner)
+   *
+   * @param {Vector2} [p] - The eoint.
+   * @param {number} [tol0] - The tolerance of geometric.
+   * @param {number} [tol1] - The tolerance of algebraic.
+   */
+  isPointAtInner(p: Vector2, tol0: number, tol1: number): boolean {
+    let u = this._algo.u(p);
+    let umin = Math.min(this._c.e.u.x, this._c.e.u.y);
+    let umax = Math.max(this._c.e.u.x, this._c.e.u.y);
+    return (u > umin && u < umax);
+  }
+
+  /**
+   * point at boder?
+   *
+   * @param {Vector2} [p] - The eoint.
+   * @param {number} [tol0] - The tolerance of geometric.
+   */
+  isPointAtBoder(p: Vector2, tol0: number, tol1: number): boolean {
+    let begin = this.getBeginPoint();
+    if (p.distanceTo(begin) <= tol0) {
+      return true;
+    }
+
+    let end = this.getEndPoint();
+    if (p.distanceTo(end) <= tol0) {
+      return true;
+    }
+    return false;
+  }
+  addIn(coedgeAlgo: Coedge2Algo) {
+    if (!this._ins.includes(coedgeAlgo)) {
+      this._ins.push(coedgeAlgo);
+    }
+  }
+  addOut(coedgeAlgo: Coedge2Algo) {
+    if (!this._outs.includes(coedgeAlgo)) {
+      this._outs.push(coedgeAlgo);
+    }
+  }
+  getBeginPoint(): Vector2 {
     return this.p(this.u.x);
   }
-  GetBeginTangent(): Vector2 {
+  getEndPoint(): Vector2 {
+    return this.p(this.u.y);
+  }
+  getBeginTangent(): Vector2 {
     return this.t(this.u.x);
   }
-  GetEndTangent(): Vector2 {
+  getEndTangent(): Vector2 {
     return this.t(this.u.y);
   }
   p(u: number): Vector2 {
@@ -36,6 +265,16 @@ class Coedge2Algo {
   t(u: number): Vector2 {
     return this._c.isPositive() ? this._algo.t(u) : this._algo.t(u).negate();
   }
+  d(u: number): Vector2 {
+    return this._c.isPositive() ? this._algo.d(u) : this._algo.d(u).negate();
+  }
+  get c(): Coedge2 {
+    return this._c;
+  }
+  /**
+   * v0 of Coedge. being.
+   *
+   */
   get v0(): Vertice2 {
     if (this._c.isForward) {
       return this._c.e.v0;
@@ -43,6 +282,23 @@ class Coedge2Algo {
       return this._c.e.v1;
     }
   }
+
+  /**
+   * v0 of Coedge. being.
+   *
+   */
+  set v0(v: Vertice2) {
+    if (this._c.isForward) {
+      this._c.e.v0 = v;
+    } else {
+      this._c.e.v1 = v;
+    }
+  }
+
+  /**
+   * v1 of Coedge. end.
+   *
+   */
   get v1(): Vertice2 {
     if (this._c.isForward) {
       return this._c.e.v1;
@@ -50,6 +306,19 @@ class Coedge2Algo {
       return this._c.e.v0;
     }
   }
+
+  /**
+   * v1 of Coedge. end.
+   *
+   */
+  set v1(v: Vertice2) {
+    if (this._c.isForward) {
+      this._c.e.v1 = v;
+    } else {
+      this._c.e.v0 = v;
+    }
+  }
+
   get u(): Vector2 {
     if (this._c.isForward) {
       return this._c.e.u.clone();
@@ -65,8 +334,16 @@ class Coedge2Algo {
     let u = this.u;
     return this._algo.da(u.x, u.y);
   }
-}
 
+
+  isPositive() {
+    return this._c.isPositive();
+  }
+
+  reverse() {
+    this._c.isForward = !this._c.isForward;
+  }
+}
 class Loop2Algo {
   private _l: Loop2;
   private _algos: Coedge2Algo[];
@@ -100,193 +377,80 @@ class Loop2Algo {
   isPositive() {
     return this.area() > 0;
   }
-}
 
-class Face2Algo {
-  private _f: Face2;
-  private _balgo: Loop2Algo;
-  private _hlgos: Loop2Algo[];
-  constructor(f: Face2) {
-    this._f = f;
-    this._balgo = new Loop2Algo(f.border, f);
-    this._hlgos = [];
-    for (let i = 0; i < f.holes.length; i++) {
-      this._hlgos.push(new Loop2Algo(f.holes[i], f));
-    }
+  reverse() {
+    this._l.coedges = this._l.coedges.reverse();
+    this._algos = this._algos.reverse();
+    this._algos.forEach((algo) => {
+      algo.reverse();
+    });
   }
 
   /**
-   * Use Green's theorem to calculate the directed area of the curve loop.
-   * Area = ∑​ |loop[i].area()| - ∑​ |hole[i].area()|;
-   * @retun {number} 
+   * get a random point on the border of the loop.
    */
-  area(): number {
-    let area = Math.abs(this._balgo.area());
-    let algos = this._hlgos;
-    let count = algos.length;
-    for (let i = 0; i < count; i++) {
-      area -= Math.abs(algos[i].area());
-    }
-    return area;
-  }
-}
-
-class Brep2Algo {
-  /**
-   * compute edge to edge intersection point.
-   *
-   * @param {Edge2} [c0] - The frist curve , binary search curve.
-   * @param {Edge2} [c1] - The second curve , general equation curve.
-   * @param {number} [tol0] - The tolerance of geometric.
-   * @param {number} [tol1] - The tolerance of algebraic.
-   */
-  static GetEdgeBeginEndPoint(e: Edge2): Vector2[] {
-    let algo = CurveBuilder.Algorithm2ByData(e.curve);
-    return [algo.p(e.u.x), algo.p(e.u.y)];
-  }
-  /**
-   * compute edge to edge intersection point.
-   *
-   * @param {Edge2} [c0] - The frist curve , binary search curve.
-   * @param {Edge2} [c1] - The second curve , general equation curve.
-   * @param {number} [tol0] - The tolerance of geometric.
-   * @param {number} [tol1] - The tolerance of algebraic.
-   */
-  static GetCoedgeBeginEndPoint(c: Coedge2): Vector2[] {
-    let algo = CurveBuilder.Algorithm2ByData(c.e.curve);
-    if (c.isForward) {
-      return [algo.p(c.e.u.x), algo.p(c.e.u.y)];
-    } else {
-      return [algo.p(c.e.u.y), algo.p(c.e.u.x)];
-    }
+  getRandomBorderPoint(): Vector2 {
+    let random = Math.floor(Math.random() * this._algos.length);
+    let u = this._algos[random].u;
+    let t = u.x + (u.y - u.x) * Math.random();
+    return this._algos[random].p(t);
   }
 
   /**
-   * point at edge boder?
+   * get a random point inside the loop.
+   */
+  getRandomInsidePoint(): Vector2 {
+    let index = Math.floor(Math.random() * this._algos.length);
+    let algo = this._algos[index];
+    let u = algo.u.x + (algo.u.y - algo.u.x) * Math.random();
+    let d = algo.p(u).normalize().multiplyScalar(0.01);
+    let p = algo.p(u).add(d);
+    return p;
+  }
+
+  /**
+   * point on coedge ? (at boder)
    *
-   * @param {Edge2} [e] - The edge.
    * @param {Vector2} [p] - The eoint.
    * @param {number} [tol0] - The tolerance of geometric.
    * @param {number} [tol1] - The tolerance of algebraic.
    */
-  static IsPointAtEdgeBoder(e: Edge2, p: Vector2, tol0: number, tol1: number): boolean {
-    let algo = CurveBuilder.Algorithm2ByData(e.curve);
-    let begin = algo.p(e.u.x);
-    if (p.distanceTo(begin) <= tol0) {
-      return true;
-    }
-
-    let end = algo.p(e.u.y);
-    if (p.distanceTo(end) <= tol0) {
-      return true;
-    }
-    return false;
-  }
-
-  /**
-   * point at edge inder?
-   *
-   * @param {Edge2} [e] - The edge.
-   * @param {Vector2} [p] - The eoint.
-   * @param {number} [tol0] - The tolerance of geometric.
-   * @param {number} [tol1] - The tolerance of algebraic.
-   */
-  static IsPointAtEdgeInder(e: Edge2, p: Vector2, tol0: number, tol1: number): boolean {
-    if (Brep2Algo.IsPointAtEdgeBoder(e, p, tol0, tol1)) {
-      return false;
-    }
-    let algo = CurveBuilder.Algorithm2ByData(e.curve);
-    let u = algo.u(p);
-    if (u) {
-      return u > e.u.x && u < e.u.y;
-    } else {
-      return false;
-    }
-  }
-
-  /**
-   * point on edge? (at boder or at inner)
-   *
-   * @param {Edge2} [e] - The edge.
-   * @param {Vector2} [p] - The eoint.
-   * @param {number} [tol0] - The tolerance of geometric.
-   * @param {number} [tol1] - The tolerance of algebraic.
-   */
-  static IsPointOnEdge(e: Edge2, p: Vector2, tol0: number, tol1: number): boolean {
-    if (Brep2Algo.IsPointAtEdgeBoder(e, p, tol0, tol1)) {
-      return false;
-    }
-    let algo = CurveBuilder.Algorithm2ByData(e.curve);
-
-    let begin = algo.p(e.u.x);
-    if (p.distanceTo(begin) <= tol0) {
-      return true;
-    }
-
-    let end = algo.p(e.u.y);
-    if (p.distanceTo(end) <= tol0) {
-      return true;
-    }
-
-    let u = algo.u(p);
-    return (u >= e.u.x && u <= e.u.y)
-      || Math.abs(u - e.u.x) <= tol1
-      || Math.abs(u - e.u.y) <= tol1;
-  }
-
-
-  /**
-   * point at face boder?
-   *
-   * @param {Face2} [f] - The face.
-   * @param {Vector2} [p] - The eoint.
-   * @param {number} [tol0] - The tolerance of geometric.
-   * @param {number} [tol1] - The tolerance of algebraic.
-   */
-  static IsPointAtFaceBoder(f: Face2, p: Vector2, tol0: number, tol1: number): boolean {
-    let edges = f.edges;
-    edges.forEach((e) => {
-      if (Brep2Algo.IsPointOnEdge(e, p, tol0, tol1)) {
+  isPointOnBoder(p: Vector2, tol0: number, tol1: number): boolean {
+    this._algos.forEach((algo) => {
+      if (algo.isPointOn(p, tol0, tol1)) {
         return true;
       }
-    });
+    })
     return false;
   }
-
   /**
    * point at loop inner?
    *
-   * @param {Loop2} [l] - The loop.
    * @param {Vector2} [p] - The eoint.
    * @param {number} [tol0] - The tolerance of geometric.
    * @param {number} [tol1] - The tolerance of algebraic.
    */
-  static IsPointAtLoopInner(l: Loop2, p: Vector2, tol0: number, tol1: number): boolean {
+  isPointAtInner(p: Vector2, tol0: number, tol1: number): boolean {
     // 获得一条水平射线
     let ray = new Line2Data(); ray.trans.pos = p;
     let rayAlgo = CurveBuilder.Algorithm2ByData(ray);
     // 计算射线与所有边的交点->判断交点是否穿透点->穿有点是奇数在轮廓内部，反之在轮廓外部。
-    let boder = l.coedges;
-    let algos: Coedge2Algo[] = [];
-    let count = boder.length;
-    for (let i = 0; i < count; i++) {
-      let curr = boder[i];
-      algos.push(new Coedge2Algo(curr));
-    }
+    let algos = this._algos;
     // 穿透点数组
     let cross: Vector2[] = [];
-    for (let i = 0; i < count; i++) {
-      let curr = boder[i];
-      let curve = curr.e.curve;
+    let count = algos.length;
+    for (let i = 0; i < algos.length; i++) {
+      let currAlgo = algos[i];
+      let curve = currAlgo.c.e.curve;
       let inters = Curve2Inter.X(ray, curve, tol0, tol1);
       let precAlgo = algos[(i - 1) % count];
-      let currAlgo = algos[i];
       let nextAlgo = algos[(i + 1) % count];
       for (let j = 0; j < inters.length; j++) {
         let inter = inters[j];
         // 是否为穿透点判定：
         // A 如果交点在曲线内部，取曲线在交点上的切线，若射线与切线重合，则是切点，不认为是穿透点。
-        if (inter.u1 > curr.e.u.x && inter.u1 < curr.e.u.y) {
+        let u = currAlgo.u;
+        if (inter.u1 > u.x && inter.u1 < u.y) {
           let d = currAlgo.t(inter.u1);//切线方向
           // 如果是水平切线，就是切点
           if (Math.abs(d.y) <= tol1) {
@@ -304,18 +468,16 @@ class Brep2Algo {
         let frontTangent: Vector2 = null;
         let backTangent: Vector2 = null;
         // 交点是当前段的起点
-        if (curr.isForward && Math.abs(inter.u1 - curr.e.u.x) <= tol1
-          || !curr.isForward && Math.abs(inter.u1 - curr.e.u.y) <= tol1) {
+        if (Math.abs(inter.u1 - u.x) <= tol1) {
           // 取前一段的终点切线和当前段起点切线
-          frontTangent = precAlgo.GetBeginTangent();
-          backTangent = currAlgo.GetBeginTangent();
+          frontTangent = precAlgo.getBeginTangent();
+          backTangent = currAlgo.getBeginTangent();
         }
         // 交点是当前段的终点
-        if (curr.isForward && Math.abs(inter.u1 - curr.e.u.y) <= tol1
-          || !curr.isForward && Math.abs(inter.u1 - curr.e.u.x) <= tol1) {
+        if (Math.abs(inter.u1 - u.y) <= tol1) {
           // 取前一段的终点切线和当前段起点切线
-          frontTangent = currAlgo.GetBeginTangent();
-          backTangent = nextAlgo.GetBeginTangent();
+          frontTangent = currAlgo.getBeginTangent();
+          backTangent = nextAlgo.getBeginTangent();
         }
 
         if (frontTangent && backTangent) {
@@ -346,30 +508,114 @@ class Brep2Algo {
     return cross.length % 2 == 1;
   }
 
+  get algos(): Coedge2Algo[] {
+    return this._algos;
+  }
+
+  get loop(): Loop2 {
+    return this._l;
+  }
+}
+
+class Face2Algo {
+  private _f: Face2;
+  private _balgo: Loop2Algo;
+  private _halgos: Loop2Algo[];
+  constructor(f: Face2) {
+    this._f = f;
+    this._balgo = new Loop2Algo(f.border, f);
+    this._halgos = [];
+    for (let i = 0; i < f.holes.length; i++) {
+      this._halgos.push(new Loop2Algo(f.holes[i], f));
+    }
+  }
+
   /**
-   * point at face inner?
+   * Use Green's theorem to calculate the directed area of the curve loop.
+   * Area = ∑​ |loop[i].area()| - ∑​ |hole[i].area()|;
+   * @retun {number} 
+   */
+  area(): number {
+    let area = this._balgo.area();
+    let algos = this._halgos;
+    let count = algos.length;
+    for (let i = 0; i < count; i++) {
+      area += algos[i].area();
+    }
+    return area;
+  }
+
+  /**
+   * get a point inner the face.
+   * @retun {Vector2} 
+   */
+  getInnerPoint(): Vector2 {
+    while (true) {
+      let randomInsidePoint = this._balgo.getRandomInsidePoint();
+      if (this._halgos.length > 0) {
+        let isPointInsideHole = false;
+        for (let i = 0.; i < this._halgos.length; i++) {
+          let halgo = this._halgos[i];
+          if (!halgo.isPointOnBoder(randomInsidePoint, 1e-4, 1e-10)
+            && halgo.isPointAtInner(randomInsidePoint, 1e-4, 1e-10)) {
+            isPointInsideHole = true;
+            break;
+          }
+        }
+        if (!isPointInsideHole) {
+          return randomInsidePoint;
+        }
+      }
+    }
+  }
+
+  /** 
+   * get a point on the border of the face.
+   * @retun {Vector2} 
+   */
+  getRandomBorderPoint(): Vector2 {
+    return this._balgo.getRandomBorderPoint();
+  }
+
+  /**
+   * point at face boder?
    *
-   * @param {Face2} [e] - The face.
+   * @param {Face2} [f] - The face.
    * @param {Vector2} [p] - The eoint.
    * @param {number} [tol0] - The tolerance of geometric.
    * @param {number} [tol1] - The tolerance of algebraic.
    */
-  static IsPointAtFaceInner(f: Face2, p: Vector2, tol0: number, tol1: number): boolean {
-    // 不能在face轮廓线上，在face的外轮看内部，并且在空腔的外部。
-    if (Brep2Algo.IsPointAtFaceBoder(f, p, tol0, tol1)) {
-      return false;
+  isPointAtBoder(p: Vector2, tol0: number, tol1: number): boolean {
+    if (this._balgo.isPointOnBoder(p, tol0, tol1)) {
+      return true;
     }
-    if (!Brep2Algo.IsPointAtLoopInner(f.border, p, tol0, tol1)) {
-      return false;
-    }
-    let holes = f.holes;
-    let count = holes.length;
-    for (let i = 0; i < count; i++) {
-      if (Brep2Algo.IsPointAtLoopInner(holes[i], p, tol0, tol1)) {
-        return false;
+    this._halgos.forEach((halgo) => {
+      if (halgo.isPointOnBoder(p, tol0, tol1)) {
+        return true;
       }
+    });
+    return false;
+  }
+
+  /**
+   * point at face inner?(inner boder and not inner holes)
+   *
+   * @param {Vector2} [p] - The eoint.
+   * @param {number} [tol0] - The tolerance of geometric.
+   * @param {number} [tol1] - The tolerance of algebraic.
+   */
+  isPointAtInner(p: Vector2, tol0: number, tol1: number): boolean {
+    if (this._balgo.isPointAtInner(p, tol0, tol1)) {
+      let count = this._halgos.length;
+      for (let i = 0; i < count; i++) {
+        if (!this._halgos[i].isPointAtInner(p, tol0, tol1)) {
+          return false;
+        }
+      }
+      return true;
     }
-    return true;
+
+    return false;
   }
 
   /**
@@ -380,23 +626,32 @@ class Brep2Algo {
    * @param {number} [tol0] - The tolerance of geometric.
    * @param {number} [tol1] - The tolerance of algebraic.
    */
-  static IsPointOnFace(f: Face2, p: Vector2, tol0: number, tol1: number): boolean {
+  isPointOn(p: Vector2, tol0: number, tol1: number): boolean {
     // 在face轮廓线上 或者 在face的外轮看内部，并且在空腔的外部。
-    if (Brep2Algo.IsPointAtFaceBoder(f, p, tol0, tol1)) {
+    if (this.isPointAtBoder(p, tol0, tol1)) {
       return true;
     }
-    if (!Brep2Algo.IsPointAtLoopInner(f.border, p, tol0, tol1)) {
-      return false;
+
+    if (this.isPointAtInner(p, tol0, tol1)) {
+      return true;
     }
-    let holes = f.holes;
-    let count = holes.length;
-    for (let i = 0; i < count; i++) {
-      if (Brep2Algo.IsPointAtLoopInner(holes[i], p, tol0, tol1)) {
-        return false;
-      }
-    }
-    return true;
+    return false;
   }
+
+  /**
+   * Returns all Loop algo from the face.
+   *
+   * @return {[Loop2Algo]} .
+   */
+  get loops(): Loop2Algo[] {
+    let result: Loop2Algo[] = [];
+    result.push(this._balgo);
+    result.push(...this._halgos);
+    return result;
+  }
+}
+
+class Brep2Algo {
 
 }
 
@@ -406,9 +661,90 @@ class Digraph2Algo {
   constructor(g: Digraph2) {
     this._g = g;
     this._algos = [];
+    let algos = this._algos;
     for (let i = 0; i < g.coedges.length; i++) {
-      this._algos.push(new Coedge2Algo(g.coedges[i]));
+      algos.push(new Coedge2Algo(g.coedges[i]));
     }
+    this.reflush();
+  }
+  // reflush ins and outs of Coedge2Algo;
+  reflush() {
+    let g = this._g;
+    let algos = this._algos;
+    for (let i = 0; i < g.vertice2s.length; i++) {
+      let curr = algos[i];
+      algos.forEach(algo => {
+        if (algo.v0 == curr.v1) {
+          curr.addIn(algo);
+        }
+        if (algo.v1 == curr.v0) {
+          curr.addOut(algo);
+        }
+      });
+    }
+  }
+
+  getAllLoops(): Loop2Algo[] {
+    let loops: Loop2Algo[] = [];
+    let algos = this._algos;
+    let visited: Coedge2Algo[] = [];
+
+    for (let i = 0; i < algos.length; i++) {
+      let curr = algos[i];
+      if (visited.includes(curr)) {
+        continue;
+      }
+      let loop = new Loop2();
+      let loopAlgo = new Loop2Algo(loop);
+      loop.coedges.push(curr.c);
+      loopAlgo.algos.push(curr);
+      visited.push(curr);
+      let next = curr.GetNext(visited);
+      while (next) {
+        curr = next;
+        loop.coedges.push(curr.c);
+        loopAlgo.algos.push(curr);
+        visited.push(curr);
+        next = curr.GetNext(visited);
+      }
+      loops.push(loopAlgo);
+    }
+    return loops;
+  }
+
+  findVerticeByPoint(p: Vector2, tol0: number): Vertice2 {
+    this._g.vertice2s.forEach((v) => {
+      if (v.p.distanceTo(p) <= tol0) {
+        return v;
+      }
+    });
+    return null;
+  }
+
+  addLoops(loops: Loop2Algo[], tol0: number) {
+    loops.forEach((l: Loop2Algo) => {
+      l.algos.forEach((coedge: Coedge2Algo) => {
+        this._algos.push(coedge);
+        let v0p = coedge.getBeginPoint();
+        let v0 = this.findVerticeByPoint(v0p, tol0);
+        if (!v0) {
+          v0 = new Vertice2();
+          v0.p = v0p;
+          this._g.vertice2s.push(v0);
+        }
+        coedge.v0 = v0;
+
+        let v1p = coedge.getEndPoint();
+        let v1 = this.findVerticeByPoint(v0p, tol0);
+        if (!v1) {
+          v1 = new Vertice2();
+          v1.p = v1p;
+          this._g.vertice2s.push(v1);
+        }
+        coedge.v1 = v1;
+      });
+    });
+    this.reflush();
   }
 }
 export {
@@ -416,5 +752,6 @@ export {
   Digraph2Algo,
   Loop2Algo,
   Coedge2Algo,
+  Edge2Algo,
   Face2Algo
 }
