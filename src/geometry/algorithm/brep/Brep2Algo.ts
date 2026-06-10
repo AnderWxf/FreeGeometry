@@ -134,18 +134,22 @@ class Edge2Algo {
   }
 }
 class Coedge2Algo {
+  private _f: Face2;
   private _c: Coedge2;
-  private _algo: Curve2Algo;
+  private _curve: Curve2Algo;
   private _ins: Coedge2Algo[];
   private _outs: Coedge2Algo[];
   constructor(c: Coedge2, face?: Face2) {
     this._c = c;
+    this._f = face;
     let curveData: Curve2Data | undefined;
     if (face && c.e.curveIndex != -1) {
       // Use the curve data from the face if available
       curveData = face.curves[c.e.curveIndex];
     }
-    this._algo = CurveBuilder.Algorithm2ByData(curveData || c.e.curve);
+    this._curve = CurveBuilder.Algorithm2ByData(curveData || c.e.curve);
+    this._ins = [];
+    this._outs = [];
   }
   // Get the next coedge in the loop, return null if no next coedge or all next coedges have been visited.
   GetNext(visited: Coedge2Algo[] = []): Coedge2Algo {
@@ -199,8 +203,8 @@ class Coedge2Algo {
    * @param {number} [tol1] - The tolerance of algebraic.
    */
   isSpacePoint(p: Vector2, tol0: number, tol1: number): boolean {
-    let u = this._algo.u(p);
-    let p_ = this._algo.p(u);
+    let u = this._curve.u(p);
+    let p_ = this._curve.p(u);
 
     return p.distanceTo(p_) <= tol0;
   }
@@ -213,10 +217,8 @@ class Coedge2Algo {
    * @param {number} [tol1] - The tolerance of algebraic.
    */
   isPointAtInner(p: Vector2, tol0: number, tol1: number): boolean {
-    let u = this._algo.u(p);
-    let umin = Math.min(this._c.e.u.x, this._c.e.u.y);
-    let umax = Math.max(this._c.e.u.x, this._c.e.u.y);
-    return (u > umin && u < umax);
+    let u = this._curve.u(p);
+    return this.isInURange(u);
   }
 
   /**
@@ -237,6 +239,7 @@ class Coedge2Algo {
     }
     return false;
   }
+
   addIn(coedgeAlgo: Coedge2Algo) {
     if (!this._ins.includes(coedgeAlgo)) {
       this._ins.push(coedgeAlgo);
@@ -260,17 +263,37 @@ class Coedge2Algo {
     return this.t(this.u.y);
   }
   p(u: number): Vector2 {
-    return this._algo.p(u);
+    return this._curve.p(u);
   }
   t(u: number): Vector2 {
-    return this._c.isPositive() ? this._algo.t(u) : this._algo.t(u).negate();
+    return this._c.isPositive() ? this._curve.t(u) : this._curve.t(u).negate();
   }
   d(u: number): Vector2 {
-    return this._c.isPositive() ? this._algo.d(u) : this._algo.d(u).negate();
+    return this._c.isPositive() ? this._curve.d(u) : this._curve.d(u).negate();
   }
+
+  // u ∈ (a,b)
+  isInURange(u: number): boolean {
+    let ur = this._c.e.ur;
+    return u > ur.x && u < ur.y;
+  }
+  // u ∈ [a,b]
+  isOnURange(u: number): boolean {
+    let ur = this._c.e.ur;
+    return u >= ur.x && u <= ur.y;
+  }
+  get ur(): Vector2 {
+    return this._c.e.ur;
+  }
+
   get c(): Coedge2 {
     return this._c;
   }
+
+  get f(): Face2 {
+    return this._f;
+  }
+
   /**
    * v0 of Coedge. being.
    *
@@ -326,13 +349,18 @@ class Coedge2Algo {
       return new Vector2(this._c.e.u.y, this._c.e.u.x);
     }
   }
+
+  get curve(): Curve2Algo {
+    return this._curve;
+  }
+
   /**
    * Use Green's theorem to calculate the area of the curve between u0 and u1.
    * @retun {number} 
    */
   da(): number {
     let u = this.u;
-    return this._algo.da(u.x, u.y);
+    return this._curve.da(u.x, u.y);
   }
 
 
@@ -346,12 +374,12 @@ class Coedge2Algo {
 }
 class Loop2Algo {
   private _l: Loop2;
-  private _algos: Coedge2Algo[];
+  private _coedges: Coedge2Algo[];
   constructor(l: Loop2, face?: Face2) {
     this._l = l;
-    this._algos = [];
+    this._coedges = [];
     for (let i = 0; i < l.coedges.length; i++) {
-      this._algos.push(new Coedge2Algo(l.coedges[i], face));
+      this._coedges.push(new Coedge2Algo(l.coedges[i], face));
     }
   }
 
@@ -363,7 +391,7 @@ class Loop2Algo {
    */
   area(): number {
     let area = 0;
-    let algos = this._algos;
+    let algos = this._coedges;
     let count = algos.length;
     for (let i = 0; i < count; i++) {
       area += algos[i].da();
@@ -380,8 +408,8 @@ class Loop2Algo {
 
   reverse() {
     this._l.coedges = this._l.coedges.reverse();
-    this._algos = this._algos.reverse();
-    this._algos.forEach((algo) => {
+    this._coedges = this._coedges.reverse();
+    this._coedges.forEach((algo) => {
       algo.reverse();
     });
   }
@@ -390,18 +418,18 @@ class Loop2Algo {
    * get a random point on the border of the loop.
    */
   getRandomBorderPoint(): Vector2 {
-    let random = Math.floor(Math.random() * this._algos.length);
-    let u = this._algos[random].u;
+    let random = Math.floor(Math.random() * this._coedges.length);
+    let u = this._coedges[random].u;
     let t = u.x + (u.y - u.x) * Math.random();
-    return this._algos[random].p(t);
+    return this._coedges[random].p(t);
   }
 
   /**
    * get a random point inside the loop.
    */
   getRandomInsidePoint(): Vector2 {
-    let index = Math.floor(Math.random() * this._algos.length);
-    let algo = this._algos[index];
+    let index = Math.floor(Math.random() * this._coedges.length);
+    let algo = this._coedges[index];
     let u = algo.u.x + (algo.u.y - algo.u.x) * Math.random();
     let d = algo.p(u).normalize().multiplyScalar(0.01);
     let p = algo.p(u).add(d);
@@ -416,11 +444,11 @@ class Loop2Algo {
    * @param {number} [tol1] - The tolerance of algebraic.
    */
   isPointOnBoder(p: Vector2, tol0: number, tol1: number): boolean {
-    this._algos.forEach((algo) => {
-      if (algo.isPointOn(p, tol0, tol1)) {
+    for (let i = 0; i < this._coedges.length; i++) {
+      if (this._coedges[i].isPointOn(p, tol0, tol1)) {
         return true;
       }
-    })
+    }
     return false;
   }
   /**
@@ -435,22 +463,26 @@ class Loop2Algo {
     let ray = new Line2Data(); ray.trans.pos = p;
     let rayAlgo = CurveBuilder.Algorithm2ByData(ray);
     // 计算射线与所有边的交点->判断交点是否穿透点->穿有点是奇数在轮廓内部，反之在轮廓外部。
-    let algos = this._algos;
+    let algos = this._coedges;
     // 穿透点数组
     let cross: Vector2[] = [];
     let count = algos.length;
     for (let i = 0; i < algos.length; i++) {
       let currAlgo = algos[i];
-      let curve = currAlgo.c.e.curve;
+      let curve = currAlgo.curve.dat;
       let inters = Curve2Inter.X(ray, curve, tol0, tol1);
       let precAlgo = algos[(i - 1) % count];
       let nextAlgo = algos[(i + 1) % count];
       for (let j = 0; j < inters.length; j++) {
         let inter = inters[j];
+        // 射线反向的直接跳过
+        if (inter.u0 < 0) {
+          continue;
+        }
         // 是否为穿透点判定：
         // A 如果交点在曲线内部，取曲线在交点上的切线，若射线与切线重合，则是切点，不认为是穿透点。
         let u = currAlgo.u;
-        if (inter.u1 > u.x && inter.u1 < u.y) {
+        if (currAlgo.isInURange(inter.u1)) {
           let d = currAlgo.t(inter.u1);//切线方向
           // 如果是水平切线，就是切点
           if (Math.abs(d.y) <= tol1) {
@@ -505,11 +537,12 @@ class Loop2Algo {
       }
     }
     // 根据剩余交点个数的奇数/偶数，判断点的位置。
-    return cross.length % 2 == 1;
+    let ret = cross.length % 2 == 1;
+    return ret;
   }
 
-  get algos(): Coedge2Algo[] {
-    return this._algos;
+  get coedges(): Coedge2Algo[] {
+    return this._coedges;
   }
 
   get loop(): Loop2 {
@@ -589,11 +622,11 @@ class Face2Algo {
     if (this._balgo.isPointOnBoder(p, tol0, tol1)) {
       return true;
     }
-    this._halgos.forEach((halgo) => {
-      if (halgo.isPointOnBoder(p, tol0, tol1)) {
+    for (let i = 0; i < this._halgos.length; i++) {
+      if (this._halgos[i].isPointOnBoder(p, tol0, tol1)) {
         return true;
       }
-    });
+    }
     return false;
   }
 
@@ -662,7 +695,7 @@ class Digraph2Algo {
     this._g = g;
     this._algos = [];
     let algos = this._algos;
-    for (let i = 0; i < g.coedges.length; i++) {
+    for (let i = 0; g.coedges && i < g.coedges.length; i++) {
       algos.push(new Coedge2Algo(g.coedges[i]));
     }
     this.reflush();
@@ -671,7 +704,7 @@ class Digraph2Algo {
   reflush() {
     let g = this._g;
     let algos = this._algos;
-    for (let i = 0; i < g.vertice2s.length; i++) {
+    for (let i = 0; g.vertice2s && i < g.vertice2s.length; i++) {
       let curr = algos[i];
       algos.forEach(algo => {
         if (algo.v0 == curr.v1) {
@@ -697,13 +730,13 @@ class Digraph2Algo {
       let loop = new Loop2();
       let loopAlgo = new Loop2Algo(loop);
       loop.coedges.push(curr.c);
-      loopAlgo.algos.push(curr);
+      loopAlgo.coedges.push(curr);
       visited.push(curr);
       let next = curr.GetNext(visited);
       while (next) {
         curr = next;
         loop.coedges.push(curr.c);
-        loopAlgo.algos.push(curr);
+        loopAlgo.coedges.push(curr);
         visited.push(curr);
         next = curr.GetNext(visited);
       }
@@ -713,17 +746,17 @@ class Digraph2Algo {
   }
 
   findVerticeByPoint(p: Vector2, tol0: number): Vertice2 {
-    this._g.vertice2s.forEach((v) => {
-      if (v.p.distanceTo(p) <= tol0) {
-        return v;
+    for (let i = 0; i < this._g.vertice2s.length; i++) {
+      if (this._g.vertice2s[i].p.distanceTo(p) <= tol0) {
+        return this._g.vertice2s[i];
       }
-    });
+    }
     return null;
   }
 
   addLoops(loops: Loop2Algo[], tol0: number) {
     loops.forEach((l: Loop2Algo) => {
-      l.algos.forEach((coedge: Coedge2Algo) => {
+      l.coedges.forEach((coedge: Coedge2Algo) => {
         this._algos.push(coedge);
         let v0p = coedge.getBeginPoint();
         let v0 = this.findVerticeByPoint(v0p, tol0);
@@ -735,7 +768,7 @@ class Digraph2Algo {
         coedge.v0 = v0;
 
         let v1p = coedge.getEndPoint();
-        let v1 = this.findVerticeByPoint(v0p, tol0);
+        let v1 = this.findVerticeByPoint(v1p, tol0);
         if (!v1) {
           v1 = new Vertice2();
           v1.p = v1p;

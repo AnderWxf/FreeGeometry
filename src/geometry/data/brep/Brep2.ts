@@ -1,4 +1,4 @@
-import type { Vector2 } from "../../../math/Math";
+import { Vector2 } from "../../../math/Math";
 import type { Curve2Data } from "../base/Curve2Data";
 import { DataBase } from "../DataBase";
 /**
@@ -94,6 +94,40 @@ class Edge2 extends DataBase {
     result.v1 = this.v1;
     result.curveIndex = this.curveIndex;
     return result;
+  }
+
+  get umin(): number {
+    return Math.min(this.u.x, this.u.y);
+  }
+
+  get umax(): number {
+    return Math.max(this.u.x, this.u.y);
+  }
+
+  set umin(u: number) {
+    if (this.isPositive()) {
+      this.u.x = u;
+    } else {
+      this.u.y = u;
+    }
+  }
+
+  set umax(u: number) {
+    if (this.isPositive()) {
+      this.u.y = u;
+    } else {
+      this.u.x = u;
+    }
+  }
+
+  /**
+   * u parameter range of curve of Edge.
+   * [a,b]. 
+   */
+  get ur(): Vector2 {
+    let min = Math.min(this.u.x, this.u.y);
+    let max = Math.max(this.u.x, this.u.y);
+    return new Vector2(min, max);
   }
 }
 
@@ -255,6 +289,34 @@ class Face2 extends DataBase {
     return result;
   }
 
+  /**
+   * Returns all edges on curve from the face.
+   *
+   * @return {[Edge2]} .
+   */
+  getEdgesByCurve(curve: Curve2Data): Edge2[] {
+    let result: Edge2[] = [];
+    this.border.coedges.forEach(coedge => {
+      if (coedge.e.curve && coedge.e.curve == curve) {
+        result.push(coedge.e);
+      }
+      else if (coedge.e.curveIndex > -1 && this.curves[coedge.e.curveIndex] == curve) {
+        result.push(coedge.e);
+      }
+    });
+    this.holes.forEach(hole => {
+      hole.coedges.forEach(coedge => {
+        if (coedge.e.curve && coedge.e.curve == curve) {
+          result.push(coedge.e);
+        }
+        else if (coedge.e.curveIndex > -1 && this.curves[coedge.e.curveIndex] == curve) {
+          result.push(coedge.e);
+        }
+      });
+    });
+    return result;
+  }
+
 }
 
 /**
@@ -269,6 +331,14 @@ class Digraph2 {
    * Coedges of Loop.
    */
   coedges: Array<Coedge2>;
+  /**
+   * Constructs a Digraph2.
+   *
+   */
+  constructor() {
+    this.vertice2s = [];
+    this.coedges = [];
+  }
 }
 
 export {

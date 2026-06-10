@@ -22,9 +22,9 @@ import verb from 'verb-nurbs';
  *
  */
 export type InterOfCurve2 = {
-    p: Vector2; // Position of intersection point.
-    u0: number; // The u parameter of intersection point on curve0.
-    u1: number; // The u parameter of intersection point on curve1.
+  p: Vector2; // Position of intersection point.
+  u0: number; // The u parameter of intersection point on curve0.
+  u1: number; // The u parameter of intersection point on curve1.
 }
 
 /**
@@ -32,951 +32,957 @@ export type InterOfCurve2 = {
  *
  */
 type ValueOfBinary = {
-    p: Vector2; // Position of curve0.
-    u: number;  // The u of curve0.
-    g: number;  // The g value of p on curve1.
+  p: Vector2; // Position of curve0.
+  u: number;  // The u of curve0.
+  g: number;  // The g value of p on curve1.
 }
 class Curve2Inter {
 
-    /**
-     * compute line to line intersection point.
-     *
-     * @param {Line2Data} [c0] - The frist curve.
-     * @param {Line2Data} [c1] - The second curve.
-     * @param {number} [tol0] - The tolerance of geometric.
-     * @param {number} [tol1] - The tolerance of algebraic.
-     * @param {number} [n] - The max number of intersection points.
-     */
-    static LineXLine(c0: Line2Data, c1: Line2Data, tol0: number, tol1: number, n: number = 1): Array<InterOfCurve2> {
-        let ret = new Array<InterOfCurve2>();
-        if (Math.abs(c0.trans.rot - c1.trans.rot) % Math.PI === 0) {
-            return ret;
+  /**
+   * compute line to line intersection point.
+   *
+   * @param {Line2Data} [c0] - The frist curve.
+   * @param {Line2Data} [c1] - The second curve.
+   * @param {number} [tol0] - The tolerance of geometric.
+   * @param {number} [tol1] - The tolerance of algebraic.
+   * @param {number} [n] - The max number of intersection points.
+   */
+  static LineXLine(c0: Line2Data, c1: Line2Data, tol0: number, tol1: number, n: number = 1): Array<InterOfCurve2> {
+    let ret = new Array<InterOfCurve2>();
+    if (Math.abs(c0.trans.rot - c1.trans.rot) % Math.PI === 0) {
+      return ret;
+    }
+
+    let c0a = new Line2Algo(c0);
+    let c1a = new Line2Algo(c1);
+    // 获取一般方程参数
+    let { A: A0, B: B0, C: C0 } = c0a.ge();
+    let { A: A1, B: B1, C: C1 } = c1a.ge();
+    let c0_ = MATHJS.unaryMinus(C0);
+    let c1_ = MATHJS.unaryMinus(C1);
+
+    // 克莱姆法则求解方程组
+    // A0x + B0y + C0 = 0
+    // A1x + B2y + C1 = 0
+    let det = MATHJS.det([[A0, B0], [A1, B1]]);
+    let detx = MATHJS.det([[c0_, B0], [c1_, B1]]);
+    let dety = MATHJS.det([[A0, c0_], [A1, c1_]]);
+
+    let x = MATHJS.divide(detx, det);
+    let y = MATHJS.divide(dety, det);
+
+    if (typeof x === 'object') {
+      x = (x as MATHJS.BigNumber).toNumber();
+    }
+    if (typeof y === 'object') {
+      y = (y as MATHJS.BigNumber).toNumber();
+    }
+    let p = new Vector2(x, y);
+
+    let u0 = c0a.u(p);
+    let u1 = c1a.u(p);
+    ret.push({ p, u0, u1 });
+    return ret;
+  }
+
+  /**
+   * compute line to arc intersection point.
+   *
+   * @param {Line2Data} [c0] - The frist curve.
+   * @param {Arc2Data} [c1] - The second curve.
+   * @param {number} [tol0] - The tolerance of geometric.
+   * @param {number} [tol1] - The tolerance of algebraic.
+   * @param {number} [n] - The max number of intersection points.
+   */
+  static LineXArc(c0: Line2Data, c1: Arc2Data, tol0: number, tol1: number, n: number = 2): Array<InterOfCurve2> {
+    let ret = new Array<InterOfCurve2>();
+    // 直线的二元一次方程
+    // A0x + B0y + C0 = 0
+    let c0a = new Line2Algo(c0);
+    // 曲线的二元二次方程
+    // A1x² + B1xy + C1y² + D1x + E1y + F1 = 0 (2)
+    let c1a = new Arc2Algo(c1);
+    // 求解方程组
+    return Curve2Inter.LineXConic(c0a.ge(), c1a.ge(), c0a, c1a, tol0, tol1, n);
+  }
+
+  /**
+   * compute line to arc intersection point.
+   *
+   * @param {Line2Data} [c0] - The frist curve.
+   * @param {Arc2Data} [c1] - The second curve.
+   * @param {number} [tol0] - The tolerance of geometric.
+   * @param {number} [tol1] - The tolerance of algebraic.
+   * @param {number} [n] - The max number of intersection points.
+   */
+  static LineXHyperbola(c0: Line2Data, c1: Hyperbola2Data, tol0: number, tol1: number, n: number = 2): Array<InterOfCurve2> {
+    let ret = new Array<InterOfCurve2>();
+    // 直线的二元一次方程
+    // A0x + B0y + C0 = 0
+    let c0a = new Line2Algo(c0);
+    // 曲线的二元二次方程
+    // A1x² + B1xy + C1y² + D1x + E1y + F1 = 0 (2)
+    let c1a = new Hyperbola2Algo(c1);
+    return Curve2Inter.LineXConic(c0a.ge(), c1a.ge(), c0a, c1a, tol0, tol1, n);
+  }
+
+  /**
+   * compute line to arc intersection point.
+   *
+   * @param {Line2Data} [c0] - The frist curve.
+   * @param {Arc2Data} [c1] - The second curve.
+   * @param {number} [tol0] - The tolerance of geometric.
+   * @param {number} [tol1] - The tolerance of algebraic.
+   * @param {number} [n] - The max number of intersection points.
+   */
+  static LineXParabola(c0: Line2Data, c1: Parabola2Data, tol0: number, tol1: number, n: number = 2): Array<InterOfCurve2> {
+    let ret = new Array<InterOfCurve2>();
+    // 直线的二元一次方程
+    // A0x + B0y + C0 = 0
+    let c0a = new Line2Algo(c0);
+    // 曲线的二元二次方程
+    // A1x² + B1xy + C1y² + D1x + E1y + F1 = 0 (2)
+    let c1a = new Parabola2Algo(c1);
+    return Curve2Inter.LineXConic(c0a.ge(), c1a.ge(), c0a, c1a, tol0, tol1, n);
+  }
+
+  /**
+   * compute line to arc intersection point.
+   *
+   * @param {Line2Data} [c0] - The frist curve.
+   * @param {Arc2Data} [c1] - The second curve.
+   * @param {number} [tol0] - The tolerance of geometric.
+   * @param {number} [tol1] - The tolerance of algebraic.
+   * @param {number} [n] - The max number of intersection points.
+   */
+  static LineXConic(c0: { A: MATHJS.BigNumber, B: MATHJS.BigNumber, C: MATHJS.BigNumber },
+    c1: { A: MATHJS.BigNumber, B: MATHJS.BigNumber, C: MATHJS.BigNumber, D: MATHJS.BigNumber, E: MATHJS.BigNumber, F: MATHJS.BigNumber },
+    c0a: Curve2Algo,
+    c1a: Curve2Algo,
+    tol0: number,
+    tol1: number,
+    n: number = 2,
+  ): Array<InterOfCurve2> {
+    let ret = new Array<InterOfCurve2>();
+    // 直线的二元一次方程
+    // A0x + B0y + C0 = 0
+    let { A: A0, B: B0, C: C0 } = c0;
+    // 曲线的二元二次方程
+    // A1x² + B1xy + C1y² + D1x + E1y + F1 = 0 (2)
+    let { A: A1, B: B1, C: C1, D: D1, E: E1, F: F1 } = c1;
+    // 求解方程组
+    // A0x + B0y + C0 = 0 (1) 
+    // A1x² + B1xy + C1y² + D1x + E1y + F1 = 0 (2)
+    // (1) >> x = (-C0 - B0y) / A0 带入方程（2）
+    if (!MATHJS.equal(A0, 0) && !MATHJS.equal(B0, 0)) {
+      // 关于x的方程 Ax² + Bx + C = 0
+      // A​ = A1 B0² - B1 A0 B0 + C1 A0²​
+      // B =-B1​ B0​ C0​ + 2C1​ A0​ C0 + D1​ B0²​ - E1 A0 B0​
+      // C​ = C1​ C0²​ - E1​ B0​ C0​ + F1​ B0²​
+      let A = MATHJS.add(
+        MATHJS.multiply(A1, B0, B0),
+        MATHJS.unaryMinus(MATHJS.multiply(B1, A0, B0)),
+        MATHJS.multiply(C1, A0, A0)
+      ) as BigNumber;
+      let B = MATHJS.add(
+        MATHJS.unaryMinus(MATHJS.multiply(B1, B0, C0)),
+        MATHJS.multiply(C1, A0, C0, 2),
+        MATHJS.multiply(D1, B0, B0),
+        MATHJS.unaryMinus(MATHJS.multiply(E1, A0, B0))
+      ) as BigNumber;
+      let C = MATHJS.add(
+        MATHJS.multiply(C1, C0, C0),
+        MATHJS.unaryMinus(MATHJS.multiply(E1, B0, C0)),
+        MATHJS.multiply(F1, B0, B0)
+      ) as BigNumber;
+
+      let xs = SolveEquation.SolveQuadraticEquation(A, B, C);
+      for (let i = 0; i < xs.length; i++) {
+        let xi = xs[i];
+        let x: BigNumber;
+        if (MATHJS.typeOf(xi) === 'Complex') {
+          xi = xi as MATHJS.Complex;
+          if (Math.abs(xi.im) > tol1) {
+            continue;
+          }
+          x = MATHJS.bignumber(xi.re);
         }
-
-        let c0a = new Line2Algo(c0);
-        let c1a = new Line2Algo(c1);
-        // 获取一般方程参数
-        let { A: A0, B: B0, C: C0 } = c0a.ge();
-        let { A: A1, B: B1, C: C1 } = c1a.ge();
-        let c0_ = MATHJS.unaryMinus(C0);
-        let c1_ = MATHJS.unaryMinus(C1);
-
-        // 克莱姆法则求解方程组
-        // A0x + B0y + C0 = 0
-        // A1x + B2y + C1 = 0
-        let det = MATHJS.det([[A0, B0], [A1, B1]]);
-        let detx = MATHJS.det([[c0_, B0], [c1_, B1]]);
-        let dety = MATHJS.det([[A0, c0_], [A1, c1_]]);
-
-        let x = MATHJS.divide(detx, det);
-        let y = MATHJS.divide(dety, det);
-        let p = new Vector2(x, y);
-
-        let u0 = c0a.u(p);
-        let u1 = c1a.u(p);
+        if (MATHJS.typeOf(xi) === 'BigNumber') {
+          x = xi as BigNumber;
+        }
+        // y= -(A0/B0​)x − C0/B0​ ​ = - (xA0 + c0)/b0
+        let y = MATHJS.unaryMinus(MATHJS.divide(MATHJS.add((MATHJS.multiply(x, A0)), C0), B0)) as BigNumber;
+        let p = new Vector2(x.toNumber(), y.toNumber());
+        let u0 = c0a?.u(p);
+        let u1 = c1a?.u(p);
         ret.push({ p, u0, u1 });
-
-        return ret;
+      }
+    } else if (!MATHJS.equal(A0, 0) && MATHJS.equal(B0, 0)) {
+      // 关于y的方程 A0x + B0y + C0 = 0 >> x = -C0/A0
+      let x = MATHJS.unaryMinus(MATHJS.divide(C0, A0)) as BigNumber;
+      // 带入二次方程得到关于y的方程
+      // A1x² + B1xy + C1y² + D1x + E1y + F1 = 0             
+      // A​ = C1
+      // B = -B1​C0/A0 + E1​
+      // C​ = A1C0C0/A0A0​ - D1​C0/A0 + F1​
+      let A = C1 as BigNumber;
+      let B = MATHJS.add(
+        MATHJS.divide(MATHJS.unaryMinus(MATHJS.multiply(B1, C0)), A0),
+        E1
+      ) as BigNumber;
+      let C = MATHJS.add(
+        MATHJS.divide(MATHJS.multiply(A1, C0, C0), MATHJS.multiply(A0, A0)),
+        MATHJS.unaryMinus(MATHJS.divide(MATHJS.multiply(D1, C0), A0)),
+        F1) as BigNumber;
+      let ys = SolveEquation.SolveQuadraticEquation(A, B, C);
+      for (let i = 0; i < ys.length; i++) {
+        let yi = ys[i];
+        let y: BigNumber;
+        if (MATHJS.typeOf(yi) === 'Complex') {
+          yi = yi as MATHJS.Complex;
+          if (Math.abs(yi.im) > tol1) {
+            continue;
+          }
+          y = MATHJS.bignumber(yi.re);
+        }
+        if (MATHJS.typeOf(yi) === 'BigNumber') {
+          y = yi as BigNumber;
+        }
+        let p = new Vector2(x.toNumber(), y.toNumber());
+        let u0 = c0a?.u(p);
+        let u1 = c1a?.u(p);
+        ret.push({ p, u0, u1 });
+      }
+    } else if (MATHJS.equal(A0, 0) && !MATHJS.equal(B0, 0)) {
+      // 关于y的方程 A0x + B0y + C0 = 0 >> y = -C0/B0
+      let y = MATHJS.unaryMinus(MATHJS.divide(C0, B0)) as BigNumber;
+      // 带入二次方程得到关于x的方程
+      // A1x² + B1xy + C1y² + D1x + E1y + F1 = 0 
+      // A​ = A1​
+      // B = -B1​C0/B0 + D1​
+      // C​ = C1C0C0/B0B0​ - E1​C0/B0 + F1​
+      let A = A1 as BigNumber;
+      let B = MATHJS.add(
+        MATHJS.divide(MATHJS.unaryMinus(MATHJS.multiply(B1, C0)), B0),
+        D1) as BigNumber;
+      let C = MATHJS.add(
+        MATHJS.divide(MATHJS.multiply(C1, C0, C0), MATHJS.multiply(B0, B0)),
+        MATHJS.unaryMinus(MATHJS.divide(MATHJS.multiply(E1, C0), B0)),
+        F1) as BigNumber;
+      let xs = SolveEquation.SolveQuadraticEquation(A, B, C);
+      for (let i = 0; i < xs.length; i++) {
+        let xi = xs[i];
+        let x: BigNumber;
+        if (MATHJS.typeOf(xi) === 'Complex') {
+          xi = xi as MATHJS.Complex;
+          if (Math.abs(xi.im) > tol1) {
+            continue;
+          }
+          x = MATHJS.bignumber(xi.re);
+        }
+        if (MATHJS.typeOf(xi) === 'BigNumber') {
+          x = xi as BigNumber;
+        }
+        let p = new Vector2(x.toNumber(), y.toNumber());
+        let u0 = c0a?.u(p);
+        let u1 = c1a?.u(p);
+        ret.push({ p, u0, u1 });
+      }
     }
+    return ret;
+  }
 
-    /**
-     * compute line to arc intersection point.
-     *
-     * @param {Line2Data} [c0] - The frist curve.
-     * @param {Arc2Data} [c1] - The second curve.
-     * @param {number} [tol0] - The tolerance of geometric.
-     * @param {number} [tol1] - The tolerance of algebraic.
-     * @param {number} [n] - The max number of intersection points.
-     */
-    static LineXArc(c0: Line2Data, c1: Arc2Data, tol0: number, tol1: number, n: number = 2): Array<InterOfCurve2> {
-        let ret = new Array<InterOfCurve2>();
-        // 直线的二元一次方程
-        // A0x + B0y + C0 = 0
-        let c0a = new Line2Algo(c0);
-        // 曲线的二元二次方程
-        // A1x² + B1xy + C1y² + D1x + E1y + F1 = 0 (2)
-        let c1a = new Arc2Algo(c1);
-        // 求解方程组
-        return Curve2Inter.LineXConic(c0a.ge(), c1a.ge(), c0a, c1a, tol0, tol1, n);
+  /**
+   * compute line to nurbs intersection point.
+   *
+   * @param {Line2Data} [c0] - The frist curve.
+   * @param {Nurbs2Data} [c1] - The second curve.
+   * @param {number} [tol0] - The tolerance of geometric.
+   * @param {number} [tol1] - The tolerance of algebraic.
+   * @param {number} [n] - The max number of intersection points.
+   */
+  static LineXNurbs(c0: Line2Data, c1: Nurbs2Data, tol0: number, tol1: number, n: number = -1): Array<InterOfCurve2> {
+    let segment = c1.controls.length * c1.degree * 2;
+    return Curve2Inter.CurveXCurve(c1, c0, segment, tol0, tol1, n);
+  }
+
+  /**
+   * compute arc to arc intersection point.
+   *
+   * @param {Arc2Data} [c0] - The frist curve.
+   * @param {Arc2Data} [c1] - The second curve.
+   * @param {number} [tol0] - The tolerance of geometric.
+   * @param {number} [tol1] - The tolerance of algebraic.
+   * @param {number} [n] - The max number of intersection points.
+   */
+  static QuadraticXQuadratic(c0: Arc2Data | Hyperbola2Data | Parabola2Data, c1: Arc2Data | Hyperbola2Data | Parabola2Data, tol0: number, tol1: number, n: number = 4): Array<InterOfCurve2> {
+    if (c0 instanceof Arc2Data && c1 instanceof Arc2Data) {
+      if (c0.trans.pos.distanceTo(c1.trans.pos) > Math.max(c0.radius.x, c0.radius.y) + Math.max(c1.radius.x, c1.radius.y)) {
+        return new Array<InterOfCurve2>();
+      }
+      if (Math.max(c0.radius.x, c0.radius.y) > Math.max(c1.radius.x, c1.radius.y)) {
+        return Curve2Inter.CurveXCurve(c1, c0, Math.round(Math.max(c1.radius.x, c1.radius.y) * Math.PI * 2), tol0, tol1, n, 0, Math.PI * 2);
+      } else {
+        return Curve2Inter.CurveXCurve(c0, c1, Math.round(Math.max(c0.radius.x, c0.radius.y) * Math.PI * 2), tol0, tol1, n, 0, Math.PI * 2);
+      }
     }
-
-    /**
-     * compute line to arc intersection point.
-     *
-     * @param {Line2Data} [c0] - The frist curve.
-     * @param {Arc2Data} [c1] - The second curve.
-     * @param {number} [tol0] - The tolerance of geometric.
-     * @param {number} [tol1] - The tolerance of algebraic.
-     * @param {number} [n] - The max number of intersection points.
-     */
-    static LineXHyperbola(c0: Line2Data, c1: Hyperbola2Data, tol0: number, tol1: number, n: number = 2): Array<InterOfCurve2> {
-        let ret = new Array<InterOfCurve2>();
-        // 直线的二元一次方程
-        // A0x + B0y + C0 = 0
-        let c0a = new Line2Algo(c0);
-        // 曲线的二元二次方程
-        // A1x² + B1xy + C1y² + D1x + E1y + F1 = 0 (2)
-        let c1a = new Hyperbola2Algo(c1);
-        return Curve2Inter.LineXConic(c0a.ge(), c1a.ge(), c0a, c1a, tol0, tol1, n);
+    if (c0 instanceof Arc2Data) {
+      if (c0.radius.x > c0.radius.y) {
+        return Curve2Inter.CurveXCurve(c0, c1, Math.round(c0.radius.x * Math.PI * 2), tol0, tol1, n, 0, Math.PI * 2);
+      } else {
+        return Curve2Inter.CurveXCurve(c0, c1, Math.round(c0.radius.y * Math.PI * 2), tol0, tol1, n, 0, Math.PI * 2);
+      }
     }
-
-    /**
-     * compute line to arc intersection point.
-     *
-     * @param {Line2Data} [c0] - The frist curve.
-     * @param {Arc2Data} [c1] - The second curve.
-     * @param {number} [tol0] - The tolerance of geometric.
-     * @param {number} [tol1] - The tolerance of algebraic.
-     * @param {number} [n] - The max number of intersection points.
-     */
-    static LineXParabola(c0: Line2Data, c1: Parabola2Data, tol0: number, tol1: number, n: number = 2): Array<InterOfCurve2> {
-        let ret = new Array<InterOfCurve2>();
-        // 直线的二元一次方程
-        // A0x + B0y + C0 = 0
-        let c0a = new Line2Algo(c0);
-        // 曲线的二元二次方程
-        // A1x² + B1xy + C1y² + D1x + E1y + F1 = 0 (2)
-        let c1a = new Parabola2Algo(c1);
-        return Curve2Inter.LineXConic(c0a.ge(), c1a.ge(), c0a, c1a, tol0, tol1, n);
+    if (c1 instanceof Arc2Data) {
+      if (c1.radius.x > c1.radius.y) {
+        return Curve2Inter.CurveXCurve(c1, c0, Math.round(c1.radius.x * Math.PI * 2), tol0, tol1, n, 0, Math.PI * 2);
+      } else {
+        return Curve2Inter.CurveXCurve(c1, c0, Math.round(c1.radius.y * Math.PI * 2), tol0, tol1, n, 0, Math.PI * 2);
+      }
     }
+    let c0a = CurveBuilder.Algorithm2ByData(c0) as Arc2Algo | Hyperbola2Algo | Parabola2Algo;
+    let c1a = CurveBuilder.Algorithm2ByData(c1) as Arc2Algo | Hyperbola2Algo | Parabola2Algo;
 
-    /**
-     * compute line to arc intersection point.
-     *
-     * @param {Line2Data} [c0] - The frist curve.
-     * @param {Arc2Data} [c1] - The second curve.
-     * @param {number} [tol0] - The tolerance of geometric.
-     * @param {number} [tol1] - The tolerance of algebraic.
-     * @param {number} [n] - The max number of intersection points.
-     */
-    static LineXConic(c0: { A: MATHJS.BigNumber, B: MATHJS.BigNumber, C: MATHJS.BigNumber },
-        c1: { A: MATHJS.BigNumber, B: MATHJS.BigNumber, C: MATHJS.BigNumber, D: MATHJS.BigNumber, E: MATHJS.BigNumber, F: MATHJS.BigNumber },
-        c0a: Curve2Algo,
-        c1a: Curve2Algo,
-        tol0: number,
-        tol1: number,
-        n: number = 2,
-    ): Array<InterOfCurve2> {
-        let ret = new Array<InterOfCurve2>();
-        // 直线的二元一次方程
-        // A0x + B0y + C0 = 0
-        let { A: A0, B: B0, C: C0 } = c0;
-        // 曲线的二元二次方程
-        // A1x² + B1xy + C1y² + D1x + E1y + F1 = 0 (2)
-        let { A: A1, B: B1, C: C1, D: D1, E: E1, F: F1 } = c1;
-        // 求解方程组
-        // A0x + B0y + C0 = 0 (1) 
-        // A1x² + B1xy + C1y² + D1x + E1y + F1 = 0 (2)
-        // (1) >> x = (-C0 - B0y) / A0 带入方程（2）
-        if (!MATHJS.equal(A0, 0) && !MATHJS.equal(B0, 0)) {
-            // 关于x的方程 Ax² + Bx + C = 0
-            // A​ = A1 B0² - B1 A0 B0 + C1 A0²​
-            // B =-B1​ B0​ C0​ + 2C1​ A0​ C0 + D1​ B0²​ - E1 A0 B0​
-            // C​ = C1​ C0²​ - E1​ B0​ C0​ + F1​ B0²​
-            let A = MATHJS.add(
-                MATHJS.multiply(A1, B0, B0),
-                MATHJS.unaryMinus(MATHJS.multiply(B1, A0, B0)),
-                MATHJS.multiply(C1, A0, A0)
-            ) as BigNumber;
-            let B = MATHJS.add(
-                MATHJS.unaryMinus(MATHJS.multiply(B1, B0, C0)),
-                MATHJS.multiply(C1, A0, C0, 2),
-                MATHJS.multiply(D1, B0, B0),
-                MATHJS.unaryMinus(MATHJS.multiply(E1, A0, B0))
-            ) as BigNumber;
-            let C = MATHJS.add(
-                MATHJS.multiply(C1, C0, C0),
-                MATHJS.unaryMinus(MATHJS.multiply(E1, B0, C0)),
-                MATHJS.multiply(F1, B0, B0)
-            ) as BigNumber;
+    // if (c0a instanceof Hyperbola2Algo || c0a instanceof Parabola2Algo
+    //     && c1a instanceof Hyperbola2Algo || c1a instanceof Parabola2Algo
+    // ) {
+    //     let c0a_ = c0a as Hyperbola2Algo | Parabola2Algo;
+    //     let c1a_ = c1a as Hyperbola2Algo | Parabola2Algo
+    //     let ns0 = c0a_.vernurbs();
+    //     let ns1 = c1a_.vernurbs();
+    //     let ret = new Array<InterOfCurve2>();
+    //     for (let i = 0; i < ns0.length; i++) {
+    //         let nurbs0 = ns0[i];
+    //         for (let j = 0; j < ns1.length; j++) {
+    //             let nurbs1 = ns1[j];
+    //             verb.eval.Intersect.curves(nurbs0._data, nurbs1._data, tol0).forEach((inter: any) => {
+    //                 let p = new Vector2(inter.point0[0], inter.point0[1]);
+    //                 ret.push({ p, u0: inter.u1, u1: inter.u2 });
+    //             });
+    //         }
+    //     }
+    //     return ret;
+    // }
 
-            let xs = SolveEquation.SolveQuadraticEquation(A, B, C);
-            for (let i = 0; i < xs.length; i++) {
-                let xi = xs[i];
-                let x: BigNumber;
-                if (MATHJS.typeOf(xi) === 'Complex') {
-                    xi = xi as MATHJS.Complex;
-                    if (Math.abs(xi.im) > tol1) {
-                        continue;
-                    }
-                    x = MATHJS.bignumber(xi.re);
-                }
-                if (MATHJS.typeOf(xi) === 'BigNumber') {
-                    x = xi as BigNumber;
-                }
-                // y= -(A0/B0​)x − C0/B0​ ​ = - (xA0 + c0)/b0
-                let y = MATHJS.unaryMinus(MATHJS.divide(MATHJS.add((MATHJS.multiply(x, A0)), C0), B0)) as BigNumber;
-                let p = new Vector2(x.toNumber(), y.toNumber());
-                let u0 = c0a?.u(p);
-                let u1 = c1a?.u(p);
-                ret.push({ p, u0, u1 });
-            }
-        } else if (!MATHJS.equal(A0, 0) && MATHJS.equal(B0, 0)) {
-            // 关于y的方程 A0x + B0y + C0 = 0 >> x = -C0/A0
-            let x = MATHJS.unaryMinus(MATHJS.divide(C0, A0)) as BigNumber;
-            // 带入二次方程得到关于y的方程
-            // A1x² + B1xy + C1y² + D1x + E1y + F1 = 0             
-            // A​ = C1
-            // B = -B1​C0/A0 + E1​
-            // C​ = A1C0C0/A0A0​ - D1​C0/A0 + F1​
-            let A = C1 as BigNumber;
-            let B = MATHJS.add(
-                MATHJS.divide(MATHJS.unaryMinus(MATHJS.multiply(B1, C0)), A0),
-                E1
-            ) as BigNumber;
-            let C = MATHJS.add(
-                MATHJS.divide(MATHJS.multiply(A1, C0, C0), MATHJS.multiply(A0, A0)),
-                MATHJS.unaryMinus(MATHJS.divide(MATHJS.multiply(D1, C0), A0)),
-                F1) as BigNumber;
-            let ys = SolveEquation.SolveQuadraticEquation(A, B, C);
-            for (let i = 0; i < ys.length; i++) {
-                let yi = ys[i];
-                let y: BigNumber;
-                if (MATHJS.typeOf(yi) === 'Complex') {
-                    yi = yi as MATHJS.Complex;
-                    if (Math.abs(yi.im) > tol1) {
-                        continue;
-                    }
-                    y = MATHJS.bignumber(yi.re);
-                }
-                if (MATHJS.typeOf(yi) === 'BigNumber') {
-                    y = yi as BigNumber;
-                }
-                let p = new Vector2(x.toNumber(), y.toNumber());
-                let u0 = c0a?.u(p);
-                let u1 = c1a?.u(p);
-                ret.push({ p, u0, u1 });
-            }
-        } else if (MATHJS.equal(A0, 0) && !MATHJS.equal(B0, 0)) {
-            // 关于y的方程 A0x + B0y + C0 = 0 >> y = -C0/B0
-            let y = MATHJS.unaryMinus(MATHJS.divide(C0, B0)) as BigNumber;
-            // 带入二次方程得到关于x的方程
-            // A1x² + B1xy + C1y² + D1x + E1y + F1 = 0 
-            // A​ = A1​
-            // B = -B1​C0/B0 + D1​
-            // C​ = C1C0C0/B0B0​ - E1​C0/B0 + F1​
-            let A = A1 as BigNumber;
-            let B = MATHJS.add(
-                MATHJS.divide(MATHJS.unaryMinus(MATHJS.multiply(B1, C0)), B0),
-                D1) as BigNumber;
-            let C = MATHJS.add(
-                MATHJS.divide(MATHJS.multiply(C1, C0, C0), MATHJS.multiply(B0, B0)),
-                MATHJS.unaryMinus(MATHJS.divide(MATHJS.multiply(E1, C0), B0)),
-                F1) as BigNumber;
-            let xs = SolveEquation.SolveQuadraticEquation(A, B, C);
-            for (let i = 0; i < xs.length; i++) {
-                let xi = xs[i];
-                let x: BigNumber;
-                if (MATHJS.typeOf(xi) === 'Complex') {
-                    xi = xi as MATHJS.Complex;
-                    if (Math.abs(xi.im) > tol1) {
-                        continue;
-                    }
-                    x = MATHJS.bignumber(xi.re);
-                }
-                if (MATHJS.typeOf(xi) === 'BigNumber') {
-                    x = xi as BigNumber;
-                }
-                let p = new Vector2(x.toNumber(), y.toNumber());
-                let u0 = c0a?.u(p);
-                let u1 = c1a?.u(p);
-                ret.push({ p, u0, u1 });
-            }
+    return Curve2Inter.ConicXConic(c0a.ge(), c1a.ge(), c0a, c1a, tol0, tol1, n);
+  }
+
+  /**
+   * compute arc to arc intersection point.
+   *
+   * @param {Arc2Data} [c0] - The frist curve.
+   * @param {Arc2Data} [c1] - The second curve.
+   * @param {number} [tol0] - The tolerance of geometric.
+   * @param {number} [tol1] - The tolerance of algebraic.
+   * @param {number} [n] - The max number of intersection points.
+   */
+  static QuadraticXNurbs(c0: Arc2Data | Hyperbola2Data | Parabola2Data, c1: Nurbs2Data, tol0: number, tol1: number, n: number = -1): Array<InterOfCurve2> {
+    let segment = c1.controls.length * c1.degree * 2;
+    return Curve2Inter.CurveXCurve(c1, c0, segment, tol0, tol1, n);
+  }
+
+
+  /**
+   * compute arc to arc intersection point.
+   * 1. 构造对称矩阵 ( A1, A2 ) 表示两条二次曲线。
+   * 2. 解广义特征值问题 (det(A1 + λA2) = 0)，得到 λ（最多三个）。
+   * 3. 对每个 λ 构造 ( B = A1 + λ A2 )。
+   * 4. 分解 B 为两条直线。
+   * 5. 每条直线与原二次曲线之一求交（解二次方程），得到候选交点。
+   * 6. 验证 候选点在两条曲线上，并去重。
+   * @param {Arc2Data} [c0] - The frist curve.
+   * @param {Arc2Data} [c1] - The second curve.
+   * @param {number} [tol0] - The tolerance of geometric.
+   * @param {number} [tol1] - The tolerance of algebraic.
+   * @param {number} [n] - The max number of intersection points.
+   */
+  static ConicXConic(
+    c0: { A: MATHJS.BigNumber, B: MATHJS.BigNumber, C: MATHJS.BigNumber, D: MATHJS.BigNumber, E: MATHJS.BigNumber, F: MATHJS.BigNumber },
+    c1: { A: MATHJS.BigNumber, B: MATHJS.BigNumber, C: MATHJS.BigNumber, D: MATHJS.BigNumber, E: MATHJS.BigNumber, F: MATHJS.BigNumber },
+    c0a: Curve2Algo,
+    c1a: Curve2Algo,
+    tol0: number,
+    tol1: number,
+    n: number = 4
+  ): Array<InterOfCurve2> {
+    let isExist = (p: Vector2): boolean => {
+      let isExist = false;
+      for (let k = 0; k < ret.length; k++) {
+        let exist = ret[k];
+        if (p.distanceTo(exist.p) < tol0) {
+          isExist = true;
+          break;
         }
-        return ret;
+      }
+      return isExist;
     }
+    // 6. 验证 候选点在两条曲线上，并去重。
+    let checkAndPush = (inters: Array<InterOfCurve2>) => {
+      for (let j = 0; j < inters.length; j++) {
+        let inter = inters[j];
+        if (isExist(inter.p)) {
+          continue
+        }
+        let g0 = c0a.g(inter.p);
+        let g1 = c1a.g(inter.p);
+        if (Math.abs(g0) < tol1 && Math.abs(g1) < tol1) {
+          ret.push({ p: inter.p, u0: inter.u1, u1: c1a.u(inter.p) });
+        }
+        else if (Math.abs(g0) < tol1) {
+          inter.u0 = c0a.u(inter.p);
+          Curve2Inter.Binary(c0a, c1a, inter, tol0, tol1);
+          g0 = c0a.g(inter.p);
+          g1 = c1a.g(inter.p);
+          if (Math.abs(g0) < tol1 && Math.abs(g1) < tol1) {
+            if (!isExist(inter.p)) {
+              ret.push({ p: inter.p, u0: inter.u1, u1: c1a.u(inter.p) });
+            }
 
-    /**
-     * compute line to nurbs intersection point.
-     *
-     * @param {Line2Data} [c0] - The frist curve.
-     * @param {Nurbs2Data} [c1] - The second curve.
-     * @param {number} [tol0] - The tolerance of geometric.
-     * @param {number} [tol1] - The tolerance of algebraic.
-     * @param {number} [n] - The max number of intersection points.
-     */
-    static LineXNurbs(c0: Line2Data, c1: Nurbs2Data, tol0: number, tol1: number, n: number = -1): Array<InterOfCurve2> {
-        let segment = c1.controls.length * c1.degree * 2;
-        return Curve2Inter.CurveXCurve(c1, c0, segment, tol0, tol1, n);
+          }
+        }
+        else if (Math.abs(g1) < tol1) {
+          inter.u0 = c1a.u(inter.p);
+          Curve2Inter.Binary(c1a, c0a, inter, tol0, tol1);
+          g0 = c0a.g(inter.p);
+          g1 = c1a.g(inter.p);
+          if (Math.abs(g0) < tol1 && Math.abs(g1) < tol1) {
+            if (!isExist(inter.p)) {
+              ret.push({ p: inter.p, u0: inter.u1, u1: c1a.u(inter.p) });
+            }
+          }
+        }
+        else {
+          // console.log("Error: g0 " + format(g0) + " g1 " + format(g1));
+        }
+      }
     }
+    let ret = new Array<InterOfCurve2>();
 
-    /**
-     * compute arc to arc intersection point.
-     *
-     * @param {Arc2Data} [c0] - The frist curve.
-     * @param {Arc2Data} [c1] - The second curve.
-     * @param {number} [tol0] - The tolerance of geometric.
-     * @param {number} [tol1] - The tolerance of algebraic.
-     * @param {number} [n] - The max number of intersection points.
-     */
-    static QuadraticXQuadratic(c0: Arc2Data | Hyperbola2Data | Parabola2Data, c1: Arc2Data | Hyperbola2Data | Parabola2Data, tol0: number, tol1: number, n: number = 4): Array<InterOfCurve2> {
-        if (c0 instanceof Arc2Data && c1 instanceof Arc2Data) {
-            if (c0.trans.pos.distanceTo(c1.trans.pos) > Math.max(c0.radius.x, c0.radius.y) + Math.max(c1.radius.x, c1.radius.y)) {
-                return new Array<InterOfCurve2>();
-            }
-            if (Math.max(c0.radius.x, c0.radius.y) > Math.max(c1.radius.x, c1.radius.y)) {
-                return Curve2Inter.CurveXCurve(c1, c0, Math.round(Math.max(c1.radius.x, c1.radius.y) * Math.PI * 2), tol0, tol1, n, 0, Math.PI * 2);
-            } else {
-                return Curve2Inter.CurveXCurve(c0, c1, Math.round(Math.max(c0.radius.x, c0.radius.y) * Math.PI * 2), tol0, tol1, n, 0, Math.PI * 2);
-            }
-        }
-        if (c0 instanceof Arc2Data) {
-            if (c0.radius.x > c0.radius.y) {
-                return Curve2Inter.CurveXCurve(c0, c1, Math.round(c0.radius.x * Math.PI * 2), tol0, tol1, n, 0, Math.PI * 2);
-            } else {
-                return Curve2Inter.CurveXCurve(c0, c1, Math.round(c0.radius.y * Math.PI * 2), tol0, tol1, n, 0, Math.PI * 2);
-            }
-        }
-        if (c1 instanceof Arc2Data) {
-            if (c1.radius.x > c1.radius.y) {
-                return Curve2Inter.CurveXCurve(c1, c0, Math.round(c1.radius.x * Math.PI * 2), tol0, tol1, n, 0, Math.PI * 2);
-            } else {
-                return Curve2Inter.CurveXCurve(c1, c0, Math.round(c1.radius.y * Math.PI * 2), tol0, tol1, n, 0, Math.PI * 2);
-            }
-        }
-        let c0a = CurveBuilder.Algorithm2ByData(c0) as Arc2Algo | Hyperbola2Algo | Parabola2Algo;
-        let c1a = CurveBuilder.Algorithm2ByData(c1) as Arc2Algo | Hyperbola2Algo | Parabola2Algo;
+    // 1. 构造对称矩阵 ( A1, A2 ) 表示两条二次曲线。
+    let A_1 = Curve2Inter.QuadraticMatrix(c0);
+    let A_2 = Curve2Inter.QuadraticMatrix(c1);
+    let a_1 = c0.A, b_1 = c0.B, c_1 = c0.C, d_1 = c0.D, e_1 = c0.E, f_1 = c0.F;
+    let a_2 = c1.A, b_2 = c1.B, c_2 = c1.C, d_2 = c1.D, e_2 = c1.E, f_2 = c1.F;
+    //2. 解广义特征值问题 (det(A1 + λA2) = 0)，得到 λ（最多三个）。
+    // det(A_1 + λ A_2) = C_3 λ^3 + C_2 λ^2 + C_1 λ + C_0 = 0
+    // C_0 = a_1 c_1 f_1 
+    //     + (b_1 d_1 e_1)/4 
+    //     - (a_1 e_1^2 + c_1 d_1^2 + f_1 b_1^2)/4
+    const C_0 = MATHJS.add(
+      MATHJS.multiply(a_1, c_1, f_1),
+      MATHJS.multiply(b_1, d_1, e_1, 0.25),
+      MATHJS.multiply(MATHJS.add(MATHJS.multiply(a_1, e_1, e_1), MATHJS.multiply(c_1, d_1, d_1), MATHJS.multiply(f_1, b_1, b_1)), -0.25),
+    ) as MATHJS.BigNumber;
+    // C_3 = a_2 c_2 f_2 
+    //    + (b_2 d_2 e_2)/4 
+    //    - (a_2 e_2^2 + c_2 d_2^2 + f_2 b_2^2)/4
+    const C_3 = MATHJS.add(
+      MATHJS.multiply(a_2, c_2, f_2),
+      MATHJS.multiply(b_2, d_2, e_2, 0.25),
+      MATHJS.multiply(MATHJS.add(MATHJS.multiply(a_2, e_2, e_2), MATHJS.multiply(c_2, d_2, d_2), MATHJS.multiply(f_2, b_2, b_2)), -0.25),
+    ) as MATHJS.BigNumber;
+    // C_1 =   (c_1 f_1 - e_1^2/4) a_2 
+    //       + (a_1 f_1 - d_1^2/4) c_2 
+    //       + (a_1 c_1 - b_1^2/4) f_2 
+    //       + ((b_1 f_1 - (d_1 e_1)/2) b_2 0.5
+    //       + ((b_1 e_1)/2 - c_1 d_1) d_2 0.5
+    //       + ((a_1 e_1 - (b_1 d_1)/2) e_2 0.5        
+    const C_1 = MATHJS.add(
+      MATHJS.multiply(MATHJS.add(MATHJS.multiply(c_1, f_1), MATHJS.multiply(e_1, e_1, -0.25)), a_2),
+      MATHJS.multiply(MATHJS.add(MATHJS.multiply(a_1, f_1), MATHJS.multiply(d_1, d_1, -0.25)), c_2),
+      MATHJS.multiply(MATHJS.add(MATHJS.multiply(a_1, c_1), MATHJS.multiply(b_1, b_1, -0.25)), f_2),
+      MATHJS.multiply(MATHJS.add(MATHJS.multiply(b_1, f_1), MATHJS.multiply(d_1, e_1, -0.5)), b_2, 0.5),
+      MATHJS.multiply(MATHJS.add(MATHJS.multiply(b_1, e_1, 0.5), MATHJS.multiply(c_1, d_1, -1)), d_2, 0.5),
+      MATHJS.multiply(MATHJS.add(MATHJS.multiply(a_1, e_1), MATHJS.multiply(b_1, d_1, -0.5)), e_2, 0.5),
+    ) as MATHJS.BigNumber;
+    // C_2 =   (c_2 f_2 - e_2^2/4) a_1 
+    //       + (a_2 f_2 - d_2^2/4) c_1 
+    //       + (a_2 c_2 - b_2^2/4) f_1 
+    //       + ((b_2 f_2 - (d_2 e_2)/2) b_1 0.5
+    //       + ((b_2 e_2)/2 - c_2 d_2) d_1 0.5
+    //       + ((a_2 e_2 - (b_2 d_2)/2) e_1 0.5
+    const C_2 = MATHJS.add(
+      MATHJS.multiply(MATHJS.add(MATHJS.multiply(c_2, f_2), MATHJS.multiply(e_2, e_2, -0.25)), a_1),
+      MATHJS.multiply(MATHJS.add(MATHJS.multiply(a_2, f_2), MATHJS.multiply(d_2, d_2, -0.25)), c_1),
+      MATHJS.multiply(MATHJS.add(MATHJS.multiply(a_2, c_2), MATHJS.multiply(b_2, b_2, -0.25)), f_1),
+      MATHJS.multiply(MATHJS.add(MATHJS.multiply(b_2, f_2), MATHJS.multiply(d_2, e_2, -0.5)), b_1, 0.5),
+      MATHJS.multiply(MATHJS.add(MATHJS.multiply(b_2, e_2, 0.5), MATHJS.multiply(c_2, d_2, -1)), d_1, 0.5),
+      MATHJS.multiply(MATHJS.add(MATHJS.multiply(a_2, e_2), MATHJS.multiply(b_2, d_2, -0.5)), e_1, 0.5),
+    ) as MATHJS.BigNumber;
 
-        // if (c0a instanceof Hyperbola2Algo || c0a instanceof Parabola2Algo
-        //     && c1a instanceof Hyperbola2Algo || c1a instanceof Parabola2Algo
-        // ) {
-        //     let c0a_ = c0a as Hyperbola2Algo | Parabola2Algo;
-        //     let c1a_ = c1a as Hyperbola2Algo | Parabola2Algo
-        //     let ns0 = c0a_.vernurbs();
-        //     let ns1 = c1a_.vernurbs();
-        //     let ret = new Array<InterOfCurve2>();
-        //     for (let i = 0; i < ns0.length; i++) {
-        //         let nurbs0 = ns0[i];
-        //         for (let j = 0; j < ns1.length; j++) {
-        //             let nurbs1 = ns1[j];
-        //             verb.eval.Intersect.curves(nurbs0._data, nurbs1._data, tol0).forEach((inter: any) => {
-        //                 let p = new Vector2(inter.point0[0], inter.point0[1]);
-        //                 ret.push({ p, u0: inter.u1, u1: inter.u2 });
-        //             });
-        //         }
-        //     }
-        //     return ret;
-        // }
+    const C3 = MATHJS.bignumber(1)
+    const C2 = MATHJS.divide(C_2, C_3) as MATHJS.BigNumber;
+    const C1 = MATHJS.divide(C_1, C_3) as MATHJS.BigNumber;
+    const C0 = MATHJS.divide(C_0, C_3) as MATHJS.BigNumber;
 
-        return Curve2Inter.ConicXConic(c0a.ge(), c1a.ge(), c0a, c1a, tol0, tol1, n);
-    }
+    //3. 对每个 λ 构造 ( B = A1 + λ A2 )。
+    const λs = SolveEquation.SolveCubicNumberical(C3, C2, C1, C0);
+    for (let i = 0; i < λs.length; i++) {
+      if (ret.length >= n) {
+        break;
+      }
+      let λ = λs[i];
+      if (MATHJS.typeOf(λ) === "Complex") {
+        continue;
+      }
+      if (i > 0 && λ == λs[i - 1]) {
+        continue;
+      }
+      let B = new Array<Array<MATHJS.BigNumber>>(3);
+      let row0 = new Array<MATHJS.BigNumber>(3);
+      let row1 = new Array<MATHJS.BigNumber>(3);
+      let row2 = new Array<MATHJS.BigNumber>(3);
+      row0[0] = MATHJS.add(A_1[0][0], MATHJS.multiply(λ, A_2[0][0])) as MATHJS.BigNumber;
+      row0[1] = MATHJS.add(A_1[0][1], MATHJS.multiply(λ, A_2[0][1])) as MATHJS.BigNumber;
+      row0[2] = MATHJS.add(A_1[0][2], MATHJS.multiply(λ, A_2[0][2])) as MATHJS.BigNumber;
+      row1[0] = MATHJS.add(A_1[1][0], MATHJS.multiply(λ, A_2[1][0])) as MATHJS.BigNumber;
+      row1[1] = MATHJS.add(A_1[1][1], MATHJS.multiply(λ, A_2[1][1])) as MATHJS.BigNumber;
+      row1[2] = MATHJS.add(A_1[1][2], MATHJS.multiply(λ, A_2[1][2])) as MATHJS.BigNumber;
+      row2[0] = MATHJS.add(A_1[2][0], MATHJS.multiply(λ, A_2[2][0])) as MATHJS.BigNumber;
+      row2[1] = MATHJS.add(A_1[2][1], MATHJS.multiply(λ, A_2[2][1])) as MATHJS.BigNumber;
+      row2[2] = MATHJS.add(A_1[2][2], MATHJS.multiply(λ, A_2[2][2])) as MATHJS.BigNumber;
 
-    /**
-     * compute arc to arc intersection point.
-     *
-     * @param {Arc2Data} [c0] - The frist curve.
-     * @param {Arc2Data} [c1] - The second curve.
-     * @param {number} [tol0] - The tolerance of geometric.
-     * @param {number} [tol1] - The tolerance of algebraic.
-     * @param {number} [n] - The max number of intersection points.
-     */
-    static QuadraticXNurbs(c0: Arc2Data | Hyperbola2Data | Parabola2Data, c1: Nurbs2Data, tol0: number, tol1: number, n: number = -1): Array<InterOfCurve2> {
-        let segment = c1.controls.length * c1.degree * 2;
-        return Curve2Inter.CurveXCurve(c1, c0, segment, tol0, tol1, n);
-    }
+      B[0] = row0;
+      B[1] = row1;
+      B[2] = row2;
 
-
-    /**
-     * compute arc to arc intersection point.
-     * 1. 构造对称矩阵 ( A1, A2 ) 表示两条二次曲线。
-     * 2. 解广义特征值问题 (det(A1 + λA2) = 0)，得到 λ（最多三个）。
-     * 3. 对每个 λ 构造 ( B = A1 + λ A2 )。
-     * 4. 分解 B 为两条直线。
-     * 5. 每条直线与原二次曲线之一求交（解二次方程），得到候选交点。
-     * 6. 验证 候选点在两条曲线上，并去重。
-     * @param {Arc2Data} [c0] - The frist curve.
-     * @param {Arc2Data} [c1] - The second curve.
-     * @param {number} [tol0] - The tolerance of geometric.
-     * @param {number} [tol1] - The tolerance of algebraic.
-     * @param {number} [n] - The max number of intersection points.
-     */
-    static ConicXConic(
-        c0: { A: MATHJS.BigNumber, B: MATHJS.BigNumber, C: MATHJS.BigNumber, D: MATHJS.BigNumber, E: MATHJS.BigNumber, F: MATHJS.BigNumber },
-        c1: { A: MATHJS.BigNumber, B: MATHJS.BigNumber, C: MATHJS.BigNumber, D: MATHJS.BigNumber, E: MATHJS.BigNumber, F: MATHJS.BigNumber },
-        c0a: Curve2Algo,
-        c1a: Curve2Algo,
-        tol0: number,
-        tol1: number,
-        n: number = 4
-    ): Array<InterOfCurve2> {
-        let isExist = (p: Vector2): boolean => {
-            let isExist = false;
-            for (let k = 0; k < ret.length; k++) {
-                let exist = ret[k];
-                if (p.distanceTo(exist.p) < tol0) {
-                    isExist = true;
-                    break;
-                }
-            }
-            return isExist;
-        }
-        // 6. 验证 候选点在两条曲线上，并去重。
-        let checkAndPush = (inters: Array<InterOfCurve2>) => {
-            for (let j = 0; j < inters.length; j++) {
-                let inter = inters[j];
-                if (isExist(inter.p)) {
-                    continue
-                }
-                let g0 = c0a.g(inter.p);
-                let g1 = c1a.g(inter.p);
-                if (Math.abs(g0) < tol1 && Math.abs(g1) < tol1) {
-                    ret.push({ p: inter.p, u0: inter.u1, u1: c1a.u(inter.p) });
-                }
-                else if (Math.abs(g0) < tol1) {
-                    inter.u0 = c0a.u(inter.p);
-                    Curve2Inter.Binary(c0a, c1a, inter, tol0, tol1);
-                    g0 = c0a.g(inter.p);
-                    g1 = c1a.g(inter.p);
-                    if (Math.abs(g0) < tol1 && Math.abs(g1) < tol1) {
-                        if (!isExist(inter.p)) {
-                            ret.push({ p: inter.p, u0: inter.u1, u1: c1a.u(inter.p) });
-                        }
-
-                    }
-                }
-                else if (Math.abs(g1) < tol1) {
-                    inter.u0 = c1a.u(inter.p);
-                    Curve2Inter.Binary(c1a, c0a, inter, tol0, tol1);
-                    g0 = c0a.g(inter.p);
-                    g1 = c1a.g(inter.p);
-                    if (Math.abs(g0) < tol1 && Math.abs(g1) < tol1) {
-                        if (!isExist(inter.p)) {
-                            ret.push({ p: inter.p, u0: inter.u1, u1: c1a.u(inter.p) });
-                        }
-                    }
-                }
-                else {
-                    // console.log("Error: g0 " + format(g0) + " g1 " + format(g1));
-                }
-            }
-        }
-        let ret = new Array<InterOfCurve2>();
-
-        // 1. 构造对称矩阵 ( A1, A2 ) 表示两条二次曲线。
-        let A_1 = Curve2Inter.QuadraticMatrix(c0);
-        let A_2 = Curve2Inter.QuadraticMatrix(c1);
-        let a_1 = c0.A, b_1 = c0.B, c_1 = c0.C, d_1 = c0.D, e_1 = c0.E, f_1 = c0.F;
-        let a_2 = c1.A, b_2 = c1.B, c_2 = c1.C, d_2 = c1.D, e_2 = c1.E, f_2 = c1.F;
-        //2. 解广义特征值问题 (det(A1 + λA2) = 0)，得到 λ（最多三个）。
-        // det(A_1 + λ A_2) = C_3 λ^3 + C_2 λ^2 + C_1 λ + C_0 = 0
-        // C_0 = a_1 c_1 f_1 
-        //     + (b_1 d_1 e_1)/4 
-        //     - (a_1 e_1^2 + c_1 d_1^2 + f_1 b_1^2)/4
-        const C_0 = MATHJS.add(
-            MATHJS.multiply(a_1, c_1, f_1),
-            MATHJS.multiply(b_1, d_1, e_1, 0.25),
-            MATHJS.multiply(MATHJS.add(MATHJS.multiply(a_1, e_1, e_1), MATHJS.multiply(c_1, d_1, d_1), MATHJS.multiply(f_1, b_1, b_1)), -0.25),
-        ) as MATHJS.BigNumber;
-        // C_3 = a_2 c_2 f_2 
-        //    + (b_2 d_2 e_2)/4 
-        //    - (a_2 e_2^2 + c_2 d_2^2 + f_2 b_2^2)/4
-        const C_3 = MATHJS.add(
-            MATHJS.multiply(a_2, c_2, f_2),
-            MATHJS.multiply(b_2, d_2, e_2, 0.25),
-            MATHJS.multiply(MATHJS.add(MATHJS.multiply(a_2, e_2, e_2), MATHJS.multiply(c_2, d_2, d_2), MATHJS.multiply(f_2, b_2, b_2)), -0.25),
-        ) as MATHJS.BigNumber;
-        // C_1 =   (c_1 f_1 - e_1^2/4) a_2 
-        //       + (a_1 f_1 - d_1^2/4) c_2 
-        //       + (a_1 c_1 - b_1^2/4) f_2 
-        //       + ((b_1 f_1 - (d_1 e_1)/2) b_2 0.5
-        //       + ((b_1 e_1)/2 - c_1 d_1) d_2 0.5
-        //       + ((a_1 e_1 - (b_1 d_1)/2) e_2 0.5        
-        const C_1 = MATHJS.add(
-            MATHJS.multiply(MATHJS.add(MATHJS.multiply(c_1, f_1), MATHJS.multiply(e_1, e_1, -0.25)), a_2),
-            MATHJS.multiply(MATHJS.add(MATHJS.multiply(a_1, f_1), MATHJS.multiply(d_1, d_1, -0.25)), c_2),
-            MATHJS.multiply(MATHJS.add(MATHJS.multiply(a_1, c_1), MATHJS.multiply(b_1, b_1, -0.25)), f_2),
-            MATHJS.multiply(MATHJS.add(MATHJS.multiply(b_1, f_1), MATHJS.multiply(d_1, e_1, -0.5)), b_2, 0.5),
-            MATHJS.multiply(MATHJS.add(MATHJS.multiply(b_1, e_1, 0.5), MATHJS.multiply(c_1, d_1, -1)), d_2, 0.5),
-            MATHJS.multiply(MATHJS.add(MATHJS.multiply(a_1, e_1), MATHJS.multiply(b_1, d_1, -0.5)), e_2, 0.5),
-        ) as MATHJS.BigNumber;
-        // C_2 =   (c_2 f_2 - e_2^2/4) a_1 
-        //       + (a_2 f_2 - d_2^2/4) c_1 
-        //       + (a_2 c_2 - b_2^2/4) f_1 
-        //       + ((b_2 f_2 - (d_2 e_2)/2) b_1 0.5
-        //       + ((b_2 e_2)/2 - c_2 d_2) d_1 0.5
-        //       + ((a_2 e_2 - (b_2 d_2)/2) e_1 0.5
-        const C_2 = MATHJS.add(
-            MATHJS.multiply(MATHJS.add(MATHJS.multiply(c_2, f_2), MATHJS.multiply(e_2, e_2, -0.25)), a_1),
-            MATHJS.multiply(MATHJS.add(MATHJS.multiply(a_2, f_2), MATHJS.multiply(d_2, d_2, -0.25)), c_1),
-            MATHJS.multiply(MATHJS.add(MATHJS.multiply(a_2, c_2), MATHJS.multiply(b_2, b_2, -0.25)), f_1),
-            MATHJS.multiply(MATHJS.add(MATHJS.multiply(b_2, f_2), MATHJS.multiply(d_2, e_2, -0.5)), b_1, 0.5),
-            MATHJS.multiply(MATHJS.add(MATHJS.multiply(b_2, e_2, 0.5), MATHJS.multiply(c_2, d_2, -1)), d_1, 0.5),
-            MATHJS.multiply(MATHJS.add(MATHJS.multiply(a_2, e_2), MATHJS.multiply(b_2, d_2, -0.5)), e_1, 0.5),
-        ) as MATHJS.BigNumber;
-
-        const C3 = MATHJS.bignumber(1)
-        const C2 = MATHJS.divide(C_2, C_3) as MATHJS.BigNumber;
-        const C1 = MATHJS.divide(C_1, C_3) as MATHJS.BigNumber;
-        const C0 = MATHJS.divide(C_0, C_3) as MATHJS.BigNumber;
-
-        //3. 对每个 λ 构造 ( B = A1 + λ A2 )。
-        const λs = SolveEquation.SolveCubicNumberical(C3, C2, C1, C0);
-        for (let i = 0; i < λs.length; i++) {
-            if (ret.length >= n) {
-                break;
-            }
-            let λ = λs[i];
-            if (MATHJS.typeOf(λ) === "Complex") {
-                continue;
-            }
-            if (i > 0 && λ == λs[i - 1]) {
-                continue;
-            }
-            let B = new Array<Array<MATHJS.BigNumber>>(3);
-            let row0 = new Array<MATHJS.BigNumber>(3);
-            let row1 = new Array<MATHJS.BigNumber>(3);
-            let row2 = new Array<MATHJS.BigNumber>(3);
-            row0[0] = MATHJS.add(A_1[0][0], MATHJS.multiply(λ, A_2[0][0])) as MATHJS.BigNumber;
-            row0[1] = MATHJS.add(A_1[0][1], MATHJS.multiply(λ, A_2[0][1])) as MATHJS.BigNumber;
-            row0[2] = MATHJS.add(A_1[0][2], MATHJS.multiply(λ, A_2[0][2])) as MATHJS.BigNumber;
-            row1[0] = MATHJS.add(A_1[1][0], MATHJS.multiply(λ, A_2[1][0])) as MATHJS.BigNumber;
-            row1[1] = MATHJS.add(A_1[1][1], MATHJS.multiply(λ, A_2[1][1])) as MATHJS.BigNumber;
-            row1[2] = MATHJS.add(A_1[1][2], MATHJS.multiply(λ, A_2[1][2])) as MATHJS.BigNumber;
-            row2[0] = MATHJS.add(A_1[2][0], MATHJS.multiply(λ, A_2[2][0])) as MATHJS.BigNumber;
-            row2[1] = MATHJS.add(A_1[2][1], MATHJS.multiply(λ, A_2[2][1])) as MATHJS.BigNumber;
-            row2[2] = MATHJS.add(A_1[2][2], MATHJS.multiply(λ, A_2[2][2])) as MATHJS.BigNumber;
-
-            B[0] = row0;
-            B[1] = row1;
-            B[2] = row2;
-
-            // 4. 分解 B 为两条直线
-            let isSVD = false;
-            let isEigs = true;
-            // 特征值分解
-            if (isEigs && ret.length < n) {
-                // console.log("特征值分解");
-                const eigenvectors = MATHJS.eigs(B, { precision: 1e-25, eigenvectors: true }).eigenvectors;
-                eigenvectors.sort((a, b): number => {
-                    let va = MATHJS.abs(a.value) as MATHJS.BigNumber;
-                    let vb = MATHJS.abs(b.value) as MATHJS.BigNumber;
-                    return MATHJS.compare(vb, va) as number;
-                });
-
-                let λ0 = eigenvectors[0].value as MATHJS.BigNumber;
-                let λ1 = eigenvectors[1].value as MATHJS.BigNumber;
-                let u = eigenvectors[0].vector as Array<MATHJS.BigNumber>;
-                let v = eigenvectors[1].vector as Array<MATHJS.BigNumber>;
-
-                // 虚数特征值跳过
-                if (MATHJS.typeOf(λ0) === 'Complex' || MATHJS.typeOf(λ1) === 'Complex') {
-                    continue
-                }
-                // λ0 * λ1 < 0 两个实数特征值
-                if (!MATHJS.largerEq(MATHJS.multiply(λ0, λ1), 0)) {
-                    let λ0_sqrt = MATHJS.sqrt(MATHJS.abs(λ0)) as MATHJS.BigNumber;
-                    let λ1_sqrt = MATHJS.sqrt(MATHJS.abs(λ1)) as MATHJS.BigNumber;
-
-                    let p = MATHJS.multiply(u, λ0_sqrt) as MATHJS.BigNumber[];
-                    let q = MATHJS.multiply(v, λ1_sqrt) as MATHJS.BigNumber[];
-                    if (!MATHJS.largerEq(λ1, 0)) {
-                        q = MATHJS.unaryMinus(q);
-                    }
-                    let l0 = MATHJS.add(p, q) as MATHJS.BigNumber[];
-                    let l1 = MATHJS.subtract(p, q) as MATHJS.BigNumber[];
-                    const lines: MATHJS.BigNumber[][] = [];
-                    lines.push(l0, l1);
-                    // 5. 每条直线与原二次曲线之一求交（解二次方程），得到候选交点。
-                    for (let j = 0; j < lines.length; j++) {
-                        const l = lines[j];
-                        // console.log(" 直线 l :" + format(l));
-                        let inters = Curve2Inter.LineXConic({ A: l[0], B: l[1], C: l[2] }, c0, null, c0a, tol0, tol1, 2);
-                        checkAndPush(inters);
-                        if (ret.length >= n) {
-                            break;
-                        }
-                        inters = Curve2Inter.LineXConic({ A: l[0], B: l[1], C: l[2] }, c1, null, c0a, tol0, tol1, 2);
-                        checkAndPush(inters);
-                        if (ret.length >= n) {
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-        return ret;
-    }
-
-    /**
-     * 用二分逼近在c0上寻找与c1的交点。
-     * 在c0的参数空间内迭代。
-     * 寻找一个c0的参数u0，使得c0.p(u0)在c1上，即满足c1的一般方程。
-     * 误差小于tol时停止。
-     * p0s为c0上的初始猜测点。
-     * 
-     * @param {Curve2Algo} [c0] - The frist curve.
-     * @param {Curve2Algo} [c1] - The second curve.
-     * @param {number} [tol0] - The tolerance of geometric.
-     * @param {number} [tol1] - The tolerance of algebraic.
-     */
-    static totaltimes = 0;
-    static Binary(
-        c0a: Curve2Algo,
-        c1a: Curve2Algo,
-        p0: InterOfCurve2,
-        tol0: number,
-        tol1: number): void {
-        let ret = p0;
-        let g = c1a.g(p0.p);
-        let s = Math.log(Math.abs(g));
-        let du = 0.75 * (s > 1 ? s : 1);
-        let du_ = 0;
-        let times = 0;
-
-        // 符号相反二分法递归细分
-        let bin = (a: ValueOfBinary, b: ValueOfBinary) => {
-            while (true) {
-                times++;
-                let u = (a.u + b.u) * 0.5;
-                let p = c0a.p(u);
-                let g = c1a.g(p);
-                // 一般方程返回值是0，则恰好是交点。
-                if (Math.abs(g) < tol1 /*|| Math.abs(a.u - b.u) < tol1 && a.p.distanceTo(b.p) < tol0*/) {
-                    ret.p = p;
-                    ret.u0 = u;
-                    ret.u1 = c1a.u(p);
-                    break;
-                } else {
-                    if (a.g * g < 0) {
-                        b = { p, u, g };
-                    }
-                    else if (b.g * g < 0) {
-                        a = { p, u, g };
-                    }
-                }
-            }
-        }
-
-        while (true) {
-            times++;
-            ret.u0 += du;
-            let u = ret.u0;
-            let dp = c0a.p(u);
-            let dg = c1a.g(dp);
-            // 异号时，说明跨过了根，减小步长并反向
-            if (g * dg < 0) {
-                let a = { p: ret.p, u: ret.u0 - du, g: g };
-                let b = { p: dp, u, g: dg };
-                if (a.u < b.u) {
-                    bin(a, b);
-                } else {
-                    bin(b, a);
-                }
-                break;
-            }
-            // 扩张时，反向
-            else if (Math.abs(dg) > Math.abs(g)) {
-                du = -du; //* 0.75;
-            }
-            // 收缩时
-            // else if (Math.abs(dg) < Math.abs(g)) {
-            //     // let s = Math.log(Math.abs(dg));
-            //     // if (s > 1) {
-            //     //     du = du * s;
-            //     // }
-            // }
-            // 满足要求,找到了在c1上的点
-            if (Math.abs(dg) < tol1) {
-                ret.p = dp;
-                ret.u1 = c1a.u(dp);
-                break;
-            }
-            // 迭代结果不变，认为已经收敛，或者du已经很小。
-            else if (Math.abs(g - dg) < tol1 && du_ == du || Math.abs(du) < 1e-15) {
-                ret.p = dp;
-                ret.u1 = c1a.u(dp);
-                break;
-            }
-            else {
-                g = dg;
-                du_ = du;
-            }
-        }
-        if (times > 100) {
-            console.warn("times :" + times);
-        } else {
-            console.log("times :" + times);
-        }
-        Curve2Inter.totaltimes += times;
-    }
-
-    // 构建二次型矩阵
-    static QuadraticMatrix(c: { A: MATHJS.BigNumber, B: MATHJS.BigNumber, C: MATHJS.BigNumber, D: MATHJS.BigNumber, E: MATHJS.BigNumber, F: MATHJS.BigNumber }): Array<Array<MATHJS.BigNumber>> {
-        let A = new Array<Array<MATHJS.BigNumber>>(3);
-        let row0 = new Array<MATHJS.BigNumber>(3);
-        let row1 = new Array<MATHJS.BigNumber>(3);
-        let row2 = new Array<MATHJS.BigNumber>(3);
-        row0[0] = c.A;
-        row0[1] = MATHJS.multiply(c.B, 0.5) as MATHJS.BigNumber;
-        row0[2] = MATHJS.multiply(c.D, 0.5) as MATHJS.BigNumber;
-        row1[0] = MATHJS.multiply(c.B, 0.5) as MATHJS.BigNumber;
-        row1[1] = c.C;
-        row1[2] = MATHJS.multiply(c.E, 0.5) as MATHJS.BigNumber;
-        row2[0] = MATHJS.multiply(c.D, 0.5) as MATHJS.BigNumber;
-        row2[1] = MATHJS.multiply(c.E, 0.5) as MATHJS.BigNumber;
-        row2[2] = c.F;
-        A[0] = row0;
-        A[1] = row1;
-        A[2] = row2;
-        return A;
-    }
-
-    /**
-     * compute arc to nurbs intersection point.
-     *
-     * @param {Arc2Data} [c0] - The frist curve.
-     * @param {Nurbs2Data} [c1] - The second curve.
-     * @param {number} [tol0] - The tolerance of geometric.
-     * @param {number} [tol1] - The tolerance of algebraic.
-     * @param {number} [n] - The max number of intersection points.
-     */
-    static ArcXNurbs(c0: Arc2Data, c1: Nurbs2Data, tol0: number, tol1: number, n: number = 2): Array<InterOfCurve2> {
-        let segment = c1.controls.length * 2;
-        return Curve2Inter.CurveXCurve(c1, c0, segment, tol0, tol1, n);
-    }
-
-    /**
-     * compute nurbs to nurbs intersection point.
-     *
-     * @param {Nurbs2Data} [c0] - The frist curve.
-     * @param {Nurbs2Data} [c1] - The second curve.
-     * @param {number} [tol0] - The tolerance of geometric.
-     * @param {number} [tol1] - The tolerance of algebraic.
-     * @param {number} [n] - The max number of intersection points.
-     */
-    static NurbsXNurbs(c0: Nurbs2Data, c1: Nurbs2Data, tol0: number, tol1: number, n: number = -1): Array<InterOfCurve2> {
-        if (c0.controls.length <= c1.controls.length) {
-            let segment = c0.controls.length * 2;
-            return Curve2Inter.CurveXCurve(c0, c1, segment, tol0, tol1, n);
-        } else {
-            let segment = c1.controls.length * 2;
-            return Curve2Inter.CurveXCurve(c1, c0, segment, tol0, tol1, n);
-        }
-    }
-
-    /**
-     * compute curve to curve intersection point.
-     *
-     * @param {Curve2Data} [c0] - The frist curve , binary search curve.
-     * @param {Curve2Data} [c1] - The second curve , general equation curve.
-     * @param {number} [segment] - The segment of frist curve.
-     * @param {number} [tol0] - The tolerance of geometric.
-     * @param {number} [tol1] - The tolerance of algebraic.
-     * @param {number} [n] - The max number of intersection points.
-     * @param {number} [u0] - The min u number of frist curve.
-     * @param {number} [u1] - The max u number of frist curve.
-     */
-    public static CurveXCurve(c0: Curve2Data, c1: Curve2Data, segment: number, tol0: number, tol1: number, n: number = -1, u0: number = 0, u1: number = 1): Array<InterOfCurve2> {
-        let algor0 = CurveBuilder.Algorithm2ByData(c0);
-        let algor1 = CurveBuilder.Algorithm2ByData(c1);
-        let ret = new Array<InterOfCurve2>();
-        let ps = new Array<ValueOfBinary>();
-
-        // 计算初始的g值
-        for (let i = 0; i <= segment; i++) {
-            let u = (u1 - u0) * i / segment;
-            let p = algor0.p(u);
-            let g = algor1.g(p);
-            ps.push({ u, p, g });
-        }
-        let times = 0;
-        // 符号相反二分法递归细分
-        let bin = (a: ValueOfBinary, b: ValueOfBinary) => {
-            while (true) {
-                times++;
-                let u = (a.u + b.u) * 0.5;
-                let p = algor0.p(u);
-                let g = algor1.g(p);
-                // 一般方程返回值是0，则恰好是交点。
-                if (Math.abs(g) < tol1 || Math.abs(a.u - b.u) < tol1 && a.p.distanceTo(b.p) < tol0) {
-                    ret.push({ p: p, u0: u, u1: algor1.u(p) });
-                    break;
-                } else {
-                    if (a.g * g < 0) {
-                        b = { p, u, g };
-                    }
-                    else if (b.g * g < 0) {
-                        a = { p, u, g };
-                    }
-                }
-            }
-        }
-
-        // 局部最小递归细分
-        let close = (a: ValueOfBinary, du: number) => {
-            let du_ = 0;
-            while (true) {
-                times++;
-                let u = a.u + du;
-                let p = algor0.p(u);
-                let g = algor1.g(p);
-                // 一般方程返回值是0，则恰好是交点。
-                if (Math.abs(g) < tol1 /*|| Math.abs(du) < tol1 && a.p.distanceTo(p) < tol0*/) {
-                    ret.push({ p: p, u0: u, u1: algor1.u(p) });
-                    break;
-                } else {
-                    // 符号相反
-                    if (a.g * g < 0) {
-                        bin(a, { p, u, g });
-                        break;
-                    }
-                    // 扩张时，反向
-                    else if (Math.abs(g) > Math.abs(a.g)) {
-                        du = -du * 0.75;
-                    }
-                    // 收缩时
-                    else if (Math.abs(g) < Math.abs(a.g)) {
-                        a.u = u;
-                        a.g = g;
-                        a.p = p;
-                    }
-                    // 迭代结果不变，认为已经收敛，或者du已经很小。
-                    else if (Math.abs(g - a.g) < tol1 && du_ == du || Math.abs(du) < 1e-15) {
-                        break;
-                    }
-                    else {
-                        a.g = g;
-                        du_ = du;
-                    }
-                }
-            }
-        }
-
-        // 查找g值为0的点，g值符号相反的点，g值局部最小的点。
-        for (let i = 0; i < ps.length; i++) {
-            let pre = i > 0 ? ps[i - 1] : undefined;
-            let cur = ps[i - 0];
-            let nex = i < ps.length - 1 ? ps[i + 1] : undefined;
-            // g值是0，则恰好是交点。
-            if (Math.abs(cur.g) < tol1) {
-                ret.push({ p: cur.p, u0: cur.u, u1: algor1.u(cur.p) });
-                continue;
-            }
-            // 符号相反，则至少一个交点在这个区间内。
-            if (pre?.g * cur?.g < 0) {
-                bin(pre, cur);
-                continue;
-            }
-            // 端点后面不处理
-            if (i == 0 || i == ps.length - 1) {
-                continue;
-            }
-            // 局部最小，附近可能有交点。
-            let preg = Math.abs(pre.g);
-            let curg = Math.abs(cur.g);
-            let nexg = Math.abs(nex.g);
-            if (curg < preg && curg < nexg) {
-                close(cur, (u1 - u0) / segment);
-                continue;
-            }
-        }
-        // 去重
-        ret.sort((a: InterOfCurve2, b: InterOfCurve2): number => {
-            if (a.u0 < b.u0) {
-                return -1;
-            }
-            if (a.u0 > b.u0) {
-                return 1;
-            }
-            if (a.u1 < b.u1) {
-                return -1;
-            }
-            if (a.u1 > b.u1) {
-                return 1;
-            }
-            return 0;
+      // 4. 分解 B 为两条直线
+      let isSVD = false;
+      let isEigs = true;
+      // 特征值分解
+      if (isEigs && ret.length < n) {
+        // console.log("特征值分解");
+        const eigenvectors = MATHJS.eigs(B, { precision: 1e-25, eigenvectors: true }).eigenvectors;
+        eigenvectors.sort((a, b): number => {
+          let va = MATHJS.abs(a.value) as MATHJS.BigNumber;
+          let vb = MATHJS.abs(b.value) as MATHJS.BigNumber;
+          return MATHJS.compare(vb, va) as number;
         });
-        for (let i = ret.length - 1; i > 0; i--) {
-            if (ret[i].p.distanceTo(ret[i - 1].p) < tol0) {
-                ret.splice(i, 1);
+
+        let λ0 = eigenvectors[0].value as MATHJS.BigNumber;
+        let λ1 = eigenvectors[1].value as MATHJS.BigNumber;
+        let u = eigenvectors[0].vector as Array<MATHJS.BigNumber>;
+        let v = eigenvectors[1].vector as Array<MATHJS.BigNumber>;
+
+        // 虚数特征值跳过
+        if (MATHJS.typeOf(λ0) === 'Complex' || MATHJS.typeOf(λ1) === 'Complex') {
+          continue
+        }
+        // λ0 * λ1 < 0 两个实数特征值
+        if (!MATHJS.largerEq(MATHJS.multiply(λ0, λ1), 0)) {
+          let λ0_sqrt = MATHJS.sqrt(MATHJS.abs(λ0)) as MATHJS.BigNumber;
+          let λ1_sqrt = MATHJS.sqrt(MATHJS.abs(λ1)) as MATHJS.BigNumber;
+
+          let p = MATHJS.multiply(u, λ0_sqrt) as MATHJS.BigNumber[];
+          let q = MATHJS.multiply(v, λ1_sqrt) as MATHJS.BigNumber[];
+          if (!MATHJS.largerEq(λ1, 0)) {
+            q = MATHJS.unaryMinus(q);
+          }
+          let l0 = MATHJS.add(p, q) as MATHJS.BigNumber[];
+          let l1 = MATHJS.subtract(p, q) as MATHJS.BigNumber[];
+          const lines: MATHJS.BigNumber[][] = [];
+          lines.push(l0, l1);
+          // 5. 每条直线与原二次曲线之一求交（解二次方程），得到候选交点。
+          for (let j = 0; j < lines.length; j++) {
+            const l = lines[j];
+            // console.log(" 直线 l :" + format(l));
+            let inters = Curve2Inter.LineXConic({ A: l[0], B: l[1], C: l[2] }, c0, null, c0a, tol0, tol1, 2);
+            checkAndPush(inters);
+            if (ret.length >= n) {
+              break;
             }
+            inters = Curve2Inter.LineXConic({ A: l[0], B: l[1], C: l[2] }, c1, null, c0a, tol0, tol1, 2);
+            checkAndPush(inters);
+            if (ret.length >= n) {
+              break;
+            }
+          }
         }
-        if (times > 100) {
-            console.warn("times :" + times);
+      }
+    }
+    return ret;
+  }
+
+  /**
+   * 用二分逼近在c0上寻找与c1的交点。
+   * 在c0的参数空间内迭代。
+   * 寻找一个c0的参数u0，使得c0.p(u0)在c1上，即满足c1的一般方程。
+   * 误差小于tol时停止。
+   * p0s为c0上的初始猜测点。
+   * 
+   * @param {Curve2Algo} [c0] - The frist curve.
+   * @param {Curve2Algo} [c1] - The second curve.
+   * @param {number} [tol0] - The tolerance of geometric.
+   * @param {number} [tol1] - The tolerance of algebraic.
+   */
+  static totaltimes = 0;
+  static Binary(
+    c0a: Curve2Algo,
+    c1a: Curve2Algo,
+    p0: InterOfCurve2,
+    tol0: number,
+    tol1: number): void {
+    let ret = p0;
+    let g = c1a.g(p0.p);
+    let s = Math.log(Math.abs(g));
+    let du = 0.75 * (s > 1 ? s : 1);
+    let du_ = 0;
+    let times = 0;
+
+    // 符号相反二分法递归细分
+    let bin = (a: ValueOfBinary, b: ValueOfBinary) => {
+      while (true) {
+        times++;
+        let u = (a.u + b.u) * 0.5;
+        let p = c0a.p(u);
+        let g = c1a.g(p);
+        // 一般方程返回值是0，则恰好是交点。
+        if (Math.abs(g) < tol1 /*|| Math.abs(a.u - b.u) < tol1 && a.p.distanceTo(b.p) < tol0*/) {
+          ret.p = p;
+          ret.u0 = u;
+          ret.u1 = c1a.u(p);
+          break;
         } else {
-            console.log("times :" + times);
+          if (a.g * g < 0) {
+            b = { p, u, g };
+          }
+          else if (b.g * g < 0) {
+            a = { p, u, g };
+          }
         }
-        Curve2Inter.totaltimes += times;
-        return ret;
+      }
     }
 
-    /**
-     * compute curve to curve intersection point.
-     *
-     * @param {Curve2Data} [c0] - The frist curve , binary search curve.
-     * @param {Curve2Data} [c1] - The second curve , general equation curve.
-     * @param {number} [tol0] - The tolerance of geometric.
-     * @param {number} [tol1] - The tolerance of algebraic.
-     */
-    public static X(c0: Curve2Data, c1: Curve2Data, tol0: number, tol1: number): Array<InterOfCurve2> {
-        let inters: Array<InterOfCurve2> = [];
-        if (c0 instanceof Line2Data) {
-            if (c1 instanceof Line2Data) {
-                inters.push(...Curve2Inter.LineXLine(c0, c1, tol0, tol1));
-            }
-            else if (c1 instanceof Arc2Data) {
-                inters.push(...Curve2Inter.LineXArc(c0, c1, tol0, tol1));
-            }
-            else if (c1 instanceof Hyperbola2Data) {
-                inters.push(...Curve2Inter.LineXHyperbola(c0, c1, tol0, tol1));
-            }
-            else if (c1 instanceof Parabola2Data) {
-                inters.push(...Curve2Inter.LineXParabola(c0, c1, tol0, tol1));
-            }
-            else if (c1 instanceof Nurbs2Data) {
-                inters.push(...Curve2Inter.LineXNurbs(c0, c1, tol0, tol1));
-            }
-        }
-        else if (c1 instanceof Line2Data) {
-            if (c0 instanceof Arc2Data) {
-                let rinters = Curve2Inter.LineXArc(c1, c0, tol0, tol1);
-                rinters.forEach((i) => {
-                    let t = i.u0; i.u0 = i.u1; i.u1 = t; inters.push(i);
-                });
-            }
-            else if (c0 instanceof Hyperbola2Data) {
-                let rinters = Curve2Inter.LineXHyperbola(c1, c0, tol0, tol1);
-                rinters.forEach((i) => {
-                    let t = i.u0; i.u0 = i.u1; i.u1 = t; inters.push(i);
-                });
-            }
-            else if (c0 instanceof Parabola2Data) {
-                let rinters = Curve2Inter.LineXParabola(c1, c0, tol0, tol1);
-                rinters.forEach((i) => {
-                    let t = i.u0; i.u0 = i.u1; i.u1 = t; inters.push(i);
-                });
-            }
-            else if (c0 instanceof Nurbs2Data) {
-                let rinters = Curve2Inter.LineXNurbs(c1, c0, tol0, tol1);
-                rinters.forEach((i) => {
-                    let t = i.u0; i.u0 = i.u1; i.u1 = t; inters.push(i);
-                });
-            }
-        }
-        else if (c0 instanceof Arc2Data || c0 instanceof Hyperbola2Data || c0 instanceof Parabola2Data) {
-            if (c0 instanceof Arc2Data && c1 instanceof Arc2Data) {
-                if (c0.radius.x === c0.radius.y && c1.radius.x === c1.radius.y) {
-                    inters.push(...Curve2Inter.QuadraticXQuadratic(c0, c1, tol0, tol1, 2));
-                } else {
-                    inters.push(...Curve2Inter.QuadraticXQuadratic(c0, c1, tol0, tol1, 4));
-                }
-            }
-            else if (c1 instanceof Arc2Data || c1 instanceof Hyperbola2Data || c1 instanceof Parabola2Data) {
-                inters.push(...Curve2Inter.QuadraticXQuadratic(c0, c1, tol0, tol1));
-            }
-            else if (c1 instanceof Nurbs2Data) {
-                inters.push(...Curve2Inter.QuadraticXNurbs(c0, c1, tol0, tol1));
-            }
-        }
-        else if (c0 instanceof Nurbs2Data) {
-            if (c1 instanceof Nurbs2Data) {
-                inters.push(...Curve2Inter.NurbsXNurbs(c0, c1, tol0, tol1));
-            }
+    while (true) {
+      times++;
+      ret.u0 += du;
+      let u = ret.u0;
+      let dp = c0a.p(u);
+      let dg = c1a.g(dp);
+      // 异号时，说明跨过了根，减小步长并反向
+      if (g * dg < 0) {
+        let a = { p: ret.p, u: ret.u0 - du, g: g };
+        let b = { p: dp, u, g: dg };
+        if (a.u < b.u) {
+          bin(a, b);
         } else {
-            inters.push(...Curve2Inter.CurveXCurve(c0, c1, 512, tol0, tol1));
+          bin(b, a);
         }
-        return inters;
+        break;
+      }
+      // 扩张时，反向
+      else if (Math.abs(dg) > Math.abs(g)) {
+        du = -du; //* 0.75;
+      }
+      // 收缩时
+      // else if (Math.abs(dg) < Math.abs(g)) {
+      //     // let s = Math.log(Math.abs(dg));
+      //     // if (s > 1) {
+      //     //     du = du * s;
+      //     // }
+      // }
+      // 满足要求,找到了在c1上的点
+      if (Math.abs(dg) < tol1) {
+        ret.p = dp;
+        ret.u1 = c1a.u(dp);
+        break;
+      }
+      // 迭代结果不变，认为已经收敛，或者du已经很小。
+      else if (Math.abs(g - dg) < tol1 && du_ == du || Math.abs(du) < 1e-15) {
+        ret.p = dp;
+        ret.u1 = c1a.u(dp);
+        break;
+      }
+      else {
+        g = dg;
+        du_ = du;
+      }
     }
+    if (times > 100) {
+      console.warn("times :" + times);
+    } else {
+      console.log("times :" + times);
+    }
+    Curve2Inter.totaltimes += times;
+  }
+
+  // 构建二次型矩阵
+  static QuadraticMatrix(c: { A: MATHJS.BigNumber, B: MATHJS.BigNumber, C: MATHJS.BigNumber, D: MATHJS.BigNumber, E: MATHJS.BigNumber, F: MATHJS.BigNumber }): Array<Array<MATHJS.BigNumber>> {
+    let A = new Array<Array<MATHJS.BigNumber>>(3);
+    let row0 = new Array<MATHJS.BigNumber>(3);
+    let row1 = new Array<MATHJS.BigNumber>(3);
+    let row2 = new Array<MATHJS.BigNumber>(3);
+    row0[0] = c.A;
+    row0[1] = MATHJS.multiply(c.B, 0.5) as MATHJS.BigNumber;
+    row0[2] = MATHJS.multiply(c.D, 0.5) as MATHJS.BigNumber;
+    row1[0] = MATHJS.multiply(c.B, 0.5) as MATHJS.BigNumber;
+    row1[1] = c.C;
+    row1[2] = MATHJS.multiply(c.E, 0.5) as MATHJS.BigNumber;
+    row2[0] = MATHJS.multiply(c.D, 0.5) as MATHJS.BigNumber;
+    row2[1] = MATHJS.multiply(c.E, 0.5) as MATHJS.BigNumber;
+    row2[2] = c.F;
+    A[0] = row0;
+    A[1] = row1;
+    A[2] = row2;
+    return A;
+  }
+
+  /**
+   * compute arc to nurbs intersection point.
+   *
+   * @param {Arc2Data} [c0] - The frist curve.
+   * @param {Nurbs2Data} [c1] - The second curve.
+   * @param {number} [tol0] - The tolerance of geometric.
+   * @param {number} [tol1] - The tolerance of algebraic.
+   * @param {number} [n] - The max number of intersection points.
+   */
+  static ArcXNurbs(c0: Arc2Data, c1: Nurbs2Data, tol0: number, tol1: number, n: number = 2): Array<InterOfCurve2> {
+    let segment = c1.controls.length * 2;
+    return Curve2Inter.CurveXCurve(c1, c0, segment, tol0, tol1, n);
+  }
+
+  /**
+   * compute nurbs to nurbs intersection point.
+   *
+   * @param {Nurbs2Data} [c0] - The frist curve.
+   * @param {Nurbs2Data} [c1] - The second curve.
+   * @param {number} [tol0] - The tolerance of geometric.
+   * @param {number} [tol1] - The tolerance of algebraic.
+   * @param {number} [n] - The max number of intersection points.
+   */
+  static NurbsXNurbs(c0: Nurbs2Data, c1: Nurbs2Data, tol0: number, tol1: number, n: number = -1): Array<InterOfCurve2> {
+    if (c0.controls.length <= c1.controls.length) {
+      let segment = c0.controls.length * 2;
+      return Curve2Inter.CurveXCurve(c0, c1, segment, tol0, tol1, n);
+    } else {
+      let segment = c1.controls.length * 2;
+      return Curve2Inter.CurveXCurve(c1, c0, segment, tol0, tol1, n);
+    }
+  }
+
+  /**
+   * compute curve to curve intersection point.
+   *
+   * @param {Curve2Data} [c0] - The frist curve , binary search curve.
+   * @param {Curve2Data} [c1] - The second curve , general equation curve.
+   * @param {number} [segment] - The segment of frist curve.
+   * @param {number} [tol0] - The tolerance of geometric.
+   * @param {number} [tol1] - The tolerance of algebraic.
+   * @param {number} [n] - The max number of intersection points.
+   * @param {number} [u0] - The min u number of frist curve.
+   * @param {number} [u1] - The max u number of frist curve.
+   */
+  public static CurveXCurve(c0: Curve2Data, c1: Curve2Data, segment: number, tol0: number, tol1: number, n: number = -1, u0: number = 0, u1: number = 1): Array<InterOfCurve2> {
+    let algor0 = CurveBuilder.Algorithm2ByData(c0);
+    let algor1 = CurveBuilder.Algorithm2ByData(c1);
+    let ret = new Array<InterOfCurve2>();
+    let ps = new Array<ValueOfBinary>();
+
+    // 计算初始的g值
+    for (let i = 0; i <= segment; i++) {
+      let u = (u1 - u0) * i / segment;
+      let p = algor0.p(u);
+      let g = algor1.g(p);
+      ps.push({ u, p, g });
+    }
+    let times = 0;
+    // 符号相反二分法递归细分
+    let bin = (a: ValueOfBinary, b: ValueOfBinary) => {
+      while (true) {
+        times++;
+        let u = (a.u + b.u) * 0.5;
+        let p = algor0.p(u);
+        let g = algor1.g(p);
+        // 一般方程返回值是0，则恰好是交点。
+        if (Math.abs(g) < tol1 || Math.abs(a.u - b.u) < tol1 && a.p.distanceTo(b.p) < tol0) {
+          ret.push({ p: p, u0: u, u1: algor1.u(p) });
+          break;
+        } else {
+          if (a.g * g < 0) {
+            b = { p, u, g };
+          }
+          else if (b.g * g < 0) {
+            a = { p, u, g };
+          }
+        }
+      }
+    }
+
+    // 局部最小递归细分
+    let close = (a: ValueOfBinary, du: number) => {
+      let du_ = 0;
+      while (true) {
+        times++;
+        let u = a.u + du;
+        let p = algor0.p(u);
+        let g = algor1.g(p);
+        // 一般方程返回值是0，则恰好是交点。
+        if (Math.abs(g) < tol1 /*|| Math.abs(du) < tol1 && a.p.distanceTo(p) < tol0*/) {
+          ret.push({ p: p, u0: u, u1: algor1.u(p) });
+          break;
+        } else {
+          // 符号相反
+          if (a.g * g < 0) {
+            bin(a, { p, u, g });
+            break;
+          }
+          // 扩张时，反向
+          else if (Math.abs(g) > Math.abs(a.g)) {
+            du = -du * 0.75;
+          }
+          // 收缩时
+          else if (Math.abs(g) < Math.abs(a.g)) {
+            a.u = u;
+            a.g = g;
+            a.p = p;
+          }
+          // 迭代结果不变，认为已经收敛，或者du已经很小。
+          else if (Math.abs(g - a.g) < tol1 && du_ == du || Math.abs(du) < 1e-15) {
+            break;
+          }
+          else {
+            a.g = g;
+            du_ = du;
+          }
+        }
+      }
+    }
+
+    // 查找g值为0的点，g值符号相反的点，g值局部最小的点。
+    for (let i = 0; i < ps.length; i++) {
+      let pre = i > 0 ? ps[i - 1] : undefined;
+      let cur = ps[i - 0];
+      let nex = i < ps.length - 1 ? ps[i + 1] : undefined;
+      // g值是0，则恰好是交点。
+      if (Math.abs(cur.g) < tol1) {
+        ret.push({ p: cur.p, u0: cur.u, u1: algor1.u(cur.p) });
+        continue;
+      }
+      // 符号相反，则至少一个交点在这个区间内。
+      if (pre?.g * cur?.g < 0) {
+        bin(pre, cur);
+        continue;
+      }
+      // 端点后面不处理
+      if (i == 0 || i == ps.length - 1) {
+        continue;
+      }
+      // 局部最小，附近可能有交点。
+      let preg = Math.abs(pre.g);
+      let curg = Math.abs(cur.g);
+      let nexg = Math.abs(nex.g);
+      if (curg < preg && curg < nexg) {
+        close(cur, (u1 - u0) / segment);
+        continue;
+      }
+    }
+    // 去重
+    ret.sort((a: InterOfCurve2, b: InterOfCurve2): number => {
+      if (a.u0 < b.u0) {
+        return -1;
+      }
+      if (a.u0 > b.u0) {
+        return 1;
+      }
+      if (a.u1 < b.u1) {
+        return -1;
+      }
+      if (a.u1 > b.u1) {
+        return 1;
+      }
+      return 0;
+    });
+    for (let i = ret.length - 1; i > 0; i--) {
+      if (ret[i].p.distanceTo(ret[i - 1].p) < tol0) {
+        ret.splice(i, 1);
+      }
+    }
+    if (times > 100) {
+      console.warn("times :" + times);
+    } else {
+      console.log("times :" + times);
+    }
+    Curve2Inter.totaltimes += times;
+    return ret;
+  }
+
+  /**
+   * compute curve to curve intersection point.
+   *
+   * @param {Curve2Data} [c0] - The frist curve , binary search curve.
+   * @param {Curve2Data} [c1] - The second curve , general equation curve.
+   * @param {number} [tol0] - The tolerance of geometric.
+   * @param {number} [tol1] - The tolerance of algebraic.
+   */
+  public static X(c0: Curve2Data, c1: Curve2Data, tol0: number, tol1: number): Array<InterOfCurve2> {
+    let inters: Array<InterOfCurve2> = [];
+    if (c0 instanceof Line2Data) {
+      if (c1 instanceof Line2Data) {
+        inters.push(...Curve2Inter.LineXLine(c0, c1, tol0, tol1));
+      }
+      else if (c1 instanceof Arc2Data) {
+        inters.push(...Curve2Inter.LineXArc(c0, c1, tol0, tol1));
+      }
+      else if (c1 instanceof Hyperbola2Data) {
+        inters.push(...Curve2Inter.LineXHyperbola(c0, c1, tol0, tol1));
+      }
+      else if (c1 instanceof Parabola2Data) {
+        inters.push(...Curve2Inter.LineXParabola(c0, c1, tol0, tol1));
+      }
+      else if (c1 instanceof Nurbs2Data) {
+        inters.push(...Curve2Inter.LineXNurbs(c0, c1, tol0, tol1));
+      }
+    }
+    else if (c1 instanceof Line2Data) {
+      if (c0 instanceof Arc2Data) {
+        let rinters = Curve2Inter.LineXArc(c1, c0, tol0, tol1);
+        rinters.forEach((i) => {
+          let t = i.u0; i.u0 = i.u1; i.u1 = t; inters.push(i);
+        });
+      }
+      else if (c0 instanceof Hyperbola2Data) {
+        let rinters = Curve2Inter.LineXHyperbola(c1, c0, tol0, tol1);
+        rinters.forEach((i) => {
+          let t = i.u0; i.u0 = i.u1; i.u1 = t; inters.push(i);
+        });
+      }
+      else if (c0 instanceof Parabola2Data) {
+        let rinters = Curve2Inter.LineXParabola(c1, c0, tol0, tol1);
+        rinters.forEach((i) => {
+          let t = i.u0; i.u0 = i.u1; i.u1 = t; inters.push(i);
+        });
+      }
+      else if (c0 instanceof Nurbs2Data) {
+        let rinters = Curve2Inter.LineXNurbs(c1, c0, tol0, tol1);
+        rinters.forEach((i) => {
+          let t = i.u0; i.u0 = i.u1; i.u1 = t; inters.push(i);
+        });
+      }
+    }
+    else if (c0 instanceof Arc2Data || c0 instanceof Hyperbola2Data || c0 instanceof Parabola2Data) {
+      if (c0 instanceof Arc2Data && c1 instanceof Arc2Data) {
+        if (c0.radius.x === c0.radius.y && c1.radius.x === c1.radius.y) {
+          inters.push(...Curve2Inter.QuadraticXQuadratic(c0, c1, tol0, tol1, 2));
+        } else {
+          inters.push(...Curve2Inter.QuadraticXQuadratic(c0, c1, tol0, tol1, 4));
+        }
+      }
+      else if (c1 instanceof Arc2Data || c1 instanceof Hyperbola2Data || c1 instanceof Parabola2Data) {
+        inters.push(...Curve2Inter.QuadraticXQuadratic(c0, c1, tol0, tol1));
+      }
+      else if (c1 instanceof Nurbs2Data) {
+        inters.push(...Curve2Inter.QuadraticXNurbs(c0, c1, tol0, tol1));
+      }
+    }
+    else if (c0 instanceof Nurbs2Data) {
+      if (c1 instanceof Nurbs2Data) {
+        inters.push(...Curve2Inter.NurbsXNurbs(c0, c1, tol0, tol1));
+      }
+    } else {
+      inters.push(...Curve2Inter.CurveXCurve(c0, c1, 512, tol0, tol1));
+    }
+    return inters;
+  }
 }
 
 export { Curve2Inter };

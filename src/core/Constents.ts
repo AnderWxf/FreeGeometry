@@ -168,9 +168,23 @@ enum CommandType {
   CALCULATE_AREA_3 = 'CA3',            // 计算面积
   CALCULATE_VOLUME_3 = 'CV3',          // 计算体积
 
-  //操作
+  //基础操作
   OPERATION_EDGE_INTERSECTION = 'OEI', // 边交点(多选对象组中的第一个与后面所有对象间的交点)
   OPERATION_EDGE_CUTTING = 'OEC',      // 边切分(多选对象组中的第一个分割后面所有对象)
+
+  //布尔运算
+  BOOL_2_INTERSECTION_MULTIPLE = 'B2IM',// 2D布尔交(多对多)
+  BOOL_2_UNION_MULTIPLE = 'B2UM',       // 2D布尔并(多对多)
+  BOOL_2_DIFFERENCE_MULTIPLE = 'B2DM',  // 2D布尔差(多对多)
+  BOOL_2_INTERSECTION = 'B2I',          // 2D布尔交(单对单)
+  BOOL_2_UNION = 'B2U',                 // 2D布尔并(单对单)
+  BOOL_2_DIFFERENCE = 'B2D',            // 2D布尔差(单对单)
+  BOOL_3_INTERSECTION_MULTIPLE = 'B3IM',// 3D布尔交(多对多)
+  BOOL_3_UNION_MULTIPLE = 'B3UM',       // 3D布尔并(多对多)
+  BOOL_3_DIFFERENCE_MULTIPLE = 'B3DM',  // 3D布尔差(多对多)
+  BOOL_3_INTERSECTION = 'B3I',          // 3D布尔交(单对单)
+  BOOL_3_UNION = 'B3U',                 // 3D布尔并(单对单)
+  BOOL_3_DIFFERENCE = 'B3D',            // 3D布尔差(单对单)
 
   // 其他
   OTHER_DELETE = 'D',                   // 删除

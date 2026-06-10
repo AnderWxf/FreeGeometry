@@ -1,6 +1,6 @@
 
 import { Digraph2, Face2, Loop2 } from "../../../data/brep/Brep2";
-import { Digraph2Algo, Face2Algo, Loop2Algo } from "../../brep/Brep2Algo";
+import { Coedge2Algo, Digraph2Algo, Face2Algo, Loop2Algo } from "../../brep/Brep2Algo";
 import { Brep2Inter, type InterOfFace2 } from "../intersection/Brep2Inter";
 
 class Bool2 {
@@ -110,28 +110,28 @@ class Bool2 {
       }
     }
     // 根据轮廓交点对面轮廓进行切割
-    Bool2.Cutting(a.loops, b.loops, inters);
+    Bool2.Cutting(algo.loops, blgo.loops, inters);
     // 删除a中在b内部的边。
     algo.loops.forEach((loop) => {
-      let count = loop.algos.length;
+      let count = loop.coedges.length;
       for (let i = count - 1; i > -1; i--) {
-        let coedge = loop.algos[i];
+        let coedge = loop.coedges[i];
         let u = coedge.u;
         let mp = coedge.p((u.x + u.y) * 0.5);
         if (blgo.isPointAtInner(mp, tol0, tol1)) {
-          loop.algos.splice(i, 1);
+          loop.coedges.splice(i, 1);
         }
       }
     });
     // 删除b中不在a内部的边。
     blgo.loops.forEach((loop) => {
-      let count = loop.algos.length;
+      let count = loop.coedges.length;
       for (let i = count - 1; i > -1; i--) {
-        let coedge = loop.algos[i];
+        let coedge = loop.coedges[i];
         let u = coedge.u;
         let mp = coedge.p((u.x + u.y) * 0.5);
         if (!algo.isPointAtInner(mp, tol0, tol1)) {
-          loop.algos.splice(i, 1);
+          loop.coedges.splice(i, 1);
         }
       }
     });
@@ -153,7 +153,7 @@ class Bool2 {
     b = b.clone();
     // 计算面与面的轮廓交点
     let algo = new Face2Algo(a);
-    let blgo = new Face2Algo(a);
+    let blgo = new Face2Algo(b);
     let inters = Brep2Inter.FaceXFace(a, b, tol0, tol1);
     if (inters.length == 0) {
       let pa = algo.getInnerPoint();
@@ -171,28 +171,28 @@ class Bool2 {
       }
     }
     // 根据轮廓交点对面轮廓进行切割
-    Bool2.Cutting(a.loops, b.loops, inters);
+    Bool2.Cutting(algo.loops, blgo.loops, inters);
     // 删除a中不在b内部的边。
     algo.loops.forEach((loop) => {
-      let count = loop.algos.length;
+      let count = loop.coedges.length;
       for (let i = count - 1; i > -1; i--) {
-        let coedge = loop.algos[i];
+        let coedge = loop.coedges[i];
         let u = coedge.u;
         let mp = coedge.p((u.x + u.y) * 0.5);
         if (!blgo.isPointAtInner(mp, tol0, tol1)) {
-          loop.algos.splice(i, 1);
+          loop.coedges.splice(i, 1);
         }
       }
     });
     // 删除b中不在a内部的边。
     blgo.loops.forEach((loop) => {
-      let count = loop.algos.length;
+      let count = loop.coedges.length;
       for (let i = count - 1; i > -1; i--) {
-        let coedge = loop.algos[i];
+        let coedge = loop.coedges[i];
         let u = coedge.u;
         let mp = coedge.p((u.x + u.y) * 0.5);
         if (!algo.isPointAtInner(mp, tol0, tol1)) {
-          loop.algos.splice(i, 1);
+          loop.coedges.splice(i, 1);
         }
       }
     });
@@ -210,7 +210,7 @@ class Bool2 {
     b = b.clone();
     // 计算面与面的轮廓交点
     let algo = new Face2Algo(a);
-    let blgo = new Face2Algo(a);
+    let blgo = new Face2Algo(b);
     let inters = Brep2Inter.FaceXFace(a, b, tol0, tol1);
     if (inters.length == 0) {
       let pa = algo.getInnerPoint();
@@ -228,28 +228,28 @@ class Bool2 {
       }
     }
     // 根据轮廓交点对面轮廓进行切割
-    Bool2.Cutting(a.loops, b.loops, inters);
+    Bool2.Cutting(algo.loops, blgo.loops, inters);
     // 删除a中在b内部的边。
     algo.loops.forEach((loop) => {
-      let count = loop.algos.length;
+      let count = loop.coedges.length;
       for (let i = count - 1; i > -1; i--) {
-        let coedge = loop.algos[i];
+        let coedge = loop.coedges[i];
         let u = coedge.u;
         let mp = coedge.p((u.x + u.y) * 0.5);
         if (blgo.isPointAtInner(mp, tol0, tol1)) {
-          loop.algos.splice(i, 1);
+          loop.coedges.splice(i, 1);
         }
       }
     });
     // 删除b中在a内部的边。
     blgo.loops.forEach((loop) => {
-      let count = loop.algos.length;
+      let count = loop.coedges.length;
       for (let i = count - 1; i > -1; i--) {
-        let coedge = loop.algos[i];
+        let coedge = loop.coedges[i];
         let u = coedge.u;
         let mp = coedge.p((u.x + u.y) * 0.5);
         if (algo.isPointAtInner(mp, tol0, tol1)) {
-          loop.algos.splice(i, 1);
+          loop.coedges.splice(i, 1);
         }
       }
     });
@@ -262,47 +262,49 @@ class Bool2 {
   * 根据交点对面的边进行切割。
   * 
   */
-  static Cutting(a: Loop2[], b: Loop2[], inters: Array<InterOfFace2>) {
+  static Cutting(a: Loop2Algo[], b: Loop2Algo[], inters: Array<InterOfFace2>) {
     // 根据轮廓交点对面轮廓进行切割
     for (let i = 0; i < inters.length; i++) {
       let inter = inters[i];
       let c0 = inter.c0;
       let c1 = inter.c1;
       let is = inter.is;
-      // 对c0进行切割
-      a.forEach(loop => {
-        for (let j = 0; j < loop.coedges.length; j++) {
-          let coedge = loop.coedges[j];
-          if (coedge.e.curve == c0) {
-            is.forEach(is => {
-              if (is.u0 > coedge.e.u.x && is.u0 < coedge.e.u.y) {
+      for (let j = 0; j < is.length; j++) {
+        let ip = is[j];
+        // 用c0对a中的所有loop进行切割
+        for (let k = 0; k < a.length; k++) {
+          let loop = a[k];
+          for (let l = 0; l < loop.coedges.length; l++) {
+            let coedge = loop.coedges[l];
+            if (coedge.curve.dat == c0) {
+              if (coedge.isInURange(ip.u0)) {
                 // 对coedge进行切割
-                let newCoedge = coedge.clone();
-                newCoedge.e.u.x = is.u0;
-                coedge.e.u.y = is.u0;
-                loop.coedges.splice(j + 1, 0, newCoedge);
+                let after = coedge.c.clone();
+                after.e.umin = ip.u0;
+                coedge.c.e.umax = ip.u0;
+                loop.coedges.splice(j + 1, 0, new Coedge2Algo(after, coedge.f));
               }
-            });
+            }
           }
         }
-      });
-      // 对c1进行切割
-      b.forEach(loop => {
-        for (let j = 0; j < loop.coedges.length; j++) {
-          let coedge = loop.coedges[j];
-          if (coedge.e.curve == c1) {
-            is.forEach(is => {
-              if (is.u0 > coedge.e.u.x && is.u0 < coedge.e.u.y) {
+
+        // 用c1对b中的所有loop进行切割
+        for (let k = 0; k < b.length; k++) {
+          let loop = b[k];
+          for (let l = 0; l < loop.coedges.length; l++) {
+            let coedge = loop.coedges[l];
+            if (coedge.curve.dat == c1) {
+              if (coedge.isInURange(ip.u1)) {
                 // 对coedge进行切割
-                let newCoedge = coedge.clone();
-                newCoedge.e.u.x = is.u0;
-                coedge.e.u.y = is.u0;
-                loop.coedges.splice(j + 1, 0, newCoedge);
+                let after = coedge.c.clone();
+                after.e.umin = ip.u1;
+                coedge.c.e.umax = ip.u1;
+                loop.coedges.splice(j + 1, 0, new Coedge2Algo(after, coedge.f));
               }
-            });
+            }
           }
         }
-      });
+      }
     }
   }
 
@@ -320,7 +322,7 @@ class Bool2 {
     let alloops = galgo.getAllLoops();
     // 删除面积为0的环
     let count = alloops.length;
-    for (let i = count; i > -1; i--) {
+    for (let i = count - 1; i > -1; i--) {
       // 面积为0
       if (Math.abs(alloops[i].area()) <= tol1) {
         alloops.splice(i, 1);
@@ -332,7 +334,7 @@ class Bool2 {
       let outside: Loop2Algo;
       // 获得一个外层loop
       let count = alloops.length;
-      for (let i = count; i > -1; i--) {
+      for (let i = count - 1; i > -1; i--) {
         // 正向的外轮廓
         if (alloops[i].isPositive()) {
           outside = alloops[i];
@@ -358,4 +360,8 @@ class Bool2 {
     }
     return result;
   }
+}
+
+export {
+  Bool2,
 }

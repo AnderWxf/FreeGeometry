@@ -13,12 +13,12 @@ class Line2Algo extends Curve2Algo {
    *
    * @type {Line2Data}
    */
-  protected dat_: Line2Data;
+  protected _dat: Line2Data;
   public get dat(): Line2Data {
-    return this.dat_;
+    return this._dat;
   }
   public set dat(dat: Line2Data) {
-    this.dat_ = dat;
+    this._dat = dat;
   }
   /**
    * Constructs a 2D line algorithm.

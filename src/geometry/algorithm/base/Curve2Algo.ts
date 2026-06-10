@@ -21,12 +21,12 @@ class Curve2Algo {
    *
    * @type {Curve2Data}
    */
-  protected dat_: Curve2Data;
+  protected _dat: Curve2Data;
   public get dat(): Curve2Data {
-    return this.dat_;
+    return this._dat;
   }
   public set dat(dat: Curve2Data) {
-    this.dat_ = dat;
+    this._dat = dat;
   }
   /**
    * Constructs a 2D curvr algorithm.
@@ -34,7 +34,7 @@ class Curve2Algo {
    * @param {Curve2Data} [dat = Curve2Data] - The data struct of this 2D curvr algorithm.
    */
   constructor(dat: Curve2Data) {
-    this.dat = dat;
+    this._dat = dat;
   }
 
   /**

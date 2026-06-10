@@ -39,7 +39,7 @@ class CreateArc2ThreePointCom extends ComCreate {
 
       let act_pick_begin = new ActPickPoint2();
       await act_pick_begin.execute(context);
-      if (this._isCancel) { this.cancel(); return; }
+      if (this._isCancel || act_pick_begin.isCancel) { this.cancel(); return; }
       this.beginPoint = new Vector2(act_pick_begin.result.x, act_pick_begin.result.y);
       userData.assistPoints.push({ p: this.beginPoint, c: THREE.Color.NAMES.limegreen });
       this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
@@ -47,7 +47,7 @@ class CreateArc2ThreePointCom extends ComCreate {
 
       let act_pick_middle = new ActPickPoint2();
       await act_pick_middle.execute(context);
-      if (this._isCancel) { this.cancel(); return; }
+      if (this._isCancel || act_pick_middle.isCancel) { this.cancel(); return; }
       this.middlePoint = new Vector2(act_pick_middle.result.x, act_pick_middle.result.y);
       userData.assistPoints.push({ p: this.middlePoint, c: THREE.Color.NAMES.darkblue });
       this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
@@ -55,7 +55,7 @@ class CreateArc2ThreePointCom extends ComCreate {
 
       let act_pick_end = new ActPickPoint2();
       await act_pick_end.execute(context);
-      if (this._isCancel) { this.cancel(); return; }
+      if (this._isCancel || act_pick_end.isCancel) { this.cancel(); return; }
       this.endPoint = new Vector2(act_pick_end.result.x, act_pick_end.result.y);
       userData.assistPoints.push({ p: this.endPoint, c: THREE.Color.NAMES.darkblue });
       this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));

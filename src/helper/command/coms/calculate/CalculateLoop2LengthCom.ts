@@ -69,7 +69,7 @@ class CalculateLoop2LengthCom extends ComCreate {
 
       let act_pick_objs = new ActPickObjects();
       await act_pick_objs.execute(context);
-      if (this._isCancel) { this.cancel(); return; }
+      if (this._isCancel || act_pick_objs.isCancel) { this.cancel(); return; }
 
       // 只能选择二维曲线类型
       for (let i = 0; i < act_pick_objs.results.length; i++) {

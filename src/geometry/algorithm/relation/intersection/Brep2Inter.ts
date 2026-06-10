@@ -33,8 +33,10 @@ class Brep2Inter {
     let inters = Curve2Inter.X(c0, c1, tol0, tol1);
     for (let i = 0; i < inters.length; i++) {
       let inter = inters[i];
-      if (inter.u0 >= e0.u.x && inter.u0 <= e0.u.y &&
-        inter.u1 >= e1.u.x && inter.u1 <= e1.u.y
+      let e0ur = e0.ur;
+      let e1ur = e1.ur;
+      if (inter.u0 >= e0ur.x && inter.u0 <= e0ur.y &&
+        inter.u1 >= e1ur.x && inter.u1 <= e1ur.y
       ) {
         result.push(inter);
       }
@@ -60,11 +62,51 @@ class Brep2Inter {
         let c0 = cs0[i];
         let c1 = cs1[j];
         inters.push(...Curve2Inter.X(c0, c1, tol0, tol1));
-        ret.push({
-          is: inters,
-          c0: c0,
-          c1: c1,
-        });
+        if (inters.length) {
+          ret.push({
+            is: inters,
+            c0: c0,
+            c1: c1,
+          });
+        }
+      }
+    }
+
+    // 过滤哪些不在边上的交点
+    let count = ret.length;
+    for (let i = count - 1; i > -1; i--) {
+      let interf = ret[i];
+      let edges0 = f0.getEdgesByCurve(interf.c0);
+      let edges1 = f1.getEdgesByCurve(interf.c1);
+      if (edges0.length == 0 || edges1.length == 0) {
+        ret.splice(i, 1);
+        continue;
+      }
+      let count1 = interf.is.length;
+      for (let j = count1 - 1; j > -1; j--) {
+        let isValid0 = false;
+        let isValid1 = false;
+        let interp = interf.is[j];
+        for (let l = 0; l < edges0.length; l++) {
+          let ur = edges0[l].ur;
+          if (interp.u0 >= ur.x && interp.u0 <= ur.y) {
+            isValid0 = true;
+            break;
+          }
+        }
+        for (let l = 0; l < edges1.length; l++) {
+          let ur = edges1[l].ur;
+          if (interp.u1 >= ur.x && interp.u1 <= ur.y) {
+            isValid1 = true;
+            break;
+          }
+        }
+        if (!isValid0 || !isValid1) {
+          interf.is.splice(j, 1);
+        }
+      }
+      if (interf.is.length == 0) {
+        ret.splice(i, 1);
       }
     }
     return ret;

@@ -47,6 +47,7 @@ import { CalculateBody3VolumeCom } from "./coms/calculate/CalculateBody3VolumeCo
 import { CalculateFace3AreaCom } from "./coms/calculate/CalculateFace3AreaCom";
 import { CalculateFace2AreaCom } from "./coms/calculate/CalculateFace2AreaCom";
 import { CalculateLoop3LengthCom } from "./coms/calculate/CalculateLoop3LengthCom";
+import { Bool2IntersectionCom } from "./coms/bool/Bool2IntersectionCom";
 
 /**
  * Command executer base class.
@@ -103,6 +104,8 @@ class CommandExecuter {
     this._commands.set(CommandType.OPERATION_EDGE_INTERSECTION, EdgeIntersectionCom);
     this._commands.set(CommandType.OPERATION_EDGE_CUTTING, EdgeCuttingCom);
 
+    this._commands.set(CommandType.BOOL_2_INTERSECTION, Bool2IntersectionCom);
+
 
     this._commands.set(CommandType.OTHER_DELETE, ComDelete);
     this._commands.set(CommandType.OTHER_MOVE, ComMove);
@@ -156,7 +159,12 @@ class CommandExecuter {
           this._curr.cancel();
         }
         this._curr = com;
-        this._curr.exec();
+        try {
+          this._curr.exec();
+        } catch (error) {
+          console.error(error);
+          this._curr.cancel();
+        }
       }
     }
   }
@@ -244,7 +252,12 @@ class CommandExecuter {
         this._curr.cancel();
       }
       this._curr = com;
-      this._curr.exec();
+      try {
+        this._curr.exec();
+      } catch (error) {
+        console.error(error);
+        this._curr.cancel();
+      }
     }
   }
 
@@ -277,7 +290,12 @@ class CommandExecuter {
             this._curr.cancel();
           }
           this._curr = com;
-          this._curr.exec();
+          try {
+            this._curr.exec();
+          } catch (error) {
+            console.error(error);
+            this._curr.cancel();
+          }
         }
       }
     }

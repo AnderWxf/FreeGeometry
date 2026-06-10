@@ -34,10 +34,10 @@ class ComTransform extends ComBatch {
       if (context.select.selectedObjects.length == 0) {
         let act_pick_data = new ActPickObject();
         await act_pick_data.execute(context);
-        if (this._isCancel) { this.cancel(); return; }
+        if (this._isCancel || act_pick_data.isCancel) { this.cancel(); return; }
         while (!act_pick_data.result.userData) {
           await act_pick_data.execute(context);
-          if (this._isCancel) { this.cancel(); return; }
+          if (this._isCancel || act_pick_data.isCancel) { this.cancel(); return; }
         }
         this.olds.push(act_pick_data.result);
       } else {
@@ -45,14 +45,14 @@ class ComTransform extends ComBatch {
       }
       let act_pick_begin = new ActPickPoint2();
       await act_pick_begin.execute(context);
-      if (this._isCancel) { this.cancel(); return; }
+      if (this._isCancel || act_pick_begin.isCancel) { this.cancel(); return; }
 
       this.beginPoint = new Vector2(act_pick_begin.result.x, act_pick_begin.result.y);
 
 
       let act_pick_end = new ActPickPoint2();
       await act_pick_end.execute(context);
-      if (this._isCancel) { this.cancel(); return; }
+      if (this._isCancel || act_pick_end.isCancel) { this.cancel(); return; }
       this.endPoint = new Vector2(act_pick_end.result.x, act_pick_end.result.y);
 
 

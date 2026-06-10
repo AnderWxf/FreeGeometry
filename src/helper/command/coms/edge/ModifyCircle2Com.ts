@@ -20,88 +20,88 @@ import { CloneUserData, CopyUserData, CreateGeomUserData, type UserData } from "
  * 
  */
 class ModifyCircle2Com extends ComModify {
-    constructor(executer: CommandExecuter, text: string) {
-        super(executer, text);
-        this.type = GeomType.C;
+  constructor(executer: CommandExecuter, text: string) {
+    super(executer, text);
+    this.type = GeomType.C;
+  }
+  async exec(): Promise<void> {
+    let str = this._text;
+    let paras = str.split(' ');
+    let userData = CreateGeomUserData(this.type);
+
+    let centerPoint: Vector2;
+    let beginPoint: Vector2;
+    if (paras.length == 5) {
+      // 创建一个直线段
+      centerPoint = new Vector2(new Number(paras[1]).valueOf(), new Number(paras[2]).valueOf());
+      beginPoint = new Vector2(new Number(paras[3]).valueOf(), new Number(paras[4]).valueOf());
+    } else {
+      this.bind(window);
+      let context: ActionContext3D = new ActionContext3D(Global.scene, Global.camera, Global.renderer, Global.select);
+
+      let act_pick_data = new ActPickObject();
+      await act_pick_data.execute(context);
+      if (this._isCancel || act_pick_data.isCancel) { this.cancel(); return; }
+      while (!act_pick_data.result.userData
+        || act_pick_data.result.userData.type != this.type
+      ) {
+        await act_pick_data.execute(context);
+        if (this._isCancel || act_pick_data.isCancel) { this.cancel(); return; }
+      }
+      this.old = act_pick_data.result;
+      CopyUserData(this.old.userData as UserData, userData);
+
+      let act_pick_assist = new ActPickAssist();
+      await act_pick_assist.execute(context);
+      this.assistIndex = this.getIndex(act_pick_assist.result);
+      while (!act_pick_assist.result.userData.isAssist || this.assistIndex < 0) {
+        await act_pick_assist.execute(context);
+        this.assistIndex = this.getIndex(act_pick_assist.result);
+        if (this._isCancel || act_pick_assist.isCancel) { this.cancel(); return; }
+      }
+
+      let act_pick_new_pos = new ActPickPoint2();
+      await act_pick_new_pos.execute(context);
+      if (this._isCancel || act_pick_new_pos.isCancel) { this.cancel(); return; }
+
+      centerPoint = userData.assistPoints[0].p as Vector2;
+      beginPoint = userData.assistPoints[1].p as Vector2;
+
+      userData.assistPoints[this.assistIndex].p.set(act_pick_new_pos.result.x, act_pick_new_pos.result.y);
+
+      this._text = paras[0] + ' ' + centerPoint.x + ' ' + centerPoint.y + ' ' + beginPoint.x + ' ' + beginPoint.y;
+
     }
-    async exec(): Promise<void> {
-        let str = this._text;
-        let paras = str.split(' ');
-        let userData = CreateGeomUserData(this.type);
+    // 创建一个曲线段
+    let edge = Brep2Builder.BuildCircleEdge2FromCenterRadius(centerPoint, beginPoint.distanceTo(centerPoint));
+    let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
+    userData.original = edge;
+    geo.userData = userData;
+    this.result = geo;
+    this.done();
+  }
+  onMouseMoveExec(event: MouseEvent) {
+    if (this._isCancel) { this.cancel(); return; }
+    if (this.assistIndex > -1) {
+      if (this.tempResult) {
+        Global.scene.remove(this.tempResult);
+      }
+      let userData = CloneUserData(this.old.userData as UserData);
 
-        let centerPoint: Vector2;
-        let beginPoint: Vector2;
-        if (paras.length == 5) {
-            // 创建一个直线段
-            centerPoint = new Vector2(new Number(paras[1]).valueOf(), new Number(paras[2]).valueOf());
-            beginPoint = new Vector2(new Number(paras[3]).valueOf(), new Number(paras[4]).valueOf());
-        } else {
-            this.bind(window);
-            let context: ActionContext3D = new ActionContext3D(Global.scene, Global.camera, Global.renderer, Global.select);
+      let beginPoint = userData.assistPoints[0].p as Vector2;
+      let endPoint = userData.assistPoints[1].p as Vector2;
 
-            let act_pick_data = new ActPickObject();
-            await act_pick_data.execute(context);
-            if (this._isCancel) { this.cancel(); return; }
-            while (!act_pick_data.result.userData
-                || act_pick_data.result.userData.type != this.type
-            ) {
-                await act_pick_data.execute(context);
-                if (this._isCancel) { this.cancel(); return; }
-            }
-            this.old = act_pick_data.result;
-            CopyUserData(this.old.userData as UserData, userData);
+      userData.assistPoints[this.assistIndex].p = Global.select.overedPoint
+        ? userData.assistPoints[this.assistIndex].p.set(Global.select.overedPoint.x, Global.select.overedPoint.y)
+        : userData.assistPoints[this.assistIndex].p.set(0, 0);
 
-            let act_pick_assist = new ActPickAssist();
-            await act_pick_assist.execute(context);
-            this.assistIndex = this.getIndex(act_pick_assist.result);
-            while (!act_pick_assist.result.userData.isAssist || this.assistIndex < 0) {
-                await act_pick_assist.execute(context);
-                this.assistIndex = this.getIndex(act_pick_assist.result);
-                if (this._isCancel) { this.cancel(); return; }
-            }
-
-            let act_pick_new_pos = new ActPickPoint2();
-            await act_pick_new_pos.execute(context);
-            if (this._isCancel) { this.cancel(); return; }
-
-            centerPoint = userData.assistPoints[0].p as Vector2;
-            beginPoint = userData.assistPoints[1].p as Vector2;
-
-            userData.assistPoints[this.assistIndex].p.set(act_pick_new_pos.result.x, act_pick_new_pos.result.y);
-
-            this._text = paras[0] + ' ' + centerPoint.x + ' ' + centerPoint.y + ' ' + beginPoint.x + ' ' + beginPoint.y;
-
-        }
-        // 创建一个曲线段
-        let edge = Brep2Builder.BuildCircleEdge2FromCenterRadius(centerPoint, beginPoint.distanceTo(centerPoint));
-        let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
-        userData.original = edge;
-        geo.userData = userData;
-        this.result = geo;
-        this.done();
+      // 创建一个临时曲线段
+      let edge = Brep2Builder.BuildCircleEdge2FromCenterRadius(beginPoint, endPoint.distanceTo(beginPoint));
+      let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0, false);
+      t.name = "temp";
+      this.tempResult = t;
+      Global.scene.add(this.tempResult);
     }
-    onMouseMoveExec(event: MouseEvent) {
-        if (this._isCancel) { this.cancel(); return; }
-        if (this.assistIndex > -1) {
-            if (this.tempResult) {
-                Global.scene.remove(this.tempResult);
-            }
-            let userData = CloneUserData(this.old.userData as UserData);
-
-            let beginPoint = userData.assistPoints[0].p as Vector2;
-            let endPoint = userData.assistPoints[1].p as Vector2;
-
-            userData.assistPoints[this.assistIndex].p = Global.select.overedPoint
-                ? userData.assistPoints[this.assistIndex].p.set(Global.select.overedPoint.x, Global.select.overedPoint.y)
-                : userData.assistPoints[this.assistIndex].p.set(0, 0);
-
-            // 创建一个临时曲线段
-            let edge = Brep2Builder.BuildCircleEdge2FromCenterRadius(beginPoint, endPoint.distanceTo(beginPoint));
-            let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0, false);
-            t.name = "temp";
-            this.tempResult = t;
-            Global.scene.add(this.tempResult);
-        }
-    };
+  };
 }
 export { ModifyCircle2Com };

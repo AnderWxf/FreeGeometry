@@ -15,15 +15,15 @@ class Nurbs2Algo extends Curve2Algo {
    *
    * @type {Nurbs2Data}
    */
-  protected override dat_: Nurbs2Data;
+  protected override _dat: Nurbs2Data;
   private curve_: any;
 
   public override get dat(): Nurbs2Data {
-    return this.dat_;
+    return this._dat;
   }
 
   public override set dat(dat: Nurbs2Data) {
-    this.dat_ = dat;
+    this._dat = dat;
     let controls: number[][] = [];
     for (let i = 0; i < dat.controls.length; i++) {
       controls.push([dat.controls[i].x, dat.controls[i].y, dat.controls[i].z]);
