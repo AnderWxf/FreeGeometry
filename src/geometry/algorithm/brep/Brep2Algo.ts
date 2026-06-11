@@ -708,10 +708,10 @@ class Digraph2Algo {
       let curr = algos[i];
       algos.forEach(algo => {
         if (algo.v0 == curr.v1) {
-          curr.addIn(algo);
+          curr.addOut(algo);
         }
         if (algo.v1 == curr.v0) {
-          curr.addOut(algo);
+          curr.addIn(algo);
         }
       });
     }

@@ -68,19 +68,19 @@ enum CommandType {
   CREATE_CIRCLE_THREE_POINT = 'C3',   // 三点圆
   CREATE_ELLIPSE = 'E',               // 椭圆
   CREATE_ELLIPSE_ARC = 'EA',          // 椭圆弧
-  CREATE_HYPERBOLA = 'HY',            // 双曲线
-  CREATE_PARABOLA = 'PA',             // 抛物线
+  CREATE_HYPERBOLA = 'H',             // 双曲线
+  CREATE_PARABOLA = 'P',              // 抛物线
   CREATE_POLYLINE = 'PO',             // 多段线
-  CREATE_NURBS_FITTING = 'NF',        // Nurbs fitting
+  CREATE_NURBS_FITTING = 'N',         // Nurbs fitting
   CREATE_NURBS_CONTROL = 'NC',        // Nurbs control
-  CREATE_RECTANGLE = 'RC',            // REC：矩形
+  CREATE_RECTANGLE = 'R',             // REC：矩形
 
   // 二维平面类型
   CREATE_CIRCLE_SURFACE = 'CI',       // 圆面
   CREATE_ELLIPSE_SURFACE = 'EL',      // 椭圆面
-  CREATE_POLYGON_SURFACE = 'POL',     // 多边形面
-  CREATE_RECTANGLE_SURFACE = 'RCT',   // 矩形面
-  CREATE_SECTION = 'SEC',             // 剖面
+  CREATE_POLYGON_SURFACE = 'PL',      // 多边形面
+  CREATE_RECTANGLE_SURFACE = 'RC',    // 矩形面
+  CREATE_SECTION = 'SE',              // 剖面
 
   // 三维曲面类型
   CREATE_SPHERE_SURFACE = 'SHP',      // 球面
@@ -173,12 +173,12 @@ enum CommandType {
   OPERATION_EDGE_CUTTING = 'OEC',      // 边切分(多选对象组中的第一个分割后面所有对象)
 
   //布尔运算
-  BOOL_2_INTERSECTION_MULTIPLE = 'B2IM',// 2D布尔交(多对多)
-  BOOL_2_UNION_MULTIPLE = 'B2UM',       // 2D布尔并(多对多)
-  BOOL_2_DIFFERENCE_MULTIPLE = 'B2DM',  // 2D布尔差(多对多)
-  BOOL_2_INTERSECTION = 'B2I',          // 2D布尔交(单对单)
-  BOOL_2_UNION = 'B2U',                 // 2D布尔并(单对单)
-  BOOL_2_DIFFERENCE = 'B2D',            // 2D布尔差(单对单)
+  BOOL_2_INTERSECTION_MULTIPLE = 'BIM', // 2D布尔交(多对多)
+  BOOL_2_UNION_MULTIPLE = 'BUM',        // 2D布尔并(多对多)
+  BOOL_2_DIFFERENCE_MULTIPLE = 'BDM',   // 2D布尔差(多对多)
+  BOOL_2_INTERSECTION = 'BI',           // 2D布尔交(单对单)
+  BOOL_2_UNION = 'BU',                  // 2D布尔并(单对单)
+  BOOL_2_DIFFERENCE = 'BD',             // 2D布尔差(单对单)
   BOOL_3_INTERSECTION_MULTIPLE = 'B3IM',// 3D布尔交(多对多)
   BOOL_3_UNION_MULTIPLE = 'B3UM',       // 3D布尔并(多对多)
   BOOL_3_DIFFERENCE_MULTIPLE = 'B3DM',  // 3D布尔差(多对多)
@@ -186,16 +186,16 @@ enum CommandType {
   BOOL_3_UNION = 'B3U',                 // 3D布尔并(单对单)
   BOOL_3_DIFFERENCE = 'B3D',            // 3D布尔差(单对单)
 
-  // 其他
-  OTHER_DELETE = 'D',                   // 删除
-  OTHER_UNDO = 'UD',                    // 撤销
-  OTHER_REDO = 'RD',                    // 重做
-  OTHER_MOVE = 'M',                     // 移动
-  OTHER_ROTATE = 'R',                   // 旋转
-  OTHER_SCALE = 'S',                    // 缩放
-  OTHER_OFFSET = 'O',                   // 偏移，产生新对象
-  OTHER_MIRROR = 'I',                   // 镜像，产生新对象   
-  OTHER_GROUP_OR_UNGROUP = 'G',         // 组合/取消组合
+  // // 其他
+  // OTHER_DELETE = 'D',                   // 删除
+  // OTHER_UNDO = 'UD',                    // 撤销
+  // OTHER_REDO = 'RD',                    // 重做
+  // OTHER_MOVE = 'M',                     // 移动
+  // OTHER_ROTATE = 'R',                   // 旋转
+  // OTHER_SCALE = 'S',                    // 缩放
+  // OTHER_OFFSET = 'O',                   // 偏移，产生新对象
+  // OTHER_MIRROR = 'I',                   // 镜像，产生新对象   
+  // OTHER_GROUP_OR_UNGROUP = 'G',         // 组合/取消组合
 }
 
 

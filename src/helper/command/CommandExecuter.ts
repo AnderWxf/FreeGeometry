@@ -48,6 +48,8 @@ import { CalculateFace3AreaCom } from "./coms/calculate/CalculateFace3AreaCom";
 import { CalculateFace2AreaCom } from "./coms/calculate/CalculateFace2AreaCom";
 import { CalculateLoop3LengthCom } from "./coms/calculate/CalculateLoop3LengthCom";
 import { Bool2IntersectionCom } from "./coms/bool/Bool2IntersectionCom";
+import { Bool2UnionCom } from "./coms/bool/Bool2UnionCom";
+import { Bool2DifferenceCom } from "./coms/bool/Bool2DifferenceCom";
 
 /**
  * Command executer base class.
@@ -105,14 +107,15 @@ class CommandExecuter {
     this._commands.set(CommandType.OPERATION_EDGE_CUTTING, EdgeCuttingCom);
 
     this._commands.set(CommandType.BOOL_2_INTERSECTION, Bool2IntersectionCom);
+    this._commands.set(CommandType.BOOL_2_UNION, Bool2UnionCom);
+    this._commands.set(CommandType.BOOL_2_DIFFERENCE, Bool2DifferenceCom);
 
-
-    this._commands.set(CommandType.OTHER_DELETE, ComDelete);
-    this._commands.set(CommandType.OTHER_MOVE, ComMove);
-    this._commands.set(CommandType.OTHER_ROTATE, ComRotate);
-    this._commands.set(CommandType.OTHER_SCALE, ComScale);
-    this._commands.set(CommandType.OTHER_MIRROR, ComMirror);
-    this._commands.set(CommandType.OTHER_OFFSET, ComOffset);
+    // this._commands.set(CommandType.OTHER_DELETE, ComDelete);
+    // this._commands.set(CommandType.OTHER_MOVE, ComMove);
+    // this._commands.set(CommandType.OTHER_ROTATE, ComRotate);
+    // this._commands.set(CommandType.OTHER_SCALE, ComScale);
+    // this._commands.set(CommandType.OTHER_MIRROR, ComMirror);
+    // this._commands.set(CommandType.OTHER_OFFSET, ComOffset);
     // this._commands.set(CommandType.OTHER_GROUP, ComGroup);
     // this._commands.set(CommandType.OTHER_UNGROUP, ComUngroup);
   }
@@ -161,8 +164,8 @@ class CommandExecuter {
         this._curr = com;
         try {
           this._curr.exec();
-        } catch (error) {
-          console.error(error);
+        } catch (e: any) {
+          console.error(e);
           this._curr.cancel();
         }
       }
@@ -254,8 +257,8 @@ class CommandExecuter {
       this._curr = com;
       try {
         this._curr.exec();
-      } catch (error) {
-        console.error(error);
+      } catch (e: any) {
+        console.error(e);
         this._curr.cancel();
       }
     }
@@ -278,26 +281,26 @@ class CommandExecuter {
       let command = s[0];
 
       command = command.toUpperCase();
-      if (command == CommandType.OTHER_UNDO) {
-        this.undo
-      } else if (command == CommandType.OTHER_REDO) {
-        this.redo();
-      } else {
-        let c = this._commands.get(command) as Function;
-        if (c) {
-          let com: Command = new (<any>c)(this, comstr);
-          if (this._curr && !this._curr.isDone) {
-            this._curr.cancel();
-          }
-          this._curr = com;
-          try {
-            this._curr.exec();
-          } catch (error) {
-            console.error(error);
-            this._curr.cancel();
-          }
+      // if (command == CommandType.OTHER_UNDO) {
+      //   this.undo();
+      // } else if (command == CommandType.OTHER_REDO) {
+      //   this.redo();
+      // } else {
+      let c = this._commands.get(command) as Function;
+      if (c) {
+        let com: Command = new (<any>c)(this, comstr);
+        if (this._curr && !this._curr.isDone) {
+          this._curr.cancel();
+        }
+        this._curr = com;
+        try {
+          this._curr.exec();
+        } catch (e: any) {
+          console.error(e);
+          this._curr.cancel();
         }
       }
+      // }
     }
   }
 

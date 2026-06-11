@@ -77,6 +77,8 @@ class Bool2 {
   * a,b都是单面片，返回单面片组。
   */
   static Difference(a: Face2, b: Face2, tol0: number, tol1: number): Face2[] {
+    let algorigin = new Face2Algo(a);
+    let blgorigin = new Face2Algo(b);
     a = a.clone();
     b = b.clone();
     // 计算面与面的轮廓交点
@@ -111,26 +113,26 @@ class Bool2 {
     }
     // 根据轮廓交点对面轮廓进行切割
     Bool2.Cutting(algo.loops, blgo.loops, inters);
-    // 删除a中在b内部的边。
+    // 删除a中在b的原始形状内部的边。
     algo.loops.forEach((loop) => {
       let count = loop.coedges.length;
       for (let i = count - 1; i > -1; i--) {
         let coedge = loop.coedges[i];
         let u = coedge.u;
         let mp = coedge.p((u.x + u.y) * 0.5);
-        if (blgo.isPointAtInner(mp, tol0, tol1)) {
+        if (blgorigin.isPointAtInner(mp, tol0, tol1)) {
           loop.coedges.splice(i, 1);
         }
       }
     });
-    // 删除b中不在a内部的边。
+    // 删除b中不在a的原始形状内部的边。
     blgo.loops.forEach((loop) => {
       let count = loop.coedges.length;
       for (let i = count - 1; i > -1; i--) {
         let coedge = loop.coedges[i];
         let u = coedge.u;
         let mp = coedge.p((u.x + u.y) * 0.5);
-        if (!algo.isPointAtInner(mp, tol0, tol1)) {
+        if (!algorigin.isPointAtInner(mp, tol0, tol1)) {
           loop.coedges.splice(i, 1);
         }
       }
@@ -149,6 +151,8 @@ class Bool2 {
   * @param {number} [tol1] - The tolerance of algebraic.
   */
   static Intersection(a: Face2, b: Face2, tol0: number, tol1: number): Face2[] {
+    let algorigin = new Face2Algo(a);
+    let blgorigin = new Face2Algo(b);
     a = a.clone();
     b = b.clone();
     // 计算面与面的轮廓交点
@@ -172,26 +176,26 @@ class Bool2 {
     }
     // 根据轮廓交点对面轮廓进行切割
     Bool2.Cutting(algo.loops, blgo.loops, inters);
-    // 删除a中不在b内部的边。
+    // 删除a中不在b的原始形状内部的边。
     algo.loops.forEach((loop) => {
       let count = loop.coedges.length;
       for (let i = count - 1; i > -1; i--) {
         let coedge = loop.coedges[i];
         let u = coedge.u;
         let mp = coedge.p((u.x + u.y) * 0.5);
-        if (!blgo.isPointAtInner(mp, tol0, tol1)) {
+        if (!blgorigin.isPointAtInner(mp, tol0, tol1)) {
           loop.coedges.splice(i, 1);
         }
       }
     });
-    // 删除b中不在a内部的边。
+    // 删除b中不在a的原始形状内部的边。
     blgo.loops.forEach((loop) => {
       let count = loop.coedges.length;
       for (let i = count - 1; i > -1; i--) {
         let coedge = loop.coedges[i];
         let u = coedge.u;
         let mp = coedge.p((u.x + u.y) * 0.5);
-        if (!algo.isPointAtInner(mp, tol0, tol1)) {
+        if (!algorigin.isPointAtInner(mp, tol0, tol1)) {
           loop.coedges.splice(i, 1);
         }
       }
@@ -206,6 +210,8 @@ class Bool2 {
   * a,b都是单面片，返回单面片组。
   */
   static Union(a: Face2, b: Face2, tol0: number, tol1: number): Face2[] {
+    let algorigin = new Face2Algo(a);
+    let blgorigin = new Face2Algo(b);
     a = a.clone();
     b = b.clone();
     // 计算面与面的轮廓交点
@@ -229,26 +235,26 @@ class Bool2 {
     }
     // 根据轮廓交点对面轮廓进行切割
     Bool2.Cutting(algo.loops, blgo.loops, inters);
-    // 删除a中在b内部的边。
+    // 删除a中在b的原始形状内部的边。
     algo.loops.forEach((loop) => {
       let count = loop.coedges.length;
       for (let i = count - 1; i > -1; i--) {
         let coedge = loop.coedges[i];
         let u = coedge.u;
         let mp = coedge.p((u.x + u.y) * 0.5);
-        if (blgo.isPointAtInner(mp, tol0, tol1)) {
+        if (blgorigin.isPointAtInner(mp, tol0, tol1)) {
           loop.coedges.splice(i, 1);
         }
       }
     });
-    // 删除b中在a内部的边。
+    // 删除b中在a的原始形状内部的边。
     blgo.loops.forEach((loop) => {
       let count = loop.coedges.length;
       for (let i = count - 1; i > -1; i--) {
         let coedge = loop.coedges[i];
         let u = coedge.u;
         let mp = coedge.p((u.x + u.y) * 0.5);
-        if (algo.isPointAtInner(mp, tol0, tol1)) {
+        if (algorigin.isPointAtInner(mp, tol0, tol1)) {
           loop.coedges.splice(i, 1);
         }
       }
@@ -273,16 +279,17 @@ class Bool2 {
         let ip = is[j];
         // 用c0对a中的所有loop进行切割
         for (let k = 0; k < a.length; k++) {
-          let loop = a[k];
-          for (let l = 0; l < loop.coedges.length; l++) {
-            let coedge = loop.coedges[l];
-            if (coedge.curve.dat == c0) {
-              if (coedge.isInURange(ip.u0)) {
+          let loopAlgo = a[k];
+          for (let l = loopAlgo.coedges.length - 1; l > -1; l--) {
+            let coedgeAlgo = loopAlgo.coedges[l];
+            if (coedgeAlgo.curve.dat == c0) {
+              if (coedgeAlgo.isInURange(ip.u0)) {
                 // 对coedge进行切割
-                let after = coedge.c.clone();
-                after.e.umin = ip.u0;
-                coedge.c.e.umax = ip.u0;
-                loop.coedges.splice(j + 1, 0, new Coedge2Algo(after, coedge.f));
+                let afterCoedge = coedgeAlgo.c.clone();
+                afterCoedge.e.umin = ip.u0;
+                coedgeAlgo.c.e.umax = ip.u0;
+                let afterCoedgeAlgo = new Coedge2Algo(afterCoedge, coedgeAlgo.f);
+                loopAlgo.coedges.splice(l + 1, 0, afterCoedgeAlgo);
               }
             }
           }
@@ -290,16 +297,17 @@ class Bool2 {
 
         // 用c1对b中的所有loop进行切割
         for (let k = 0; k < b.length; k++) {
-          let loop = b[k];
-          for (let l = 0; l < loop.coedges.length; l++) {
-            let coedge = loop.coedges[l];
-            if (coedge.curve.dat == c1) {
-              if (coedge.isInURange(ip.u1)) {
+          let loopAlgo = b[k];
+          for (let l = loopAlgo.coedges.length - 1; l > -1; l--) {
+            let coedgeAlgo = loopAlgo.coedges[l];
+            if (coedgeAlgo.curve.dat == c1) {
+              if (coedgeAlgo.isInURange(ip.u1)) {
                 // 对coedge进行切割
-                let after = coedge.c.clone();
-                after.e.umin = ip.u1;
-                coedge.c.e.umax = ip.u1;
-                loop.coedges.splice(j + 1, 0, new Coedge2Algo(after, coedge.f));
+                let afterCoedge = coedgeAlgo.c.clone();
+                afterCoedge.e.umin = ip.u1;
+                coedgeAlgo.c.e.umax = ip.u1;
+                let afterCoedgeAlgo = new Coedge2Algo(afterCoedge, coedgeAlgo.f);
+                loopAlgo.coedges.splice(l + 1, 0, afterCoedgeAlgo);
               }
             }
           }
@@ -339,6 +347,21 @@ class Bool2 {
         if (alloops[i].isPositive()) {
           outside = alloops[i];
           f.border = outside.loop;
+          outside.coedges.forEach(coedge => {
+            let index = f.curves.indexOf(coedge.curve.dat);
+            if (index == -1) {
+              index = f.curves.length;
+              f.curves.push(coedge.curve.dat);
+            }
+            coedge.c.e.curve = null;
+            coedge.c.e.curveIndex = index;
+            if (!f.vertice2s.includes(coedge.c.e.v0)) {
+              f.vertice2s.push(coedge.c.e.v0);
+            }
+            if (!f.vertice2s.includes(coedge.c.e.v1)) {
+              f.vertice2s.push(coedge.c.e.v1);
+            }
+          });
           alloops.splice(i, 1);
           break;
         }
@@ -351,9 +374,25 @@ class Bool2 {
           let inp = inside.getRandomBorderPoint();
           if (outside.isPointAtInner(inp, tol0, tol1)) {
             f.holes.push(inside.loop);
+            inside.coedges.forEach(coedge => {
+              let index = f.curves.indexOf(coedge.curve.dat);
+              if (index == -1) {
+                index = f.curves.length;
+                f.curves.push(coedge.curve.dat);
+              }
+              coedge.c.e.curve = null;
+              coedge.c.e.curveIndex = index;
+              if (!f.vertice2s.includes(coedge.c.e.v0)) {
+                f.vertice2s.push(coedge.c.e.v0);
+              }
+              if (!f.vertice2s.includes(coedge.c.e.v1)) {
+                f.vertice2s.push(coedge.c.e.v1);
+              }
+            });
             alloops.splice(i, 1);
           }
         }
+        result.push(f);
       } else {
         break;
       }
