@@ -303,7 +303,7 @@ class Curve2Inter {
    */
   static LineXNurbs(c0: Line2Data, c1: Nurbs2Data, tol0: number, tol1: number, n: number = -1): Array<InterOfCurve2> {
     let segment = c1.controls.length * c1.degree * 2;
-    return Curve2Inter.CurveXCurve(c1, c0, segment, tol0, tol1, n);
+    return Curve2Inter.SwapU(Curve2Inter.CurveXCurve(c1, c0, segment, tol0, tol1, n));
   }
 
   /**
@@ -321,7 +321,7 @@ class Curve2Inter {
         return new Array<InterOfCurve2>();
       }
       if (Math.max(c0.radius.x, c0.radius.y) > Math.max(c1.radius.x, c1.radius.y)) {
-        return Curve2Inter.CurveXCurve(c1, c0, Math.round(Math.max(c1.radius.x, c1.radius.y) * Math.PI * 2), tol0, tol1, n, 0, Math.PI * 2);
+        return Curve2Inter.SwapU(Curve2Inter.CurveXCurve(c1, c0, Math.round(Math.max(c1.radius.x, c1.radius.y) * Math.PI * 2), tol0, tol1, n, 0, Math.PI * 2));
       } else {
         return Curve2Inter.CurveXCurve(c0, c1, Math.round(Math.max(c0.radius.x, c0.radius.y) * Math.PI * 2), tol0, tol1, n, 0, Math.PI * 2);
       }
@@ -335,9 +335,9 @@ class Curve2Inter {
     }
     if (c1 instanceof Arc2Data) {
       if (c1.radius.x > c1.radius.y) {
-        return Curve2Inter.CurveXCurve(c1, c0, Math.round(c1.radius.x * Math.PI * 2), tol0, tol1, n, 0, Math.PI * 2);
+        return Curve2Inter.SwapU(Curve2Inter.CurveXCurve(c1, c0, Math.round(c1.radius.x * Math.PI * 2), tol0, tol1, n, 0, Math.PI * 2));
       } else {
-        return Curve2Inter.CurveXCurve(c1, c0, Math.round(c1.radius.y * Math.PI * 2), tol0, tol1, n, 0, Math.PI * 2);
+        return Curve2Inter.SwapU(Curve2Inter.CurveXCurve(c1, c0, Math.round(c1.radius.y * Math.PI * 2), tol0, tol1, n, 0, Math.PI * 2));
       }
     }
     let c0a = CurveBuilder.Algorithm2ByData(c0) as Arc2Algo | Hyperbola2Algo | Parabola2Algo;
@@ -378,7 +378,7 @@ class Curve2Inter {
    */
   static QuadraticXNurbs(c0: Arc2Data | Hyperbola2Data | Parabola2Data, c1: Nurbs2Data, tol0: number, tol1: number, n: number = -1): Array<InterOfCurve2> {
     let segment = c1.controls.length * c1.degree * 2;
-    return Curve2Inter.CurveXCurve(c1, c0, segment, tol0, tol1, n);
+    return Curve2Inter.SwapU(Curve2Inter.CurveXCurve(c1, c0, segment, tol0, tol1, n));
   }
 
 
@@ -738,7 +738,7 @@ class Curve2Inter {
    */
   static ArcXNurbs(c0: Arc2Data, c1: Nurbs2Data, tol0: number, tol1: number, n: number = 2): Array<InterOfCurve2> {
     let segment = c1.controls.length * 2;
-    return Curve2Inter.CurveXCurve(c1, c0, segment, tol0, tol1, n);
+    return Curve2Inter.SwapU(Curve2Inter.CurveXCurve(c1, c0, segment, tol0, tol1, n));
   }
 
   /**
@@ -756,7 +756,7 @@ class Curve2Inter {
       return Curve2Inter.CurveXCurve(c0, c1, segment, tol0, tol1, n);
     } else {
       let segment = c1.controls.length * 2;
-      return Curve2Inter.CurveXCurve(c1, c0, segment, tol0, tol1, n);
+      return Curve2Inter.SwapU(Curve2Inter.CurveXCurve(c1, c0, segment, tol0, tol1, n));
     }
   }
 
@@ -935,28 +935,16 @@ class Curve2Inter {
     }
     else if (c1 instanceof Line2Data) {
       if (c0 instanceof Arc2Data) {
-        let rinters = Curve2Inter.LineXArc(c1, c0, tol0, tol1);
-        rinters.forEach((i) => {
-          let t = i.u0; i.u0 = i.u1; i.u1 = t; inters.push(i);
-        });
+        inters.push(...Curve2Inter.SwapU(Curve2Inter.LineXArc(c1, c0, tol0, tol1)));
       }
       else if (c0 instanceof Hyperbola2Data) {
-        let rinters = Curve2Inter.LineXHyperbola(c1, c0, tol0, tol1);
-        rinters.forEach((i) => {
-          let t = i.u0; i.u0 = i.u1; i.u1 = t; inters.push(i);
-        });
+        inters.push(...Curve2Inter.SwapU(Curve2Inter.LineXHyperbola(c1, c0, tol0, tol1)));
       }
       else if (c0 instanceof Parabola2Data) {
-        let rinters = Curve2Inter.LineXParabola(c1, c0, tol0, tol1);
-        rinters.forEach((i) => {
-          let t = i.u0; i.u0 = i.u1; i.u1 = t; inters.push(i);
-        });
+        inters.push(...Curve2Inter.SwapU(Curve2Inter.LineXParabola(c1, c0, tol0, tol1)));
       }
       else if (c0 instanceof Nurbs2Data) {
-        let rinters = Curve2Inter.LineXNurbs(c1, c0, tol0, tol1);
-        rinters.forEach((i) => {
-          let t = i.u0; i.u0 = i.u1; i.u1 = t; inters.push(i);
-        });
+        inters.push(...Curve2Inter.SwapU(Curve2Inter.LineXNurbs(c1, c0, tol0, tol1)));
       }
     }
     else if (c0 instanceof Arc2Data || c0 instanceof Hyperbola2Data || c0 instanceof Parabola2Data) {
@@ -981,6 +969,20 @@ class Curve2Inter {
     } else {
       inters.push(...Curve2Inter.CurveXCurve(c0, c1, 512, tol0, tol1));
     }
+    return inters;
+  }
+
+  /**
+   * swap u of curve to curve intersection point.
+   *
+   * @param {InterOfCurve2} [inters] - The intersection of curve to curve.
+   */
+  private static SwapU(inters: Array<InterOfCurve2>): Array<InterOfCurve2> { 
+    inters.forEach((inter) => {
+      let temp = inter.u0;
+      inter.u0 = inter.u1;
+      inter.u1 = temp;
+    });
     return inters;
   }
 }

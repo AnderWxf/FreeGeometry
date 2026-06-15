@@ -704,7 +704,7 @@ class Digraph2Algo {
   reflush() {
     let g = this._g;
     let algos = this._algos;
-    for (let i = 0; g.vertice2s && i < g.vertice2s.length; i++) {
+    for (let i = 0; i < algos.length; i++) {
       let curr = algos[i];
       algos.forEach(algo => {
         if (algo.v0 == curr.v1) {
