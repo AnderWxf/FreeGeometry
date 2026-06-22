@@ -28,7 +28,7 @@ class Bool2UnionCom extends BoolCom {
     let paras = str.split(' ');
 
     this.bind(window);
-    let context: ActionContext3D = new ActionContext3D(Global.scene, Global.camera, Global.renderer, Global.select);
+    let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);
     let act_pick_objs = new ActPickObjects();
     await act_pick_objs.execute(context);
     if (this._isCancel || act_pick_objs.isCancel) { this.cancel(); return; }

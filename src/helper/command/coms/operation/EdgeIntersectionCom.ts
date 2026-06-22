@@ -16,7 +16,7 @@ import * as THREE from "three";
 class EdgeIntersectionCom extends Command {
   public src: Array<Edge2>;
   public des: Array<Edge2>;
-  protected results: InterOfFace2[];
+  public results: InterOfFace2[];
   protected assists: THREE.Object3D[];
 
   constructor(executer: CommandExecuter, text: string) {
@@ -33,7 +33,7 @@ class EdgeIntersectionCom extends Command {
 
 
     this.bind(window);
-    let context: ActionContext3D = new ActionContext3D(Global.scene, Global.camera, Global.renderer, Global.select);
+    let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);
 
     let act_pick_objs = new ActPickObjects();
     await act_pick_objs.execute(context);

@@ -37,7 +37,7 @@ class ModifyCircle2Com extends ComModify {
       beginPoint = new Vector2(new Number(paras[3]).valueOf(), new Number(paras[4]).valueOf());
     } else {
       this.bind(window);
-      let context: ActionContext3D = new ActionContext3D(Global.scene, Global.camera, Global.renderer, Global.select);
+      let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);
 
       let act_pick_data = new ActPickObject();
       await act_pick_data.execute(context);
@@ -77,7 +77,7 @@ class ModifyCircle2Com extends ComModify {
     let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
     userData.original = edge;
     geo.userData = userData;
-    this.result = geo;
+    this.results = geo;
     this.done();
   }
   onMouseMoveExec(event: MouseEvent) {

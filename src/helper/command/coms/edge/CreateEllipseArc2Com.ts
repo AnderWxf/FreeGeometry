@@ -43,7 +43,7 @@ class CreateEllipseArc2Com extends ComCreate {
       this.isForward = new Boolean(paras[11]).valueOf();
     } else {
       this.bind(window);
-      let context: ActionContext3D = new ActionContext3D(Global.scene, Global.camera, Global.renderer, Global.select);
+      let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);
 
       let act_pick_center = new ActPickPoint2();
       await act_pick_center.execute(context);
@@ -120,7 +120,7 @@ class CreateEllipseArc2Com extends ComCreate {
     let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
     userData.original = edge;
     geo.userData = userData;
-    this.result = geo;
+    this.results = geo;
     this.done();
   }
   onMouseMoveExec(event: MouseEvent) {

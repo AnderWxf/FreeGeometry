@@ -20,7 +20,7 @@ import * as THREE from "three";
  */
 class BoolCom extends Command {
   protected olds: THREE.Object3D[];
-  protected results: THREE.Object3D[];
+  public results: THREE.Object3D[];
 
 
   constructor(executer: CommandExecuter, text: string) {

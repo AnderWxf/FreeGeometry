@@ -8,64 +8,64 @@ import * as THREE from "three";
  * 
  */
 class ComBatch extends Command {
-    public olds: THREE.Object3D[];
-    protected results: THREE.Object3D[];
-    protected tempResults: THREE.Object3D[];
-    protected isDeleteOld = true;
-    constructor(executer: CommandExecuter, text: string) {
-        super(executer, text);
-        this.olds = [];
-        this.results = [];
-        this.tempResults = [];
-    }
+  public olds: THREE.Object3D[];
+  public results: THREE.Object3D[];
+  protected tempResults: THREE.Object3D[];
+  protected isDeleteOld = true;
+  constructor(executer: CommandExecuter, text: string) {
+    super(executer, text);
+    this.olds = [];
+    this.results = [];
+    this.tempResults = [];
+  }
 
-    async exec(): Promise<void> {
+  async exec(): Promise<void> {
 
-    }
-    onMouseMoveExec(event: MouseEvent) {
-    };
+  }
+  onMouseMoveExec(event: MouseEvent) {
+  };
 
-    override cancel() {
-        super.cancel();
-        this.unbind(window);
-        Global.scene.remove(...this.tempResults);
+  override cancel() {
+    super.cancel();
+    this.unbind(window);
+    Global.scene.remove(...this.tempResults);
 
-        this.olds = null;
-        this.results = null;
-        this.tempResults = [];
-    }
+    this.olds = null;
+    this.results = null;
+    this.tempResults = [];
+  }
 
-    override done() {
-        super.done();
-        this.unbind(window);
-        Global.scene.add(...this.results);
-        if (this.isDeleteOld)
-            Global.scene.remove(...this.olds);
-        Global.scene.remove(...this.tempResults);
-        Global.select.clear();
-        this.tempResults = [];
+  override done() {
+    super.done();
+    this.unbind(window);
+    Global.scene.add(...this.results);
+    if (this.isDeleteOld)
+      Global.scene.remove(...this.olds);
+    Global.scene.remove(...this.tempResults);
+    Global.select.clear();
+    this.tempResults = [];
+  }
+  override bind(window: Window) {
+    super.bind(window);
+    window.addEventListener("mousemove", this.onMouseMove);
+  }
+  override unbind(window: Window) {
+    super.unbind(window);
+    window.removeEventListener("mousemove", this.onMouseMove);
+  }
+  override undo() {
+    if (this._isDone) {
+      Global.scene.remove(...this.results);
+      if (this.isDeleteOld)
+        Global.scene.add(...this.olds);
     }
-    override bind(window: Window) {
-        super.bind(window);
-        window.addEventListener("mousemove", this.onMouseMove);
+  }
+  override redo() {
+    if (this._isDone) {
+      Global.scene.add(...this.results);
+      if (this.isDeleteOld)
+        Global.scene.remove(...this.olds);
     }
-    override unbind(window: Window) {
-        super.unbind(window);
-        window.removeEventListener("mousemove", this.onMouseMove);
-    }
-    override undo() {
-        if (this._isDone) {
-            Global.scene.remove(...this.results);
-            if (this.isDeleteOld)
-                Global.scene.add(...this.olds);
-        }
-    }
-    override redo() {
-        if (this._isDone) {
-            Global.scene.add(...this.results);
-            if (this.isDeleteOld)
-                Global.scene.remove(...this.olds);
-        }
-    }
+  }
 }
 export { ComBatch };

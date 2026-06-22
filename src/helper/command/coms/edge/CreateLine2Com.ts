@@ -33,7 +33,7 @@ class CreateLine2Com extends ComCreate {
       this.endPoint = new Vector2(new Number(paras[3]).valueOf(), new Number(paras[4]).valueOf());
     } else {
       this.bind(window);
-      let context: ActionContext3D = new ActionContext3D(Global.scene, Global.camera, Global.renderer, Global.select);
+      let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);
 
       let act_pick_begin = new ActPickPoint2();
       await act_pick_begin.execute(context);
@@ -58,7 +58,7 @@ class CreateLine2Com extends ComCreate {
     let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
     userData.original = edge;
     geo.userData = userData;
-    this.result = geo;
+    this.results = geo;
     this.done();
   }
   onMouseMoveExec(event: MouseEvent) {

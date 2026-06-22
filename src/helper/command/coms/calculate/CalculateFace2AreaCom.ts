@@ -13,7 +13,7 @@ import { Face2Algo } from "../../../../geometry/algorithm/brep/Brep2Algo";
  * 
  */
 class CalculateFace2AreaCom extends Command {
-  result: number = 0;
+  public results: number = 0;
   faces: Face2[];
   constructor(executer: CommandExecuter, text: string) {
     super(executer, text);
@@ -22,7 +22,7 @@ class CalculateFace2AreaCom extends Command {
   async exec(): Promise<void> {
 
     this.bind(window);
-    let context: ActionContext3D = new ActionContext3D(Global.scene, Global.camera, Global.renderer, Global.select);
+    let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);
 
     let act_pick_objs = new ActPickObjects();
     await act_pick_objs.execute(context);
@@ -44,7 +44,7 @@ class CalculateFace2AreaCom extends Command {
         let algo = new Face2Algo(face);
         area += algo.area();
       }
-      this.result = area;
+      this.results = area;
       console.log('area: ', area);
       this.done();
     } else {

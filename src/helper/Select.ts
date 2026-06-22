@@ -217,9 +217,9 @@ class Select {
                                     material.color.setHex(THREE.Color.NAMES.aqua);
                                 }
                             }
-                            this.selectedObjects.push(obj);
+                          this.selectedObjects.push(obj);
+                          break;
                         }
-                        break;
                     }
                 }
 

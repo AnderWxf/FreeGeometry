@@ -58,14 +58,14 @@ class CalculateLoop3LengthCom extends ComCreate {
         let geo = BrepMeshBuilder.BuildFace2Mesh(face, THREE.Color.NAMES.blue);
         userData.original = face;
         geo.userData = userData;
-        this.result = geo;
+        this.results = geo;
         this.done();
       } else {
         this.cancel();
       }
     } else {
       this.bind(window);
-      let context: ActionContext3D = new ActionContext3D(Global.scene, Global.camera, Global.renderer, Global.select);
+      let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);
 
       let act_pick_objs = new ActPickObjects();
       await act_pick_objs.execute(context);
@@ -103,7 +103,7 @@ class CalculateLoop3LengthCom extends ComCreate {
         let geo = BrepMeshBuilder.BuildFace2Mesh(face, THREE.Color.NAMES.blue);
         userData.original = face;
         geo.userData = userData;
-        this.result = geo;
+        this.results = geo;
         this.done();
       } else {
         this.cancel();

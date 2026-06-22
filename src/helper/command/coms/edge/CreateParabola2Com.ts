@@ -36,7 +36,7 @@ class CreateParabola2Com extends ComCreate {
       this.beginPoint = new Vector2(new Number(paras[5]).valueOf(), new Number(paras[6]).valueOf());
     } else {
       this.bind(window);
-      let context: ActionContext3D = new ActionContext3D(Global.scene, Global.camera, Global.renderer, Global.select);
+      let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);
 
       let act_pick_center = new ActPickPoint2();
       await act_pick_center.execute(context);
@@ -66,7 +66,7 @@ class CreateParabola2Com extends ComCreate {
     let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
     userData.original = edge;
     geo.userData = userData;
-    this.result = geo;
+    this.results = geo;
 
     userData.assistPoints.push({ p: this.beginPoint, c: THREE.Color.NAMES.greenyellow });
     this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));

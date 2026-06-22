@@ -28,6 +28,7 @@ import { Select } from './helper/Select';
 import { Global } from './core/Global';
 import { CreateLine2Com } from './helper/command/coms/edge/CreateLine2Com';
 import { CommandExecuter } from './helper/command/CommandExecuter';
+import { Scene } from './helper/Scene';
 // import App from './ui/PropsTrans';
 
 // import CommandBar from './ui/CommandBar';
@@ -36,7 +37,7 @@ export class Cube {
     public constructor() {
         // 创建一个场景
         const scene = new THREE.Scene();
-        Global.scene = scene;
+      Global.scene = new Scene(scene);
 
         // const app = App();
         // const ui: HTMLElement = document.getElementById('ui');

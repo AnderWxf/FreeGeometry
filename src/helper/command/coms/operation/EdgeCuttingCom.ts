@@ -20,7 +20,7 @@ class EdgeCuttingCom extends Command {
   public src: Array<Edge2>;
   public des: Array<{ e: Edge2, u: UserData }>;
   public olds: THREE.Object3D[];
-  protected results: THREE.Object3D[];
+  public results: THREE.Object3D[];
 
 
   constructor(executer: CommandExecuter, text: string) {
@@ -39,7 +39,7 @@ class EdgeCuttingCom extends Command {
 
 
     this.bind(window);
-    let context: ActionContext3D = new ActionContext3D(Global.scene, Global.camera, Global.renderer, Global.select);
+    let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);
 
     let act_pick_objs = new ActPickObjects();
     await act_pick_objs.execute(context);

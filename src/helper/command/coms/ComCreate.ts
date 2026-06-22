@@ -9,55 +9,55 @@ import * as THREE from "three";
  * 
  */
 class ComCreate extends Command {
-    protected type: GeomType;
-    protected result: THREE.Object3D;
-    protected tempResult: THREE.Object3D;
-    protected assists: THREE.Object3D[];
+  protected type: GeomType;
+  public results: THREE.Object3D;
+  protected tempResult: THREE.Object3D;
+  protected assists: THREE.Object3D[];
 
-    constructor(executer: CommandExecuter, text: string) {
-        super(executer, text);
-        this.assists = [];
-    }
+  constructor(executer: CommandExecuter, text: string) {
+    super(executer, text);
+    this.assists = [];
+  }
 
 
-    override cancel() {
-        super.cancel();
-        this.unbind(window);
-        if (this.tempResult) {
-            Global.scene.remove(this.tempResult);
-        }
-        this.assists.forEach(element => {
-            if (Global.scene.children.includes(element)) {
-                Global.scene.remove(element);
-            }
-            element.visible = Global.isShowAssists;
-        });
+  override cancel() {
+    super.cancel();
+    this.unbind(window);
+    if (this.tempResult) {
+      Global.scene.remove(this.tempResult);
     }
-    override done() {
-        super.done();
-        this.unbind(window);
-        Global.scene.add(this.result);
-        if (this.tempResult) {
-            Global.scene.remove(this.tempResult);
-        }
-        this.assists.forEach(element => {
-            if (Global.scene.children.includes(element)) {
-                Global.scene.remove(element);
-            }
-            this.result.children.push(element);
-            element.visible = Global.isShowAssists;
-        });
+    this.assists.forEach(element => {
+      if (Global.scene.children.includes(element)) {
+        Global.scene.remove(element);
+      }
+      element.visible = Global.isShowAssists;
+    });
+  }
+  override done() {
+    super.done();
+    this.unbind(window);
+    Global.scene.add(this.results);
+    if (this.tempResult) {
+      Global.scene.remove(this.tempResult);
     }
+    this.assists.forEach(element => {
+      if (Global.scene.children.includes(element)) {
+        Global.scene.remove(element);
+      }
+      this.results.children.push(element);
+      element.visible = Global.isShowAssists;
+    });
+  }
 
-    override undo() {
-        if (this._isDone) {
-            Global.scene.remove(this.result);
-        }
+  override undo() {
+    if (this._isDone) {
+      Global.scene.remove(this.results);
     }
-    override redo() {
-        if (this._isDone) {
-            Global.scene.add(this.result);
-        }
+  }
+  override redo() {
+    if (this._isDone) {
+      Global.scene.add(this.results);
     }
+  }
 }
 export { ComCreate };
