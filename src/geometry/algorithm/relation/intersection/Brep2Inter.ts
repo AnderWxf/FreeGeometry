@@ -5,6 +5,7 @@ import { Nurbs2Data } from "../../../data/base/curve2/Nurbs2Data";
 import { Parabola2Data } from "../../../data/base/curve2/Parabola2Data";
 import type { Curve2Data } from "../../../data/base/Curve2Data";
 import type { Edge2, Face2 } from "../../../data/brep/Brep2";
+import type { Face2Algo } from "../../brep/Brep2Algo";
 import { Curve2Inter, type InterOfCurve2 } from "./Curve2Inter";
 
 /**
@@ -33,11 +34,8 @@ class Brep2Inter {
     let inters = Curve2Inter.X(c0, c1, tol0, tol1);
     for (let i = 0; i < inters.length; i++) {
       let inter = inters[i];
-      let e0ur = e0.ur;
-      let e1ur = e1.ur;
-      if (inter.u0 >= e0ur.x && inter.u0 <= e0ur.y &&
-        inter.u1 >= e1ur.x && inter.u1 <= e1ur.y
-      ) {
+      if (e0.isOnURange(inter.u0, tol1)
+        && e1.isOnURange(inter.u1, tol1)) {
         result.push(inter);
       }
     }
@@ -47,14 +45,14 @@ class Brep2Inter {
   /**
    * compute edge to edge intersection point.
    *
-   * @param {Edge2} [c0] - The frist curve , binary search curve.
-   * @param {Edge2} [c1] - The second curve , general equation curve.
+   * @param {Face2Algo} [f0] - The frist curve , binary search curve.
+   * @param {Face2Algo} [f1] - The second curve , general equation curve.
    * @param {number} [tol0] - The tolerance of geometric.
    * @param {number} [tol1] - The tolerance of algebraic.
    */
-  public static FaceXFace(f0: Face2, f1: Face2, tol0: number, tol1: number): Array<InterOfFace2> {
-    let cs0 = f0.curves;
-    let cs1 = f1.curves;
+  public static FaceXFace(f0: Face2Algo, f1: Face2Algo, tol0: number, tol1: number): Array<InterOfFace2> {
+    let cs0 = f0.f.curves;
+    let cs1 = f1.f.curves;
     let ret: Array<InterOfFace2> = [];
     for (let i = 0; i < cs0.length; i++) {
       for (let j = 0; j < cs1.length; j++) {
@@ -76,9 +74,9 @@ class Brep2Inter {
     let count = ret.length;
     for (let i = count - 1; i > -1; i--) {
       let interf = ret[i];
-      let edges0 = f0.getEdgesByCurve(interf.c0);
-      let edges1 = f1.getEdgesByCurve(interf.c1);
-      if (edges0.length == 0 || edges1.length == 0) {
+      let coedges0 = f0.getCoedgesByCurve(interf.c0);
+      let coedges1 = f1.getCoedgesByCurve(interf.c1);
+      if (coedges0.length == 0 || coedges1.length == 0) {
         ret.splice(i, 1);
         continue;
       }
@@ -87,16 +85,16 @@ class Brep2Inter {
         let isValid0 = false;
         let isValid1 = false;
         let interp = interf.is[j];
-        for (let l = 0; l < edges0.length; l++) {
-          let ur = edges0[l].ur;
-          if (interp.u0 >= ur.x && interp.u0 <= ur.y) {
+        for (let l = 0; l < coedges0.length; l++) {
+          let isOn = coedges0[l].isOnURange(interp.u0, tol1);
+          if (isOn) {
             isValid0 = true;
             break;
           }
         }
-        for (let l = 0; l < edges1.length; l++) {
-          let ur = edges1[l].ur;
-          if (interp.u1 >= ur.x && interp.u1 <= ur.y) {
+        for (let l = 0; l < coedges1.length; l++) {
+          let isOn = coedges1[l].isOnURange(interp.u1, tol1);
+          if (isOn) {
             isValid1 = true;
             break;
           }

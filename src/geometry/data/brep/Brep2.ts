@@ -129,6 +129,19 @@ class Edge2 extends DataBase {
     let max = Math.max(this.u.x, this.u.y);
     return new Vector2(min, max);
   }
+
+  // u ∈ (a,b)
+  isInURange(u: number): boolean {
+    let ur = this.ur;
+    return u > ur.x && u < ur.y;
+  }
+  // u ∈ [a,b]
+  isOnURange(u: number, tol1: number): boolean {
+    let ur = this.ur;
+    return Math.abs(u - ur.x) <= tol1
+      || Math.abs(u - ur.y) <= tol1
+      || this.isInURange(u);
+  }  
 }
 
 /**
@@ -173,6 +186,30 @@ class Coedge2 extends DataBase {
    */
   isPositive() {
     return this.isForward ? this.e.isPositive() : !this.e.isPositive();
+  }
+
+  /**
+   * u parameter range of curve of Edge.
+   * [a,b]. 
+   */
+  get ur(): Vector2 {
+    let min = Math.min(this.e.u.x, this.e.u.y);
+    let max = Math.max(this.e.u.x, this.e.u.y);
+    return new Vector2(min, max);
+  }
+
+  // u ∈ (a,b)
+  isInURange(u: number): boolean {
+    let ur = this.ur;
+    return u > ur.x && u < ur.y;
+  }
+  
+  // u ∈ [a,b]
+  isOnURange(u: number, tol1: number): boolean {
+    let ur = this.ur;
+    return Math.abs(u - ur.x) <= tol1
+      || Math.abs(u - ur.y) <= tol1
+      || this.isInURange(u);
   }
 }
 
@@ -316,7 +353,6 @@ class Face2 extends DataBase {
     });
     return result;
   }
-
 }
 
 /**

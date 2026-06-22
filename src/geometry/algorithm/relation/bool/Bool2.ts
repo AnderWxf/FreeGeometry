@@ -88,7 +88,7 @@ class Bool2 {
     blgo.loops.forEach((loop) => {
       loop.reverse();
     });
-    let inters = Brep2Inter.FaceXFace(a, b, tol0, tol1);
+    let inters = Brep2Inter.FaceXFace(algo, blgo, tol0, tol1);
     if (inters.length == 0) {
       let pa = algo.getInnerPoint();
       let pb = blgo.getInnerPoint();
@@ -112,7 +112,7 @@ class Bool2 {
       }
     }
     // 根据轮廓交点对面轮廓进行切割
-    Bool2.Cutting(algo.loops, blgo.loops, inters);
+    Bool2.Cutting(algo.loops, blgo.loops, inters, tol0, tol1);
     // 删除a中在b的原始形状内部的边。
     algo.loops.forEach((loop) => {
       let count = loop.coedges.length;
@@ -158,7 +158,7 @@ class Bool2 {
     // 计算面与面的轮廓交点
     let algo = new Face2Algo(a);
     let blgo = new Face2Algo(b);
-    let inters = Brep2Inter.FaceXFace(a, b, tol0, tol1);
+    let inters = Brep2Inter.FaceXFace(algo, blgo, tol0, tol1);
     if (inters.length == 0) {
       let pa = algo.getInnerPoint();
       let pb = blgo.getInnerPoint();
@@ -175,7 +175,7 @@ class Bool2 {
       }
     }
     // 根据轮廓交点对面轮廓进行切割
-    Bool2.Cutting(algo.loops, blgo.loops, inters);
+    Bool2.Cutting(algo.loops, blgo.loops, inters, tol0, tol1);
     // 删除a中不在b的原始形状内部的边。
     algo.loops.forEach((loop) => {
       let count = loop.coedges.length;
@@ -217,7 +217,7 @@ class Bool2 {
     // 计算面与面的轮廓交点
     let algo = new Face2Algo(a);
     let blgo = new Face2Algo(b);
-    let inters = Brep2Inter.FaceXFace(a, b, tol0, tol1);
+    let inters = Brep2Inter.FaceXFace(algo, blgo, tol0, tol1);
     if (inters.length == 0) {
       let pa = algo.getInnerPoint();
       let pb = blgo.getInnerPoint();
@@ -234,7 +234,7 @@ class Bool2 {
       }
     }
     // 根据轮廓交点对面轮廓进行切割
-    Bool2.Cutting(algo.loops, blgo.loops, inters);
+    Bool2.Cutting(algo.loops, blgo.loops, inters, tol0, tol1);
     // 删除a中在b的原始形状内部的边。
     algo.loops.forEach((loop) => {
       let count = loop.coedges.length;
@@ -268,7 +268,7 @@ class Bool2 {
   * 根据交点对面的边进行切割。
   * 
   */
-  static Cutting(a: Loop2Algo[], b: Loop2Algo[], inters: Array<InterOfFace2>) {
+  static Cutting(a: Loop2Algo[], b: Loop2Algo[], inters: Array<InterOfFace2>, tol0: number, tol1: number) {
     // 根据轮廓交点对面轮廓进行切割
     for (let i = 0; i < inters.length; i++) {
       let inter = inters[i];
@@ -283,7 +283,7 @@ class Bool2 {
           for (let l = loopAlgo.coedges.length - 1; l > -1; l--) {
             let coedgeAlgo = loopAlgo.coedges[l];
             if (coedgeAlgo.curve.dat == c0) {
-              if (coedgeAlgo.isInURange(ip.u0)) {
+              if (!coedgeAlgo.isOnUBoder(ip.u0, tol1) && coedgeAlgo.isInURange(ip.u0)) {
                 // 对coedge进行切割
                 let afterCoedge = coedgeAlgo.c.clone();
                 afterCoedge.e.umin = ip.u0;
@@ -301,7 +301,7 @@ class Bool2 {
           for (let l = loopAlgo.coedges.length - 1; l > -1; l--) {
             let coedgeAlgo = loopAlgo.coedges[l];
             if (coedgeAlgo.curve.dat == c1) {
-              if (coedgeAlgo.isInURange(ip.u1)) {
+              if (!coedgeAlgo.isOnUBoder(ip.u1, tol1) && coedgeAlgo.isInURange(ip.u1)) {
                 // 对coedge进行切割
                 let afterCoedge = coedgeAlgo.c.clone();
                 afterCoedge.e.umin = ip.u1;

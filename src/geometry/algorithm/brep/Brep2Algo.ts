@@ -82,6 +82,20 @@ class Edge2Algo {
     }
     return false;
   }
+
+  // u ∈ (a,b)
+  isInURange(u: number): boolean {
+    let ur = this._e.ur;
+    return u > ur.x && u < ur.y;
+  }
+  // u ∈ [a,b]
+  isOnURange(u: number, tol1: number): boolean {
+    let ur = this._e.ur;
+    return Math.abs(u - ur.x) <= tol1
+      || Math.abs(u - ur.y) <= tol1
+      || this.isInURange(u);
+  }
+
   getBeginPoint(): Vector2 {
     return this.p(this.u.y);
   }
@@ -271,16 +285,23 @@ class Coedge2Algo {
   d(u: number): Vector2 {
     return this._c.isPositive() ? this._curve.d(u) : this._curve.d(u).negate();
   }
-
+  // u == a || u == b
+  isOnUBoder(u: number, tol1: number): boolean {
+    let ur = this._c.e.ur;
+    return Math.abs(u - ur.x) <= tol1
+      || Math.abs(u - ur.y) <= tol1;
+  }
   // u ∈ (a,b)
   isInURange(u: number): boolean {
     let ur = this._c.e.ur;
     return u > ur.x && u < ur.y;
   }
   // u ∈ [a,b]
-  isOnURange(u: number): boolean {
+  isOnURange(u: number,tol1:number): boolean {
     let ur = this._c.e.ur;
-    return u >= ur.x && u <= ur.y;
+    return Math.abs(u - ur.x) <= tol1
+      || Math.abs(u - ur.y) <= tol1
+      || this.isInURange(u);
   }
   get ur(): Vector2 {
     return this._c.e.ur;
@@ -482,7 +503,7 @@ class Loop2Algo {
         // 是否为穿透点判定：
         // A 如果交点在曲线内部，取曲线在交点上的切线，若射线与切线重合，则是切点，不认为是穿透点。
         let u = currAlgo.u;
-        if (currAlgo.isInURange(inter.u1)) {
+        if (!currAlgo.isOnUBoder(inter.u1,tol1) && currAlgo.isInURange(inter.u1)) {
           let d = currAlgo.t(inter.u1);//切线方向
           // 如果是水平切线，就是切点
           if (Math.abs(d.y) <= tol1) {
@@ -492,34 +513,36 @@ class Loop2Algo {
           cross.push(inter.p);
           continue;
         }
-        // B 如果交点在曲线两端，取交点在射线前后很小范围内的两个点，检查两个点是否同在前后两段边的左侧或者右侧。
-        //   如果同在前后两段边的左侧或者右侧，则是切点，不认为是穿透点。
+        // B 如果交点在曲线两端，取交点在前后两段很小范围内的两个点，检查两个点是否同在射线的左侧或者右侧。
+        //   如果同在射线的左侧或者右侧，则是切点，不认为是穿透点。
         //取交点在射线前后很小范围内的两个点
-        let frontPoint = rayAlgo.p(inter.u0 - 1e-4);
-        let backPoint = rayAlgo.p(inter.u0 + 1e-4);
-        let frontTangent: Vector2 = null;
-        let backTangent: Vector2 = null;
-        // 交点是当前段的起点
-        if (Math.abs(inter.u1 - u.x) <= tol1) {
-          // 取前一段的终点切线和当前段起点切线
-          frontTangent = precAlgo.getBeginTangent();
-          backTangent = currAlgo.getBeginTangent();
-        }
-        // 交点是当前段的终点
-        if (Math.abs(inter.u1 - u.y) <= tol1) {
-          // 取前一段的终点切线和当前段起点切线
-          frontTangent = currAlgo.getBeginTangent();
-          backTangent = nextAlgo.getBeginTangent();
-        }
+        if (currAlgo.isOnUBoder(inter.u1, tol1)) { 
+          let rayTange = new Vector2(1, 0);
+          let frontPoint: Vector2 = null;
+          let backPoint: Vector2 = null;
+          // 交点是当前段的起点
+          if (Math.abs(inter.u1 - u.x) <= tol1) {
+            // 取前一段的终点附近点和当前段起点附近点
+            frontPoint = precAlgo.p(precAlgo.u.y - 1e-4);
+            backPoint = currAlgo.p(currAlgo.u.x + 1e-4);
+          }
+          // 交点是当前段的终点
+          if (Math.abs(inter.u1 - u.y) <= tol1) {
+            // 取当前段的终点附近点和下一段的段起点附近点
+            frontPoint = currAlgo.p(precAlgo.u.y - 1e-4);
+            backPoint = nextAlgo.p(nextAlgo.u.x + 1e-4);
+          }
 
-        if (frontTangent && backTangent) {
-          let frontVector = frontPoint.clone().sub(inter.p);
-          let backVector = backPoint.clone().sub(inter.p);
-          let frontCross = frontVector.cross(frontTangent);
-          let backCross = backVector.cross(backTangent);
-          // 叉乘结果同号，说明两个点分处在曲线的不同侧，是穿透点。
-          if (frontCross * backCross < 0) {
-            cross.push(inter.p);
+          if (frontPoint && backPoint) {
+            let frontVector = frontPoint.clone().sub(inter.p).normalize();
+            let backVector = backPoint.clone().sub(inter.p).normalize();
+            let frontCross = rayTange.cross(frontVector);
+            let backCross = rayTange.cross(backVector);
+            // 叉乘结果异号，说明两个点分处在曲线的不同侧，是穿透点。
+            let t = frontCross * backCross;
+            if (Math.abs(t) > tol0 && t < 0) {
+              cross.push(inter.p);
+            }
           }
         }
       }
@@ -671,6 +694,10 @@ class Face2Algo {
     return false;
   }
 
+  get f(): Face2 {
+    return this._f;
+  }  
+
   /**
    * Returns all Loop algo from the face.
    *
@@ -680,6 +707,28 @@ class Face2Algo {
     let result: Loop2Algo[] = [];
     result.push(this._balgo);
     result.push(...this._halgos);
+    return result;
+  }
+
+  /**
+   * Returns all edges on curve from the face.
+   *
+   * @return {[Coedge2Algo]} .
+   */
+  getCoedgesByCurve(curve: Curve2Data): Coedge2Algo[] {
+    let result: Coedge2Algo[] = [];
+    this._balgo.coedges.forEach(coedge => {
+      if (coedge.curve && coedge.curve.dat == curve) {
+        result.push(coedge);
+      }
+    });
+    this._halgos.forEach(hole => {
+      hole.coedges.forEach(coedge => {
+        if (coedge.curve && coedge.curve.dat == curve) {
+          result.push(coedge);
+        }
+      });
+    });
     return result;
   }
 }
