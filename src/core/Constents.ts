@@ -54,7 +54,49 @@ enum GeomType {
   STRE = 72,    // 拉伸体
   ROTA = 73,    // 旋转体
   SWEP = 74,    // 扫掠体
-  LOFT = 75     // 放样体
+  LOFT = 75,     // 放样体
+
+  DATA_TYPE_ARC2 = 0 + 255,
+  DATA_TYPE_HYPERBOLA2 = 1 + 255,
+  DATA_TYPE_LINE2 = 2 + 255,
+  DATA_TYPE_NURBS2 = 3 + 255,
+  DATA_TYPE_PARABOLA2 = 4 + 255,
+
+  DATA_TYPE_ARC3 = 10 + 255,
+  DATA_TYPE_HYPERBOLA3 = 11 + 255,
+  DATA_TYPE_LINE3 = 12 + 255,
+  DATA_TYPE_NURBS3 = 13 + 255,
+  DATA_TYPE_PARABOLA3 = 14 + 255,
+  DATA_TYPE_UVCURVE = 14 + 255,
+
+  DATA_TYPE_CONICALSURFACE = 20 + 255,
+  DATA_TYPE_CYLINDERSURFACE = 21 + 255,
+  DATA_TYPE_ELLIPSOIDSURFACE = 22 + 255,
+  DATA_TYPE_LOFTINGSURFACE = 23 + 255,
+  DATA_TYPE_NURBSSURFACE = 24 + 255,
+  DATA_TYPE_PLANESURFACE = 25 + 255,
+  DATA_TYPE_SPHERESURFACE = 26 + 255,
+  DATA_TYPE_SWEEPSURFACE = 27 + 255,
+
+  DATA_TYPE_TRANSFORM2 = 32 + 255,
+  DATA_TYPE_TRANSFORM3 = 33 + 255,
+
+  DATA_TYPE_VERTICE2 = 40 + 255,
+  DATA_TYPE_EDGE2 = 41 + 255,
+  DATA_TYPE_COEDGE2 = 42 + 255,
+  DATA_TYPE_LOOP2 = 43 + 255,
+  DATA_TYPE_FACE2 = 44 + 255,
+  DATA_TYPE_DIGRAPH2 = 45 + 255,
+
+  DATA_TYPE_VERTICE3 = 50 + 255,
+  DATA_TYPE_EDGE3 = 51 + 255,
+  DATA_TYPE_COEDGE3 = 52 + 255,
+  DATA_TYPE_LOOP3 = 53 + 255,
+  DATA_TYPE_FACE3 = 54 + 255,
+  DATA_TYPE_DIGRAPH3 = 55 + 255,
+  DATA_TYPE_SHELL3 = 56 + 255,
+  DATA_TYPE_LUMP3 = 57 + 255,
+  DATA_TYPE_BODY3 = 58 + 255,
 }
 
 // 命令类型
@@ -73,7 +115,7 @@ enum CommandType {
   CREATE_POLYLINE = 'PO',             // 多段线
   CREATE_NURBS_FITTING = 'N',         // Nurbs fitting
   CREATE_NURBS_CONTROL = 'NC',        // Nurbs control
-  CREATE_RECTANGLE = 'R',             // REC：矩形
+  CREATE_RECTANGLE = 'RE',             // REC：矩形
 
   // 二维平面类型
   CREATE_CIRCLE_SURFACE = 'CI',       // 圆面
@@ -186,16 +228,23 @@ enum CommandType {
   BOOL_3_UNION = 'B3U',                 // 3D布尔并(单对单)
   BOOL_3_DIFFERENCE = 'B3D',            // 3D布尔差(单对单)
 
-  // // 其他
-  // OTHER_DELETE = 'D',                   // 删除
-  // OTHER_UNDO = 'UD',                    // 撤销
-  // OTHER_REDO = 'RD',                    // 重做
-  // OTHER_MOVE = 'M',                     // 移动
-  // OTHER_ROTATE = 'R',                   // 旋转
-  // OTHER_SCALE = 'S',                    // 缩放
-  // OTHER_OFFSET = 'O',                   // 偏移，产生新对象
-  // OTHER_MIRROR = 'I',                   // 镜像，产生新对象   
-  // OTHER_GROUP_OR_UNGROUP = 'G',         // 组合/取消组合
+  // 场景
+  SCENE_SAVE = 'SAVE',                  // 保存
+  SCENE_SAVEAS = 'SAVEAS',              // 另存为
+  SCENE_LOAD = 'LOAD',                  // 加载
+  SCENE_IMPORT = 'IMPORT',              // 导入
+  SCENE_EXPORT = 'EXPORT',              // 导出
+
+  // 其他
+  OTHER_DELETE = 'D',                   // 删除
+  OTHER_UNDO = 'UD',                    // 撤销
+  OTHER_REDO = 'RD',                    // 重做
+  OTHER_MOVE = 'M',                     // 移动
+  OTHER_ROTATE = 'R',                   // 旋转
+  OTHER_SCALE = 'S',                    // 缩放
+  OTHER_OFFSET = 'O',                   // 偏移，产生新对象
+  OTHER_MIRROR = 'I',                   // 镜像，产生新对象   
+  OTHER_GROUP_OR_UNGROUP = 'G',         // 组合/取消组合
 }
 
 

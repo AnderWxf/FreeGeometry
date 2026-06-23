@@ -50,6 +50,9 @@ import { CalculateLoop3LengthCom } from "./coms/calculate/CalculateLoop3LengthCo
 import { Bool2IntersectionCom } from "./coms/bool/Bool2IntersectionCom";
 import { Bool2UnionCom } from "./coms/bool/Bool2UnionCom";
 import { Bool2DifferenceCom } from "./coms/bool/Bool2DifferenceCom";
+import { Doc } from "../Doc";
+import { SaveCom } from "./coms/scene/SaveCom";
+import { LoadCom } from "./coms/scene/LoadCom";
 
 /**
  * Command executer base class.
@@ -110,14 +113,16 @@ class CommandExecuter {
     this._commands.set(CommandType.BOOL_2_UNION, Bool2UnionCom);
     this._commands.set(CommandType.BOOL_2_DIFFERENCE, Bool2DifferenceCom);
 
-    // this._commands.set(CommandType.OTHER_DELETE, ComDelete);
-    // this._commands.set(CommandType.OTHER_MOVE, ComMove);
-    // this._commands.set(CommandType.OTHER_ROTATE, ComRotate);
-    // this._commands.set(CommandType.OTHER_SCALE, ComScale);
-    // this._commands.set(CommandType.OTHER_MIRROR, ComMirror);
-    // this._commands.set(CommandType.OTHER_OFFSET, ComOffset);
-    // this._commands.set(CommandType.OTHER_GROUP, ComGroup);
-    // this._commands.set(CommandType.OTHER_UNGROUP, ComUngroup);
+    this._commands.set(CommandType.SCENE_SAVE, SaveCom);
+    this._commands.set(CommandType.SCENE_LOAD, LoadCom);
+
+    this._commands.set(CommandType.OTHER_DELETE, ComDelete);
+    this._commands.set(CommandType.OTHER_MOVE, ComMove);
+    this._commands.set(CommandType.OTHER_ROTATE, ComRotate);
+    this._commands.set(CommandType.OTHER_SCALE, ComScale);
+    this._commands.set(CommandType.OTHER_MIRROR, ComMirror);
+    this._commands.set(CommandType.OTHER_OFFSET, ComOffset);
+    // this._commands.set(CommandType.OTHER_GROUP_OR_UNGROUP, ComGroup);
   }
 
   RegisterCommand(type: string, com: Function) {
@@ -279,28 +284,36 @@ class CommandExecuter {
     let s = comstr.split(' ');
     if (s.length) {
       let command = s[0];
-
       command = command.toUpperCase();
-      // if (command == CommandType.OTHER_UNDO) {
-      //   this.undo();
-      // } else if (command == CommandType.OTHER_REDO) {
-      //   this.redo();
-      // } else {
-      let c = this._commands.get(command) as Function;
-      if (c) {
-        let com: Command = new (<any>c)(this, comstr);
-        if (this._curr && !this._curr.isDone) {
-          this._curr.cancel();
-        }
-        this._curr = com;
-        try {
-          this._curr.exec();
-        } catch (e: any) {
-          console.error(e);
-          this._curr.cancel();
-        }
+      switch (command) {
+        // case CommandType.SCENE_SAVE:
+        //   Doc.Save();
+        //   break;
+        // case CommandType.SCENE_LOAD:
+        //   Doc.Load();
+        //   break;
+        case CommandType.OTHER_UNDO:
+          this.undo();
+          break;
+        case CommandType.OTHER_REDO:
+          this.redo();
+          break;
+        default:
+          let c = this._commands.get(command) as Function;
+          if (c) {
+            let com: Command = new (<any>c)(this, comstr);
+            if (this._curr && !this._curr.isDone) {
+              this._curr.cancel();
+            }
+            this._curr = com;
+            try {
+              this._curr.exec();
+            } catch (e: any) {
+              console.error(e);
+              this._curr.cancel();
+            }
+          }
       }
-      // }
     }
   }
 
