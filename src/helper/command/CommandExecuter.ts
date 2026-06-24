@@ -50,9 +50,10 @@ import { CalculateLoop3LengthCom } from "./coms/calculate/CalculateLoop3LengthCo
 import { Bool2IntersectionCom } from "./coms/bool/Bool2IntersectionCom";
 import { Bool2UnionCom } from "./coms/bool/Bool2UnionCom";
 import { Bool2DifferenceCom } from "./coms/bool/Bool2DifferenceCom";
-import { Doc } from "../Doc";
-import { SaveCom } from "./coms/scene/SaveCom";
-import { LoadCom } from "./coms/scene/LoadCom";
+import { SceneSaveCom } from "./coms/scene/SceneSaveCom";
+import { SceneLoadCom } from "./coms/scene/SceneLoadCom";
+import { SceneClearCom } from "./coms/scene/SceneClearCom";
+import { SceneImportCom } from "./coms/scene/SceneImportCom";
 
 /**
  * Command executer base class.
@@ -113,8 +114,10 @@ class CommandExecuter {
     this._commands.set(CommandType.BOOL_2_UNION, Bool2UnionCom);
     this._commands.set(CommandType.BOOL_2_DIFFERENCE, Bool2DifferenceCom);
 
-    this._commands.set(CommandType.SCENE_SAVE, SaveCom);
-    this._commands.set(CommandType.SCENE_LOAD, LoadCom);
+    this._commands.set(CommandType.SCENE_SAVE, SceneSaveCom);
+    this._commands.set(CommandType.SCENE_LOAD, SceneLoadCom);
+    this._commands.set(CommandType.SCENE_IMPORT, SceneImportCom);
+    this._commands.set(CommandType.SCENE_CLEAR, SceneClearCom);
 
     this._commands.set(CommandType.OTHER_DELETE, ComDelete);
     this._commands.set(CommandType.OTHER_MOVE, ComMove);

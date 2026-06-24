@@ -41,14 +41,14 @@ class CalculateFace3AreaCom extends ComCreate {
       if (points.length > 3) {
         let face = new Face2();
         for (let i = 0; i < points.length; i++) {
-          face.vertice2s.push(new Vertice2());
+          face.vertices.push(new Vertice2());
         }
         for (let i = 0; i < points.length; i++) {
           let b = points[i];
           let e = points[(i + 1) % points.length];
           let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(b, e);
-          edge.v0 = face.vertice2s[i];
-          edge.v1 = face.vertice2s[(i + 1) % points.length];
+          edge.v0 = face.vertices[i];
+          edge.v1 = face.vertices[(i + 1) % points.length];
           let coedge = new Coedge2();
           coedge.e = edge;
           face.border.coedges.push(coedge);
@@ -87,18 +87,18 @@ class CalculateFace3AreaCom extends ComCreate {
       if (this.edges.length) {
         let face = new Face2();
         for (let i = 0; i < this.edges.length; i++) {
-          face.vertice2s.push(new Vertice2());
+          face.vertices.push(new Vertice2());
         }
         for (let i = 0; i < this.edges.length; i++) {
           let edge = this.edges[i].clone();
-          edge.v0 = face.vertice2s[i];
-          edge.v1 = face.vertice2s[(i + 1) % this.edges.length];
+          edge.v0 = face.vertices[i];
+          edge.v1 = face.vertices[(i + 1) % this.edges.length];
           let coedge = new Coedge2();
           coedge.e = edge;
           face.border.coedges.push(coedge);
           face.curves.push(edge.curve);
           edge.curve = null;
-          edge.curveIndex = i;
+          edge.curvei = i;
         }
         let geo = BrepMeshBuilder.BuildFace2Mesh(face, THREE.Color.NAMES.blue);
         userData.original = face;

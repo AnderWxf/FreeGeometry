@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 
 class Scene {
-
   private _objects: Map<number, THREE.Object3D>;
   private _scene: THREE.Scene;
   constructor(secne: THREE.Scene) {
@@ -21,11 +20,9 @@ class Scene {
     this._scene.remove(...object);
   }
   clear() {
+    this._scene.remove(...this._objects.values());
     this._objects.clear();
-    this._scene.clear();
   }
-
-  ;
   get children(): THREE.Object3D[] {
     return this._scene.children;
   }

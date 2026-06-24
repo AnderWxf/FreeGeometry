@@ -1,37 +1,55 @@
 import { Vector3 } from "../../../../math/Math";
 import { Transform3 } from "../Transform3";
 import { Curve3Data } from "../Curve3Data";
+import { GeomType } from "../../../../core/Constents";
 /**
  * 3D Parabola curve data struct. TODO
  * 
  */
 class Parabola3Data extends Curve3Data {
-    /**
-     * The focus distance of this Parabola curve.
-     *
-     * @type {number}
-     */
-    public f: number;
+  /**
+   * The type of data for unserialize.
+   *
+   * @type {number}
+   */
+  private type = GeomType.DATA_TYPE_CURVE3_PARABOLA3;   
+  /**
+   * The focus distance of this Parabola curve.
+   *
+   * @type {number}
+   */
+  public f: number;
 
-    /**
-     * Constructs a new 3D Transfrom.
-     *
-     * @param {Transform3} [trans={position=(0,0),rotation=0}]- The transfrom value of this Parabola curve.
-     * @param {number} [f=(1)] - The focus distance of this Parabola curve.
-     */
-    constructor(trans = new Transform3(), f: number = 1) {
-        super(trans);
-        this.f = f;
-    }
+  /**
+   * Constructs a new 3D Transfrom.
+   *
+   * @param {Transform3} [trans={position=(0,0),rotation=0}]- The transfrom value of this Parabola curve.
+   * @param {number} [f=(1)] - The focus distance of this Parabola curve.
+   */
+  constructor(trans = new Transform3(), f: number = 1) {
+    super(trans);
+    this.f = f;
+  }
 
-    /**
-     * Returns a new Parabola3Data with copied values from this instance.
-     *
-     * @return {Parabola3Data} A clone of this instance.
-     */
-    override clone() {
-        return new Parabola3Data(this.trans.clone(), this.f);
-    }
+  /**
+   * Returns a new Parabola3Data with copied values from this instance.
+   *
+   * @return {Parabola3Data} A clone of this instance.
+   */
+  override clone() {
+    return new Parabola3Data(this.trans.clone(), this.f);
+  }
+
+  /**
+   * Returns a new Parabola3Data with unserialize data.
+   *
+   * @return {Parabola3Data} a new instance.
+   */
+  static Unserialize(data: any): Parabola3Data {
+    let ret = new Parabola3Data(Transform3.Unserialize(data.trans), data.f);
+    ret.uuid = data.uuid;
+    return ret;
+  }
 }
 
 export { Parabola3Data };

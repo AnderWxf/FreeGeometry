@@ -157,9 +157,9 @@ class Coedge2Algo {
     this._c = c;
     this._f = face;
     let curveData: Curve2Data | undefined;
-    if (face && c.e.curveIndex != -1) {
+    if (face && c.e.curvei != -1) {
       // Use the curve data from the face if available
-      curveData = face.curves[c.e.curveIndex];
+      curveData = face.curves[c.e.curvei];
     }
     this._curve = CurveBuilder.Algorithm2ByData(curveData || c.e.curve);
     this._ins = [];
@@ -297,7 +297,7 @@ class Coedge2Algo {
     return u > ur.x && u < ur.y;
   }
   // u ∈ [a,b]
-  isOnURange(u: number,tol1:number): boolean {
+  isOnURange(u: number, tol1: number): boolean {
     let ur = this._c.e.ur;
     return Math.abs(u - ur.x) <= tol1
       || Math.abs(u - ur.y) <= tol1
@@ -503,7 +503,7 @@ class Loop2Algo {
         // 是否为穿透点判定：
         // A 如果交点在曲线内部，取曲线在交点上的切线，若射线与切线重合，则是切点，不认为是穿透点。
         let u = currAlgo.u;
-        if (!currAlgo.isOnUBoder(inter.u1,tol1) && currAlgo.isInURange(inter.u1)) {
+        if (!currAlgo.isOnUBoder(inter.u1, tol1) && currAlgo.isInURange(inter.u1)) {
           let d = currAlgo.t(inter.u1);//切线方向
           // 如果是水平切线，就是切点
           if (Math.abs(d.y) <= tol1) {
@@ -516,7 +516,7 @@ class Loop2Algo {
         // B 如果交点在曲线两端，取交点在前后两段很小范围内的两个点，检查两个点是否同在射线的左侧或者右侧。
         //   如果同在射线的左侧或者右侧，则是切点，不认为是穿透点。
         //取交点在射线前后很小范围内的两个点
-        if (currAlgo.isOnUBoder(inter.u1, tol1)) { 
+        if (currAlgo.isOnUBoder(inter.u1, tol1)) {
           let rayTange = new Vector2(1, 0);
           let frontPoint: Vector2 = null;
           let backPoint: Vector2 = null;
@@ -696,7 +696,7 @@ class Face2Algo {
 
   get f(): Face2 {
     return this._f;
-  }  
+  }
 
   /**
    * Returns all Loop algo from the face.

@@ -5,126 +5,138 @@ import { Matrix3, Vector2 } from "../../../math/Math";
  *
  */
 class Transform2 {
+  /**
+   * The position value of this Transfrom2.
+   *
+   * @type {Vector2}
+   */
+  public pos: Vector2;
+
+  /**
+   * The rotation value of this Transfrom2.
+   *
+   * @type {number}
+   */
+  public rot: number;
+
+  /**
+   * The scale value of this Transfrom2.
+   *
+   * @type {Vector2}
+   */
+  public scale: Vector2;
+
+  /**
+   * The parent transfrom of this Transfrom2.
+   *
+   * @type {Transform2}
+   */
+  public parent: Transform2;
+
+  /**
+   * Constructs a new 2D Transfrom.
+   *
+   * @param {Vector2} [position=(0,0)] - The position value of this Transfrom.
+   * @param {number} [rotation=0] - The rotation value of this Transfrom.
+   * @param {Vector2} [scale=(1,1)] - The scale value of this Transfrom.
+   * @param {Transform2} [parent=null] - The parent transfrom of this Transfrom.
+   */
+  constructor(position = new Vector2(), rotation = 0, scale = new Vector2(1, 1), parent?: Transform2) {
     /**
      * The position value of this Transfrom2.
      *
      * @type {Vector2}
      */
-    public pos: Vector2;
+    this.pos = position;
 
     /**
      * The rotation value of this Transfrom2.
      *
      * @type {number}
      */
-    public rot: number;
+    this.rot = rotation;
 
     /**
-     * The scale value of this Transfrom2.
+     * The scale value of this Transform2.
      *
      * @type {Vector2}
      */
-    public scale: Vector2;
+    this.scale = scale;
 
     /**
      * The parent transfrom of this Transfrom2.
      *
      * @type {Transform2}
      */
-    public parent: Transform2;
+    this.parent = parent;
+  }
+  /**
+   * comput local matrix as a 2D translation trans.
+   *
+   * @return {Matrix3} A reference to this matrix.
+   */
+  makeLocalMatrix() {
+    let ret = new Matrix3();
+    const c = Math.cos(this.rot);
+    const s = Math.sin(this.rot);
+    const x = this.pos.x;
+    const y = this.pos.y;
+    const sx = this.scale.x;
+    const sy = this.scale.y;
+    ret.set(
+      c * sx, -s * sy, x,
+      s * sx, c * sy, y,
+      0, 0, 1
+    );
+    return ret;
+  }
 
-    /**
-     * Constructs a new 2D Transfrom.
-     *
-     * @param {Vector2} [position=(0,0)] - The position value of this Transfrom.
-     * @param {number} [rotation=0] - The rotation value of this Transfrom.
-     * @param {Vector2} [scale=(1,1)] - The scale value of this Transfrom.
-     * @param {Transform2} [parent=null] - The parent transfrom of this Transfrom.
-     */
-    constructor(position = new Vector2(), rotation = 0, scale = new Vector2(1, 1), parent?: Transform2) {
-        /**
-         * The position value of this Transfrom2.
-         *
-         * @type {Vector2}
-         */
-        this.pos = position;
+  /**
+   * comput 2D translation trans from matrix.
+   *
+   * @param {Matrix3} value reference to this matrix.
+   */
+  fromLocalMatrix(value: Matrix3): Transform2 {
+    let result = value.decompose();
+    this.pos = result.position;
+    this.rot = result.rotation;
+    this.scale = result.scale;
+    return this;
+  }
 
-        /**
-         * The rotation value of this Transfrom2.
-         *
-         * @type {number}
-         */
-        this.rot = rotation;
-
-        /**
-         * The scale value of this Transform2.
-         *
-         * @type {Vector2}
-         */
-        this.scale = scale;
-
-        /**
-         * The parent transfrom of this Transfrom2.
-         *
-         * @type {Transform2}
-         */
-        this.parent = parent;
+  /**
+   * comput world matrix as a 2D translation trans.
+   *
+   * @return {Matrix3} A reference to this matrix.
+   */
+  makeWorldMatrix() {
+    let matrix = this.makeLocalMatrix();
+    if (this.parent) {
+      let world = this.parent.makeLocalMatrix();
+      matrix.multiply(world);
     }
-    /**
-     * comput local matrix as a 2D translation trans.
-     *
-     * @return {Matrix3} A reference to this matrix.
-     */
-    makeLocalMatrix() {
-        let ret = new Matrix3();
-        const c = Math.cos(this.rot);
-        const s = Math.sin(this.rot);
-        const x = this.pos.x;
-        const y = this.pos.y;
-        const sx = this.scale.x;
-        const sy = this.scale.y;
-        ret.set(
-            c * sx, -s * sy, x,
-            s * sx, c * sy, y,
-            0, 0, 1
-        );
-        return ret;
-    }
+    return matrix;
+  }
 
-    /**
-     * comput 2D translation trans from matrix.
-     *
-     * @param {Matrix3} value reference to this matrix.
-     */
-    fromLocalMatrix(value: Matrix3): Transform2 {
-        let result = value.decompose();
-        this.pos = result.position;
-        this.rot = result.rotation;
-        this.scale = result.scale;
-        return this;
-    }
+  /**
+   * Returns a new Transform2 with copied values from this instance.
+   *
+   * @return {Transform2} A clone of this instance.
+   */
+  clone() {
+    return new Transform2(this.pos.clone(), this.rot, this.scale.clone(), this.parent);
+  }
 
-    /**
-     * comput world matrix as a 2D translation trans.
-     *
-     * @return {Matrix3} A reference to this matrix.
-     */
-    makeWorldMatrix() {
-        let matrix = this.makeLocalMatrix();
-        if (this.parent) {
-            let world = this.parent.makeLocalMatrix();
-            matrix.multiply(world);
-        }
-        return matrix;
-    }
+  /**
+   * Returns a new Transform2 with unserialize data.
+   *
+   * @return {Transform2} a new instance.
+   */
+  static Unserialize(data: any): Transform2 {
+    let ret = new Transform2(Vector2.Unserialize(data.pos), data.rot, Vector2.Unserialize(data.scale));
+    ret.parent = data.parent ? Transform2.Unserialize(data.parent) : null;
+    return ret;
+  }
 
-    /**
-     * Returns a new Transform2 with copied values from this instance.
-     *
-     * @return {Transform2} A clone of this instance.
-     */
-    clone() {
-        return new Transform2(this.pos.clone(), this.rot, this.scale.clone(), this.parent);
-    }
 }
 export { Transform2 };

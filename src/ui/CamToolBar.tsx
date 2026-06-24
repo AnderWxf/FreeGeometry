@@ -7,8 +7,9 @@ import { OrthographicController } from '../helper/camera/OrthographicController'
 import { Grid } from '../helper/Grid';
 import { Global } from '../core/Global';
 import { CommandType } from '../core/Constents';
-import { PieChartOutlined, DesktopOutlined, ContainerOutlined, SettingOutlined, SaveFilled, EditTwoTone, TransactionOutlined, BuildFilled, AppstoreFilled, CalculatorOutlined, LineChartOutlined, AreaChartOutlined, GlobalOutlined, RubyOutlined, BlockOutlined } from '@ant-design/icons';
+import { SaveFilled, EditTwoTone, BuildFilled, AppstoreFilled, CalculatorOutlined, LineChartOutlined, AreaChartOutlined, GlobalOutlined, RubyOutlined, BlockOutlined } from '@ant-design/icons';
 import type { MenuInfo } from 'rc-menu/lib/interface';
+import { useState } from 'react';
 
 
 const perspective: PerspectiveController = new PerspectiveController();
@@ -165,16 +166,11 @@ let CommandBarOnEnter = (value: string) => {
   Global.comExector.execute(value.toUpperCase());
 };
 
-const MenuBarOnChange = (info: MenuInfo): void => {
-  Global.gpu.focus();
-  let command = info.key.toUpperCase();
-  Global.comExector.execute(command);
-};
 
 const CommandBar: React.FC = () => (
   <Space wrap>
     <Input id='CommandLine' placeholder="请输入命令"
-      style={{ position: 'fixed', width: '100%', bottom: 0, right: 0 }}
+      style={{ position: 'fixed', width: '100%', bottom: 0, right: 0, background: 'transparent' }}
       onPressEnter={(e) => {
         e.stopPropagation();
         let element = (e.target as HTMLInputElement);
@@ -220,6 +216,8 @@ const MenuItems = [
     children: [
       { key: CommandType.SCENE_SAVE, label: '保存' + ' ' + CommandType.SCENE_SAVE },
       { key: CommandType.SCENE_LOAD, label: '加载' + ' ' + CommandType.SCENE_LOAD },
+      { key: CommandType.SCENE_IMPORT, label: '导入' + ' ' + CommandType.SCENE_IMPORT },
+      { key: CommandType.SCENE_CLEAR, label: '清空' + ' ' + CommandType.SCENE_CLEAR },
     ],
   },
   {
@@ -441,8 +439,14 @@ const MenuItems = [
     ]
   },
 ];
-
-
+// let selectedKeys: string[] = [];
+const MenuBarOnChange = (info: MenuInfo): void => {
+  Global.gpu.focus();
+  let command = info.key.toUpperCase();
+  Global.comExector.execute(command);
+  // let [selectedKeys, setSelectedKeys] = useState<string[]>([]);
+  // setSelectedKeys([]);
+};
 const MenuBar: React.FC = () => (
   <Space wrap>
     <input type="file" id="fileInput" accept=".json,application/json" hidden></input>
@@ -456,6 +460,7 @@ const MenuBar: React.FC = () => (
             popupBg: 'transparent',
             colorSubItemBg: 'transparent',
             horizontalItemHoverBg: 'transparent',
+            itemHoverColor: '#FFFFFF',
           },
         },
       }}
@@ -463,8 +468,12 @@ const MenuBar: React.FC = () => (
       <Menu
         style={{ width: '30%', height: 40, position: 'fixed', top: -5, left: 0 }}
         mode="horizontal"
+        // selectedKeys={selectedKeys}
         onClick={(e) => {
           MenuBarOnChange(e);
+        }}
+        onBlur={(e) => {
+          (e.target as any).selectedKeys = [];
         }}
         items={MenuItems}
       />

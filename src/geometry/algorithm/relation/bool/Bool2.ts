@@ -354,12 +354,12 @@ class Bool2 {
               f.curves.push(coedge.curve.dat);
             }
             coedge.c.e.curve = null;
-            coedge.c.e.curveIndex = index;
-            if (!f.vertice2s.includes(coedge.c.e.v0)) {
-              f.vertice2s.push(coedge.c.e.v0);
+            coedge.c.e.curvei = index;
+            if (!f.vertices.includes(coedge.c.e.v0)) {
+              f.vertices.push(coedge.c.e.v0);
             }
-            if (!f.vertice2s.includes(coedge.c.e.v1)) {
-              f.vertice2s.push(coedge.c.e.v1);
+            if (!f.vertices.includes(coedge.c.e.v1)) {
+              f.vertices.push(coedge.c.e.v1);
             }
           });
           alloops.splice(i, 1);
@@ -381,12 +381,12 @@ class Bool2 {
                 f.curves.push(coedge.curve.dat);
               }
               coedge.c.e.curve = null;
-              coedge.c.e.curveIndex = index;
-              if (!f.vertice2s.includes(coedge.c.e.v0)) {
-                f.vertice2s.push(coedge.c.e.v0);
+              coedge.c.e.curvei = index;
+              if (!f.vertices.includes(coedge.c.e.v0)) {
+                f.vertices.push(coedge.c.e.v0);
               }
-              if (!f.vertice2s.includes(coedge.c.e.v1)) {
-                f.vertice2s.push(coedge.c.e.v1);
+              if (!f.vertices.includes(coedge.c.e.v1)) {
+                f.vertices.push(coedge.c.e.v1);
               }
             });
             alloops.splice(i, 1);

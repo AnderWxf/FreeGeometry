@@ -1,11 +1,18 @@
 import { Vector2 } from "../../../../math/Math";
 import { Transform2 } from "../Transform2";
 import { Curve2Data } from "../Curve2Data";
+import { GeomType } from "../../../../core/Constents";
 /**
  * 2D hyperbola data struct. 
  *
  */
 class Hyperbola2Data extends Curve2Data {
+  /**
+   * The type of data for unserialize.
+   *
+   * @type {number}
+   */
+  private type = GeomType.DATA_TYPE_CURVE2_HYPERBOLA2;  
   /**
    * The radius value of this Hyperbola2Data.
    *
@@ -31,6 +38,17 @@ class Hyperbola2Data extends Curve2Data {
    */
   override clone() {
     return new Hyperbola2Data(this.trans.clone(), this.radius.clone());
+  }
+
+  /**
+   * Returns a new Hyperbola2Data with unserialize data.
+   *
+   * @return {Hyperbola2Data} a new instance.
+   */
+  static Unserialize(data: any): Hyperbola2Data {
+    let ret = new Hyperbola2Data(Transform2.Unserialize(data.trans), Vector2.Unserialize(data.radius));
+    ret.uuid = data.uuid;
+    return ret;
   }
 }
 

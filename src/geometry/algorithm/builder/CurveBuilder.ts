@@ -32,265 +32,267 @@ import { Hyperbola2AlgoAb } from "../base/curve2/Hyperbola2AlgoAb";
  *
  */
 class CurveBuilder {
-    /**
-     * build line2 from begin point and end point.
-     *
-     * @param {Vector2} [b] - The begin point.
-     * @param {Vector2} [e] - The end point.
-     */
-    static BuildLine2FromBeginEndPoint(b: Vector2, e: Vector2): Line2Data {
-        let ret = new Line2Data();
-        ret.trans.pos = b;
-        let r = e.clone().sub(b).normalize();
-        ret.trans.rot = r.angle();
-        return ret;
+  /**
+   * build line2 from begin point and end point.
+   *
+   * @param {Vector2} [b] - The begin point.
+   * @param {Vector2} [e] - The end point.
+   */
+  static BuildLine2FromBeginEndPoint(b: Vector2, e: Vector2): Line2Data {
+    let ret = new Line2Data();
+    ret.trans.pos = b;
+    let r = e.clone().sub(b).normalize();
+    ret.trans.rot = r.angle();
+    return ret;
+  }
+
+  /**
+   * build line2 from begin point and end point.
+   *
+   * @param {Vector2} [p] - The point.
+   * @param {Vector2} [v] - The vector.
+   */
+  static BuildLine2FromPointAndVector(p: Vector2, v: Vector2): Line2Data {
+    let ret = new Line2Data();
+    ret.trans.pos = p;
+    ret.trans.rot = v.angle();
+    return ret;
+  }
+
+  /**
+   * build circle from center point and radius.
+   *
+   * @param {Vector2} [c] - The center point.
+   * @param {number} [r] - radius.
+   */
+  static BuildCircle2FromCenterRadius(c: Vector2, r: number): Arc2Data {
+    let ret = new Arc2Data();
+    ret.trans.pos = c;
+    ret.radius.set(r, r);
+    return ret;
+  }
+
+  /**
+   * build circle from bengin center end point.
+   * 
+   * @param {Vector2} [c] - The center point.
+   * @param {Vector2} [b] - The bengin point.
+   */
+  static BuildCircle2FromCenterBeginEndPoint(c: Vector2, b: Vector2): Arc2Data {
+    let ret = new Arc2Data();
+    let r = c.distanceTo(b);
+    ret.trans.pos = c;
+    ret.trans.rot = Math.atan2(b.y - c.y, b.x - c.x);
+    ret.radius.set(r, r);
+    return ret;
+  }
+
+  /**
+   * build circle from bengin middle end point.
+   * bengin middle end point on citcle.
+   * 
+   * @param {Vector2} [b] - The bengin point.
+   * @param {Vector2} [m] - The middle point.
+   * @param {Vector2} [e] - The end point.
+   */
+  static BuildCircle2FromBeginMiddleEndPoint(b: Vector2, m: Vector2, e: Vector2): Arc2Data {
+    let x1 = b.x, y1 = b.y, x2 = m.x, y2 = m.y, x3 = e.x, y3 = e.y;
+    let mat = new Matrix2();
+    mat.set(
+      x1 - x3, y1 - y3,
+      x2 - x3, y2 - y3
+    )
+    let det = mat.determinant();
+    if (det == 0) {
+      return null;
     }
+    let v = new Vector2(x3 * x3 + y3 * y3 - x1 * x1 - y1 * y1, x3 * x3 + y3 * y3 - x2 * x2 - y2 * y2);
+    mat.invert();
+    v.applyMatrix2(mat);
 
-    /**
-     * build line2 from begin point and end point.
-     *
-     * @param {Vector2} [p] - The point.
-     * @param {Vector2} [v] - The vector.
-     */
-    static BuildLine2FromPointAndVector(p: Vector2, v: Vector2): Line2Data {
-        let ret = new Line2Data();
-        ret.trans.pos = p;
-        ret.trans.rot = v.angle();
-        return ret;
+    let ret = new Arc2Data();
+    let c = new Vector2(-v.x / 2, -v.y / 2);
+    let r = c.distanceTo(b);
+    ret.trans.pos = c;
+    ret.trans.rot = Math.atan2(b.y - c.y, b.x - c.x);
+    ret.radius.set(r, r);
+    return ret;
+  }
+
+  /**
+   * build ellipse from bengin center end point.
+   * center point is center of ellipse.
+   * vector center to begin is major of radius.
+   * the distance of end point project to major radius of ellipse is minor radius size of ellipse.
+   * 
+   * @param {Vector2} [c] - The center point.
+   * @param {Vector2} [b] - The bengin point.
+   * @param {Vector2} [e] - The end point.
+   */
+  static BuildEllipse2FromCenterBeginEndPoint(c: Vector2, b: Vector2, e: Vector2): Arc2Data {
+    let major = b.clone().sub(c);
+    let radius = new Vector2();
+    radius.x = major.length();
+    major.normalize();
+    let rotation = Math.atan2(major.y, major.x);
+    major.multiplyScalar(e.clone().dot(major));
+    radius.y = e.distanceTo(major);
+    let tr = new Transform2(c, rotation);
+    return new Arc2Data(tr, radius);
+  }
+
+  /**
+   * build hyperbola from bengin center end point.
+   * center point is center of hyperbola.
+   * vector center to begin is major of radius.
+   * the distance of end point project to major radius of hyperbola is minor radius size of hyperbola.
+   * 
+   * @param {Vector2} [c] - The center point.
+   * @param {Vector2} [a] - The a point.
+   * @param {Vector2} [b] - The b point.
+   */
+  static BuildHyperbola2FromCenterABPoint(c: Vector2, a: Vector2, b: Vector2): Hyperbola2Data {
+    let major = a.clone().sub(c);
+    let radius = new Vector2();
+    radius.x = major.length();
+    major.normalize();
+    let rotation = Math.atan2(major.y, major.x);
+    major.multiplyScalar(b.clone().dot(major));
+    radius.y = b.distanceTo(major);
+    let tr = new Transform2(c, rotation);
+    return new Hyperbola2Data(tr, radius);
+  }
+
+  /**
+   * build parabola from bengin top focus point.
+   * center point is top of parabola.
+   * vector top to focus is major of parabola.
+   * 
+   * @param {Vector2} [c] - The top point.
+   * @param {Vector2} [a] - The focus point.
+   */
+  static BuildParabola2FromCenterABPoint(c: Vector2, a: Vector2): Parabola2Data {
+    let major = a.clone().sub(c);
+    let f = major.length();
+    major.normalize();
+    let rotation = Math.atan2(major.y, major.x) - Math.PI / 2;
+    let tr = new Transform2(c, rotation);
+    return new Parabola2Data(tr, f);
+  }
+
+  /**
+   * build nurbs from fitting points.
+   *
+   * @param {Array<Vector2>} [points] - The fitting points.
+   */
+  static BuildNurbs2FromFittingPoints(points: Array<Vector2>, degree: number = 3): Nurbs2Data {
+    const curve = Nurbs2Algo.Fit(points, degree);
+    return curve;
+  }
+
+  /**
+   * build line3 from begin point and end point.
+   *
+   * @param {Vector3} [b] - The begin point.
+   * @param {Vector3} [e] - The end point.
+   */
+  static BuildLine3FromBeginEndPoint(b: Vector3, e: Vector3): Line3Data {
+    debugger;
+    return null;
+  }
+
+  /**
+   * build circle from center point and radius.
+   *
+   * @param {Vector3} [c] - The center point.
+   * @param {number} [r] - radius.
+   */
+  static BuildCircle3FromCenterRadius(c: Vector3, r: number): Arc3Data {
+    debugger;
+    return null;
+  }
+
+  /**
+   * build circle from bengin center end point.
+   *
+   * @param {Vector3} [b] - The bengin point.
+   * @param {Vector3} [c] - The center point.
+   * @param {Vector3} [e] - The end point.
+   */
+  static BuildCircle3FromBeginCenterEndPoint(b: Vector3, c: Vector3, e: Vector3): Arc3Data {
+    debugger;
+    return null;
+  }
+
+  /**
+   * build arc from bengin center end point.
+   *
+   * @param {Vector3} [b] - The bengin point.
+   * @param {Vector3} [c] - The center point.
+   * @param {Vector3} [e] - The end point.
+   */
+  static BuildArc3FromBeginCenterEndPoint(b: Vector3, c: Vector3, e: Vector3): Arc3Data {
+    debugger;
+    return null;
+  }
+
+  /**
+   * build nurbs from fitting points.
+   *
+   * @param {Array<Vector3>} [points] - The fitting points.
+   */
+  static BuildNurbs3FromFittingPoints(points: Array<Vector3>): Nurbs3Data {
+    debugger;
+    return null;
+  }
+
+
+  static Algorithm2ByData(dat: Curve2Data, sub: number = 0): Curve2Algo {
+    if (dat instanceof Arc2Data) {
+      return new Arc2Algo(dat);
     }
-
-    /**
-     * build circle from center point and radius.
-     *
-     * @param {Vector2} [c] - The center point.
-     * @param {number} [r] - radius.
-     */
-    static BuildCircle2FromCenterRadius(c: Vector2, r: number): Arc2Data {
-        let ret = new Arc2Data();
-        ret.trans.pos = c;
-        ret.radius.set(r, r);
-        return ret;
+    else if (dat instanceof Line2Data) {
+      return new Line2Algo(dat);
     }
-
-    /**
-     * build circle from bengin center end point.
-     * 
-     * @param {Vector2} [c] - The center point.
-     * @param {Vector2} [b] - The bengin point.
-     */
-    static BuildCircle2FromCenterBeginEndPoint(c: Vector2, b: Vector2): Arc2Data {
-        let ret = new Arc2Data();
-        let r = c.distanceTo(b);
-        ret.trans.pos = c;
-        ret.trans.rot = Math.atan2(b.y - c.y, b.x - c.x);
-        ret.radius.set(r, r);
-        return ret;
+    else if (dat instanceof Nurbs2Data) {
+      return new Nurbs2Algo(dat);
     }
-
-    /**
-     * build circle from bengin middle end point.
-     * bengin middle end point on citcle.
-     * 
-     * @param {Vector2} [b] - The bengin point.
-     * @param {Vector2} [m] - The middle point.
-     * @param {Vector2} [e] - The end point.
-     */
-    static BuildCircle2FromBeginMiddleEndPoint(b: Vector2, m: Vector2, e: Vector2): Arc2Data {
-        let x1 = b.x, y1 = b.y, x2 = m.x, y2 = m.y, x3 = e.x, y3 = e.y;
-        let mat = new Matrix2();
-        mat.set(
-            x1 - x3, y1 - y3,
-            x2 - x3, y2 - y3
-        )
-        let det = mat.determinant();
-        if (det == 0) {
-            return null;
-        }
-        let v = new Vector2(x3 * x3 + y3 * y3 - x1 * x1 - y1 * y1, x3 * x3 + y3 * y3 - x2 * x2 - y2 * y2);
-        mat.invert();
-        v.applyMatrix2(mat);
-
-        let ret = new Arc2Data();
-        let c = new Vector2(-v.x / 2, -v.y / 2);
-        let r = c.distanceTo(b);
-        ret.trans.pos = c;
-        ret.trans.rot = Math.atan2(b.y - c.y, b.x - c.x);
-        ret.radius.set(r, r);
-        return ret;
+    else if (dat instanceof Hyperbola2Data) {
+      switch (sub) {
+        case 0:
+          return new Hyperbola2Algo(dat);
+        case 1:
+          return new Hyperbola2AlgoAb(dat);
+        default:
+          return new Hyperbola2Algo(dat);
+      }
     }
-
-    /**
-     * build ellipse from bengin center end point.
-     * center point is center of ellipse.
-     * vector center to begin is major of radius.
-     * the distance of end point project to major radius of ellipse is minor radius size of ellipse.
-     * 
-     * @param {Vector2} [c] - The center point.
-     * @param {Vector2} [b] - The bengin point.
-     * @param {Vector2} [e] - The end point.
-     */
-    static BuildEllipse2FromCenterBeginEndPoint(c: Vector2, b: Vector2, e: Vector2): Arc2Data {
-        let major = b.clone().sub(c);
-        let radius = new Vector2();
-        radius.x = major.length();
-        major.normalize();
-        let rotation = Math.atan2(major.y, major.x);
-        major.multiplyScalar(e.clone().dot(major));
-        radius.y = e.distanceTo(major);
-        let tr = new Transform2(c, rotation);
-        return new Arc2Data(tr, radius);
+    else if (dat instanceof Parabola2Data) {
+      return new Parabola2Algo(dat);
     }
+    debugger;
+    return null;
+  }
 
-    /**
-     * build hyperbola from bengin center end point.
-     * center point is center of hyperbola.
-     * vector center to begin is major of radius.
-     * the distance of end point project to major radius of hyperbola is minor radius size of hyperbola.
-     * 
-     * @param {Vector2} [c] - The center point.
-     * @param {Vector2} [a] - The a point.
-     * @param {Vector2} [b] - The b point.
-     */
-    static BuildHyperbola2FromCenterABPoint(c: Vector2, a: Vector2, b: Vector2): Hyperbola2Data {
-        let major = a.clone().sub(c);
-        let radius = new Vector2();
-        radius.x = major.length();
-        major.normalize();
-        let rotation = Math.atan2(major.y, major.x);
-        major.multiplyScalar(b.clone().dot(major));
-        radius.y = b.distanceTo(major);
-        let tr = new Transform2(c, rotation);
-        return new Hyperbola2Data(tr, radius);
+  static Algorithm3ByData(dat: Curve3Data): Curve3Algo {
+    if (dat instanceof Arc3Data) {
+      return new Arc3Algo(dat);
     }
-
-    /**
-     * build parabola from bengin top focus point.
-     * center point is top of parabola.
-     * vector top to focus is major of parabola.
-     * 
-     * @param {Vector2} [c] - The top point.
-     * @param {Vector2} [a] - The focus point.
-     */
-    static BuildParabola2FromCenterABPoint(c: Vector2, a: Vector2): Parabola2Data {
-        let major = a.clone().sub(c);
-        let f = major.length();
-        major.normalize();
-        let rotation = Math.atan2(major.y, major.x) - Math.PI / 2;
-        let tr = new Transform2(c, rotation);
-        return new Parabola2Data(tr, f);
+    else if (dat instanceof Hyperbola3Data) {
+      return new Hyperbola3Algo(dat);
     }
-
-    /**
-     * build nurbs from fitting points.
-     *
-     * @param {Array<Vector2>} [points] - The fitting points.
-     */
-    static BuildNurbs2FromFittingPoints(points: Array<Vector2>, degree: number = 3): Nurbs2Data {
-        const curve = Nurbs2Algo.Fit(points, degree);
-        return curve;
+    else if (dat instanceof Parabola3Data) {
+      return new Parabola3Algo(dat);
     }
-
-    /**
-     * build line3 from begin point and end point.
-     *
-     * @param {Vector3} [b] - The begin point.
-     * @param {Vector3} [e] - The end point.
-     */
-    static BuildLine3FromBeginEndPoint(b: Vector3, e: Vector3): Line3Data {
-        debugger;
-        return null;
+    else if (dat instanceof Line3Data) {
+      return new Line3Algo(dat);
     }
-
-    /**
-     * build circle from center point and radius.
-     *
-     * @param {Vector3} [c] - The center point.
-     * @param {number} [r] - radius.
-     */
-    static BuildCircle3FromCenterRadius(c: Vector3, r: number): Arc3Data {
-        debugger;
-        return null;
+    else if (dat instanceof Nurbs3Data) {
+      return new Nurbs3Algo(dat);
     }
-
-    /**
-     * build circle from bengin center end point.
-     *
-     * @param {Vector3} [b] - The bengin point.
-     * @param {Vector3} [c] - The center point.
-     * @param {Vector3} [e] - The end point.
-     */
-    static BuildCircle3FromBeginCenterEndPoint(b: Vector3, c: Vector3, e: Vector3): Arc3Data {
-        debugger;
-        return null;
-    }
-
-    /**
-     * build arc from bengin center end point.
-     *
-     * @param {Vector3} [b] - The bengin point.
-     * @param {Vector3} [c] - The center point.
-     * @param {Vector3} [e] - The end point.
-     */
-    static BuildArc3FromBeginCenterEndPoint(b: Vector3, c: Vector3, e: Vector3): Arc3Data {
-        debugger;
-        return null;
-    }
-
-    /**
-     * build nurbs from fitting points.
-     *
-     * @param {Array<Vector3>} [points] - The fitting points.
-     */
-    static BuildNurbs3FromFittingPoints(points: Array<Vector3>): Nurbs3Data {
-        debugger;
-        return null;
-    }
-
-
-    static Algorithm2ByData(dat: Curve2Data, sub: number = 0): Curve2Algo {
-        if (dat instanceof Arc2Data) {
-            return new Arc2Algo(dat);
-        }
-        else if (dat instanceof Line2Data) {
-            return new Line2Algo(dat);
-        }
-        else if (dat instanceof Nurbs2Data) {
-            return new Nurbs2Algo(dat);
-        }
-        else if (dat instanceof Hyperbola2Data) {
-            switch (sub) {
-                case 0:
-                    return new Hyperbola2Algo(dat);
-                case 1:
-                    return new Hyperbola2AlgoAb(dat);
-            }
-        }
-        else if (dat instanceof Parabola2Data) {
-            return new Parabola2Algo(dat);
-        }
-        debugger;
-        return null;
-    }
-
-    static Algorithm3ByData(dat: Curve3Data): Curve3Algo {
-        if (dat instanceof Arc3Data) {
-            return new Arc3Algo(dat);
-        }
-        else if (dat instanceof Hyperbola3Data) {
-            return new Hyperbola3Algo(dat);
-        }
-        else if (dat instanceof Parabola3Data) {
-            return new Parabola3Algo(dat);
-        }
-        else if (dat instanceof Line3Data) {
-            return new Line3Algo(dat);
-        }
-        else if (dat instanceof Nurbs3Data) {
-            return new Nurbs3Algo(dat);
-        }
-        debugger;
-        return null;
-    }
+    debugger;
+    return null;
+  }
 }
 
 export { CurveBuilder };

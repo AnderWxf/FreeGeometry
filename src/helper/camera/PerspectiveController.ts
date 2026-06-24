@@ -73,7 +73,7 @@ class PerspectiveController {
   }
 
   onKeyDown = (event: KeyboardEvent) => {
-    if (event.target != Global.canvas) return;
+    // if (event.target != Global.canvas) return;
     switch (event.code) {
       case "KeyW":
         this.KeyWDown = true;
@@ -102,7 +102,7 @@ class PerspectiveController {
     }
   }
   onKeyUp = (event: KeyboardEvent) => {
-    if (event.target != Global.canvas) return;
+    // if (event.target != Global.canvas) return;
     switch (event.code) {
       case "KeyW":
         this.KeyWDown = false;

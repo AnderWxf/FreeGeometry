@@ -1,10 +1,5 @@
 import { Global } from "../../core/Global";
-import { Brep2Builder } from "../../geometry/algorithm/builder/Brep2Builder";
-import type { DataBase } from "../../geometry/data/DataBase";
-import { Vector2, Vector3 } from "../../math/Math";
-import { bin } from "../../mathjs/lib/cjs/entry/pureFunctionsAny.generated";
-import { BrepMeshBuilder } from "../BrepMeshBuilder";
-import type { AssisPoint } from "../UserData";
+import { type AssisPoint } from "../UserData";
 import type { CommandExecuter } from "./CommandExecuter";
 import * as THREE from "three";
 
@@ -32,8 +27,6 @@ class Command {
   get isDone(): boolean {
     return this._isDone;
   }
-
-
   // 创建一个辅助点
   protected createAssistPoint(a: AssisPoint): THREE.Mesh {
     const material = new THREE.MeshBasicMaterial({ color: a.c });
