@@ -31,7 +31,7 @@ class CalculateFace2AreaCom extends Command {
     // 只能选择二维平面类型
     for (let i = 0; i < act_pick_objs.results.length; i++) {
       let geo = act_pick_objs.results[i];
-      if (geo.userData.type >= GeomType.CI && geo.userData.type < GeomType.PLA) {
+      if (geo.userData.type >= GeomType.DRAW_SURFACE_CI && geo.userData.type < GeomType.DRAW_SURFACE_PLA) {
         let original = geo.userData.original as Face2;
         this.faces.push(original);
       }

@@ -25,7 +25,7 @@ import { CloneUserData, CopyUserData, CreateGeomUserData, type UserData } from "
 class ModifyPolyline2Com extends ComModify {
   constructor(executer: CommandExecuter, text: string) {
     super(executer, text);
-    this.type = GeomType.PO;
+    this.type = GeomType.DRAW_CURVE2_PO;
   }
   async exec(): Promise<void> {
     let str = this._text;
@@ -120,7 +120,7 @@ class ModifyPolyline2Com extends ComModify {
         let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(beginPoint, endPoint);
         edges.push(edge);
       }
-      let t = BrepMeshBuilder.BuildEdge2sMesh(edges, THREE.Color.NAMES.gray, undefined, 0, false);
+      let t = BrepMeshBuilder.BuildEdge2sMesh(edges, THREE.Color.NAMES.gray, undefined, 0);
       t.name = "temp";
       this.tempResult = t;
       Global.scene.add(this.tempResult);

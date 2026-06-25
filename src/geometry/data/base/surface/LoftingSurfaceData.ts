@@ -53,9 +53,9 @@ class LoftingSurfaceData extends SurfaceData {
     let sections = data.sections as [any];
     let secs = new Array<{ t: number, c: Curve2Data }>;
     for (let i = 0; i < sections.length; i++) {
-      secs.push({ t: sections[i].t, c: unserialize(sections[i].c) as Curve2Data });
+      secs.push({ t: sections[i].t, c: unserialize(sections[i].c)[0] as Curve2Data });
     }
-    let ret = new LoftingSurfaceData(Transform3.Unserialize(data.trans), secs, unserialize(data.path) as Curve3Data);
+    let ret = new LoftingSurfaceData(Transform3.Unserialize(data.trans), secs, unserialize(data.path)[0] as Curve3Data);
     ret.uuid = data.uuid;
     return ret;
   }

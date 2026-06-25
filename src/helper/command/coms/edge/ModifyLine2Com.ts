@@ -21,7 +21,7 @@ class ModifyLine2Com extends ComModify {
 
   constructor(executer: CommandExecuter, text: string) {
     super(executer, text);
-    this.type = GeomType.L;
+    this.type = GeomType.DRAW_CURVE2_L;
   }
 
   async exec(): Promise<void> {
@@ -74,7 +74,7 @@ class ModifyLine2Com extends ComModify {
     }
     // 创建一个直线段
     let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(beginPoint, endPoint);
-    let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
+    let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, userData.color);
     userData.original = edge;
     geo.userData = userData;
     this.results = geo;
@@ -97,7 +97,7 @@ class ModifyLine2Com extends ComModify {
 
       // 创建一个临时直线段
       let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(beginPoint, endPoint);
-      let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0, false);
+      let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0);
       t.name = "temp";
       this.tempResult = t;
       Global.scene.add(this.tempResult);

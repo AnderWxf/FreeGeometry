@@ -200,7 +200,7 @@ class Edge2 extends DataBase {
    */
   static Unserialize(data: any): Edge2 {
     let ret = new Edge2();
-    ret.curve = data.curve ? unserialize(data.curve) as Curve2Data : null;
+    ret.curve = data.curve ? unserialize(data.curve)[0] as Curve2Data : null;
     ret.u = data.u ? Vector2.Unserialize(data.u) : null;
     ret.v0 = data.v0 ? Vertice2.Unserialize(data.v0) : null;
     ret.v1 = data.v1 ? Vertice2.Unserialize(data.v1) : null;
@@ -498,7 +498,7 @@ class Face2 extends DataBase {
     }
     let curves = data.curves as [];
     for (let i = 0; i < curves.length; i++) {
-      ret.curves.push(unserialize(curves[i]) as Curve2Data);
+      ret.curves.push(unserialize(curves[i])[0] as Curve2Data);
     }
     let edge2s = data.edge2s as [];
     for (let i = 0; i < edge2s.length; i++) {

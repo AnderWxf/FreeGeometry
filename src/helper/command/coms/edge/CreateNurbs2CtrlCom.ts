@@ -23,7 +23,7 @@ class CreateNurbs2CtrlCom extends ComCreate {
   constructor(executer: CommandExecuter, text: string) {
     super(executer, text);
     this.points = [];
-    this.type = GeomType.NC;
+    this.type = GeomType.DRAW_CURVE2_NC;
   }
   async exec(): Promise<void> {
     let str = this._text;
@@ -77,7 +77,7 @@ class CreateNurbs2CtrlCom extends ComCreate {
 
       let nurbsData = new Nurbs2Data(new Transform2(), controls, knots, degree);
       let edge = Brep2Builder.BuildEdge2FromCurve2(nurbsData, 0, 1);
-      let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
+      let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, userData.color);
       userData.original = edge;
       geo.userData = userData;
       this.results = geo;
@@ -106,7 +106,7 @@ class CreateNurbs2CtrlCom extends ComCreate {
       // 创建一个临时直线段
       let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(beginPoint, endPoint);
       edges.push(edge);
-      let geo = BrepMeshBuilder.BuildEdge2sMesh(edges, THREE.Color.NAMES.gray, undefined, 0, false);
+      let geo = BrepMeshBuilder.BuildEdge2sMesh(edges, THREE.Color.NAMES.gray, undefined, 0);
       this.tempResult.children.push(geo);
       // 创建一个临时曲线段
       let points: Vector2[] = [];
@@ -131,7 +131,7 @@ class CreateNurbs2CtrlCom extends ComCreate {
 
         let nurbsData = new Nurbs2Data(new Transform2(), controls, knots, degree);
         let edge_ctrl = Brep2Builder.BuildEdge2FromCurve2(nurbsData, 0, 1);
-        let geo_ctrl = BrepMeshBuilder.BuildEdge2Mesh(edge_ctrl, THREE.Color.NAMES.gray, undefined, 0, false);
+        let geo_ctrl = BrepMeshBuilder.BuildEdge2Mesh(edge_ctrl, THREE.Color.NAMES.gray, undefined, 0);
         this.tempResult.children.push(geo_ctrl);
       }
       Global.scene.add(this.tempResult);

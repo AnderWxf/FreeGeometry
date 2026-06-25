@@ -42,8 +42,8 @@ class EdgeIntersectionCom extends Command {
     // 只能选择二维曲线类型
     for (let i = 0; i < act_pick_objs.results.length; i++) {
       let geo = act_pick_objs.results[i];
-      if (geo.userData.type < GeomType.RC) {
-        if (geo.userData.type == GeomType.PO || geo.userData.type == GeomType.RC) {
+      if (geo.userData.type < GeomType.DRAW_CURVE2_RC) {
+        if (geo.userData.type == GeomType.DRAW_CURVE2_PO || geo.userData.type == GeomType.DRAW_CURVE2_RC) {
           let original = geo.userData.original as Array<Edge2>;
           if (this.src.length == 0) {
             this.src.push(...original);

@@ -21,7 +21,7 @@ class CreateNurbs2FitCom extends ComCreate {
   constructor(executer: CommandExecuter, text: string) {
     super(executer, text);
     this.points = [];
-    this.type = GeomType.NF;
+    this.type = GeomType.DRAW_CURVE2_NF;
   }
   async exec(): Promise<void> {
     let str = this._text;
@@ -58,7 +58,7 @@ class CreateNurbs2FitCom extends ComCreate {
     // 创建一个曲线段
     if (this.points.length > 2) {
       let edge = Brep2Builder.BuildEdge2FromFittingPoints(this.points, this.points.length == 3 ? 2 : 3);
-      let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
+      let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, userData.color);
       userData.original = edge;
       geo.userData = userData;
       this.results = geo;
@@ -79,14 +79,14 @@ class CreateNurbs2FitCom extends ComCreate {
         let beginPoint = this.points[i - 1];
         let endPoint = this.points[i];
         let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(beginPoint, endPoint);
-        let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0, false);
+        let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0);
         this.tempResult.children.push(geo);
       }
       let beginPoint = this.points[this.points.length - 1];
       let endPoint: Vector2 = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
       // 创建一个临时直线段
       let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(beginPoint, endPoint);
-      let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0, false);
+      let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0);
       this.tempResult.children.push(geo);
       // 创建一个临时曲线段
       let points: Vector2[] = [];
@@ -94,7 +94,7 @@ class CreateNurbs2FitCom extends ComCreate {
       points.push(endPoint);
       if (points.length > 2) {
         let edge_fit = Brep2Builder.BuildEdge2FromFittingPoints(points, points.length == 3 ? 2 : 3);
-        let geo_fit = BrepMeshBuilder.BuildEdge2Mesh(edge_fit, THREE.Color.NAMES.gray, undefined, 0, false);
+        let geo_fit = BrepMeshBuilder.BuildEdge2Mesh(edge_fit, THREE.Color.NAMES.gray, undefined, 0);
         this.tempResult.children.push(geo_fit);
       }
       Global.scene.add(this.tempResult);

@@ -27,7 +27,7 @@ class ModifyEllipseArc2Com extends ComModify {
   private isForward: boolean = true;   // 默认正向弧(按下左shift表示画反向弧-正时针旋转)
   constructor(executer: CommandExecuter, text: string) {
     super(executer, text);
-    this.type = GeomType.EA;
+    this.type = GeomType.DRAW_CURVE2_EA;
   }
   async exec(): Promise<void> {
     let str = this._text;
@@ -118,7 +118,7 @@ class ModifyEllipseArc2Com extends ComModify {
       }
     }
 
-    let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
+    let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, userData.color);
     userData.original = edge;
     geo.userData = userData;
     this.results = geo;
@@ -171,7 +171,7 @@ class ModifyEllipseArc2Com extends ComModify {
         }
       }
 
-      let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0, false);
+      let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0);
       t.name = "temp";
       this.tempResult = t;
       Global.scene.add(this.tempResult);

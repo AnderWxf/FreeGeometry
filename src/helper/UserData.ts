@@ -24,7 +24,7 @@ function CreateGeomUserData(type: GeomType): UserData {
     canPick: true,
     isAssist: false,
     assistPoints: [],
-    color: 0xffffff,
+    color: THREE.Color.NAMES.red,
     original: null
   } as UserData;
 };

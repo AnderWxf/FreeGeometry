@@ -25,7 +25,7 @@ import { CloneUserData, CopyUserData, CreateGeomUserData, type UserData } from "
 class ModifyNurbs2FitCom extends ComModify {
   constructor(executer: CommandExecuter, text: string) {
     super(executer, text);
-    this.type = GeomType.NF;
+    this.type = GeomType.DRAW_CURVE2_NF;
   }
   async exec(): Promise<void> {
     let str = this._text;
@@ -84,7 +84,7 @@ class ModifyNurbs2FitCom extends ComModify {
     // 创建一个曲线段
     if (points.length > 2) {
       let edge = Brep2Builder.BuildEdge2FromFittingPoints(points, points.length == 3 ? 2 : 3);
-      let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
+      let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, userData.color);
       userData.original = edge;
       geo.userData = userData;
       this.results = geo;
@@ -112,7 +112,7 @@ class ModifyNurbs2FitCom extends ComModify {
       // 创建一个临时曲线段
       if (points.length > 2) {
         let edge_fit = Brep2Builder.BuildEdge2FromFittingPoints(points, points.length == 3 ? 2 : 3);
-        let geo_fit = BrepMeshBuilder.BuildEdge2Mesh(edge_fit, THREE.Color.NAMES.gray, undefined, 0, false);
+        let geo_fit = BrepMeshBuilder.BuildEdge2Mesh(edge_fit, THREE.Color.NAMES.gray, undefined, 0);
         geo_fit.name = "temp";
         this.tempResult = geo_fit;
         Global.scene.add(this.tempResult);

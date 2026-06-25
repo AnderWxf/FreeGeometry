@@ -21,7 +21,7 @@ class CalculateLoop3LengthCom extends ComCreate {
   constructor(executer: CommandExecuter, text: string) {
     super(executer, text);
     this.edges = [];
-    this.type = GeomType.SEC;
+    this.type = GeomType.DRAW_SURFACE_SEC;
   }
   async exec(): Promise<void> {
     let str = this._text;
@@ -55,7 +55,8 @@ class CalculateLoop3LengthCom extends ComCreate {
           face.curves.push(edge.curve);
         }
 
-        let geo = BrepMeshBuilder.BuildFace2Mesh(face, THREE.Color.NAMES.blue);
+        userData.color = THREE.Color.NAMES.blue;
+        let geo = BrepMeshBuilder.BuildFace2Mesh(face, userData.color);
         userData.original = face;
         geo.userData = userData;
         this.results = geo;
@@ -74,8 +75,8 @@ class CalculateLoop3LengthCom extends ComCreate {
       // 只能选择二维曲线类型
       for (let i = 0; i < act_pick_objs.results.length; i++) {
         let geo = act_pick_objs.results[i];
-        if (geo.userData.type < GeomType.CI) {
-          if (geo.userData.type == GeomType.PO || geo.userData.type == GeomType.RC) {
+        if (geo.userData.type < GeomType.DRAW_SURFACE_CI) {
+          if (geo.userData.type == GeomType.DRAW_CURVE2_PO || geo.userData.type == GeomType.DRAW_CURVE2_RC) {
             let original = geo.userData.original as Array<Edge2>;
             this.edges.push(...original);
           } else {
@@ -100,7 +101,8 @@ class CalculateLoop3LengthCom extends ComCreate {
           edge.curve = null;
           edge.curvei = i;
         }
-        let geo = BrepMeshBuilder.BuildFace2Mesh(face, THREE.Color.NAMES.blue);
+        userData.color = THREE.Color.NAMES.blue;
+        let geo = BrepMeshBuilder.BuildFace2Mesh(face, userData.color);
         userData.original = face;
         geo.userData = userData;
         this.results = geo;

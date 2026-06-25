@@ -37,7 +37,7 @@ class Bool2IntersectionCom extends BoolCom {
     for (let i = 0; i < act_pick_objs.results.length; i++) {
       let geo = act_pick_objs.results[i];
       let userData = geo.userData as UserData;
-      if (userData.type >= GeomType.CI && userData.type < GeomType.PLA) {
+      if (userData.type >= GeomType.DRAW_SURFACE_CI && userData.type < GeomType.DRAW_SURFACE_PLA) {
         let original = userData.original as Face2;
         // 选择第一个Face
         if (!this.src) {
@@ -59,8 +59,9 @@ class Bool2IntersectionCom extends BoolCom {
       let rets = Bool2.Intersection(this.src, this.des, 1e-4, 1e-10);
       for (let i = 0; i < rets.length; i++) {
         let face = rets[i];
-        let geo = BrepMeshBuilder.BuildFace2Mesh(face, THREE.Color.NAMES.blue);
-        let userData = CreateGeomUserData(GeomType.SEC);
+        let userData = CreateGeomUserData(GeomType.DRAW_SURFACE_SEC);
+        userData.color = THREE.Color.NAMES.blue;
+        let geo = BrepMeshBuilder.BuildFace2Mesh(face, userData.color);
         userData.original = face;
         geo.userData = userData;
         this.results.push(geo);

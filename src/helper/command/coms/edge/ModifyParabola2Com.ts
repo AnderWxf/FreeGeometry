@@ -25,7 +25,7 @@ import { CloneUserData, CopyUserData, CreateGeomUserData, type UserData } from "
 class ModifyParabola2Com extends ComModify {
   constructor(executer: CommandExecuter, text: string) {
     super(executer, text);
-    this.type = GeomType.PA;
+    this.type = GeomType.DRAW_CURVE2_PA;
   }
   async exec(): Promise<void> {
     let str = this._text;
@@ -79,7 +79,7 @@ class ModifyParabola2Com extends ComModify {
     }
     // 创建一个曲线段
     let edge = Brep2Builder.BuildParabolaEdge2FromCenterABPoint(centerPoint, focusPoint, beginPoint);
-    let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
+    let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, userData.color);
     userData.original = edge;
     geo.userData = userData;
     this.results = geo;
@@ -109,7 +109,7 @@ class ModifyParabola2Com extends ComModify {
 
       // 创建一个临时曲线段
       let edge = Brep2Builder.BuildParabolaEdge2FromCenterABPoint(centerPoint, focusPoint, beginPoint);
-      let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0, false);
+      let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0);
       t.name = "temp";
       this.tempResult = t;
       Global.scene.add(this.tempResult);

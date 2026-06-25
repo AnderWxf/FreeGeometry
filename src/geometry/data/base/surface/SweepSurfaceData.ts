@@ -49,7 +49,7 @@ class SweepSurfaceData extends SurfaceData {
    * @return {SweepSurfaceData} a new instance.
    */
   static Unserialize(data: any): SweepSurfaceData {
-    let ret = new SweepSurfaceData(Transform3.Unserialize(data.trans), unserialize(data.section) as Curve2Data, unserialize(data.path) as Curve3Data);
+    let ret = new SweepSurfaceData(Transform3.Unserialize(data.trans), unserialize(data.section)[0] as Curve2Data, unserialize(data.path)[0] as Curve3Data);
     ret.uuid = data.uuid;
     return ret;
   }

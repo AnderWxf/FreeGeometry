@@ -24,7 +24,7 @@ class ModifyArc2Com extends ComModify {
   private isForward: boolean = true;
   constructor(executer: CommandExecuter, text: string) {
     super(executer, text);
-    this.type = GeomType.A;
+    this.type = GeomType.DRAW_CURVE2_A;
   }
   async exec(): Promise<void> {
     let str = this._text;
@@ -78,7 +78,7 @@ class ModifyArc2Com extends ComModify {
     // 创建一个曲线段
     let edge = Brep2Builder.BuildCircleArcEdge2FromCenterBeginEndPoin(centerPoint, beginPoint, endPoint);
     edge.u.y = this.isForward ? edge.u.y : edge.u.y - PI2;
-    let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
+    let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, userData.color);
     userData.original = edge;
     geo.userData = userData;
     this.results = geo;

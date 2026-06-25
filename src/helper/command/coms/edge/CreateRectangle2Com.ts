@@ -21,7 +21,7 @@ class CreateRectangle2Com extends ComCreate {
   endPoint: Vector2;
   constructor(executer: CommandExecuter, text: string) {
     super(executer, text);
-    this.type = GeomType.RC;
+    this.type = GeomType.DRAW_CURVE2_RC;
   }
   async exec(): Promise<void> {
     let str = this._text;
@@ -110,7 +110,7 @@ class CreateRectangle2Com extends ComCreate {
       let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(points[points.length - 1], points[0]);
       edges.push(edge);
 
-      let geo = BrepMeshBuilder.BuildEdge2sMesh(edges, THREE.Color.NAMES.gray, undefined, 0, false);
+      let geo = BrepMeshBuilder.BuildEdge2sMesh(edges, THREE.Color.NAMES.gray, undefined, 0);
       this.tempResult.children.push(geo);
       Global.scene.add(this.tempResult);
     }

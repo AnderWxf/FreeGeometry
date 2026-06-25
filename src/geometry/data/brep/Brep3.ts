@@ -203,7 +203,7 @@ class Edge3 extends DataBase {
    */
   static Unserialize(data: any): Edge3 {
     let ret = new Edge3();
-    ret.curve = data.curve ? unserialize(data.curve) as Curve3Data : null;
+    ret.curve = data.curve ? unserialize(data.curve)[0] as Curve3Data : null;
     ret.u = data.u ? Vector2.Unserialize(data.u) : null;
     ret.v0 = data.v0 ? Vertice3.Unserialize(data.v0) : null;
     ret.v1 = data.v1 ? Vertice3.Unserialize(data.v1) : null;
@@ -440,7 +440,7 @@ class Face3 extends DataBase {
     for (let i = 0; i < holes.length; i++) {
       ret.holes.push(Loop3.Unserialize(holes[i]));
     }
-    ret.surface = data.surface ? unserialize(data.surface) as SurfaceData : null;
+    ret.surface = data.surface ? unserialize(data.surface)[0] as SurfaceData : null;
     ret.surfaceIndex = data.surfaceIndex;
     ret.uv = data.uv ? Vector4.Unserialize(data.uv) : null;
     ret.uuid = data.uuid;
@@ -590,7 +590,7 @@ class Body3 extends DataBase {
     }
     let curves = data.curves as [];
     for (let i = 0; i < curves.length; i++) {
-      ret.curves.push(unserialize(curves[i]) as Curve3Data);
+      ret.curves.push(unserialize(curves[i])[0] as Curve3Data);
     }
 
     let edges = data.edges as [];
@@ -600,7 +600,7 @@ class Body3 extends DataBase {
 
     let surfaces = data.surfaces as [];
     for (let i = 0; i < surfaces.length; i++) {
-      ret.surfaces.push(unserialize(surfaces[i]) as SurfaceData);
+      ret.surfaces.push(unserialize(surfaces[i])[0] as SurfaceData);
     }
 
     ret.transform = data.transform ? Transform3.Unserialize(data.transform) : null;

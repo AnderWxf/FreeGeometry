@@ -1,10 +1,6 @@
-import { ImportJson, type DocNode } from "../../../Doc";
+import { ImportJson } from "../../../Doc";
 import { Command } from "../../Command";
 import * as THREE from "three";
-import { unserialize } from "../../../../geometry/data/base/Unserialize";
-import { Edge2, Face2 } from "../../../../geometry/data/brep/Brep2";
-import { BrepMeshBuilder } from "../../../BrepMeshBuilder";
-import { Vector2 } from "../../../../math/Math";
 import { Global } from "../../../../core/Global";
 import type { CommandExecuter } from "../../CommandExecuter";
 class SceneLoadCom extends Command {

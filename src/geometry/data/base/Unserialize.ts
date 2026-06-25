@@ -21,46 +21,53 @@ import { PlaneSurfaceData } from "./surface/PlaneSurfaceData";
 import { SphereSurfaceData } from "./surface/SphereSurfaceData";
 import { SweepSurfaceData } from "./surface/SweepSurfaceData";
 
-export function unserialize(data: any): DataBase {
+export function unserialize(data: any): DataBase[] {
   switch (data.type) {
-    case GeomType.DATA_TYPE_CURVE2_ARC2: return Arc2Data.Unserialize(data);
-    case GeomType.DATA_TYPE_CURVE2_HYPERBOLA2: return Hyperbola2Data.Unserialize(data);
-    case GeomType.DATA_TYPE_CURVE2_LINE2: return Line2Data.Unserialize(data);
-    case GeomType.DATA_TYPE_CURVE2_NURBS2: return Nurbs2Data.Unserialize(data);
-    case GeomType.DATA_TYPE_CURVE2_PARABOLA2: return Parabola2Data.Unserialize(data);
+    case GeomType.DATA_TYPE_CURVE2_ARC2: return [Arc2Data.Unserialize(data)];
+    case GeomType.DATA_TYPE_CURVE2_HYPERBOLA2: return [Hyperbola2Data.Unserialize(data)];
+    case GeomType.DATA_TYPE_CURVE2_LINE2: return [Line2Data.Unserialize(data)];
+    case GeomType.DATA_TYPE_CURVE2_NURBS2: return [Nurbs2Data.Unserialize(data)];
+    case GeomType.DATA_TYPE_CURVE2_PARABOLA2: return [Parabola2Data.Unserialize(data)];
 
-    case GeomType.DATA_TYPE_CURVE3_ARC3: return Arc3Data.Unserialize(data);
-    case GeomType.DATA_TYPE_CURVE3_HYPERBOLA3: return Hyperbola3Data.Unserialize(data);
-    case GeomType.DATA_TYPE_CURVE3_LINE3: return Line2Data.Unserialize(data);
-    case GeomType.DATA_TYPE_CURVE3_NURBS3: return Nurbs3Data.Unserialize(data);
-    case GeomType.DATA_TYPE_CURVE3_PARABOLA3: return Parabola3Data.Unserialize(data);
-    case GeomType.DATA_TYPE_CURVE3_UVCURVE: return UvCurveData.Unserialize(data);
+    case GeomType.DATA_TYPE_CURVE3_ARC3: return [Arc3Data.Unserialize(data)];
+    case GeomType.DATA_TYPE_CURVE3_HYPERBOLA3: return [Hyperbola3Data.Unserialize(data)];
+    case GeomType.DATA_TYPE_CURVE3_LINE3: return [Line2Data.Unserialize(data)];
+    case GeomType.DATA_TYPE_CURVE3_NURBS3: return [Nurbs3Data.Unserialize(data)];
+    case GeomType.DATA_TYPE_CURVE3_PARABOLA3: return [Parabola3Data.Unserialize(data)];
+    case GeomType.DATA_TYPE_CURVE3_UVCURVE: return [UvCurveData.Unserialize(data)];
 
-    case GeomType.DATA_TYPE_SURFACE_CONICALSURFACE: return ConicalSurfaceData.Unserialize(data);
-    case GeomType.DATA_TYPE_SURFACE_CYLINDERSURFACE: return CylinderSurfaceData.Unserialize(data);
-    case GeomType.DATA_TYPE_SURFACE_ELLIPSOIDSURFACE: return EllipsoidSurfaceData.Unserialize(data);
-    case GeomType.DATA_TYPE_SURFACE_LOFTINGSURFACE: return LoftingSurfaceData.Unserialize(data);
-    case GeomType.DATA_TYPE_SURFACE_NURBSSURFACE: return NurbsSurfaceData.Unserialize(data);
-    case GeomType.DATA_TYPE_SURFACE_PLANESURFACE: return PlaneSurfaceData.Unserialize(data);
-    case GeomType.DATA_TYPE_SURFACE_SPHERESURFACE: return SphereSurfaceData.Unserialize(data);
-    case GeomType.DATA_TYPE_SURFACE_SWEEPSURFACE: return SweepSurfaceData.Unserialize(data);
+    case GeomType.DATA_TYPE_SURFACE_CONICALSURFACE: return [ConicalSurfaceData.Unserialize(data)];
+    case GeomType.DATA_TYPE_SURFACE_CYLINDERSURFACE: return [CylinderSurfaceData.Unserialize(data)];
+    case GeomType.DATA_TYPE_SURFACE_ELLIPSOIDSURFACE: return [EllipsoidSurfaceData.Unserialize(data)];
+    case GeomType.DATA_TYPE_SURFACE_LOFTINGSURFACE: return [LoftingSurfaceData.Unserialize(data)];
+    case GeomType.DATA_TYPE_SURFACE_NURBSSURFACE: return [NurbsSurfaceData.Unserialize(data)];
+    case GeomType.DATA_TYPE_SURFACE_PLANESURFACE: return [PlaneSurfaceData.Unserialize(data)];
+    case GeomType.DATA_TYPE_SURFACE_SPHERESURFACE: return [SphereSurfaceData.Unserialize(data)];
+    case GeomType.DATA_TYPE_SURFACE_SWEEPSURFACE: return [SweepSurfaceData.Unserialize(data)];
 
-    case GeomType.DATA_TYPE_BREP2_VERTICE2: return Vertice2.Unserialize(data);
-    case GeomType.DATA_TYPE_BREP2_EDGE2: return Edge2.Unserialize(data);
-    case GeomType.DATA_TYPE_BREP2_COEDGE2: return Coedge2.Unserialize(data);
-    case GeomType.DATA_TYPE_BREP2_LOOP2: return Loop2.Unserialize(data);
-    case GeomType.DATA_TYPE_BREP2_FACE2: return Face2.Unserialize(data);
-    case GeomType.DATA_TYPE_BREP2_DIGRAPH2: return Digraph2.Unserialize(data);
+    case GeomType.DATA_TYPE_BREP2_VERTICE2: return [Vertice2.Unserialize(data)];
+    case GeomType.DATA_TYPE_BREP2_EDGE2: return [Edge2.Unserialize(data)];
+    case GeomType.DATA_TYPE_BREP2_COEDGE2: return [Coedge2.Unserialize(data)];
+    case GeomType.DATA_TYPE_BREP2_LOOP2: return [Loop2.Unserialize(data)];
+    case GeomType.DATA_TYPE_BREP2_FACE2: return [Face2.Unserialize(data)];
+    case GeomType.DATA_TYPE_BREP2_DIGRAPH2: return [Digraph2.Unserialize(data)];
 
-    case GeomType.DATA_TYPE_BREP3_VERTICE3: return Vertice3.Unserialize(data);
-    case GeomType.DATA_TYPE_BREP3_EDGE3: return Edge3.Unserialize(data);
-    case GeomType.DATA_TYPE_BREP3_COEDGE3: return Coedge3.Unserialize(data);
-    case GeomType.DATA_TYPE_BREP3_LOOP3: return Loop3.Unserialize(data);
-    case GeomType.DATA_TYPE_BREP3_FACE3: return Face3.Unserialize(data);
-    // case GeomType.DATA_TYPE_BREP3_DIGRAPH3: return dig.Unserialize(data);
-    case GeomType.DATA_TYPE_BREP3_SHELL3: return Shell3.Unserialize(data);
-    case GeomType.DATA_TYPE_BREP3_LUMP3: return Lump3.Unserialize(data);
-    case GeomType.DATA_TYPE_BREP3_BODY3: return Body3.Unserialize(data);
+    case GeomType.DATA_TYPE_BREP3_VERTICE3: return [Vertice3.Unserialize(data)];
+    case GeomType.DATA_TYPE_BREP3_EDGE3: return [Edge3.Unserialize(data)];
+    case GeomType.DATA_TYPE_BREP3_COEDGE3: return [Coedge3.Unserialize(data)];
+    case GeomType.DATA_TYPE_BREP3_LOOP3: return [Loop3.Unserialize(data)];
+    case GeomType.DATA_TYPE_BREP3_FACE3: return [Face3.Unserialize(data)];
+    // case GeomType.DATA_TYPE_BREP3_DIGRAPH3: return [dig.Unserialize(data)];
+    case GeomType.DATA_TYPE_BREP3_SHELL3: return [Shell3.Unserialize(data)];
+    case GeomType.DATA_TYPE_BREP3_LUMP3: return [Lump3.Unserialize(data)];
+    case GeomType.DATA_TYPE_BREP3_BODY3: return [Body3.Unserialize(data)];
   }
-  return null;
+  if (data instanceof Array) {
+    let rets: DataBase[] = [];
+    for (let i = 0; i < data.length; i++) {
+      rets.push(...unserialize(data[i]));
+    }
+    return rets;
+  }
+  return [];
 }

@@ -21,7 +21,7 @@ class CreateCircle2Com extends ComCreate {
   beginPoint: Vector2;
   constructor(executer: CommandExecuter, text: string) {
     super(executer, text);
-    this.type = GeomType.C;
+    this.type = GeomType.DRAW_CURVE2_C;
   }
   async exec(): Promise<void> {
     let str = this._text;
@@ -54,7 +54,7 @@ class CreateCircle2Com extends ComCreate {
     }
     // 创建一个曲线段
     let edge = Brep2Builder.BuildCircleEdge2FromCenterRadius(this.centerPoint, this.beginPoint.distanceTo(this.centerPoint));
-    let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
+    let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, userData.color);
     userData.original = edge;
     geo.userData = userData;
     this.results = geo;
@@ -69,7 +69,7 @@ class CreateCircle2Com extends ComCreate {
       let beginPoint: Vector2 = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
       // 创建一个临时曲线段
       let edge = Brep2Builder.BuildCircleEdge2FromCenterRadius(this.centerPoint, beginPoint.distanceTo(this.centerPoint));
-      let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0, false);
+      let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0);
       t.name = "temp";
       this.tempResult = t;
       Global.scene.add(this.tempResult);

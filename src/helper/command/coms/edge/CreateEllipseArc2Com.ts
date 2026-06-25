@@ -27,7 +27,7 @@ class CreateEllipseArc2Com extends ComCreate {
   private isForward: boolean = true;   // 默认正向弧(按下左shift表示画反向弧-正时针旋转)
   constructor(executer: CommandExecuter, text: string) {
     super(executer, text);
-    this.type = GeomType.EA;
+    this.type = GeomType.DRAW_CURVE2_EA;
   }
   async exec(): Promise<void> {
     let str = this._text;
@@ -117,7 +117,7 @@ class CreateEllipseArc2Com extends ComCreate {
         edge.u.set(u0, u1 - PI2);
       }
     }
-    let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
+    let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, userData.color);
     userData.original = edge;
     geo.userData = userData;
     this.results = geo;
@@ -132,7 +132,7 @@ class CreateEllipseArc2Com extends ComCreate {
       let majorPoint: Vector2 = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
       // 创建一个临时曲线段
       let edge = Brep2Builder.BuildCircleEdge2FromCenterRadius(this.centerPoint, majorPoint.distanceTo(this.centerPoint));
-      let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0, false);
+      let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0);
       t.name = "temp";
       this.tempResult = t;
       Global.scene.add(this.tempResult);
@@ -145,7 +145,7 @@ class CreateEllipseArc2Com extends ComCreate {
       let minorPoint: Vector2 = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
       // 创建一个临时曲线段
       let edge = Brep2Builder.BuildEllipseEdge2FromCenterBeginEndPoint(this.centerPoint, this.majorPoint, minorPoint);
-      let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0, false);
+      let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0);
       t.name = "temp";
       this.tempResult = t;
       Global.scene.add(this.tempResult);
@@ -161,7 +161,7 @@ class CreateEllipseArc2Com extends ComCreate {
       let alg = CurveBuilder.Algorithm2ByData(edge.curve);
       let u0 = alg.u(u0Point);
       edge.u.x = u0;
-      let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0, false);
+      let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0);
       t.name = "temp";
       this.tempResult = t;
       Global.scene.add(this.tempResult);
@@ -188,7 +188,7 @@ class CreateEllipseArc2Com extends ComCreate {
         }
       }
 
-      let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0, false);
+      let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0);
       t.name = "temp";
       this.tempResult = t;
       Global.scene.add(this.tempResult);

@@ -26,7 +26,7 @@ import { CurveBuilder } from "../../../../geometry/algorithm/builder/CurveBuilde
 class ModifyEllipse2Com extends ComModify {
   constructor(executer: CommandExecuter, text: string) {
     super(executer, text);
-    this.type = GeomType.E;
+    this.type = GeomType.DRAW_CURVE2_E;
   }
   async exec(): Promise<void> {
     let str = this._text;
@@ -78,7 +78,7 @@ class ModifyEllipse2Com extends ComModify {
     }
     // 创建一个曲线段
     let edge = Brep2Builder.BuildEllipseEdge2FromCenterBeginEndPoint(centerPoint, majorPoint, minorPoint);
-    let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
+    let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, userData.color);
     userData.original = edge;
     geo.userData = userData;
     this.results = geo;
@@ -108,7 +108,7 @@ class ModifyEllipse2Com extends ComModify {
 
       // 创建一个临时曲线段
       let edge = Brep2Builder.BuildEllipseEdge2FromCenterBeginEndPoint(centerPoint, majorPoint, minorPoint);
-      let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0, false);
+      let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0);
       t.name = "temp";
       this.tempResult = t;
       Global.scene.add(this.tempResult);

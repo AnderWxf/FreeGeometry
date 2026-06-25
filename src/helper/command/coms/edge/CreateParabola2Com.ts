@@ -22,7 +22,7 @@ class CreateParabola2Com extends ComCreate {
   beginPoint: Vector2;
   constructor(executer: CommandExecuter, text: string) {
     super(executer, text);
-    this.type = GeomType.PA;
+    this.type = GeomType.DRAW_CURVE2_PA;
   }
   async exec(): Promise<void> {
     let str = this._text;
@@ -63,7 +63,7 @@ class CreateParabola2Com extends ComCreate {
     let edge = Brep2Builder.BuildParabolaEdge2FromCenterABPoint(this.centerPoint, this.focusPoint, this.beginPoint);
     let alg = CurveBuilder.Algorithm2ByData(edge.curve);
     this.beginPoint = alg.p(edge.u.x);
-    let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
+    let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, userData.color);
     userData.original = edge;
     geo.userData = userData;
     this.results = geo;
@@ -89,7 +89,7 @@ class CreateParabola2Com extends ComCreate {
       let u1 = -u0;
       // 创建一个临时曲线段
       let edge = Brep2Builder.BuildParabolaEdge2FromCenterAPoint(this.centerPoint, beginPoint, u0, u1);
-      let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0, false);
+      let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0);
       t.name = "temp";
       this.tempResult = t;
       Global.scene.add(this.tempResult);
@@ -101,7 +101,7 @@ class CreateParabola2Com extends ComCreate {
       let endPoint: Vector2 = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
       // 创建一个临时曲线段
       let edge = Brep2Builder.BuildParabolaEdge2FromCenterABPoint(this.centerPoint, this.focusPoint, endPoint);
-      let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0, false);
+      let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0);
       t.name = "temp";
       this.tempResult = t;
       Global.scene.add(this.tempResult);

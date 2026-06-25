@@ -64,8 +64,8 @@ class ComTransform extends ComBatch {
       let old = this.olds[i];
       let userData = CloneUserData(old.userData as UserData);
       // 线
-      if (old.userData.type < GeomType.CI) {
-        if (old.userData.type == GeomType.PO || old.userData.type == GeomType.RC) {
+      if (old.userData.type < GeomType.DRAW_SURFACE_CI) {
+        if (old.userData.type == GeomType.DRAW_CURVE2_PO || old.userData.type == GeomType.DRAW_CURVE2_RC) {
           // 数组
           if (old.userData.original instanceof Array) {
             let array = old.userData.original as Array<any>;
@@ -78,7 +78,7 @@ class ComTransform extends ComBatch {
               }
             }
             userData.original = edges;
-            let geo = BrepMeshBuilder.BuildEdge2sMesh(edges, THREE.Color.NAMES.red);
+            let geo = BrepMeshBuilder.BuildEdge2sMesh(edges, userData.color);
             if (userData.assistPoints) {
               userData.assistPoints.forEach((ap) => {
                 ap.p.applyMatrix3(trans);
@@ -94,7 +94,7 @@ class ComTransform extends ComBatch {
           let edge = (old.userData.original as Edge2).clone();
           this.appTransfrom(edge.curve.trans, trans);
           userData.original = edge;
-          let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
+          let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, userData.color);
           if (userData.assistPoints) {
             userData.assistPoints.forEach((ap) => {
               ap.p.applyMatrix3(trans);
@@ -106,13 +106,15 @@ class ComTransform extends ComBatch {
         }
       }
       // 面
-      else if (old.userData.type < GeomType.PLA) {
+      else if (old.userData.type < GeomType.DRAW_SURFACE_PLA) {
         let face = (old.userData.original as Face2).clone() as Face2;
         for (let i = 0; i < face.curves.length; i++) {
           this.appTransfrom(face.curves[i].trans, trans);
         }
         userData.original = face;
-        let geo = BrepMeshBuilder.BuildFace2Mesh(face, THREE.Color.NAMES.blue, undefined, true, false);
+        userData.canPick = false;
+        userData.color = THREE.Color.NAMES.blue;
+        let geo = BrepMeshBuilder.BuildFace2Mesh(face, userData.color, undefined, true);
         if (userData.assistPoints) {
           userData.assistPoints.forEach((ap) => {
             ap.p.applyMatrix3(trans);
@@ -153,12 +155,12 @@ class ComTransform extends ComBatch {
         let old = this.olds[i];
         let userData = CloneUserData(old.userData as UserData);
         // 线
-        if (old.userData.type < GeomType.CI) {
+        if (old.userData.type < GeomType.DRAW_SURFACE_CI) {
           // 创建一个线段
           if (old.userData.original instanceof Edge2) {
             let edge = (old.userData.original as Edge2).clone();
             this.appTransfrom(edge.curve.trans, trans);
-            let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0, false);
+            let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0);
             t.name = "temp";
             userData.assistPoints.forEach((ap) => {
               ap.p.applyMatrix3(trans);
@@ -177,7 +179,7 @@ class ComTransform extends ComBatch {
                 edges.push(edge);
               }
             }
-            let t = BrepMeshBuilder.BuildEdge2sMesh(edges, THREE.Color.NAMES.gray, undefined, 0, false);
+            let t = BrepMeshBuilder.BuildEdge2sMesh(edges, THREE.Color.NAMES.gray, undefined, 0);
             t.userData.type = old.userData.type;
             t.name = "temp";
             userData.assistPoints.forEach((ap) => {
@@ -188,13 +190,13 @@ class ComTransform extends ComBatch {
           }
         }
         // 面
-        else if (old.userData.type < GeomType.PLA) {
+        else if (old.userData.type < GeomType.DRAW_SURFACE_PLA) {
           let face = (old.userData.original as Face2).clone() as Face2;
           for (let i = 0; i < face.curves.length; i++) {
             this.appTransfrom(face.curves[i].trans, trans);
           }
 
-          let t = BrepMeshBuilder.BuildFace2Mesh(face, THREE.Color.NAMES.gray, undefined, false, false);
+          let t = BrepMeshBuilder.BuildFace2Mesh(face, THREE.Color.NAMES.gray, undefined, false);
           t.name = "temp";
           userData.assistPoints.forEach((ap) => {
             ap.p.applyMatrix3(trans);
@@ -206,7 +208,7 @@ class ComTransform extends ComBatch {
 
       // 创建一个临时直线段
       let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(this.beginPoint, endPoint);
-      let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0, false);
+      let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0,);
       t.name = "temp";
       this.tempResults.push(t);
       Global.scene.add(...this.tempResults);

@@ -27,7 +27,7 @@ class CreateHyperbola2Com extends ComCreate {
   private isRight: boolean = true;   // 默认右侧弧(按下左shift表示画左侧弧)
   constructor(executer: CommandExecuter, text: string) {
     super(executer, text);
-    this.type = GeomType.HY;
+    this.type = GeomType.DRAW_CURVE2_HY;
   }
   async exec(): Promise<void> {
     let str = this._text;
@@ -105,7 +105,7 @@ class CreateHyperbola2Com extends ComCreate {
     Global.scene.add(this.assists[this.assists.length - 1]);
 
     edge.u.set(u0, u1);
-    let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
+    let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, userData.color);
     userData.original = edge;
     geo.userData = userData;
     this.results = geo;
@@ -120,7 +120,7 @@ class CreateHyperbola2Com extends ComCreate {
       let majorPoint: Vector2 = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
       // 创建一个临时曲线段
       let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(this.centerPoint, majorPoint);
-      let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0, false);
+      let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0);
       t.name = "temp";
       this.tempResult = t;
       Global.scene.add(this.tempResult);
@@ -138,7 +138,7 @@ class CreateHyperbola2Com extends ComCreate {
       } else {
         edge.u.set(PI_2 + 1e-4, PI_2 + PI - 1e-4);
       }
-      let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0, false);
+      let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0);
       t.name = "temp";
       this.tempResult = t;
       Global.scene.add(this.tempResult);
@@ -158,7 +158,7 @@ class CreateHyperbola2Com extends ComCreate {
       } else {
         edge.u.set(u0, PI_2 + PI - 1e-4);
       }
-      let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0, false);
+      let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0);
       t.name = "temp";
       this.tempResult = t;
       Global.scene.add(this.tempResult);
@@ -175,7 +175,7 @@ class CreateHyperbola2Com extends ComCreate {
       let u0 = alg.u(this.u0Point);
       let u1 = alg.u(u1Point);
       edge.u.set(u0, u1);
-      let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0, false);
+      let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0);
       t.name = "temp";
       this.tempResult = t;
       Global.scene.add(this.tempResult);

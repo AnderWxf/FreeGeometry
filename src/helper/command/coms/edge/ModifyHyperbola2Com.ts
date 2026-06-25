@@ -27,7 +27,7 @@ class ModifyHyperbola2Com extends ComModify {
   private isRight: boolean = true;   // 默认右侧弧(按下左shift表示画左侧弧)
   constructor(executer: CommandExecuter, text: string) {
     super(executer, text);
-    this.type = GeomType.HY;
+    this.type = GeomType.DRAW_CURVE2_HY;
   }
   async exec(): Promise<void> {
     let str = this._text;
@@ -107,7 +107,7 @@ class ModifyHyperbola2Com extends ComModify {
 
     edge.u.set(u0, u1);
 
-    let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
+    let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, userData.color);
     userData.original = edge;
     geo.userData = userData;
     this.results = geo;
@@ -142,7 +142,7 @@ class ModifyHyperbola2Com extends ComModify {
       u1Point = alg.p(u1);
       edge.u.set(u0, u1);
 
-      let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0, false);
+      let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0);
       t.name = "temp";
       this.tempResult = t;
       Global.scene.add(this.tempResult);

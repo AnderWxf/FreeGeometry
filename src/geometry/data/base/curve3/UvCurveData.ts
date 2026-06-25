@@ -58,7 +58,7 @@ class UvCurveData extends Curve3Data {
    * @return {UvCurveData} a new instance.
    */
   static Unserialize(data: any): UvCurveData {
-    let ret = new UvCurveData(unserialize(data.curve) as Curve2Data, unserialize(data.surface) as SurfaceData);
+    let ret = new UvCurveData(unserialize(data.curve)[0] as Curve2Data, unserialize(data.surface)[0] as SurfaceData);
     ret.uuid = data.uuid;
     return ret;
   }

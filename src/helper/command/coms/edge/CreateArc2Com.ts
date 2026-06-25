@@ -25,7 +25,7 @@ class CreateArc2Com extends ComCreate {
   private isForward: boolean = true;
   constructor(executer: CommandExecuter, text: string) {
     super(executer, text);
-    this.type = GeomType.A;
+    this.type = GeomType.DRAW_CURVE2_A;
   }
   async exec(): Promise<void> {
     let str = this._text;
@@ -66,7 +66,7 @@ class CreateArc2Com extends ComCreate {
     // 创建一个曲线段
     let edge = Brep2Builder.BuildCircleArcEdge2FromCenterBeginEndPoin(this.centerPoint, this.beginPoint, this.endPoint);
     edge.u.y = this.isForward ? edge.u.y : edge.u.y - PI2;
-    let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.red);
+    let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, userData.color);
     userData.original = edge;
     geo.userData = userData;
     this.results = geo;
@@ -94,7 +94,7 @@ class CreateArc2Com extends ComCreate {
       // 创建一个临时曲线段
       let edge = Brep2Builder.BuildCircleEdge2FromCenterRadius(this.centerPoint, beginPoint.distanceTo(this.centerPoint));
 
-      let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0, false);
+      let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0);
       t.name = "temp";
       this.tempResult = t;
       Global.scene.add(this.tempResult);
@@ -107,7 +107,7 @@ class CreateArc2Com extends ComCreate {
       // 创建一个临时曲线段
       let edge = Brep2Builder.BuildCircleArcEdge2FromCenterBeginEndPoin(this.centerPoint, this.beginPoint, endPoint);
       edge.u.y = this.isForward ? edge.u.y : edge.u.y - PI2;
-      let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0, false);
+      let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0);
       t.name = "temp";
       this.tempResult = t;
       Global.scene.add(this.tempResult);

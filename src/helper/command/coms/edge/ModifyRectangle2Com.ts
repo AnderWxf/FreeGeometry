@@ -23,7 +23,7 @@ class ModifyRectangle2Com extends ComModify {
 
   constructor(executer: CommandExecuter, text: string) {
     super(executer, text);
-    this.type = GeomType.RC;
+    this.type = GeomType.DRAW_CURVE2_RC;
   }
 
   async exec(): Promise<void> {
@@ -153,7 +153,7 @@ class ModifyRectangle2Com extends ComModify {
       let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(points[points.length - 1], points[0]);
       edges.push(edge);
 
-      let t = BrepMeshBuilder.BuildEdge2sMesh(edges, THREE.Color.NAMES.gray, undefined, 0, false);
+      let t = BrepMeshBuilder.BuildEdge2sMesh(edges, THREE.Color.NAMES.gray, undefined, 0);
       t.name = "temp";
       this.tempResult = t;
       Global.scene.add(this.tempResult);

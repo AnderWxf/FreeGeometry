@@ -21,7 +21,7 @@ class CreatePolyline2Com extends ComCreate {
   constructor(executer: CommandExecuter, text: string) {
     super(executer, text);
     this.points = [];
-    this.type = GeomType.PO;
+    this.type = GeomType.DRAW_CURVE2_PO;
   }
   async exec(): Promise<void> {
     let str = this._text;
@@ -81,14 +81,14 @@ class CreatePolyline2Com extends ComCreate {
         let beginPoint = this.points[i - 1];
         let endPoint = this.points[i];
         let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(beginPoint, endPoint);
-        let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0, false);
+        let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0);
         this.tempResult.children.push(geo);
       }
       let beginPoint = this.points[this.points.length - 1];
       let endPoint: Vector2 = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
       // 创建一个临时直线段
       let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(beginPoint, endPoint);
-      let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0, false);
+      let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0);
       this.tempResult.children.push(geo);
       Global.scene.add(this.tempResult);
     }

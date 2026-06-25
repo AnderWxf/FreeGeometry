@@ -49,15 +49,15 @@ class EdgeCuttingCom extends Command {
     for (let i = 0; i < act_pick_objs.results.length; i++) {
       let geo = act_pick_objs.results[i];
       let userData = geo.userData as UserData;
-      if (userData.type < GeomType.RC) {
-        if (userData.type == GeomType.PO || userData.type == GeomType.RC) {
+      if (userData.type < GeomType.DRAW_CURVE2_RC) {
+        if (userData.type == GeomType.DRAW_CURVE2_PO || userData.type == GeomType.DRAW_CURVE2_RC) {
           let original = userData.original as Array<Edge2>;
           if (this.src.length == 0) {
             this.src.push(...original);
           } else {
             original.forEach((e: Edge2) => {
               let u: UserData = {
-                type: GeomType.L,
+                type: GeomType.DRAW_CURVE2_L,
                 canPick: userData.canPick,
                 isAssist: false,
                 assistPoints: null,
@@ -76,7 +76,7 @@ class EdgeCuttingCom extends Command {
             this.src.push(original);
           } else {
             let u: UserData = {
-              type: GeomType.L,
+              type: GeomType.DRAW_CURVE2_L,
               canPick: userData.canPick,
               isAssist: false,
               assistPoints: null,

@@ -23,7 +23,7 @@ class BrepMeshBuilder {
    * @param {number} [segment] - The segment of edge2 object.
    * @param {number} [sub] - The sub type of edge2 object.
    */
-  static BuildEdge2sMesh(edges: Edge2[], color: number, segment?: number, sub: number = 0, canPick: boolean = true): THREE.Line {
+  static BuildEdge2sMesh(edges: Edge2[], color: number, segment?: number, sub: number = 0): THREE.Line {
     let vertices = new Array<number>;
     for (let i = 0; i < edges.length; i++) {
       let edge = edges[i];
@@ -54,8 +54,6 @@ class BrepMeshBuilder {
 
     const materialline = new THREE.MeshBasicMaterial({ color: color });
     let ret = new THREE.Line(buff, materialline);
-    ret.userData.canPick = canPick;
-    ret.userData.original = edges;
     ret.frustumCulled = false;
     return ret;
   }
@@ -67,7 +65,7 @@ class BrepMeshBuilder {
    * @param {number} [segment] - The segment of edge2 object.
    * @param {number} [sub] - The sub type of edge2 object.
    */
-  static BuildEdge2Mesh(edge: Edge2, color: number, segment?: number, sub: number = 0, canPick: boolean = true): THREE.Line {
+  static BuildEdge2Mesh(edge: Edge2, color: number, segment?: number, sub: number = 0): THREE.Line {
     if (segment == undefined) {
       if (edge.curve instanceof Line2Data) {
         segment = 1;
@@ -94,8 +92,6 @@ class BrepMeshBuilder {
 
     const materialline = new THREE.MeshBasicMaterial({ color: color });
     let ret = new THREE.Line(buff, materialline);
-    ret.userData.canPick = canPick;
-    ret.userData.original = edge;
     ret.frustumCulled = false;
     return ret;
   }
@@ -136,7 +132,6 @@ class BrepMeshBuilder {
 
     const materialline = new THREE.MeshBasicMaterial({ color: color });
     let ret = new THREE.LineSegments(buff, materialline);
-    ret.userData.original = edge;
     ret.frustumCulled = false;
     return ret;
   }
@@ -180,7 +175,6 @@ class BrepMeshBuilder {
 
     const materialline = new THREE.MeshBasicMaterial({ color: color });
     let ret = new THREE.LineSegments(buff, materialline);
-    ret.userData.original = edge;
     ret.frustumCulled = false;
     return ret;
   }
@@ -216,8 +210,6 @@ class BrepMeshBuilder {
 
     const materialline = new THREE.MeshBasicMaterial({ color: color });
     let ret = new THREE.Line(buff, materialline);
-    ret.userData.canPick = true;
-    ret.userData.original = edge;
     ret.frustumCulled = false;
     return ret;
   }
@@ -258,7 +250,6 @@ class BrepMeshBuilder {
 
     const materialline = new THREE.MeshBasicMaterial({ color: color });
     let ret = new THREE.LineSegments(buff, materialline);
-    ret.userData.original = edge;
     ret.frustumCulled = false;
     return ret;
   }
@@ -310,7 +301,7 @@ class BrepMeshBuilder {
    *
    * @param {Face2} [face] - The face2 object.
    */
-  static BuildFace2Mesh(face: Face2, color: number, segment?: number, canPick: boolean = true, drawOutLine: boolean = true): THREE.Mesh {
+  static BuildFace2Mesh(face: Face2, color: number, segment?: number, drawOutLine: boolean = true): THREE.Mesh {
     let points = new Array<THREE.Vector2>();
     let holes = new Array<THREE.Path>();
     face.border.coedges.forEach(coedge => {
@@ -375,8 +366,6 @@ class BrepMeshBuilder {
     const material = new THREE.MeshBasicMaterial({ color: color, opacity: 0.25, transparent: true });
     let buff = new THREE.ShapeGeometry(shape);
     let ret = new THREE.Mesh(buff, material);
-    ret.userData.canPick = canPick;
-    ret.userData.original = face;
     ret.frustumCulled = false;
 
     // 绘制边界线
@@ -415,6 +404,133 @@ class BrepMeshBuilder {
         holeMesh.frustumCulled = false;
         ret.children.push(holeMesh);
       });
+    }
+    return ret;
+  }
+
+  /**
+   * build face2 mesh BufferGeometry.
+   *
+   * @param {Face2} [face] - The face2 object.
+   */
+  static BuildFace2sMesh(faces: Face2[], color: number, segment?: number, drawOutLine: boolean = true): THREE.Mesh {
+    let pointss = new Array<Array<THREE.Vector2>>();
+    let holess = new Array<Array<THREE.Path>>();
+    let shapes: THREE.Shape[] = [];
+    for (let i = 0; i < faces.length; i++) {
+      let points = new Array<THREE.Vector2>();
+      let holes = new Array<THREE.Path>();
+      let face = faces[i];
+      face.border.coedges.forEach(coedge => {
+        let edge = coedge.e;
+        let curve = edge.curve;
+        if (curve == null) {
+          curve = face.curves[edge.curvei];
+        }
+        let edgeSegment = segment;
+        if (edgeSegment == undefined) {
+          if (curve instanceof Line2Data) {
+            edgeSegment = 1;
+          } else {
+            edgeSegment = Math.ceil(MathUtils.clamp(Brep2Builder.Length(curve, edge.u, 1, 512), 64, 512));
+          }
+        }
+
+        let algor = CurveBuilder.Algorithm2ByData(curve);
+        let ub = edge.u.x;
+        let ue = edge.u.y;
+        if (!coedge.isForward) {
+          [ub, ue] = [ue, ub];
+        }
+        let step = (ue - ub) / edgeSegment;
+        for (let u = ub, i = 0; i <= edgeSegment; u += step, i++) {
+          let p = algor.p(u);
+          points.push(new THREE.Vector2(p.x, p.y));
+        }
+      });
+      face.holes.forEach(hole => {
+        let holePoints = new Array<THREE.Vector2>();
+        hole.coedges.forEach(coedge => {
+          let edge = coedge.e;
+          let curve = edge.curve;
+          if (curve == null) {
+            curve = face.curves[edge.curvei];
+          }
+          let edgeSegment = segment;
+          if (edgeSegment == undefined) {
+            if (curve instanceof Line2Data) {
+              edgeSegment = 1;
+            } else {
+              edgeSegment = Math.ceil(MathUtils.clamp(Brep2Builder.Length(curve, edge.u, 1, 512), 64, 512));
+            }
+          }
+          let algor = CurveBuilder.Algorithm2ByData(curve);
+          let ub = edge.u.x;
+          let ue = edge.u.y;
+          if (!coedge.isForward) {
+            [ub, ue] = [ue, ub];
+          }
+          let step = (ue - ub) / edgeSegment;
+          for (let u = ub, i = 0; i <= edgeSegment; u += step, i++) {
+            let p = algor.p(u);
+            holePoints.push(new THREE.Vector2(p.x, p.y));
+          }
+        });
+        holes.push(new THREE.Path(holePoints));
+      });
+      pointss.push(points);
+      holess.push(holes);
+      let shape = new THREE.Shape(points);
+      shape.holes = holes;
+      shapes.push(shape)
+    }
+
+    const material = new THREE.MeshBasicMaterial({ color: color, opacity: 0.25, transparent: true });
+    let buff = new THREE.ShapeGeometry(shapes);
+    let ret = new THREE.Mesh(buff, material);
+    ret.frustumCulled = false;
+
+    // 绘制边界线
+    if (drawOutLine) {
+      for (let i = 0; i < faces.length; i++) {
+        let points = pointss[i];
+        let holes = holess[i];
+        let vertices = new Array<number>;
+        for (let j = 0; j < points.length; j++) {
+          let p = points[j];
+          vertices.push(p.x);
+          vertices.push(p.y);
+          vertices.push(0);
+        }
+        let p = points[0];
+        vertices.push(p.x);
+        vertices.push(p.y);
+        vertices.push(0);
+        let borderbuff = new THREE.BufferGeometry()
+        borderbuff.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+        const materialline = new THREE.MeshBasicMaterial({ color: color });
+        let borderMesh = new THREE.Line(borderbuff, materialline);
+        borderMesh.frustumCulled = false;
+        ret.children.push(borderMesh);
+        holes.forEach(hole => {
+          let vertices = new Array<number>;
+          hole.getPoints().forEach(p => {
+            vertices.push(p.x);
+            vertices.push(p.y);
+            vertices.push(0);
+          });
+          let p = points[0];
+          vertices.push(p.x);
+          vertices.push(p.y);
+          vertices.push(0);
+          let holeBuff = new THREE.BufferGeometry()
+          holeBuff.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+          let holeMesh = new THREE.Line(holeBuff, materialline);
+          holeMesh.frustumCulled = false;
+          ret.children.push(holeMesh);
+        });
+      }
+
     }
     return ret;
   }

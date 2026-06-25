@@ -6,62 +6,66 @@ enum DisplayLayers {
 }
 // 几何类型,名字也是创建命令
 enum GeomType {
-  // 二维曲线类型
-  L = 0,       // 两点直线段
-  A = 1,       // 圆弧
-  A3 = 2,      // 三点圆弧
-  C = 3,       // 圆
-  C3 = 4,      // 三点圆
-  E = 5,       // 椭圆
-  EA = 6,      // 椭圆弧
-  HY = 7,      // 双曲线
-  PA = 8,      // 抛物线
-  PO = 9,      // 多段线
-  NF = 10,     // Nurbs fitting
-  NC = 11,     // Nurbs control
-  RC = 12,     // REC：矩形
+  // 二维曲线绘制类型
+  DRAW_CURVE2_L = 0,       // 两点直线段
+  DRAW_CURVE2_A = 1,       // 圆弧
+  DRAW_CURVE2_A3 = 2,      // 三点圆弧
+  DRAW_CURVE2_C = 3,       // 圆
+  DRAW_CURVE2_C3 = 4,      // 三点圆
+  DRAW_CURVE2_E = 5,       // 椭圆
+  DRAW_CURVE2_EA = 6,      // 椭圆弧
+  DRAW_CURVE2_HY = 7,      // 双曲线
+  DRAW_CURVE2_PA = 8,      // 抛物线
+  DRAW_CURVE2_PO = 9,      // 多段线
+  DRAW_CURVE2_NF = 10,     // Nurbs fitting
+  DRAW_CURVE2_NC = 11,     // Nurbs control
+  DRAW_CURVE2_RC = 12,     // REC：矩形
 
-  // 二维平面类型
-  CI = 20,     // 圆面
-  EL = 21,     // 椭圆面
-  POL = 22,    // 多边形面
-  RCT = 23,    // 矩形面
-  SEC = 24,    // 剖面
+  // 三维曲线绘制类型
 
-  // 三维曲面类型
-  PLA = 41,     // 空间平面
-  SHP = 42,     // 球面
-  ELL = 43,     // 椭球面
-  CYL = 44,     // 圆柱面
-  CON = 45,     // 圆锥面
-  NUR = 46,     // Nurbs面
-  STR = 47,     // 拉伸面
-  ROT = 48,     // 旋转面
-  SWE = 49,     // 扫掠面
-  LOF = 50,     // 放样曲面
+  // 二维平面绘制类型
+  DRAW_SURFACE_CI = 30,     // 圆面
+  DRAW_SURFACE_EL = 31,     // 椭圆面
+  DRAW_SURFACE_POL = 32,    // 多边形面
+  DRAW_SURFACE_RCT = 33,    // 矩形面
+  DRAW_SURFACE_SEC = 34,    // 剖面
 
-  // 三维实体类型
-  HEXA = 60,    // 六面体
-  TETR = 61,    // 四面体
-  PRIS = 62,    // 棱柱体
-  PYRA = 63,    // 金字塔体
-  CYLI = 65,    // 圆柱体
-  CONE = 66,    // 圆锥体
-  TORU = 67,    // 圆环
-  ECYL = 69,    // 椭圆柱
-  ECON = 70,    // 椭圆锥
-  ETOR = 71,    // 椭圆环
-  STRE = 72,    // 拉伸体
-  ROTA = 73,    // 旋转体
-  SWEP = 74,    // 扫掠体
-  LOFT = 75,     // 放样体
+  // 三维曲面绘制类型
+  DRAW_SURFACE_PLA = 41,     // 空间平面
+  DRAW_SURFACE_SHP = 42,     // 球面
+  DRAW_SURFACE_ELL = 43,     // 椭球面
+  DRAW_SURFACE_CYL = 44,     // 圆柱面
+  DRAW_SURFACE_CON = 45,     // 圆锥面
+  DRAW_SURFACE_NUR = 46,     // Nurbs面
+  DRAW_SURFACE_STR = 47,     // 拉伸面
+  DRAW_SURFACE_ROT = 48,     // 旋转面
+  DRAW_SURFACE_SWE = 49,     // 扫掠面
+  DRAW_SURFACE_LOF = 50,     // 放样曲面
 
+  // 三维实体绘制类型
+  DRAW_SOLID_HEXA = 60,    // 六面体
+  DRAW_SOLID_TETR = 61,    // 四面体
+  DRAW_SOLID_PRIS = 62,    // 棱柱体
+  DRAW_SOLID_PYRA = 63,    // 金字塔体
+  DRAW_SOLID_CYLI = 65,    // 圆柱体
+  DRAW_SOLID_CONE = 66,    // 圆锥体
+  DRAW_SOLID_TORU = 67,    // 圆环
+  DRAW_SOLID_ECYL = 69,    // 椭圆柱
+  DRAW_SOLID_ECON = 70,    // 椭圆锥
+  DRAW_SOLID_ETOR = 71,    // 椭圆环
+  DRAW_SOLID_STRE = 72,    // 拉伸体
+  DRAW_SOLID_ROTA = 73,    // 旋转体
+  DRAW_SOLID_SWEP = 74,    // 扫掠体
+  DRAW_SOLID_LOFT = 75,     // 放样体
+
+  // 二维曲线数据类型
   DATA_TYPE_CURVE2_ARC2 = 0 + 255,
   DATA_TYPE_CURVE2_HYPERBOLA2 = 1 + 255,
   DATA_TYPE_CURVE2_LINE2 = 2 + 255,
   DATA_TYPE_CURVE2_NURBS2 = 3 + 255,
   DATA_TYPE_CURVE2_PARABOLA2 = 4 + 255,
 
+  // 三维曲线数据类型
   DATA_TYPE_CURVE3_ARC3 = 10 + 255,
   DATA_TYPE_CURVE3_HYPERBOLA3 = 11 + 255,
   DATA_TYPE_CURVE3_LINE3 = 12 + 255,
@@ -69,6 +73,7 @@ enum GeomType {
   DATA_TYPE_CURVE3_PARABOLA3 = 14 + 255,
   DATA_TYPE_CURVE3_UVCURVE = 14 + 255,
 
+  // 三维曲面数据类型
   DATA_TYPE_SURFACE_CONICALSURFACE = 20 + 255,
   DATA_TYPE_SURFACE_CYLINDERSURFACE = 21 + 255,
   DATA_TYPE_SURFACE_ELLIPSOIDSURFACE = 22 + 255,
@@ -78,6 +83,7 @@ enum GeomType {
   DATA_TYPE_SURFACE_SPHERESURFACE = 26 + 255,
   DATA_TYPE_SURFACE_SWEEPSURFACE = 27 + 255,
 
+  // 二维Brep数据类型
   DATA_TYPE_BREP2_VERTICE2 = 40 + 255,
   DATA_TYPE_BREP2_EDGE2 = 41 + 255,
   DATA_TYPE_BREP2_COEDGE2 = 42 + 255,
@@ -85,6 +91,7 @@ enum GeomType {
   DATA_TYPE_BREP2_FACE2 = 44 + 255,
   DATA_TYPE_BREP2_DIGRAPH2 = 45 + 255,
 
+  // 三维Brep数据类型
   DATA_TYPE_BREP3_VERTICE3 = 50 + 255,
   DATA_TYPE_BREP3_EDGE3 = 51 + 255,
   DATA_TYPE_BREP3_COEDGE3 = 52 + 255,
