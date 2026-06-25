@@ -289,12 +289,6 @@ class CommandExecuter {
       let command = s[0];
       command = command.toUpperCase();
       switch (command) {
-        // case CommandType.SCENE_SAVE:
-        //   Doc.Save();
-        //   break;
-        // case CommandType.SCENE_LOAD:
-        //   Doc.Load();
-        //   break;
         case CommandType.OTHER_UNDO:
           this.undo();
           break;
@@ -315,6 +309,8 @@ class CommandExecuter {
               console.error(e);
               this._curr.cancel();
             }
+          } else {
+            alert('命令不存在：' + command);
           }
       }
     }

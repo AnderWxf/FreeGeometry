@@ -119,7 +119,7 @@ enum CommandType {
   CREATE_POLYLINE = 'PO',             // 多段线
   CREATE_NURBS_FITTING = 'N',         // Nurbs fitting
   CREATE_NURBS_CONTROL = 'NC',        // Nurbs control
-  CREATE_RECTANGLE = 'RE',             // REC：矩形
+  CREATE_RECTANGLE = 'RE',            // REC：矩形
 
   // 二维平面类型
   CREATE_CIRCLE_SURFACE = 'CI',       // 圆面
