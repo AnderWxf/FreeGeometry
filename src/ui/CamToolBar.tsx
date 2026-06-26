@@ -9,7 +9,6 @@ import { Global } from '../core/Global';
 import { CommandType } from '../core/Constents';
 import { SaveFilled, EditTwoTone, BuildFilled, AppstoreFilled, CalculatorOutlined, LineChartOutlined, AreaChartOutlined, GlobalOutlined, RubyOutlined, BlockOutlined } from '@ant-design/icons';
 import type { MenuInfo } from 'rc-menu/lib/interface';
-import { useState } from 'react';
 
 
 const perspective: PerspectiveController = new PerspectiveController();
@@ -106,12 +105,10 @@ let CamToolBarOnChange = (value: string) => {
 const CamToolBar: React.FC = () => (
   <Space wrap>
     <Select
-      value="前"
+      defaultValue="前"
       style={{ width: 50, position: 'fixed', top: 10, right: 10, zIndex: 1000 }}
-      onChange={(value: string) => {
-        if (CamToolBarOnChange) {
-          CamToolBarOnChange(value);
-        }
+      onSelect={(value: string) => {
+        CamToolBarOnChange(value);
       }}
       options={[
         { value: '前', label: '前' },
@@ -125,7 +122,6 @@ const CamToolBar: React.FC = () => (
     />
   </Space>
 );
-
 
 const ComOptionBar: React.FC = () => (
   <Space wrap>
@@ -162,6 +158,7 @@ const ComOptionBar: React.FC = () => (
 let inputs = new Array<string>();
 let pos = 0;
 let CommandBarOnEnter = (value: string) => {
+  if (value.trim() == '') { return; }
   Global.gpu.focus();
   Global.comExector.execute(value.toUpperCase());
 };
@@ -170,7 +167,7 @@ let CommandBarOnEnter = (value: string) => {
 const CommandBar: React.FC = () => (
   <Space wrap>
     <Input id='CommandLine' placeholder="请输入命令"
-      style={{ position: 'fixed', width: '100%', bottom: 0, right: 0, background: 'transparent' }}
+      style={{ position: 'fixed', width: '100%', bottom: 0, left: 0, zIndex: 1000, background: 'transparent' }}
       onPressEnter={(e) => {
         e.stopPropagation();
         let element = (e.target as HTMLInputElement);
@@ -257,7 +254,7 @@ const MenuItems = [
           { key: CommandType.CREATE_ELLIPSE_SURFACE, label: '椭圆面' + ' ' + CommandType.CREATE_ELLIPSE_SURFACE },
           { key: CommandType.CREATE_POLYGON_SURFACE, label: '多边形面' + ' ' + CommandType.CREATE_POLYGON_SURFACE },
           { key: CommandType.CREATE_RECTANGLE_SURFACE, label: '矩形面' + ' ' + CommandType.CREATE_RECTANGLE_SURFACE },
-          { key: CommandType.CREATE_SECTION, label: '剖面' + ' ' + CommandType.CREATE_SECTION },
+          { key: CommandType.CREATE_SECTION_SURFACE, label: '剖面' + ' ' + CommandType.CREATE_SECTION_SURFACE },
         ]
       },
       {
@@ -339,7 +336,7 @@ const MenuItems = [
           { key: CommandType.MODIFY_ELLIPSE_SURFACE, label: '椭圆面' + ' ' + CommandType.MODIFY_ELLIPSE_SURFACE },
           { key: CommandType.MODIFY_POLYGON_SURFACE, label: '多边形面' + ' ' + CommandType.MODIFY_POLYGON_SURFACE },
           { key: CommandType.MODIFY_RECTANGLE_SURFACE, label: '矩形面' + ' ' + CommandType.MODIFY_RECTANGLE_SURFACE },
-          { key: CommandType.MODIFY_SECTION, label: '剖面' + ' ' + CommandType.MODIFY_SECTION },
+          { key: CommandType.MODIFY_SECTION_SURFACE, label: '剖面' + ' ' + CommandType.MODIFY_SECTION_SURFACE },
         ]
       },
       {
@@ -439,17 +436,14 @@ const MenuItems = [
     ]
   },
 ];
-// let selectedKeys: string[] = [];
 const MenuBarOnChange = (info: MenuInfo): void => {
   Global.gpu.focus();
   let command = info.key.toUpperCase();
   Global.comExector.execute(command);
-  // let [selectedKeys, setSelectedKeys] = useState<string[]>([]);
-  // setSelectedKeys([]);
 };
 const MenuBar: React.FC = () => (
   <Space wrap>
-    <input type="file" id="fileInput" accept=".json,application/json" hidden></input>
+    <input type="file" id="fileInput" accept=".json,application/json" hidden disabled></input>
     <ConfigProvider
       theme={{
         components: {
@@ -481,7 +475,7 @@ const MenuBar: React.FC = () => (
 
 
     <Input id='CommandLine' placeholder="请输入命令"
-      style={{ position: 'fixed', width: '100%', bottom: 0, right: 0 }}
+      style={{ position: 'fixed', width: '100%', bottom: 0, right: 0, color: "#00A000", backgroundColor: 'transparent' }}
       onPressEnter={(e) => {
         e.stopPropagation();
         let element = (e.target as HTMLInputElement);
@@ -493,7 +487,7 @@ const MenuBar: React.FC = () => (
       }}
       onBlur={(e) => {
         let element = (e.target as HTMLInputElement);
-        element.disabled = true;
+        // element.disabled = true;
       }}
       onKeyUp={(e) => {
         e.stopPropagation();
@@ -525,8 +519,8 @@ root.render(
   <React.StrictMode>
     <CamToolBar />
     <ComOptionBar />
-    <CommandBar />
     <MenuBar />
+    <CommandBar />
   </React.StrictMode>
 );
 

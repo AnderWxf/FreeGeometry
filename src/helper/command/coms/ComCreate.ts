@@ -48,7 +48,6 @@ class ComCreate extends Command {
       element.visible = Global.isShowAssists;
     });
   }
-
   override undo() {
     if (this._isDone) {
       Global.scene.remove(this.results);

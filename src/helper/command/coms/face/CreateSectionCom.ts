@@ -10,24 +10,24 @@ import { GeomType } from "../../../../core/Constents";
 import { Coedge2, Edge2, Face2, Vertice2 } from "../../../../geometry/data/brep/Brep2";
 import { ActPickObjects } from "../../acts/ActPickObjects";
 import { CreateGeomUserData } from "../../../UserData";
+import { CreateFaceCom } from "./CreateFaceCom";
 
 
 /**
  * Create command class.
  * 
  */
-class CreateSectionCom extends ComCreate {
-  edges: Edge2[];
+class CreateSectionCom extends CreateFaceCom {
+
   constructor(executer: CommandExecuter, text: string) {
     super(executer, text);
-    this.edges = [];
     this.type = GeomType.DRAW_SURFACE_SEC;
   }
   async exec(): Promise<void> {
     let str = this._text;
     let paras = str.split(' ');
     let userData = CreateGeomUserData(this.type);
-
+    let edges: Edge2[] = [];
     if (paras.length > 5) {
       // 创建一个面
       let points: Vector2[] = [];
@@ -37,6 +37,7 @@ class CreateSectionCom extends ComCreate {
       }
 
       this._text = paras[0];
+
       // 创建一个面
       if (points.length > 3) {
         let face = new Face2();
@@ -49,6 +50,7 @@ class CreateSectionCom extends ComCreate {
           let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(b, e);
           edge.v0 = face.vertices[i];
           edge.v1 = face.vertices[(i + 1) % points.length];
+          edges.push(edge);
           let coedge = new Coedge2();
           coedge.e = edge;
           face.border.coedges.push(coedge);
@@ -78,29 +80,18 @@ class CreateSectionCom extends ComCreate {
         if (geo.userData.type < GeomType.DRAW_SURFACE_CI) {
           if (geo.userData.type == GeomType.DRAW_CURVE2_PO || geo.userData.type == GeomType.DRAW_CURVE2_RC) {
             let original = geo.userData.original as Array<Edge2>;
-            this.edges.push(...original);
+            edges.push(...original);
           } else {
-            this.edges.push(geo.userData.original as Edge2);
+            edges.push(geo.userData.original as Edge2);
           }
         }
       }
 
-      if (this.edges.length) {
-        let face = new Face2();
-        for (let i = 0; i < this.edges.length; i++) {
-          face.vertices.push(new Vertice2());
+      if (edges.length) {
+        for (let i = 0; i < edges.length; i++) {
+          edges[i] = edges[i].clone();
         }
-        for (let i = 0; i < this.edges.length; i++) {
-          let edge = this.edges[i].clone();
-          edge.v0 = face.vertices[i];
-          edge.v1 = face.vertices[(i + 1) % this.edges.length];
-          let coedge = new Coedge2();
-          coedge.e = edge;
-          face.border.coedges.push(coedge);
-          face.curves.push(edge.curve);
-          edge.curve = null;
-          edge.curvei = i;
-        }
+        let face = this.createFace(edges);
         userData.color = THREE.Color.NAMES.blue;
         let geo = BrepMeshBuilder.BuildFace2Mesh(face, userData.color);
         userData.original = face;

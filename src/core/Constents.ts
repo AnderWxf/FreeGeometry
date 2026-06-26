@@ -126,7 +126,7 @@ enum CommandType {
   CREATE_ELLIPSE_SURFACE = 'EL',      // 椭圆面
   CREATE_POLYGON_SURFACE = 'PL',      // 多边形面
   CREATE_RECTANGLE_SURFACE = 'RC',    // 矩形面
-  CREATE_SECTION = 'SE',              // 剖面
+  CREATE_SECTION_SURFACE = 'SE',      // 剖面
 
   // 三维曲面类型
   CREATE_SPHERE_SURFACE = 'SHP',      // 球面
@@ -162,7 +162,7 @@ enum CommandType {
   MODIFY_ARC = 'MA',                   // 圆弧
   MODIFY_ARC_THREE_POINT = 'MA3',      // 三点圆弧
   MODIFY_CIRCLE = 'MC',                // 圆
-  MODIFY_CIRCLE_THREE_POINT = 'MC3',      // 三点圆
+  MODIFY_CIRCLE_THREE_POINT = 'MC3',   // 三点圆
   MODIFY_ELLIPSE = 'ME',               // 椭圆
   MODIFY_ELLIPSE_ARC = 'MEA',          // 椭圆弧
   MODIFY_HYPERBOLA = 'MHY',            // 双曲线
@@ -177,7 +177,7 @@ enum CommandType {
   MODIFY_ELLIPSE_SURFACE = 'MEL',      // 椭圆面
   MODIFY_POLYGON_SURFACE = 'MPOL',     // 多边形面
   MODIFY_RECTANGLE_SURFACE = 'MRCT',   // 矩形面
-  MODIFY_SECTION = 'MSEC',             // 剖面
+  MODIFY_SECTION_SURFACE = 'MSEC',     // 剖面
 
   // 三维曲面类型
   MODIFY_SPHERE_SURFACE = 'MSHP',      // 球面

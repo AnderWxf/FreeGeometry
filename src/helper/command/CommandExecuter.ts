@@ -54,6 +54,13 @@ import { SceneSaveCom } from "./coms/scene/SceneSaveCom";
 import { SceneLoadCom } from "./coms/scene/SceneLoadCom";
 import { SceneClearCom } from "./coms/scene/SceneClearCom";
 import { SceneImportCom } from "./coms/scene/SceneImportCom";
+import { CreateCircleAreaCom } from "./coms/face/CreateCircleAreaCom";
+import { ModifyEllipseAreaCom } from "./coms/face/ModifyEllipseAreaCom";
+import { ModifyPolylineAreaCom } from "./coms/face/ModifyPolylineAreaCom";
+import { ModifyRectangleAreaCom } from "./coms/face/ModifyRectangleAreaCom";
+import { CreatePolylineAreaCom } from "./coms/face/CreatePolylineAreaCom";
+import { CreateRectangleAreaCom } from "./coms/face/CreateRectangleAreaCom";
+import { CreateEllipseAreaCom } from "./coms/face/CreateEllipseAreaCom";
 
 /**
  * Command executer base class.
@@ -85,7 +92,12 @@ class CommandExecuter {
     this._commands.set(CommandType.CREATE_RECTANGLE, CreateRectangle2Com);
     this._commands.set(CommandType.CREATE_NURBS_FITTING, CreateNurbs2FitCom);
     this._commands.set(CommandType.CREATE_NURBS_CONTROL, CreateNurbs2CtrlCom);
-    this._commands.set(CommandType.CREATE_SECTION, CreateSectionCom);
+
+    this._commands.set(CommandType.CREATE_CIRCLE_SURFACE, CreateCircleAreaCom);
+    this._commands.set(CommandType.CREATE_ELLIPSE_SURFACE, CreateEllipseAreaCom);
+    this._commands.set(CommandType.CREATE_POLYGON_SURFACE, CreatePolylineAreaCom);
+    this._commands.set(CommandType.CREATE_RECTANGLE_SURFACE, CreateRectangleAreaCom);
+    this._commands.set(CommandType.CREATE_SECTION_SURFACE, CreateSectionCom);
 
     this._commands.set(CommandType.MODIFY_LINE, ModifyLine2Com);
     this._commands.set(CommandType.MODIFY_CIRCLE, ModifyCircle2Com);
@@ -100,6 +112,12 @@ class CommandExecuter {
     this._commands.set(CommandType.MODIFY_NURBS_FITTING, ModifyNurbs2FitCom);
     this._commands.set(CommandType.MODIFY_NURBS_CONTROL, ModifyNurbs2CtrlCom);
     this._commands.set(CommandType.MODIFY_RECTANGLE, ModifyRectangle2Com);
+
+
+    this._commands.set(CommandType.MODIFY_CIRCLE_SURFACE, ModifyCircle2Com);
+    this._commands.set(CommandType.MODIFY_ELLIPSE_SURFACE, ModifyEllipseAreaCom);
+    this._commands.set(CommandType.MODIFY_POLYGON_SURFACE, ModifyPolylineAreaCom);
+    this._commands.set(CommandType.MODIFY_RECTANGLE_SURFACE, ModifyRectangleAreaCom);
 
     this._commands.set(CommandType.CALCULATE_LENGTH_2, CalculateLoop2LengthCom);
     this._commands.set(CommandType.CALCULATE_LENGTH_3, CalculateLoop3LengthCom);
@@ -310,7 +328,7 @@ class CommandExecuter {
               this._curr.cancel();
             }
           } else {
-            alert('命令不存在：' + command);
+            console.warn('命令不存在：' + command);
           }
       }
     }
