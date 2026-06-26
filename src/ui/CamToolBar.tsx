@@ -171,7 +171,7 @@ const CommandBar: React.FC = () => (
       onPressEnter={(e) => {
         e.stopPropagation();
         let element = (e.target as HTMLInputElement);
-        element.disabled = true;
+        // element.disabled = true;
         const value = element.value;
         inputs.push(value);
         pos = inputs.length - 1;
@@ -179,7 +179,7 @@ const CommandBar: React.FC = () => (
       }}
       onBlur={(e) => {
         let element = (e.target as HTMLInputElement);
-        element.disabled = true;
+        // element.disabled = true;
       }}
       onKeyUp={(e) => {
         e.stopPropagation();

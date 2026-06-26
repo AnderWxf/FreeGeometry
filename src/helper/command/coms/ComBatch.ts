@@ -30,8 +30,8 @@ class ComBatch extends Command {
     this.unbind(window);
     Global.scene.remove(...this.tempResults);
 
-    this.olds = null;
-    this.results = null;
+    this.olds = [];
+    this.results = [];
     this.tempResults = [];
   }
 

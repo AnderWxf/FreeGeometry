@@ -112,7 +112,6 @@ class ComTransform extends ComBatch {
           this.appTransfrom(face.curves[i].trans, trans);
         }
         userData.original = face;
-        userData.canPick = false;
         userData.color = THREE.Color.NAMES.blue;
         let geo = BrepMeshBuilder.BuildFace2Mesh(face, userData.color, undefined, true);
         if (userData.assistPoints) {
