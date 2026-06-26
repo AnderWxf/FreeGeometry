@@ -11,3 +11,6 @@ npm install -save webpack
 
 npm install -save antd
 
+Build:
+./build
+
