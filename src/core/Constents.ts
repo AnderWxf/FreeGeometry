@@ -6,6 +6,7 @@ enum DisplayLayers {
 }
 // 几何类型,名字也是创建命令
 enum GeomType {
+  //绘制类型的最后一段必须和绘制命令的枚举值保持一致。
   // 二维曲线绘制类型
   DRAW_CURVE2_L = 0,       // 两点直线段
   DRAW_CURVE2_A = 1,       // 圆弧
@@ -119,13 +120,13 @@ enum CommandType {
   CREATE_POLYLINE = 'PO',             // 多段线
   CREATE_NURBS_FITTING = 'N',         // Nurbs fitting
   CREATE_NURBS_CONTROL = 'NC',        // Nurbs control
-  CREATE_RECTANGLE = 'RE',            // REC：矩形
+  CREATE_RECTANGLE = 'RC',            // REC：矩形
 
   // 二维平面类型
   CREATE_CIRCLE_SURFACE = 'CI',       // 圆面
   CREATE_ELLIPSE_SURFACE = 'EL',      // 椭圆面
   CREATE_POLYGON_SURFACE = 'PL',      // 多边形面
-  CREATE_RECTANGLE_SURFACE = 'RC',    // 矩形面
+  CREATE_RECTANGLE_SURFACE = 'RCT',   // 矩形面
   CREATE_SECTION_SURFACE = 'SE',      // 剖面
 
   // 三维曲面类型
