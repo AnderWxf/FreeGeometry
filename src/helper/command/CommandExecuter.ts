@@ -179,7 +179,7 @@ class CommandExecuter {
     let userData = seleced.userData as UserData;
     let type = userData.type;
     let typeName = GeomType[type] as string;
-    typeName = typeName.split('_')[2];
+    typeName = typeName.split('_')[2];//DRAW_CURVE2_L = 0, // 两点直线段
     if (typeName) {
       let command = 'M' + typeName;
       let c = this._commands.get(command) as Function;
