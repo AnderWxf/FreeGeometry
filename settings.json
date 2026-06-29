@@ -1,0 +1,9 @@
+{
+   "markdown-preview-enhanced.mathRenderingOption": "MathJax",
+    // 启用数学环境的智能提示
+    "latex-workshop.intellisense.mathEnv.enabled": true,
+    // 设置触发补全的字符，比如输入 \ 或 $ 时弹出建议
+    "latex-workshop.intellisense.trigger.latex": ["$", "\\"],
+    // 确保编辑器在输入触发字符时显示建议
+    "editor.suggestOnTriggerCharacters": true
+}
