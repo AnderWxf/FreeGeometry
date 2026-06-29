@@ -65,32 +65,30 @@ class ComTransform extends ComBatch {
       let userData = CloneUserData(old.userData as UserData);
       // 线
       if (old.userData.type < GeomType.DRAW_SURFACE_CI) {
-        if (old.userData.type == GeomType.DRAW_CURVE2_PO || old.userData.type == GeomType.DRAW_CURVE2_RC) {
-          // 数组
-          if (old.userData.original instanceof Array) {
-            let array = old.userData.original as Array<any>;
-            let edges: Edge2[] = [];
-            for (let i = 0; i < array.length; i++) {
-              if (array[i] instanceof Edge2) {
-                let edge = (array[i] as Edge2).clone();
-                this.appTransfrom(edge.curve.trans, trans);
-                edges.push(edge);
-              }
+        // 数组
+        if (old.userData.original instanceof Array) {
+          let array = old.userData.original as Array<any>;
+          let edges: Edge2[] = [];
+          for (let i = 0; i < array.length; i++) {
+            if (array[i] instanceof Edge2) {
+              let edge = (array[i] as Edge2).clone();
+              this.appTransfrom(edge.curve.trans, trans);
+              edges.push(edge);
             }
-            userData.original = edges;
-            let geo = BrepMeshBuilder.BuildEdge2sMesh(edges, userData.color);
-            if (userData.assistPoints) {
-              userData.assistPoints.forEach((ap) => {
-                ap.p.applyMatrix3(trans);
-                geo.children.push(this.createAssistPoint(ap));
-              });
-            }
-            geo.userData = userData;
-            this.results.push(geo);
           }
+          userData.original = edges;
+          let geo = BrepMeshBuilder.BuildEdge2sMesh(edges, userData.color);
+          if (userData.assistPoints) {
+            userData.assistPoints.forEach((ap) => {
+              ap.p.applyMatrix3(trans);
+              geo.children.push(this.createAssistPoint(ap));
+            });
+          }
+          geo.userData = userData;
+          this.results.push(geo);
         }
         // 单例
-        else {
+        if (old.userData.original instanceof Edge2) {
           let edge = (old.userData.original as Edge2).clone();
           this.appTransfrom(edge.curve.trans, trans);
           userData.original = edge;
@@ -107,21 +105,48 @@ class ComTransform extends ComBatch {
       }
       // 面
       else if (old.userData.type < GeomType.DRAW_SURFACE_PLA) {
-        let face = (old.userData.original as Face2).clone() as Face2;
-        for (let i = 0; i < face.curves.length; i++) {
-          this.appTransfrom(face.curves[i].trans, trans);
+        // 数组
+        if (old.userData.original instanceof Array) {
+          let array = old.userData.original as Array<any>;
+          let faces: Face2[] = [];
+          for (let i = 0; i < array.length; i++) {
+            if (array[i] instanceof Face2) {
+              let face = (array[i] as Face2).clone();
+              face.curves.forEach((curve) => {
+                this.appTransfrom(curve.trans, trans);
+              });
+              faces.push(face);
+            }
+          }
+          userData.original = faces;
+          let geo = BrepMeshBuilder.BuildFace2sMesh(faces, userData.color);
+          if (userData.assistPoints) {
+            userData.assistPoints.forEach((ap) => {
+              ap.p.applyMatrix3(trans);
+              geo.children.push(this.createAssistPoint(ap));
+            });
+          }
+          geo.userData = userData;
+          this.results.push(geo);
         }
-        userData.original = face;
-        userData.color = THREE.Color.NAMES.blue;
-        let geo = BrepMeshBuilder.BuildFace2Mesh(face, userData.color, undefined, true);
-        if (userData.assistPoints) {
-          userData.assistPoints.forEach((ap) => {
-            ap.p.applyMatrix3(trans);
-            geo.children.push(this.createAssistPoint(ap));
-          });
+        // 单例
+        if (old.userData.original instanceof Face2) {
+          let face = (old.userData.original as Face2).clone() as Face2;
+          for (let i = 0; i < face.curves.length; i++) {
+            this.appTransfrom(face.curves[i].trans, trans);
+          }
+          userData.original = face;
+          userData.color = THREE.Color.NAMES.blue;
+          let geo = BrepMeshBuilder.BuildFace2Mesh(face, userData.color, undefined, true);
+          if (userData.assistPoints) {
+            userData.assistPoints.forEach((ap) => {
+              ap.p.applyMatrix3(trans);
+              geo.children.push(this.createAssistPoint(ap));
+            });
+          }
+          geo.userData = userData;
+          this.results.push(geo);
         }
-        geo.userData = userData;
-        this.results.push(geo);
       }
     }
     this.done();
@@ -145,17 +170,14 @@ class ComTransform extends ComBatch {
         Global.scene.remove(...this.tempResults);
         this.tempResults = [];
       }
-
-
       let endPoint: Vector2 = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
-
       let trans = this.makeTransfrom(this.beginPoint, endPoint);
       for (let i = 0; i < this.olds.length; i++) {
         let old = this.olds[i];
         let userData = CloneUserData(old.userData as UserData);
         // 线
         if (old.userData.type < GeomType.DRAW_SURFACE_CI) {
-          // 创建一个线段
+          // 单例
           if (old.userData.original instanceof Edge2) {
             let edge = (old.userData.original as Edge2).clone();
             this.appTransfrom(edge.curve.trans, trans);
@@ -167,7 +189,7 @@ class ComTransform extends ComBatch {
             });
             this.tempResults.push(t);
           }
-          // 创建多个线段
+          // 数组
           if (old.userData.original instanceof Array) {
             let array = old.userData.original as Array<any>;
             let edges: Edge2[] = [];
@@ -189,19 +211,44 @@ class ComTransform extends ComBatch {
           }
         }
         // 面
-        else if (old.userData.type < GeomType.DRAW_SURFACE_PLA) {
-          let face = (old.userData.original as Face2).clone() as Face2;
-          for (let i = 0; i < face.curves.length; i++) {
-            this.appTransfrom(face.curves[i].trans, trans);
-          }
+        if (old.userData.type < GeomType.DRAW_SURFACE_PLA) {
+          // 单例
+          if (old.userData.original instanceof Face2) {
+            let face = (old.userData.original as Face2).clone() as Face2;
+            for (let i = 0; i < face.curves.length; i++) {
+              this.appTransfrom(face.curves[i].trans, trans);
+            }
 
-          let t = BrepMeshBuilder.BuildFace2Mesh(face, THREE.Color.NAMES.gray, undefined, false);
-          t.name = "temp";
-          userData.assistPoints.forEach((ap) => {
-            ap.p.applyMatrix3(trans);
-            t.children.push(this.createAssistPoint(ap));
-          });
-          this.tempResults.push(t);
+            let t = BrepMeshBuilder.BuildFace2Mesh(face, THREE.Color.NAMES.gray, undefined, false);
+            t.name = "temp";
+            userData.assistPoints.forEach((ap) => {
+              ap.p.applyMatrix3(trans);
+              t.children.push(this.createAssistPoint(ap));
+            });
+            this.tempResults.push(t);
+          }
+          // 数组
+          if (old.userData.original instanceof Array) {
+            let array = old.userData.original as Array<any>;
+            let faces: Face2[] = [];
+            for (let i = 0; i < array.length; i++) {
+              if (array[i] instanceof Face2) {
+                let face = (array[i] as Face2).clone();
+                face.curves.forEach((curve) => {
+                  this.appTransfrom(curve.trans, trans);
+                });
+                faces.push(face);
+              }
+            }
+            let t = BrepMeshBuilder.BuildFace2sMesh(faces, THREE.Color.NAMES.gray, undefined, false);
+            t.userData.type = old.userData.type;
+            t.name = "temp";
+            userData.assistPoints.forEach((ap) => {
+              ap.p.applyMatrix3(trans);
+              t.children.push(this.createAssistPoint(ap));
+            });
+            this.tempResults.push(t);
+          }
         }
       }
 

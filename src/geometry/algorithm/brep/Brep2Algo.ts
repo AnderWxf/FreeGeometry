@@ -492,8 +492,8 @@ class Loop2Algo {
       let currAlgo = algos[i];
       let curve = currAlgo.curve.dat;
       let inters = Curve2Inter.X(ray, curve, tol0, tol1);
-      let precAlgo = algos[(i - 1) % count];
-      let nextAlgo = algos[(i + 1) % count];
+      let precAlgo = algos[(i + count - 1) % count];
+      let nextAlgo = algos[(i + count + 1) % count];
       for (let j = 0; j < inters.length; j++) {
         let inter = inters[j];
         // 射线反向的直接跳过
@@ -608,19 +608,20 @@ class Face2Algo {
   getInnerPoint(): Vector2 {
     while (true) {
       let randomInsidePoint = this._balgo.getRandomInsidePoint();
-      if (this._halgos.length > 0) {
-        let isPointInsideHole = false;
-        for (let i = 0.; i < this._halgos.length; i++) {
-          let halgo = this._halgos[i];
-          if (!halgo.isPointOnBoder(randomInsidePoint, 1e-4, 1e-10)
-            && halgo.isPointAtInner(randomInsidePoint, 1e-4, 1e-10)) {
-            isPointInsideHole = true;
-            break;
-          }
+      if (this._halgos.length == 0) {
+        return randomInsidePoint;
+      }
+      let isPointInsideHole = false;
+      for (let i = 0.; i < this._halgos.length; i++) {
+        let halgo = this._halgos[i];
+        if (!halgo.isPointOnBoder(randomInsidePoint, 1e-4, 1e-10)
+          && halgo.isPointAtInner(randomInsidePoint, 1e-4, 1e-10)) {
+          isPointInsideHole = true;
+          break;
         }
-        if (!isPointInsideHole) {
-          return randomInsidePoint;
-        }
+      }
+      if (!isPointInsideHole) {
+        return randomInsidePoint;
       }
     }
   }

@@ -58,16 +58,20 @@ class Bool2 {
     let result: Face2[] = [];
     for (let i = 0; i < a.length; i++) {
       let fa = a[i];
-      let ret: Face2[] = [];
-      for (let j = 0; j < b.length; j++) {
-        let fb = b[j];
-        if (j == 0) {
-          ret = Bool2.Difference(fa, fb, tol0, tol1);
-        } else {
-          ret = Bool2.Differences(ret, [fb], tol0, tol1);
+      if (i == 0) {
+        let ret: Face2[] = [];
+        for (let j = 0; j < b.length; j++) {
+          let fb = b[j];
+          if (j == 0) {
+            ret = Bool2.Union(fa, fb, tol0, tol1);
+          } else {
+            ret = Bool2.Unions(ret, [fb], tol0, tol1);
+          }
         }
+        result.push(...ret);
+      } else {
+        result = Bool2.Unions(result, [fa], tol0, tol1);
       }
-      result.push(...ret);
     }
     return result;
   }
@@ -369,7 +373,7 @@ class Bool2 {
       // 内部的逆向空腔
       if (outside) {
         count = alloops.length;
-        for (let i = 0; i < count; i++) {
+        for (let i = count - 1; i > -1; i--) {
           let inside = alloops[i];
           let inp = inside.getRandomBorderPoint();
           if (outside.isPointAtInner(inp, tol0, tol1)) {
