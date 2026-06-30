@@ -23,34 +23,34 @@ import type { SurfaceAlgo } from "../base/SurfaceAlgo";
  */
 class SurfaceBulder {
 
-    static BuildSurfaceAlgorithmByData(dat: SurfaceData): SurfaceAlgo {
-        if (dat instanceof ConicalSurfaceData) {
-            return new ConicalSurfaceAlgo(dat);
-        }
-        else if (dat instanceof CylinderSurfaceData) {
-            return new CylinderSurfaceAlgo(dat);
-        }
-        else if (dat instanceof EllipsoidSurfaceData) {
-            return new EllipsoidSurfaceAlgo(dat);
-        }
-        else if (dat instanceof LoftingSurfaceData) {
-            return new LoftingSurfaceAlgo(dat);
-        }
-        else if (dat instanceof NurbsSurfaceData) {
-            return new NurbsSurfaceAlgo(dat);
-        }
-        else if (dat instanceof PlaneSurfaceData) {
-            return new PlaneSurfaceAlgo(dat);
-        }
-        else if (dat instanceof SphereSurfaceData) {
-            return new SphereSurfaceAlgo(dat);
-        }
-        else if (dat instanceof SweepSurfaceData) {
-            return new SweepSurfaceAlgo(dat);
-        }
-        debugger;
-        return null;
+  static AlgorithmByData(dat: SurfaceData): SurfaceAlgo {
+    if (dat instanceof ConicalSurfaceData) {
+      return new ConicalSurfaceAlgo(dat);
     }
+    else if (dat instanceof CylinderSurfaceData) {
+      return new CylinderSurfaceAlgo(dat);
+    }
+    else if (dat instanceof EllipsoidSurfaceData) {
+      return new EllipsoidSurfaceAlgo(dat);
+    }
+    else if (dat instanceof LoftingSurfaceData) {
+      return new LoftingSurfaceAlgo(dat);
+    }
+    else if (dat instanceof NurbsSurfaceData) {
+      return new NurbsSurfaceAlgo(dat);
+    }
+    else if (dat instanceof PlaneSurfaceData) {
+      return new PlaneSurfaceAlgo(dat);
+    }
+    else if (dat instanceof SphereSurfaceData) {
+      return new SphereSurfaceAlgo(dat);
+    }
+    else if (dat instanceof SweepSurfaceData) {
+      return new SweepSurfaceAlgo(dat);
+    }
+    debugger;
+    return null;
+  }
 }
 
 export { SurfaceBulder };
