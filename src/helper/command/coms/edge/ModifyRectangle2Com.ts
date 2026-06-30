@@ -103,6 +103,9 @@ class ModifyRectangle2Com extends ComModify {
     let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(points[points.length - 1], points[0]);
     edges.push(edge);
 
+    beginPoint.applyMatrix3(m);
+    endPoint.applyMatrix3(m);
+
     let geo = BrepMeshBuilder.BuildEdge2sMesh(edges, THREE.Color.NAMES.red);
     userData.original = edges;
     geo.userData = userData;
@@ -152,6 +155,9 @@ class ModifyRectangle2Com extends ComModify {
       }
       let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(points[points.length - 1], points[0]);
       edges.push(edge);
+
+      beginPoint.applyMatrix3(m);
+      endPoint.applyMatrix3(m);
 
       let t = BrepMeshBuilder.BuildEdge2sMesh(edges, THREE.Color.NAMES.gray, undefined, 0);
       t.name = "temp";

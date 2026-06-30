@@ -211,14 +211,15 @@ class ComTransform extends ComBatch {
           }
         }
         // 面
-        if (old.userData.type < GeomType.DRAW_SURFACE_PLA) {
+        if (old.userData.type >= GeomType.DRAW_SURFACE_CI
+          && old.userData.type < GeomType.DRAW_SURFACE_PLA
+        ) {
           // 单例
           if (old.userData.original instanceof Face2) {
             let face = (old.userData.original as Face2).clone() as Face2;
             for (let i = 0; i < face.curves.length; i++) {
               this.appTransfrom(face.curves[i].trans, trans);
             }
-
             let t = BrepMeshBuilder.BuildFace2Mesh(face, THREE.Color.NAMES.gray, undefined, false);
             t.name = "temp";
             userData.assistPoints.forEach((ap) => {

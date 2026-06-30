@@ -74,7 +74,7 @@ class ModifyRectangleAreaCom extends ModifyFaceCom {
 
       this._text = paras[0] + ' ' + beginPoint.x + ' ' + beginPoint.y + ' ' + endPoint.x + ' ' + endPoint.y;
     }
-    let m = this.old.userData.original[0].curve.trans.makeLocalMatrix();
+    let m = this.old.userData.original.curves[0].trans.makeLocalMatrix();
     let invert = m.clone().invert();
     beginPoint.applyMatrix3(invert);
     endPoint.applyMatrix3(invert);
@@ -102,6 +102,9 @@ class ModifyRectangleAreaCom extends ModifyFaceCom {
     let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(points[points.length - 1], points[0]);
     edges.push(edge);
 
+    beginPoint.applyMatrix3(m);
+    endPoint.applyMatrix3(m);
+
     // 创建一个面
     let face = this.createFace(edges);
     userData.color = THREE.Color.NAMES.blue;
@@ -128,7 +131,7 @@ class ModifyRectangleAreaCom extends ModifyFaceCom {
         ? userData.assistPoints[this.assistIndex].p.set(Global.select.overedPoint.x, Global.select.overedPoint.y)
         : userData.assistPoints[this.assistIndex].p.set(0, 0);
 
-      let m = this.old.userData.original[0].curve.trans.makeLocalMatrix();
+      let m = this.old.userData.original.curves[0].trans.makeLocalMatrix();
       let invert = m.clone().invert();
       beginPoint.applyMatrix3(invert);
       endPoint.applyMatrix3(invert);
@@ -155,6 +158,9 @@ class ModifyRectangleAreaCom extends ModifyFaceCom {
       }
       let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(points[points.length - 1], points[0]);
       edges.push(edge);
+
+      beginPoint.applyMatrix3(m);
+      endPoint.applyMatrix3(m);
 
       let t = BrepMeshBuilder.BuildEdge2sMesh(edges, THREE.Color.NAMES.gray, undefined, 0);
       t.name = "temp";

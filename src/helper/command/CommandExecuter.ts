@@ -64,6 +64,7 @@ import { CreateEllipseAreaCom } from "./coms/face/CreateEllipseAreaCom";
 import { Bool2MulUnionCom } from "./coms/bool/Bool2MulUnionCom";
 import { Bool2MulDifferenceCom } from "./coms/bool/Bool2MulDifferenceCom";
 import { Bool2MulIntersectionCom } from "./coms/bool/Bool2MulIntersectionCom";
+import { ModifyCircleAreaCom } from "./coms/face/ModifyCircleAreaCom";
 
 /**
  * Command executer base class.
@@ -117,7 +118,7 @@ class CommandExecuter {
     this._commands.set(CommandType.MODIFY_RECTANGLE, ModifyRectangle2Com);
 
 
-    this._commands.set(CommandType.MODIFY_CIRCLE_SURFACE, ModifyCircle2Com);
+    this._commands.set(CommandType.MODIFY_CIRCLE_SURFACE, ModifyCircleAreaCom);
     this._commands.set(CommandType.MODIFY_ELLIPSE_SURFACE, ModifyEllipseAreaCom);
     this._commands.set(CommandType.MODIFY_POLYGON_SURFACE, ModifyPolylineAreaCom);
     this._commands.set(CommandType.MODIFY_RECTANGLE_SURFACE, ModifyRectangleAreaCom);

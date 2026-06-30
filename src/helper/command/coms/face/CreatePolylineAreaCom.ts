@@ -89,19 +89,28 @@ class CreatePolylineAreaCom extends CreateFaceCom {
         Global.scene.remove(this.tempResult);
       }
       this.tempResult = new THREE.Object3D();
-      // 创建一个临时多段线
+      // 创建一个闭合多段线
+      let edges: Edge2[] = [];
       for (let i = 1; i < this.points.length; i++) {
         let beginPoint = this.points[i - 1];
         let endPoint = this.points[i];
         let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(beginPoint, endPoint);
-        let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0);
-        this.tempResult.children.push(geo);
+        edges.push(edge);
       }
+
+      // 创建一个临时直线段
       let beginPoint = this.points[this.points.length - 1];
       let endPoint: Vector2 = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
-      // 创建一个临时直线段
       let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(beginPoint, endPoint);
-      let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0);
+      edges.push(edge);
+
+      // 封闭
+      beginPoint = endPoint;
+      endPoint = this.points[0];
+      edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(endPoint, endPoint);
+      edges.push(edge);
+
+      let geo = BrepMeshBuilder.BuildEdge2sMesh(edges, THREE.Color.NAMES.gray, undefined, 0);
       this.tempResult.children.push(geo);
       Global.scene.add(this.tempResult);
     }

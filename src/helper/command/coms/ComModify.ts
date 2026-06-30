@@ -39,8 +39,10 @@ class ComModify extends Command {
   }
 
   protected getIndex(pick: THREE.Object3D): number {
-    for (let i = 0; i < this.old.children.length; i++) {
-      if (pick.position.equals(this.old.children[i].position)) {
+    let userData = this.old.userData as UserData;
+    for (let i = 0; i < userData.assistPoints.length; i++) {
+      if (pick.position.x == userData.assistPoints[i].p.x
+        && pick.position.y == userData.assistPoints[i].p.y) {
         return i;
       }
     }

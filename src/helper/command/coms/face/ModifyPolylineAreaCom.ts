@@ -116,7 +116,7 @@ class ModifyPolylineAreaCom extends ModifyFaceCom {
       for (let i = 0; i < userData.assistPoints.length; i++) {
         points.push(userData.assistPoints[i].p as Vector2);
       }
-      // 创建一个临时多段线
+      // 创建一个闭合多段线
       let edges: Edge2[] = [];
       for (let i = 1; i < points.length; i++) {
         let beginPoint = points[i - 1];
@@ -124,6 +124,11 @@ class ModifyPolylineAreaCom extends ModifyFaceCom {
         let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(beginPoint, endPoint);
         edges.push(edge);
       }
+      let beginPoint = points[points.length - 1];
+      let endPoint = points[0];
+      let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(beginPoint, endPoint);
+      edges.push(edge);
+
       let t = BrepMeshBuilder.BuildEdge2sMesh(edges, THREE.Color.NAMES.gray, undefined, 0);
       t.name = "temp";
       this.tempResult = t;
