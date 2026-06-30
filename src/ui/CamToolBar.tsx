@@ -299,88 +299,88 @@ const MenuItems = [
       },
     ],
   },
-  {
-    key: 'editer',
-    icon: <EditTwoTone />,
-    label: '编辑',
-    children: [
-      //基本修改命令
-      {
-        key: 'curve',
-        icon: <LineChartOutlined />,
-        label: '曲线',
-        children: [
-          //二维曲线类型
-          { key: CommandType.MODIFY_LINE, label: '两点直线段' + ' ' + CommandType.MODIFY_LINE },
-          { key: CommandType.MODIFY_ARC, label: '圆弧' + ' ' + CommandType.MODIFY_ARC },
-          { key: CommandType.MODIFY_ARC_THREE_POINT, label: '三点圆弧' + ' ' + CommandType.MODIFY_ARC_THREE_POINT },
-          { key: CommandType.MODIFY_CIRCLE, label: '圆' + ' ' + CommandType.MODIFY_CIRCLE },
-          { key: CommandType.MODIFY_CIRCLE_THREE_POINT, label: '三点圆' + ' ' + CommandType.MODIFY_CIRCLE_THREE_POINT },
-          { key: CommandType.MODIFY_ELLIPSE, label: '椭圆' + ' ' + CommandType.MODIFY_ELLIPSE },
-          { key: CommandType.MODIFY_ELLIPSE_ARC, label: '椭圆弧' + ' ' + CommandType.MODIFY_ELLIPSE_ARC },
-          { key: CommandType.MODIFY_HYPERBOLA, label: '双曲线' + ' ' + CommandType.MODIFY_HYPERBOLA },
-          { key: CommandType.MODIFY_PARABOLA, label: '抛物线' + ' ' + CommandType.MODIFY_PARABOLA },
-          { key: CommandType.MODIFY_POLYLINE, label: '多段线' + ' ' + CommandType.MODIFY_POLYLINE },
-          { key: CommandType.MODIFY_NURBS_FITTING, label: 'Nurbs' + ' ' + CommandType.MODIFY_NURBS_FITTING },
-          { key: CommandType.MODIFY_NURBS_CONTROL, label: 'Nurbs' + ' ' + CommandType.MODIFY_NURBS_CONTROL },
-          { key: CommandType.MODIFY_RECTANGLE, label: '矩形' + ' ' + CommandType.MODIFY_RECTANGLE },
-        ]
-      },
-      {
-        key: 'plane',
-        icon: <AreaChartOutlined />,
-        label: '平面域',
-        children: [
-          //二维平面类型
-          { key: CommandType.MODIFY_CIRCLE_SURFACE, label: '圆面' + ' ' + CommandType.MODIFY_CIRCLE_SURFACE },
-          { key: CommandType.MODIFY_ELLIPSE_SURFACE, label: '椭圆面' + ' ' + CommandType.MODIFY_ELLIPSE_SURFACE },
-          { key: CommandType.MODIFY_POLYGON_SURFACE, label: '多边形面' + ' ' + CommandType.MODIFY_POLYGON_SURFACE },
-          { key: CommandType.MODIFY_RECTANGLE_SURFACE, label: '矩形面' + ' ' + CommandType.MODIFY_RECTANGLE_SURFACE },
-          { key: CommandType.MODIFY_SECTION_SURFACE, label: '剖面' + ' ' + CommandType.MODIFY_SECTION_SURFACE },
-        ]
-      },
-      {
-        key: 'surface3',
-        icon: <GlobalOutlined />,
-        label: '曲面域',
-        children: [
-          //三维曲面类型
-          { key: CommandType.MODIFY_SPHERE_SURFACE, label: '球面' + ' ' + CommandType.MODIFY_SPHERE_SURFACE },
-          { key: CommandType.MODIFY_ELLIPSOID_SURFACE, label: '椭球面' + ' ' + CommandType.MODIFY_ELLIPSOID_SURFACE },
-          { key: CommandType.MODIFY_CYLINDER_SURFACE, label: '圆柱面' + ' ' + CommandType.MODIFY_CYLINDER_SURFACE },
-          { key: CommandType.MODIFY_CONE_SURFACE, label: '圆锥面' + ' ' + CommandType.MODIFY_CONE_SURFACE },
-          { key: CommandType.MODIFY_PLANE_SURFACE, label: '空间平面' + ' ' + CommandType.MODIFY_PLANE_SURFACE },
-          { key: CommandType.MODIFY_NURBS_SURFACE, label: 'Nurbs面' + ' ' + CommandType.MODIFY_NURBS_SURFACE },
-          { key: CommandType.MODIFY_STRETCH_SURFACE, label: '拉伸面' + ' ' + CommandType.MODIFY_STRETCH_SURFACE },
-          { key: CommandType.MODIFY_ROTATE_SURFACE, label: '旋转面' + ' ' + CommandType.MODIFY_ROTATE_SURFACE },
-          { key: CommandType.MODIFY_SWEEP_SURFACE, label: '扫掠面' + ' ' + CommandType.MODIFY_SWEEP_SURFACE },
-          { key: CommandType.MODIFY_LOFT_SURFACE, label: '放样曲面' + ' ' + CommandType.MODIFY_LOFT_SURFACE },
-        ]
-      },
-      {
-        key: 'solid',
-        icon: <RubyOutlined />,
-        label: '实体',
-        children: [
-          //三维实体类型
-          { key: CommandType.MODIFY_HEXAHEDRON, label: '六面体' + ' ' + CommandType.MODIFY_HEXAHEDRON },
-          { key: CommandType.MODIFY_TETRAHEDRON, label: '四面体' + ' ' + CommandType.MODIFY_TETRAHEDRON },
-          { key: CommandType.MODIFY_PRISM, label: '棱柱体' + ' ' + CommandType.MODIFY_PRISM },
-          { key: CommandType.MODIFY_PYRAMID, label: '金字塔体' + ' ' + CommandType.MODIFY_PYRAMID },
-          { key: CommandType.MODIFY_CYLINDER, label: '圆柱体' + ' ' + CommandType.MODIFY_CYLINDER },
-          { key: CommandType.MODIFY_CONE, label: '圆锥体' + ' ' + CommandType.MODIFY_CONE },
-          { key: CommandType.MODIFY_TORUS, label: '圆环' + ' ' + CommandType.MODIFY_TORUS },
-          { key: CommandType.MODIFY_ELLIPTICAL_CYLINDER, label: '椭圆柱' + ' ' + CommandType.MODIFY_ELLIPTICAL_CYLINDER },
-          { key: CommandType.MODIFY_ELLIPTICAL_CONE, label: '椭圆锥' + ' ' + CommandType.MODIFY_ELLIPTICAL_CONE },
-          { key: CommandType.MODIFY_ELLIPTICAL_TORUS, label: '椭圆环' + ' ' + CommandType.MODIFY_ELLIPTICAL_TORUS },
-          { key: CommandType.MODIFY_STRETCH_BODY, label: '拉伸体' + ' ' + CommandType.MODIFY_STRETCH_BODY },
-          { key: CommandType.MODIFY_ROTATE_BODY, label: '旋转体' + ' ' + CommandType.MODIFY_ROTATE_BODY },
-          { key: CommandType.MODIFY_SWEEP_BODY, label: '扫掠体' + ' ' + CommandType.MODIFY_SWEEP_BODY },
-          { key: CommandType.MODIFY_LOFT_BODY, label: '放样体' + ' ' + CommandType.MODIFY_LOFT_BODY },
-        ]
-      },
-    ]
-  },
+  // {
+  //   key: 'editer',
+  //   icon: <EditTwoTone />,
+  //   label: '编辑',
+  //   children: [
+  //     //基本修改命令
+  //     {
+  //       key: 'curve',
+  //       icon: <LineChartOutlined />,
+  //       label: '曲线',
+  //       children: [
+  //         //二维曲线类型
+  //         { key: CommandType.MODIFY_LINE, label: '两点直线段' + ' ' + CommandType.MODIFY_LINE },
+  //         { key: CommandType.MODIFY_ARC, label: '圆弧' + ' ' + CommandType.MODIFY_ARC },
+  //         { key: CommandType.MODIFY_ARC_THREE_POINT, label: '三点圆弧' + ' ' + CommandType.MODIFY_ARC_THREE_POINT },
+  //         { key: CommandType.MODIFY_CIRCLE, label: '圆' + ' ' + CommandType.MODIFY_CIRCLE },
+  //         { key: CommandType.MODIFY_CIRCLE_THREE_POINT, label: '三点圆' + ' ' + CommandType.MODIFY_CIRCLE_THREE_POINT },
+  //         { key: CommandType.MODIFY_ELLIPSE, label: '椭圆' + ' ' + CommandType.MODIFY_ELLIPSE },
+  //         { key: CommandType.MODIFY_ELLIPSE_ARC, label: '椭圆弧' + ' ' + CommandType.MODIFY_ELLIPSE_ARC },
+  //         { key: CommandType.MODIFY_HYPERBOLA, label: '双曲线' + ' ' + CommandType.MODIFY_HYPERBOLA },
+  //         { key: CommandType.MODIFY_PARABOLA, label: '抛物线' + ' ' + CommandType.MODIFY_PARABOLA },
+  //         { key: CommandType.MODIFY_POLYLINE, label: '多段线' + ' ' + CommandType.MODIFY_POLYLINE },
+  //         { key: CommandType.MODIFY_NURBS_FITTING, label: 'Nurbs' + ' ' + CommandType.MODIFY_NURBS_FITTING },
+  //         { key: CommandType.MODIFY_NURBS_CONTROL, label: 'Nurbs' + ' ' + CommandType.MODIFY_NURBS_CONTROL },
+  //         { key: CommandType.MODIFY_RECTANGLE, label: '矩形' + ' ' + CommandType.MODIFY_RECTANGLE },
+  //       ]
+  //     },
+  //     {
+  //       key: 'plane',
+  //       icon: <AreaChartOutlined />,
+  //       label: '平面域',
+  //       children: [
+  //         //二维平面类型
+  //         { key: CommandType.MODIFY_CIRCLE_SURFACE, label: '圆面' + ' ' + CommandType.MODIFY_CIRCLE_SURFACE },
+  //         { key: CommandType.MODIFY_ELLIPSE_SURFACE, label: '椭圆面' + ' ' + CommandType.MODIFY_ELLIPSE_SURFACE },
+  //         { key: CommandType.MODIFY_POLYGON_SURFACE, label: '多边形面' + ' ' + CommandType.MODIFY_POLYGON_SURFACE },
+  //         { key: CommandType.MODIFY_RECTANGLE_SURFACE, label: '矩形面' + ' ' + CommandType.MODIFY_RECTANGLE_SURFACE },
+  //         { key: CommandType.MODIFY_SECTION_SURFACE, label: '剖面' + ' ' + CommandType.MODIFY_SECTION_SURFACE },
+  //       ]
+  //     },
+  //     {
+  //       key: 'surface3',
+  //       icon: <GlobalOutlined />,
+  //       label: '曲面域',
+  //       children: [
+  //         //三维曲面类型
+  //         { key: CommandType.MODIFY_SPHERE_SURFACE, label: '球面' + ' ' + CommandType.MODIFY_SPHERE_SURFACE },
+  //         { key: CommandType.MODIFY_ELLIPSOID_SURFACE, label: '椭球面' + ' ' + CommandType.MODIFY_ELLIPSOID_SURFACE },
+  //         { key: CommandType.MODIFY_CYLINDER_SURFACE, label: '圆柱面' + ' ' + CommandType.MODIFY_CYLINDER_SURFACE },
+  //         { key: CommandType.MODIFY_CONE_SURFACE, label: '圆锥面' + ' ' + CommandType.MODIFY_CONE_SURFACE },
+  //         { key: CommandType.MODIFY_PLANE_SURFACE, label: '空间平面' + ' ' + CommandType.MODIFY_PLANE_SURFACE },
+  //         { key: CommandType.MODIFY_NURBS_SURFACE, label: 'Nurbs面' + ' ' + CommandType.MODIFY_NURBS_SURFACE },
+  //         { key: CommandType.MODIFY_STRETCH_SURFACE, label: '拉伸面' + ' ' + CommandType.MODIFY_STRETCH_SURFACE },
+  //         { key: CommandType.MODIFY_ROTATE_SURFACE, label: '旋转面' + ' ' + CommandType.MODIFY_ROTATE_SURFACE },
+  //         { key: CommandType.MODIFY_SWEEP_SURFACE, label: '扫掠面' + ' ' + CommandType.MODIFY_SWEEP_SURFACE },
+  //         { key: CommandType.MODIFY_LOFT_SURFACE, label: '放样曲面' + ' ' + CommandType.MODIFY_LOFT_SURFACE },
+  //       ]
+  //     },
+  //     {
+  //       key: 'solid',
+  //       icon: <RubyOutlined />,
+  //       label: '实体',
+  //       children: [
+  //         //三维实体类型
+  //         { key: CommandType.MODIFY_HEXAHEDRON, label: '六面体' + ' ' + CommandType.MODIFY_HEXAHEDRON },
+  //         { key: CommandType.MODIFY_TETRAHEDRON, label: '四面体' + ' ' + CommandType.MODIFY_TETRAHEDRON },
+  //         { key: CommandType.MODIFY_PRISM, label: '棱柱体' + ' ' + CommandType.MODIFY_PRISM },
+  //         { key: CommandType.MODIFY_PYRAMID, label: '金字塔体' + ' ' + CommandType.MODIFY_PYRAMID },
+  //         { key: CommandType.MODIFY_CYLINDER, label: '圆柱体' + ' ' + CommandType.MODIFY_CYLINDER },
+  //         { key: CommandType.MODIFY_CONE, label: '圆锥体' + ' ' + CommandType.MODIFY_CONE },
+  //         { key: CommandType.MODIFY_TORUS, label: '圆环' + ' ' + CommandType.MODIFY_TORUS },
+  //         { key: CommandType.MODIFY_ELLIPTICAL_CYLINDER, label: '椭圆柱' + ' ' + CommandType.MODIFY_ELLIPTICAL_CYLINDER },
+  //         { key: CommandType.MODIFY_ELLIPTICAL_CONE, label: '椭圆锥' + ' ' + CommandType.MODIFY_ELLIPTICAL_CONE },
+  //         { key: CommandType.MODIFY_ELLIPTICAL_TORUS, label: '椭圆环' + ' ' + CommandType.MODIFY_ELLIPTICAL_TORUS },
+  //         { key: CommandType.MODIFY_STRETCH_BODY, label: '拉伸体' + ' ' + CommandType.MODIFY_STRETCH_BODY },
+  //         { key: CommandType.MODIFY_ROTATE_BODY, label: '旋转体' + ' ' + CommandType.MODIFY_ROTATE_BODY },
+  //         { key: CommandType.MODIFY_SWEEP_BODY, label: '扫掠体' + ' ' + CommandType.MODIFY_SWEEP_BODY },
+  //         { key: CommandType.MODIFY_LOFT_BODY, label: '放样体' + ' ' + CommandType.MODIFY_LOFT_BODY },
+  //       ]
+  //     },
+  //   ]
+  // },
   {
     key: 'option',
     icon: <AppstoreFilled />,
@@ -396,6 +396,26 @@ const MenuItems = [
       { key: CommandType.OTHER_OFFSET, label: '偏移' + ' ' + CommandType.OTHER_OFFSET },
       { key: CommandType.OTHER_MIRROR, label: '镜像' + ' ' + CommandType.OTHER_MIRROR },
       { key: CommandType.OTHER_GROUP_OR_UNGROUP, label: '组合/取消组合' + ' ' + CommandType.OTHER_GROUP_OR_UNGROUP },
+    ]
+  },
+  {
+    key: 'bool',
+    icon: <BlockOutlined />,
+    label: '布尔',
+    children: [
+      //布尔运算
+      { key: CommandType.BOOL_2_INTERSECTION, label: '2D布尔交(单)' + ' ' + CommandType.BOOL_2_INTERSECTION },
+      { key: CommandType.BOOL_2_UNION, label: '2D布尔并(单)' + ' ' + CommandType.BOOL_2_UNION },
+      { key: CommandType.BOOL_2_DIFFERENCE, label: '2D布尔差(单)' + ' ' + CommandType.BOOL_2_DIFFERENCE },
+      { key: CommandType.BOOL_2_INTERSECTION_MULTIPLE, label: '2D布尔交(多)' + ' ' + CommandType.BOOL_2_INTERSECTION_MULTIPLE },
+      { key: CommandType.BOOL_2_UNION_MULTIPLE, label: '2D布尔并(多)' + ' ' + CommandType.BOOL_2_UNION_MULTIPLE },
+      { key: CommandType.BOOL_2_DIFFERENCE_MULTIPLE, label: '2D布尔差(多)' + ' ' + CommandType.BOOL_2_DIFFERENCE_MULTIPLE },
+      { key: CommandType.BOOL_3_INTERSECTION, label: '3D布尔交(单)' + ' ' + CommandType.BOOL_3_INTERSECTION },
+      { key: CommandType.BOOL_3_UNION, label: '3D布尔并(单)' + ' ' + CommandType.BOOL_3_UNION },
+      { key: CommandType.BOOL_3_DIFFERENCE, label: '3D布尔差(单)' + ' ' + CommandType.BOOL_3_DIFFERENCE },
+      { key: CommandType.BOOL_3_INTERSECTION_MULTIPLE, label: '3D布尔交(多)' + ' ' + CommandType.BOOL_3_INTERSECTION_MULTIPLE },
+      { key: CommandType.BOOL_3_UNION_MULTIPLE, label: '3D布尔并(多)' + ' ' + CommandType.BOOL_3_UNION_MULTIPLE },
+      { key: CommandType.BOOL_3_DIFFERENCE_MULTIPLE, label: '3D布尔差(多)' + ' ' + CommandType.BOOL_3_DIFFERENCE_MULTIPLE },
     ]
   },
   {
@@ -415,26 +435,7 @@ const MenuItems = [
       { key: CommandType.OPERATION_EDGE_CUTTING, label: '边切分' + ' ' + CommandType.OPERATION_EDGE_CUTTING },
     ]
   },
-  {
-    key: 'bool',
-    icon: <BlockOutlined />,
-    label: '布尔',
-    children: [
-      //布尔运算
-      { key: CommandType.BOOL_2_INTERSECTION, label: '2D布尔交(单)' + ' ' + CommandType.BOOL_2_INTERSECTION },
-      { key: CommandType.BOOL_2_UNION, label: '2D布尔并(单)' + ' ' + CommandType.BOOL_2_UNION },
-      { key: CommandType.BOOL_2_DIFFERENCE, label: '2D布尔差(单)' + ' ' + CommandType.BOOL_2_DIFFERENCE },
-      { key: CommandType.BOOL_3_INTERSECTION, label: '3D布尔交(单)' + ' ' + CommandType.BOOL_3_INTERSECTION },
-      { key: CommandType.BOOL_3_UNION, label: '3D布尔并(单)' + ' ' + CommandType.BOOL_3_UNION },
-      { key: CommandType.BOOL_3_DIFFERENCE, label: '3D布尔差(单)' + ' ' + CommandType.BOOL_3_DIFFERENCE },
-      { key: CommandType.BOOL_2_INTERSECTION_MULTIPLE, label: '2D布尔交(多)' + ' ' + CommandType.BOOL_2_INTERSECTION_MULTIPLE },
-      { key: CommandType.BOOL_2_UNION_MULTIPLE, label: '2D布尔并(多)' + ' ' + CommandType.BOOL_2_UNION_MULTIPLE },
-      { key: CommandType.BOOL_2_DIFFERENCE_MULTIPLE, label: '2D布尔差(多)' + ' ' + CommandType.BOOL_2_DIFFERENCE_MULTIPLE },
-      { key: CommandType.BOOL_3_INTERSECTION_MULTIPLE, label: '3D布尔交(多)' + ' ' + CommandType.BOOL_3_INTERSECTION_MULTIPLE },
-      { key: CommandType.BOOL_3_UNION_MULTIPLE, label: '3D布尔并(多)' + ' ' + CommandType.BOOL_3_UNION_MULTIPLE },
-      { key: CommandType.BOOL_3_DIFFERENCE_MULTIPLE, label: '3D布尔差(多)' + ' ' + CommandType.BOOL_3_DIFFERENCE_MULTIPLE },
-    ]
-  },
+
 ];
 const MenuBarOnChange = (info: MenuInfo): void => {
   Global.gpu.focus();

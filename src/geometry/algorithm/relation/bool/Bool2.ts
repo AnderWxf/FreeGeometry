@@ -1,6 +1,6 @@
 
 import { Digraph2, Face2, Loop2 } from "../../../data/brep/Brep2";
-import { Coedge2Algo, Digraph2Algo, Face2Algo, Loop2Algo } from "../../brep/Brep2Algo";
+import { Coedge2Algo, Digraph2Algo, Face2Algo, Face2Algos, Loop2Algo } from "../../brep/Brep2Algo";
 import { Brep2Inter, type InterOfFace2 } from "../intersection/Brep2Inter";
 
 class Bool2 {
@@ -10,26 +10,53 @@ class Bool2 {
   * a,b都是单面片组,组内不相交，返回单面片组。
   */
   static Differences(a: Face2[], b: Face2[], tol0: number, tol1: number): Face2[] {
-    let result: Face2[] = [];
+    let algorigin = new Face2Algos(a);
+    let blgorigin = new Face2Algos(b);
     for (let i = 0; i < a.length; i++) {
-      let fa = a[i];
-      let ret: Face2[] = [];
-      for (let j = 0; j < b.length; j++) {
-        let fb = b[j];
-        if (j == 0) {
-          ret = Bool2.Difference(fa, fb, tol0, tol1);
-          if (ret.length == 0) {
-            break;
-          }
-        } else {
-          ret = Bool2.Differences(ret, [fb], tol0, tol1);
-          if (ret.length == 0) {
-            break;
-          }
+      a[i] = a[i].clone();
+    }
+    for (let i = 0; i < b.length; i++) {
+      b[i] = b[i].clone();
+    }
+    // 计算面与面的轮廓交点
+    let algo = new Face2Algos(a);
+    let blgo = new Face2Algos(b);
+    // 被减的一方轮廓需要翻转
+    blgo.loops.forEach((loop) => {
+      loop.reverse();
+    });
+    let inters = Brep2Inter.FaceXFace(algo, blgo, tol0, tol1);
+    if (inters.length) {
+      // 根据轮廓交点对面轮廓进行切割
+      Bool2.Cutting(algo.loops, blgo.loops, inters, tol0, tol1);
+    }
+
+    // 删除a中在b的原始形状内部的边。
+    algo.loops.forEach((loop) => {
+      let count = loop.coedges.length;
+      for (let i = count - 1; i > -1; i--) {
+        let coedge = loop.coedges[i];
+        let u = coedge.u;
+        let mp = coedge.p((u.x + u.y) * 0.5);
+        if (blgorigin.isPointAtInner(mp, tol0, tol1)) {
+          loop.coedges.splice(i, 1);
         }
       }
-      result.push(...ret);
-    }
+    });
+    // 删除b中不在a的原始形状内部的边。
+    blgo.loops.forEach((loop) => {
+      let count = loop.coedges.length;
+      for (let i = count - 1; i > -1; i--) {
+        let coedge = loop.coedges[i];
+        let u = coedge.u;
+        let mp = coedge.p((u.x + u.y) * 0.5);
+        if (!algorigin.isPointAtInner(mp, tol0, tol1)) {
+          loop.coedges.splice(i, 1);
+        }
+      }
+    });
+    // 面重构
+    let result: Face2[] = Bool2.FaceRebuild(algo, blgo, tol0, tol1);
     return result;
   }
 
@@ -38,15 +65,49 @@ class Bool2 {
   * a,b都是单面片组,组内不相交，返回单面片组。
   */
   static Intersections(a: Face2[], b: Face2[], tol0: number, tol1: number): Face2[] {
-    let result: Face2[] = [];
+    let algorigin = new Face2Algos(a);
+    let blgorigin = new Face2Algos(b);
     for (let i = 0; i < a.length; i++) {
-      let fa = a[i];
-      for (let j = 0; j < b.length; j++) {
-        let fb = b[j];
-        let ret = Bool2.Intersection(fa, fb, tol0, tol1);
-        result.push(...ret);
-      }
+      a[i] = a[i].clone();
     }
+    for (let i = 0; i < b.length; i++) {
+      b[i] = b[i].clone();
+    }
+    // 计算面与面的轮廓交点
+    let algo = new Face2Algos(a);
+    let blgo = new Face2Algos(b);
+    let inters = Brep2Inter.FaceXFace(algo, blgo, tol0, tol1);
+    if (inters.length) {
+      // 根据轮廓交点对面轮廓进行切割
+      Bool2.Cutting(algo.loops, blgo.loops, inters, tol0, tol1);
+    }
+
+    // 删除a中不在b的原始形状内部的边。
+    algo.loops.forEach((loop) => {
+      let count = loop.coedges.length;
+      for (let i = count - 1; i > -1; i--) {
+        let coedge = loop.coedges[i];
+        let u = coedge.u;
+        let mp = coedge.p((u.x + u.y) * 0.5);
+        if (!blgorigin.isPointAtInner(mp, tol0, tol1)) {
+          loop.coedges.splice(i, 1);
+        }
+      }
+    });
+    // 删除b中不在a的原始形状内部的边。
+    blgo.loops.forEach((loop) => {
+      let count = loop.coedges.length;
+      for (let i = count - 1; i > -1; i--) {
+        let coedge = loop.coedges[i];
+        let u = coedge.u;
+        let mp = coedge.p((u.x + u.y) * 0.5);
+        if (!algorigin.isPointAtInner(mp, tol0, tol1)) {
+          loop.coedges.splice(i, 1);
+        }
+      }
+    });
+    // 面重构
+    let result: Face2[] = Bool2.FaceRebuild(algo, blgo, tol0, tol1);
     return result;
   }
 
@@ -55,24 +116,48 @@ class Bool2 {
   * a,b都是单面片组,组内不相交，返回单面片组。
   */
   static Unions(a: Face2[], b: Face2[], tol0: number, tol1: number): Face2[] {
-    let result: Face2[] = [];
+    let algorigin = new Face2Algos(a);
+    let blgorigin = new Face2Algos(b);
     for (let i = 0; i < a.length; i++) {
-      let fa = a[i];
-      if (i == 0) {
-        let ret: Face2[] = [];
-        for (let j = 0; j < b.length; j++) {
-          let fb = b[j];
-          if (j == 0) {
-            ret = Bool2.Union(fa, fb, tol0, tol1);
-          } else {
-            ret = Bool2.Unions(ret, [fb], tol0, tol1);
-          }
-        }
-        result.push(...ret);
-      } else {
-        result = Bool2.Unions(result, [fa], tol0, tol1);
-      }
+      a[i] = a[i].clone();
     }
+    for (let i = 0; i < b.length; i++) {
+      b[i] = b[i].clone();
+    }
+    // 计算面与面的轮廓交点
+    let algo = new Face2Algos(a);
+    let blgo = new Face2Algos(b);
+    let inters = Brep2Inter.FaceXFace(algo, blgo, tol0, tol1);
+    if (inters.length) {
+      // 根据轮廓交点对面轮廓进行切割
+      Bool2.Cutting(algo.loops, blgo.loops, inters, tol0, tol1);
+    }
+    // 删除a中在b的原始形状内部的边。
+    algo.loops.forEach((loop) => {
+      let count = loop.coedges.length;
+      for (let i = count - 1; i > -1; i--) {
+        let coedge = loop.coedges[i];
+        let u = coedge.u;
+        let mp = coedge.p((u.x + u.y) * 0.5);
+        if (blgorigin.isPointAtInner(mp, tol0, tol1)) {
+          loop.coedges.splice(i, 1);
+        }
+      }
+    });
+    // 删除b中在a的原始形状内部的边。
+    blgo.loops.forEach((loop) => {
+      let count = loop.coedges.length;
+      for (let i = count - 1; i > -1; i--) {
+        let coedge = loop.coedges[i];
+        let u = coedge.u;
+        let mp = coedge.p((u.x + u.y) * 0.5);
+        if (algorigin.isPointAtInner(mp, tol0, tol1)) {
+          loop.coedges.splice(i, 1);
+        }
+      }
+    });
+    // 面重构
+    let result: Face2[] = Bool2.FaceRebuild(algo, blgo, tol0, tol1);
     return result;
   }
 
@@ -93,7 +178,7 @@ class Bool2 {
       loop.reverse();
     });
     let inters = Brep2Inter.FaceXFace(algo, blgo, tol0, tol1);
-    if (inters.length == 0) {
+    if (inters.length == 0 && a.holes.length == 0 && b.holes.length == 0) {
       let pa = algo.getInnerPoint();
       let pb = blgo.getInnerPoint();
       // a在b内
@@ -163,7 +248,7 @@ class Bool2 {
     let algo = new Face2Algo(a);
     let blgo = new Face2Algo(b);
     let inters = Brep2Inter.FaceXFace(algo, blgo, tol0, tol1);
-    if (inters.length == 0) {
+    if (inters.length == 0 && a.holes.length == 0 && b.holes.length == 0) {
       let pa = algo.getInnerPoint();
       let pb = blgo.getInnerPoint();
       // a在b内
@@ -222,7 +307,7 @@ class Bool2 {
     let algo = new Face2Algo(a);
     let blgo = new Face2Algo(b);
     let inters = Brep2Inter.FaceXFace(algo, blgo, tol0, tol1);
-    if (inters.length == 0) {
+    if (inters.length == 0 && a.holes.length == 0 && b.holes.length == 0) {
       let pa = algo.getInnerPoint();
       let pb = blgo.getInnerPoint();
       // a在b内
@@ -324,7 +409,7 @@ class Bool2 {
   * 面重构
   * 
   */
-  static FaceRebuild(algo: Face2Algo, blgo: Face2Algo, tol0: number, tol1: number): Face2[] {
+  static FaceRebuild(algo: Face2Algo | Face2Algos, blgo: Face2Algo | Face2Algos, tol0: number, tol1: number): Face2[] {
     // 构建全新的有向图
     let galgo = new Digraph2Algo(new Digraph2());
     let loops: Loop2Algo[] = [];

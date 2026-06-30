@@ -699,6 +699,10 @@ class Face2Algo {
     return this._f;
   }
 
+  get curves(): Curve2Data[] {
+    return this.f.curves;
+  }
+
   /**
    * Returns all Loop algo from the face.
    *
@@ -734,6 +738,151 @@ class Face2Algo {
   }
 }
 
+
+class Face2Algos {
+  private _fs: Face2[];
+  private _fas: Face2Algo[];
+  constructor(fs: Face2[]) {
+    this._fs = fs;
+    this._fas = [];
+    for (let i = 0; i < fs.length; i++) {
+      this._fas.push(new Face2Algo(fs[i]));
+    }
+  }
+
+  /**
+   * Use Green's theorem to calculate the directed area of the curve loop.
+   * Area = ∑​ |loop[i].area()| - ∑​ |hole[i].area()|;
+   * @retun {number} 
+   */
+  area(): number {
+    let area = 0;
+    let algos = this._fas;
+    let count = algos.length;
+    for (let i = 0; i < count; i++) {
+      area += algos[i].area();
+    }
+    return area;
+  }
+
+  /**
+   * get a point inner the face.
+   * @retun {Vector2} 
+   */
+  getInnerPoint(): Vector2 {
+    let algos = this._fas;
+    return algos[Math.floor(Math.random() * algos.length)].getInnerPoint();
+  }
+
+  /** 
+   * get a point on the border of the face.
+   * @retun {Vector2} 
+   */
+  getRandomBorderPoint(): Vector2 {
+    let algos = this._fas;
+    return algos[Math.floor(Math.random() * algos.length)].getRandomBorderPoint();
+  }
+
+  /**
+   * point at face boder?
+   *
+   * @param {Face2} [f] - The face.
+   * @param {Vector2} [p] - The eoint.
+   * @param {number} [tol0] - The tolerance of geometric.
+   * @param {number} [tol1] - The tolerance of algebraic.
+   */
+  isPointAtBoder(p: Vector2, tol0: number, tol1: number): boolean {
+    let algos = this._fas;
+    let count = algos.length;
+    for (let i = 0; i < count; i++) {
+      if (algos[i].isPointAtBoder(p, tol0, tol1)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * point at face inner?(inner boder and not inner holes)
+   *
+   * @param {Vector2} [p] - The eoint.
+   * @param {number} [tol0] - The tolerance of geometric.
+   * @param {number} [tol1] - The tolerance of algebraic.
+   */
+  isPointAtInner(p: Vector2, tol0: number, tol1: number): boolean {
+    let algos = this._fas;
+    let count = algos.length;
+    for (let i = 0; i < count; i++) {
+      if (algos[i].isPointAtInner(p, tol0, tol1)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * point on face? (at boder or at inner)
+   *
+   * @param {Face2} [e] - The face.
+   * @param {Vector2} [p] - The eoint.
+   * @param {number} [tol0] - The tolerance of geometric.
+   * @param {number} [tol1] - The tolerance of algebraic.
+   */
+  isPointOn(p: Vector2, tol0: number, tol1: number): boolean {
+    let algos = this._fas;
+    let count = algos.length;
+    for (let i = 0; i < count; i++) {
+      if (algos[i].isPointOn(p, tol0, tol1)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  get fs(): Face2[] {
+    return this._fs;
+  }
+
+  get curves(): Curve2Data[] {
+    let result: Curve2Data[] = [];
+    let algos = this._fas;
+    let count = algos.length;
+    for (let i = 0; i < count; i++) {
+      result.push(...algos[i].f.curves);
+    }
+    return result;
+  }
+
+  /**
+   * Returns all Loop algo from the face.
+   *
+   * @return {[Loop2Algo]} .
+   */
+  get loops(): Loop2Algo[] {
+    let result: Loop2Algo[] = [];
+    let algos = this._fas;
+    let count = algos.length;
+    for (let i = 0; i < count; i++) {
+      result.push(...algos[i].loops);
+    }
+    return result;
+  }
+
+  /**
+   * Returns all edges on curve from the face.
+   *
+   * @return {[Coedge2Algo]} .
+   */
+  getCoedgesByCurve(curve: Curve2Data): Coedge2Algo[] {
+    let result: Coedge2Algo[] = [];
+    let algos = this._fas;
+    let count = algos.length;
+    for (let i = 0; i < count; i++) {
+      result.push(...algos[i].getCoedgesByCurve(curve));
+    }
+    return result;
+  }
+}
 class Brep2Algo {
 
 }
@@ -836,5 +985,6 @@ export {
   Loop2Algo,
   Coedge2Algo,
   Edge2Algo,
-  Face2Algo
+  Face2Algo,
+  Face2Algos
 }

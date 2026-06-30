@@ -61,6 +61,9 @@ import { ModifyRectangleAreaCom } from "./coms/face/ModifyRectangleAreaCom";
 import { CreatePolylineAreaCom } from "./coms/face/CreatePolylineAreaCom";
 import { CreateRectangleAreaCom } from "./coms/face/CreateRectangleAreaCom";
 import { CreateEllipseAreaCom } from "./coms/face/CreateEllipseAreaCom";
+import { Bool2MulUnionCom } from "./coms/bool/Bool2MulUnionCom";
+import { Bool2MulDifferenceCom } from "./coms/bool/Bool2MulDifferenceCom";
+import { Bool2MulIntersectionCom } from "./coms/bool/Bool2MulIntersectionCom";
 
 /**
  * Command executer base class.
@@ -131,6 +134,10 @@ class CommandExecuter {
     this._commands.set(CommandType.BOOL_2_INTERSECTION, Bool2IntersectionCom);
     this._commands.set(CommandType.BOOL_2_UNION, Bool2UnionCom);
     this._commands.set(CommandType.BOOL_2_DIFFERENCE, Bool2DifferenceCom);
+
+    this._commands.set(CommandType.BOOL_2_INTERSECTION_MULTIPLE, Bool2MulIntersectionCom);
+    this._commands.set(CommandType.BOOL_2_UNION_MULTIPLE, Bool2MulUnionCom);
+    this._commands.set(CommandType.BOOL_2_DIFFERENCE_MULTIPLE, Bool2MulDifferenceCom);
 
     this._commands.set(CommandType.SCENE_SAVE, SceneSaveCom);
     this._commands.set(CommandType.SCENE_LOAD, SceneLoadCom);

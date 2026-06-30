@@ -5,7 +5,7 @@ import { Nurbs2Data } from "../../../data/base/curve2/Nurbs2Data";
 import { Parabola2Data } from "../../../data/base/curve2/Parabola2Data";
 import type { Curve2Data } from "../../../data/base/Curve2Data";
 import type { Edge2, Face2 } from "../../../data/brep/Brep2";
-import type { Face2Algo } from "../../brep/Brep2Algo";
+import type { Face2Algo, Face2Algos } from "../../brep/Brep2Algo";
 import { Curve2Inter, type InterOfCurve2 } from "./Curve2Inter";
 
 /**
@@ -50,9 +50,9 @@ class Brep2Inter {
    * @param {number} [tol0] - The tolerance of geometric.
    * @param {number} [tol1] - The tolerance of algebraic.
    */
-  public static FaceXFace(f0: Face2Algo, f1: Face2Algo, tol0: number, tol1: number): Array<InterOfFace2> {
-    let cs0 = f0.f.curves;
-    let cs1 = f1.f.curves;
+  public static FaceXFace(f0: Face2Algo | Face2Algos, f1: Face2Algo | Face2Algos, tol0: number, tol1: number): Array<InterOfFace2> {
+    let cs0 = f0.curves;
+    let cs1 = f1.curves;
     let ret: Array<InterOfFace2> = [];
     for (let i = 0; i < cs0.length; i++) {
       for (let j = 0; j < cs1.length; j++) {
