@@ -67,10 +67,16 @@ class Nurbs2Algo extends Curve2Algo {
     if (r === 0) {
       let points = verb.eval.Eval.curvePoint(this.curve_._data, u) as number[];
       // let points = verb.eval.Eval.rationalCurvePoint(this.curve_._data, u) as number[];
-      return new Vector2(points[0] / points[2], points[1] / points[2]);
+      let m = this.dat.trans.makeLocalMatrix();
+      let ret = new Vector2(points[0] / points[2], points[1] / points[2]);
+      ret.applyMatrix3(m);
+      return ret;
     } else {
       let points = verb.eval.Eval.rationalCurveDerivatives(this.curve_._data, u, r) as number[][];
-      return new Vector2(points[1][0], points[1][1]);
+      let m = this.dat.trans.makeLocalMatrix();
+      let ret = new Vector2(points[1][0], points[1][1]);
+      ret.applyMatrix3(m);
+      return ret;
     }
   }
 
