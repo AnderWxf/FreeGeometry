@@ -1,4 +1,4 @@
-import { Vector2, Vector3, Vector4 } from "../../../../math/Math";
+import { Matrix3, Vector2, Vector3, Vector4 } from "../../../../math/Math";
 import { Nurbs2Data } from "../../../data/base/curve2/Nurbs2Data";
 import { Transform2 } from "../../../data/base/Transform2";
 import { Curve2Algo } from "../Curve2Algo";
@@ -132,11 +132,70 @@ class Nurbs2Algo extends Curve2Algo {
   }
 
   /**
-   * 使用正则化最小二乘法拟合 NURBS 曲线
+   * 使用NurbsCurveData创建NURBS曲线
    */
   public static FromVerb(dat: any): Nurbs2Data {
     const controlPoints = dat.controlPoints.map((point: any) => new Vector3(point[0], point[1], point[2]));
     return new Nurbs2Data(new Transform2(), controlPoints, dat.knots, dat.degree);
+  }
+
+  //高斯-勒让德积分 data:NurbsCurveData
+  private static SegmentArea(u0: number, u1: number, m: Matrix3, data: any): number {
+    // 高斯-勒让德节点和权重（n=5）
+    const GaussData = {
+      points: [
+        -0.9061798459386640,
+        -0.5384693101056831,
+        0,
+        0.5384693101056831,
+        0.9061798459386640
+      ],
+      weights: [
+        0.2369268850561891,
+        0.4786286704993665,
+        0.5688888888888889,
+        0.4786286704993665,
+        0.2369268850561891
+      ]
+    };
+    const halfLen = (u1 - u0) / 2;
+    const mid = (u0 + u1) / 2;
+    let integral = 0;
+
+    for (let i = 0; i < GaussData.points.length; i++) {
+      // 将节点从 [-1,1] 映射到 [u0, u1]
+      const u = mid + halfLen * GaussData.points[i];
+      // 获取曲线在 u 处的位置和导数
+      let dts = verb.eval.Eval.rationalCurveDerivatives(data, u, 1) as number[][];
+      // {x, y}
+      let pt = new Vector2(dts[0][0], dts[0][1]);
+      pt.applyMatrix3(m);
+      // {dx, dy}
+      let der = new Vector2(dts[1][0], dts[1][1]);
+      der.applyMatrix3(m);
+      // 计算被积函数值
+      const g = pt.x * der.y - pt.y * der.x;
+      // 累加
+      integral += GaussData.weights[i] * g;
+    }
+
+    // 乘以区间半长，再除以 2（格林公式的 1/2 因子）
+    return (halfLen * integral) / 2;
+  }
+  //有向面积 data:NurbsCurveData
+  private static Area(m: Matrix3, data: any): number {
+    // 使用高斯-勒让德积分计算曲线的有向面积
+    let knots: number[] = data.knots as number[];
+    let degree: number = data.degree as number;
+    let totalArea = 0;
+    // 遍历每个非空节点区间 [knots[i], knots[i+1]]
+    for (let i = degree; i < knots.length - degree - 1; i++) {
+      const u0 = knots[i];
+      const u1 = knots[i + 1];
+      if (Math.abs(u1 - u0) < 1e-12) continue;  // 跳过重复节点
+      totalArea += Nurbs2Algo.SegmentArea(u0, u1, m, data);
+    }
+    return totalArea;
   }
 
   /**
@@ -148,6 +207,48 @@ class Nurbs2Algo extends Curve2Algo {
    * @retun {number} 
    */
   da(u0: number, u1: number): number {
+    // 使用高斯-勒让德积分计算曲线的有向面积
+    if (u0 < u1) {
+      if (u0 == 0 && u1 == 1) {
+        let totalArea = Nurbs2Algo.Area(this._dat.trans.makeLocalMatrix(), this.curve_._data);
+        return totalArea;
+      }
+      if (u0 == 0) {
+        let data = verb.eval.Divide.curveSplit(this.curve_._data, u1)[0];
+        let totalArea = Nurbs2Algo.Area(this._dat.trans.makeLocalMatrix(), data);
+        return totalArea;
+      }
+      if (u1 == 1) {
+        let data = verb.eval.Divide.curveSplit(this.curve_._data, u0)[1];
+        let totalArea = Nurbs2Algo.Area(this._dat.trans.makeLocalMatrix(), data);
+        return totalArea;
+      }
+      let data = verb.eval.Divide.curveSplit(this.curve_._data, u0)[1];
+      data = verb.eval.Divide.curveSplit(data, (u1 - u0) / (1 - u0))[0];
+      let totalArea = Nurbs2Algo.Area(this._dat.trans.makeLocalMatrix(), data);
+      return totalArea;
+    }
+
+    if (u0 > u1) {
+      if (u0 == 1 && u1 == 0) {
+        let totalArea = Nurbs2Algo.Area(this._dat.trans.makeLocalMatrix(), this.curve_._data);
+        return -totalArea;
+      }
+      if (u1 == 0) {
+        let data = verb.eval.Divide.curveSplit(this.curve_._data, u0)[0];
+        let totalArea = Nurbs2Algo.Area(this._dat.trans.makeLocalMatrix(), data);
+        return -totalArea;
+      }
+      if (u0 == 1) {
+        let data = verb.eval.Divide.curveSplit(this.curve_._data, u1)[1];
+        let totalArea = Nurbs2Algo.Area(this._dat.trans.makeLocalMatrix(), data);
+        return -totalArea;
+      }
+      let data = verb.eval.Divide.curveSplit(this.curve_._data, u1)[1];
+      data = verb.eval.Divide.curveSplit(data, (u0 - u1) / (1 - u1))[0];
+      let totalArea = Nurbs2Algo.Area(this._dat.trans.makeLocalMatrix(), data);
+      return -totalArea;
+    }
     return 0;
   }
 }

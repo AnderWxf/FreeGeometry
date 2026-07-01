@@ -444,7 +444,7 @@ const MenuBarOnChange = (info: MenuInfo): void => {
 };
 const MenuBar: React.FC = () => (
   <Space wrap>
-    <input type="file" id="fileInput" accept=".json,application/json" hidden disabled></input>
+    <input type="file" id="fileInput" accept=".json,application/json" hidden></input>
     <ConfigProvider
       theme={{
         components: {

@@ -91,12 +91,21 @@ class CreateSectionCom extends CreateFaceCom {
         for (let i = 0; i < edges.length; i++) {
           edges[i] = edges[i].clone();
         }
-        let face = this.createFace(edges);
         userData.color = THREE.Color.NAMES.blue;
-        let geo = BrepMeshBuilder.BuildFace2Mesh(face, userData.color);
-        userData.original = face;
-        geo.userData = userData;
-        this.results = geo;
+        if (act_pick_objs.results.length == 1) {
+            let face = this.createFace(edges);
+          let geo = BrepMeshBuilder.BuildFace2Mesh(face, userData.color);
+          userData.original = face;
+          geo.userData = userData;
+          this.results = geo;
+        }
+        if (act_pick_objs.results.length > 1) {
+          let faces = this.createFaces(edges, 1e-4, 1e-10);
+          let geo = BrepMeshBuilder.BuildFace2sMesh(faces, userData.color);
+          userData.original = faces;
+          geo.userData = userData;
+          this.results = geo;
+        }
         this.done();
       } else {
         this.cancel();

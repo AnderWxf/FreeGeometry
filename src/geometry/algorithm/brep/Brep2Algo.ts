@@ -1,7 +1,7 @@
 import { Vector2 } from "../../../math/Math";
 import { Line2Data } from "../../data/base/curve2/Line2Data";
 import type { Curve2Data } from "../../data/base/Curve2Data";
-import { Loop2, Vertice2, type Coedge2, type Digraph2, type Edge2, type Face2 } from "../../data/brep/Brep2";
+import { Coedge2, Loop2, Vertice2, type Digraph2, type Edge2, type Face2 } from "../../data/brep/Brep2";
 import type { Curve2Algo } from "../base/Curve2Algo";
 import { CurveBuilder } from "../builder/CurveBuilder";
 import { Curve2Inter } from "../relation/intersection/Curve2Inter";
@@ -905,14 +905,32 @@ class Digraph2Algo {
     let algos = this._algos;
     for (let i = 0; i < algos.length; i++) {
       let curr = algos[i];
-      algos.forEach(algo => {
-        if (algo.v0 == curr.v1) {
-          curr.addOut(algo);
-        }
-        if (algo.v1 == curr.v0) {
-          curr.addIn(algo);
-        }
-      });
+      if (curr.c.e) {
+        algos.forEach(algo => {
+          // 不能自己和自己的兄弟构成循环
+          if (curr.c.e != algo.c.e) {
+            if (algo.v0 == curr.v1) {
+              curr.addOut(algo);
+            }
+            if (algo.v1 == curr.v0) {
+              curr.addIn(algo);
+            }
+          }
+        });
+      }
+      else if (curr.c.ei > -1) {
+        algos.forEach(algo => {
+          // 不能自己和自己的兄弟构成循环
+          if (curr.c.ei != algo.c.ei) {
+            if (algo.v0 == curr.v1) {
+              curr.addOut(algo);
+            }
+            if (algo.v1 == curr.v0) {
+              curr.addIn(algo);
+            }
+          }
+        });
+      }
     }
   }
 
@@ -975,6 +993,57 @@ class Digraph2Algo {
         }
         coedge.v1 = v1;
       });
+    });
+    this.reflush();
+  }
+
+  addEdges(edges: Edge2[], tol0: number) {
+    edges.forEach((edge: Edge2) => {
+      let cf = new Coedge2(); cf.e = edge; cf.isForward = true;
+      let cb = new Coedge2(); cb.e = edge; cb.isForward = false;
+      let cfalgo = new Coedge2Algo(cf);
+      let cbalgo = new Coedge2Algo(cb);
+
+      this._algos.push(cfalgo);
+      this._algos.push(cbalgo);
+
+      let v0pf = cfalgo.getBeginPoint();
+      let v0f = this.findVerticeByPoint(v0pf, tol0);
+      if (!v0f) {
+        v0f = new Vertice2();
+        v0f.p = v0pf;
+        this._g.vertice2s.push(v0f);
+      }
+      cfalgo.v0 = v0f;
+
+      let v1pf = cfalgo.getEndPoint();
+      let v1f = this.findVerticeByPoint(v1pf, tol0);
+      if (!v1f) {
+        v1f = new Vertice2();
+        v1f.p = v1pf;
+        this._g.vertice2s.push(v1f);
+      }
+      cfalgo.v1 = v1f;
+
+
+      let v0pb = cbalgo.getBeginPoint();
+      let v0b = this.findVerticeByPoint(v0pb, tol0);
+      if (!v0b) {
+        v0b = new Vertice2();
+        v0b.p = v0pb;
+        this._g.vertice2s.push(v0b);
+      }
+      cbalgo.v0 = v0b;
+
+      let v1pb = cbalgo.getEndPoint();
+      let v1b = this.findVerticeByPoint(v1pb, tol0);
+      if (!v1b) {
+        v1b = new Vertice2();
+        v1b.p = v1pb;
+        this._g.vertice2s.push(v1b);
+      }
+      cbalgo.v1 = v1b;
+
     });
     this.reflush();
   }
