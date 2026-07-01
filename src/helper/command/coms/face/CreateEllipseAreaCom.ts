@@ -77,7 +77,7 @@ class CreateEllipseAreaCom extends CreateFaceCom {
     Global.scene.add(this.assists[this.assists.length - 1]);
 
     // 创建一个面
-    let face = this.createFace([edge]);
+    let face = Brep2Builder.BuildFaceByEdges([edge]);
     userData.color = THREE.Color.NAMES.blue;
     let geo = BrepMeshBuilder.BuildFace2Mesh(face, userData.color);
     userData.original = face;

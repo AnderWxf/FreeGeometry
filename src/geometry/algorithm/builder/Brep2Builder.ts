@@ -4,8 +4,9 @@ import { Line2Data } from "../../data/base/curve2/Line2Data";
 import { Nurbs2Data } from "../../data/base/curve2/Nurbs2Data";
 import { Parabola2Data } from "../../data/base/curve2/Parabola2Data";
 import type { Curve2Data } from "../../data/base/Curve2Data";
-import { Edge2, type Face2 } from "../../data/brep/Brep2";
+import { Coedge2, Digraph2, Edge2, Face2, Vertice2 } from "../../data/brep/Brep2";
 import { Nurbs2Algo } from "../base/curve2/Nurbs2Algo";
+import { Digraph2Algo } from "../brep/Brep2Algo";
 import { CurveBuilder } from "./CurveBuilder";
 
 /**
@@ -229,8 +230,22 @@ class Brep2Builder {
    * @param {Vector2} [points] - The points of polygon.
    */
   static BuildPolygonFace(points: Array<Vector2>): Face2 {
-    debugger;
-    return null;
+    // 创建一个闭合多段线
+    let edges: Edge2[] = [];
+    for (let i = 1; i < points.length; i++) {
+      let beginPoint = points[i - 1];
+      let endPoint = points[i];
+      let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(beginPoint, endPoint);
+      edges.push(edge);
+    }
+    let beginPoint = points[points.length - 1];
+    let endPoint = points[0];
+    let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(beginPoint, endPoint);
+    edges.push(edge);
+
+    // 创建一个面
+    let face = Brep2Builder.BuildFaceByEdges(edges);
+    return face;
   }
 
   /**
@@ -263,6 +278,79 @@ class Brep2Builder {
   static BuildFace(cures: Array<Curve2Data>): Face2 {
     debugger;
     return null;
+  }
+
+  /**
+   * build face from edges that one by one closed.
+   *
+   * @param {Array<Edge2>} [edges] - The edges of face.
+   */
+  static BuildFaceByEdges(edges: Edge2[]): Face2 {
+    // 创建一个面
+    let face = new Face2();
+    for (let i = 0; i < edges.length; i++) {
+      face.vertices.push(new Vertice2());
+    }
+    for (let i = 0; i < edges.length; i++) {
+      let edge = edges[i];
+      edge.v0 = face.vertices[i];
+      edge.v1 = face.vertices[(i + 1) % edges.length];
+      let coedge = new Coedge2();
+      coedge.e = edge;
+      face.border.coedges.push(coedge);
+      face.curves.push(edge.curve);
+      edge.curve = null;
+      edge.curvei = i;
+    }
+    return face;
+  }
+
+  /**
+   * build face from edges that one by one closed.
+   *
+   * @param {Array<Edge2>} [edges] - The edges of face.
+   */
+  static BuildFacesByEdges(edges: Edge2[], tol0: number, tol1: number): Face2[] {
+    // 构建全新的有向图
+    let galgo = new Digraph2Algo(new Digraph2());
+    galgo.addEdges(edges, tol0);
+    let alloops = galgo.getAllLoops();
+    // 删除面积为0或者反向的环
+    let count = alloops.length;
+    for (let i = count - 1; i > -1; i--) {
+      // 面积 <= 0
+      if (alloops[i].area() <= tol1) {
+        alloops.splice(i, 1);
+      }
+    }
+    let result: Face2[] = [];
+    if (alloops.length) {
+      // 获得一个外层loop
+      let count = alloops.length;
+      for (let i = count - 1; i > -1; i--) {
+        let f = new Face2();
+        // 正向的外轮廓
+        let outside = alloops[i];
+        f.border = outside.loop;
+        outside.coedges.forEach(coedge => {
+          let index = f.curves.indexOf(coedge.curve.dat);
+          if (index == -1) {
+            index = f.curves.length;
+            f.curves.push(coedge.curve.dat);
+          }
+          coedge.c.e.curve = null;
+          coedge.c.e.curvei = index;
+          if (!f.vertices.includes(coedge.c.e.v0)) {
+            f.vertices.push(coedge.c.e.v0);
+          }
+          if (!f.vertices.includes(coedge.c.e.v1)) {
+            f.vertices.push(coedge.c.e.v1);
+          }
+        });
+        result.push(f);
+      }
+    }
+    return result;
   }
 
   /**

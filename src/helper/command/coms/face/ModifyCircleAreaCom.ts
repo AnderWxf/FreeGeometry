@@ -76,7 +76,7 @@ class ModifyCircleAreaCom extends ModifyFaceCom {
     // 创建一个曲线段
     let edge = Brep2Builder.BuildCircleEdge2FromCenterRadius(centerPoint, beginPoint.distanceTo(centerPoint));
     // 创建一个面
-    let face = this.createFace([edge]);
+    let face = Brep2Builder.BuildFaceByEdges([edge]);
     userData.color = THREE.Color.NAMES.blue;
     let geo = BrepMeshBuilder.BuildFace2Mesh(face, userData.color);
     userData.original = face;

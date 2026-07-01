@@ -1,6 +1,4 @@
 import { Global } from "../../../../core/Global";
-import { type DocNode } from "../../../Doc";
-import type { UserData } from "../../../UserData";
 import { Command } from "../../Command";
 import * as THREE from "three";
 import type { CommandExecuter } from "../../CommandExecuter";

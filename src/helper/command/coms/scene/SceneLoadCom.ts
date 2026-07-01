@@ -15,8 +15,13 @@ class SceneLoadCom extends Command {
   async exec() {
     SceneLoadCom.this_ = this;
     try {
-      document.getElementById('fileInput').addEventListener('change', this.onLoaded);
-      document.getElementById('fileInput').click();
+      const fileInput = document.getElementById('fileInput');
+      // 克隆元素（包括所有子节点）
+      const newfileInput = fileInput.cloneNode(true) as HTMLElement;
+      // 用克隆的元素替换原元素
+      fileInput.parentNode.replaceChild(newfileInput, fileInput);
+      newfileInput.addEventListener('change', this.onLoaded);
+      newfileInput.click();
     } catch (error) {
       if (error instanceof Error) {
         if (error.name === 'AbortError') {

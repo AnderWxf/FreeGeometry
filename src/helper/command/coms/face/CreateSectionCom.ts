@@ -93,14 +93,14 @@ class CreateSectionCom extends CreateFaceCom {
         }
         userData.color = THREE.Color.NAMES.blue;
         if (act_pick_objs.results.length == 1) {
-            let face = this.createFace(edges);
+          let face = Brep2Builder.BuildFaceByEdges(edges);
           let geo = BrepMeshBuilder.BuildFace2Mesh(face, userData.color);
           userData.original = face;
           geo.userData = userData;
           this.results = geo;
         }
         if (act_pick_objs.results.length > 1) {
-          let faces = this.createFaces(edges, 1e-4, 1e-10);
+          let faces = Brep2Builder.BuildFacesByEdges(edges, 1e-4, 1e-10);
           let geo = BrepMeshBuilder.BuildFace2sMesh(faces, userData.color);
           userData.original = faces;
           geo.userData = userData;

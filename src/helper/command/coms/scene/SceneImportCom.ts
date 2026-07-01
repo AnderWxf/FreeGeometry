@@ -1,10 +1,6 @@
 import { ImportJson, type DocNode } from "../../../Doc";
 import { Command } from "../../Command";
 import * as THREE from "three";
-import { unserialize } from "../../../../geometry/data/base/Unserialize";
-import { Edge2, Face2 } from "../../../../geometry/data/brep/Brep2";
-import { BrepMeshBuilder } from "../../../BrepMeshBuilder";
-import { Vector2 } from "../../../../math/Math";
 import { Global } from "../../../../core/Global";
 import type { CommandExecuter } from "../../CommandExecuter";
 
@@ -18,8 +14,13 @@ class SceneImportCom extends Command {
   async exec() {
     SceneImportCom.this_ = this;
     try {
-      document.getElementById('fileInput').addEventListener('change', this.onLoaded);
-      document.getElementById('fileInput').click();
+      const fileInput = document.getElementById('fileInput');
+      // 克隆元素（包括所有子节点）
+      const newfileInput = fileInput.cloneNode(true) as HTMLElement;
+      // 用克隆的元素替换原元素
+      fileInput.parentNode.replaceChild(newfileInput, fileInput);
+      newfileInput.addEventListener('change', this.onLoaded);
+      newfileInput.click();
     } catch (error) {
       if (error instanceof Error) {
         if (error.name === 'AbortError') {

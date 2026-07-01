@@ -500,11 +500,11 @@ class Face2 extends DataBase {
     for (let i = 0; i < curves.length; i++) {
       ret.curves.push(unserialize(curves[i])[0] as Curve2Data);
     }
-    let edge2s = data.edge2s as [];
-    for (let i = 0; i < edge2s.length; i++) {
-      ret.edges.push(Edge2.Unserialize(edge2s[i]));
+    let edges = data.edges as [];
+    for (let i = 0; i < edges.length; i++) {
+      ret.edges.push(Edge2.Unserialize(edges[i]));
     }
-    ret.border = data.border ? Loop2.Unserialize(data.loop) : null;
+    ret.border = data.border ? Loop2.Unserialize(data.border) : null;
     let holes = data.holes as [];
     for (let i = 0; i < holes.length; i++) {
       ret.holes.push(Loop2.Unserialize(holes[i]));

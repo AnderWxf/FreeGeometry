@@ -85,7 +85,7 @@ class ModifyPolylineAreaCom extends ModifyFaceCom {
     edges.push(edge);
 
     // 创建一个面
-    let face = this.createFace(edges);
+    let face = Brep2Builder.BuildFaceByEdges(edges);
     userData.color = THREE.Color.NAMES.blue;
     let geo = BrepMeshBuilder.BuildFace2Mesh(face, userData.color);
     userData.original = face;
