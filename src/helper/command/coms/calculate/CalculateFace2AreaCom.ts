@@ -32,8 +32,14 @@ class CalculateFace2AreaCom extends Command {
     for (let i = 0; i < act_pick_objs.results.length; i++) {
       let geo = act_pick_objs.results[i];
       if (geo.userData.type >= GeomType.DRAW_SURFACE_CI && geo.userData.type < GeomType.DRAW_SURFACE_PLA) {
-        let original = geo.userData.original as Face2;
-        this.faces.push(original);
+        if (geo.userData.original instanceof Face2) {
+          let original = geo.userData.original as Face2;
+          this.faces.push(original);
+        }
+        if (geo.userData.original instanceof Array) {
+          let originals = geo.userData.original as Face2[];
+          this.faces.push(...originals);
+        }
       }
     }
 

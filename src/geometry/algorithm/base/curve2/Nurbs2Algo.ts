@@ -54,6 +54,15 @@ class Nurbs2Algo extends Curve2Algo {
     let v = point.clone();
     v.applyMatrix3(this.dat.trans.makeWorldMatrix().invert());
     let u = verb.eval.Analyze.rationalCurveClosestParam(this.curve_._data, [v.x, v.y]) as number;
+    if (u == 0 || u == 1) {
+      let d_ = verb.eval.Eval.rationalCurveDerivatives(this.curve_._data, u, 1) as number[][];
+      let p = new Vector2(d_[0][0], d_[0][1]);
+      let v0 = new Vector2(d_[1][0], d_[1][1]); // 切向量
+      v0.normalize();
+      let v1 = v.sub(p);          // 投影点到目标点方向
+      let dot = v1.dot(v0);
+      u += dot;
+    }
     return u;
   }
 
@@ -140,7 +149,7 @@ class Nurbs2Algo extends Curve2Algo {
   }
 
   //高斯-勒让德积分 data:NurbsCurveData
-  private static SegmentArea(u0: number, u1: number, m: Matrix3, data: any): number {
+  private static SegmentArea(u0: number, u1: number, data: any): number {
     // 高斯-勒让德节点和权重（n=5）
     const GaussData = {
       points: [
@@ -169,10 +178,8 @@ class Nurbs2Algo extends Curve2Algo {
       let dts = verb.eval.Eval.rationalCurveDerivatives(data, u, 1) as number[][];
       // {x, y}
       let pt = new Vector2(dts[0][0], dts[0][1]);
-      pt.applyMatrix3(m);
       // {dx, dy}
       let der = new Vector2(dts[1][0], dts[1][1]);
-      der.applyMatrix3(m);
       // 计算被积函数值
       const g = pt.x * der.y - pt.y * der.x;
       // 累加
@@ -183,7 +190,7 @@ class Nurbs2Algo extends Curve2Algo {
     return (halfLen * integral) / 2;
   }
   //有向面积 data:NurbsCurveData
-  private static Area(m: Matrix3, data: any): number {
+  private static Area(data: any): number {
     // 使用高斯-勒让德积分计算曲线的有向面积
     let knots: number[] = data.knots as number[];
     let degree: number = data.degree as number;
@@ -193,7 +200,7 @@ class Nurbs2Algo extends Curve2Algo {
       const u0 = knots[i];
       const u1 = knots[i + 1];
       if (Math.abs(u1 - u0) < 1e-12) continue;  // 跳过重复节点
-      totalArea += Nurbs2Algo.SegmentArea(u0, u1, m, data);
+      totalArea += Nurbs2Algo.SegmentArea(u0, u1, data);
     }
     return totalArea;
   }
@@ -207,49 +214,56 @@ class Nurbs2Algo extends Curve2Algo {
    * @retun {number} 
    */
   da(u0: number, u1: number): number {
+    let Ilocal = 0;
+    let m = this.dat.trans.makeLocalMatrix();
+    let a = m.elements[0];
+    let b = m.elements[1];
+    let c = m.elements[3];
+    let d = m.elements[4];
+    let Tx = m.elements[2];
+    let Ty = m.elements[5];
+    let Δ = a * d - b * c;
+    let begin = this.p(u0);
+    let end = this.p(u1);
+    let ΔX = end.x - begin.x;
+    let ΔY = end.y - begin.y;
     // 使用高斯-勒让德积分计算曲线的有向面积
+    let data = this.curve_._data;
     if (u0 < u1) {
       if (u0 == 0 && u1 == 1) {
-        let totalArea = Nurbs2Algo.Area(this._dat.trans.makeLocalMatrix(), this.curve_._data);
-        return totalArea;
+        // data = this.curve_._data;
       }
-      if (u0 == 0) {
-        let data = verb.eval.Divide.curveSplit(this.curve_._data, u1)[0];
-        let totalArea = Nurbs2Algo.Area(this._dat.trans.makeLocalMatrix(), data);
-        return totalArea;
+      else if (u0 == 0) {
+        data = verb.eval.Divide.curveSplit(this.curve_._data, u1)[0];
       }
-      if (u1 == 1) {
-        let data = verb.eval.Divide.curveSplit(this.curve_._data, u0)[1];
-        let totalArea = Nurbs2Algo.Area(this._dat.trans.makeLocalMatrix(), data);
-        return totalArea;
+      else if (u1 == 1) {
+        data = verb.eval.Divide.curveSplit(this.curve_._data, u0)[1];
       }
-      let data = verb.eval.Divide.curveSplit(this.curve_._data, u0)[1];
-      data = verb.eval.Divide.curveSplit(data, (u1 - u0) / (1 - u0))[0];
-      let totalArea = Nurbs2Algo.Area(this._dat.trans.makeLocalMatrix(), data);
-      return totalArea;
-    }
+      else {
+        data = verb.eval.Divide.curveSplit(this.curve_._data, u0)[1];
+        data = verb.eval.Divide.curveSplit(data, (u1 - u0) / (1 - u0))[0];
+      }
+      Ilocal = Nurbs2Algo.Area(data);
 
+    }
     if (u0 > u1) {
       if (u0 == 1 && u1 == 0) {
-        let totalArea = Nurbs2Algo.Area(this._dat.trans.makeLocalMatrix(), this.curve_._data);
-        return -totalArea;
+        // data = this.curve_._data;
       }
-      if (u1 == 0) {
-        let data = verb.eval.Divide.curveSplit(this.curve_._data, u0)[0];
-        let totalArea = Nurbs2Algo.Area(this._dat.trans.makeLocalMatrix(), data);
-        return -totalArea;
+      else if (u1 == 0) {
+        data = verb.eval.Divide.curveSplit(this.curve_._data, u0)[0] as any;
       }
-      if (u0 == 1) {
-        let data = verb.eval.Divide.curveSplit(this.curve_._data, u1)[1];
-        let totalArea = Nurbs2Algo.Area(this._dat.trans.makeLocalMatrix(), data);
-        return -totalArea;
+      else if (u0 == 1) {
+        data = verb.eval.Divide.curveSplit(this.curve_._data, u1)[1];
       }
-      let data = verb.eval.Divide.curveSplit(this.curve_._data, u1)[1];
-      data = verb.eval.Divide.curveSplit(data, (u0 - u1) / (1 - u1))[0];
-      let totalArea = Nurbs2Algo.Area(this._dat.trans.makeLocalMatrix(), data);
-      return -totalArea;
+      else {
+        data = verb.eval.Divide.curveSplit(this.curve_._data, u1)[1];
+        data = verb.eval.Divide.curveSplit(data, (u0 - u1) / (1 - u1))[0];
+      }
+      Ilocal = -Nurbs2Algo.Area(data);
     }
-    return 0;
+    let Iworld = Δ * Ilocal + 0.5 * (Tx * ΔY - Ty * ΔX);
+    return Iworld;
   }
 }
 
