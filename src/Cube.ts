@@ -443,17 +443,5 @@ export class Cube {
         cam.orthographic.camera.bottom = cam.orthographic.camera.left * window.innerHeight / window.innerWidth; // 宽高比
       }
     });
-
-    // let v2 = new Vector2();
-    // let line = new Line2Data();
-    // let plane = new PlaneSurfaceData();
-    // let lineAlg = CurveBuilder.Algorithm2ByData(line);
-    // let planeAlg = SurfaceBulder.BuildSurfaceAlgorithmByData(plane);
-
-    // let createLine = new CreateLine2Com();
-    // createLine.exec();
-    // SolveEquation.testQuadraticSolver();
-    // SolveEquation.testCubicSolver();
-    // SolveEquation.testQuarticSolver();
   }
 }
