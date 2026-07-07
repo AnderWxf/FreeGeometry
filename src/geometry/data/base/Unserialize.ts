@@ -1,4 +1,5 @@
 import { GeomType } from "../../../core/Constents";
+import { Euler, Matrix2, Matrix3, Matrix4, Quaternion, Vector2, Vector3, Vector4 } from "../../../math/Math";
 import { Coedge2, Digraph2, Edge2, Face2, Loop2, Vertice2 } from "../brep/Brep2";
 import { Body3, Coedge3, Edge3, Face3, Loop3, Lump3, Shell3, Vertice3 } from "../brep/Brep3";
 import type { DataBase } from "../DataBase";
@@ -21,8 +22,21 @@ import { PlaneSurfaceData } from "./surface/PlaneSurfaceData";
 import { SphereSurfaceData } from "./surface/SphereSurfaceData";
 import { SweepSurfaceData } from "./surface/SweepSurfaceData";
 
-export function unserialize(data: any): DataBase[] {
+export function unserialize(data: any): any[] {
   switch (data.type) {
+    case GeomType.MATH_VECTOR2: return [Vector2.Unserialize(data)];
+    case GeomType.MATH_VECTOR3: return [Vector3.Unserialize(data)];
+    case GeomType.MATH_VECTOR4: return [Vector4.Unserialize(data)];
+    case GeomType.MATH_EULER: return [Euler.Unserialize(data)];
+    case GeomType.MATH_QUATERNION: return [Quaternion.Unserialize(data)];
+    case GeomType.MATH_MATRIX2: return [Matrix2.Unserialize(data)];
+    case GeomType.MATH_MATRIX3: return [Matrix3.Unserialize(data)];
+    case GeomType.MATH_MATRIX4: return [Matrix4.Unserialize(data)];
+
+    case GeomType.DATA_TYPE_CURVE2_ARC2: return [Arc2Data.Unserialize(data)];
+    case GeomType.DATA_TYPE_CURVE2_ARC2: return [Arc2Data.Unserialize(data)];
+
+
     case GeomType.DATA_TYPE_CURVE2_ARC2: return [Arc2Data.Unserialize(data)];
     case GeomType.DATA_TYPE_CURVE2_HYPERBOLA2: return [Hyperbola2Data.Unserialize(data)];
     case GeomType.DATA_TYPE_CURVE2_LINE2: return [Line2Data.Unserialize(data)];

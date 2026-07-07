@@ -4,7 +4,9 @@
     "antd": "^5.27.6",
     "es-module-loader": "^2.3.0",
     "es6-module-loader": "^0.17.11",
+    "lodash": "^4.18.1",
     "mathjs": "^15.1.0",
+    "node": "^26.4.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "requirejs": "^2.3.8",
@@ -14,18 +16,27 @@
     "verb-nurbs": "^3.0.3"
   },
   "scripts": {
-    "dev": "vite"
+    "dev": "vite",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:watch": "vitest --watch",
+    "test:coverage": "vitest --coverage"
   },
   "devDependencies": {
     "@types/dat.gui": "^0.7.13",
+    "@types/lodash": "^4.17.24",
+    "@types/node": "^26.1.0",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
     "@types/three": "^0.180.0",
+    "@vitest/ui": "^4.1.9",
     "baseline-browser-mapping": "^2.9.6",
+    "jsdom": "^29.1.1",
     "terser-webpack-plugin": "^5.3.14",
     "ts-loader": "^9.5.4",
     "typescript": "^5.9.3",
     "vite": "^7.1.9",
+    "vitest": "^4.1.9",
     "webpack": "^5.102.1",
     "webpack-cli": "^6.0.1",
     "webpack-merge": "^6.0.1"

@@ -1,3 +1,4 @@
+import { GeomType } from "../core/Constents";
 import { clamp } from "./MathUtils"
 
 /**
@@ -43,6 +44,12 @@ export const WebGPUCoordinateSystem = 2001;
  * ```
  */
 class Vector2 {
+  /**
+   * The type of data for unserialize.
+   *
+   * @type {number}
+   */
+  private type = GeomType.MATH_VECTOR2;
   /**
    * The x value of this vector.
    *
@@ -948,6 +955,12 @@ class Vector2 {
  * ```
  */
 class Vector3 {
+  /**
+ * The type of data for unserialize.
+ *
+ * @type {number}
+ */
+  private type = GeomType.MATH_VECTOR3;
   public x: number;
   public y: number;
   public z: number;
@@ -2185,6 +2198,12 @@ class Vector3 {
  */
 class Vector4 {
   /**
+   * The type of data for unserialize.
+   *
+   * @type {number}
+   */
+  private type = GeomType.MATH_VECTOR4;
+  /**
    * The x value of this vector.
    *
    * @type {number}
@@ -3272,6 +3291,12 @@ class Vector4 {
  */
 class Euler {
   /**
+   * The type of data for unserialize.
+   *
+   * @type {number}
+   */
+  private type = GeomType.MATH_EULER;
+  /**
    * The default Euler angle order.
    *
    * @static
@@ -3721,7 +3746,12 @@ class Euler {
  * ```
  */
 class Quaternion {
-
+  /**
+   * The type of data for unserialize.
+   *
+   * @type {number}
+   */
+  private type = GeomType.MATH_QUATERNION;
   public _x: number;
   public _y: number;
   public _z: number;
@@ -4684,6 +4714,12 @@ class Quaternion {
  * transpose of any matrices outlined here to make sense of the calculations.
  */
 class Matrix2 {
+  /**
+ * The type of data for unserialize.
+ *
+ * @type {number}
+ */
+  private type = GeomType.MATH_MATRIX2;
   public elements = [
     1, 0,
     0, 1,
@@ -4895,6 +4931,12 @@ class Matrix2 {
  * transpose of any matrices outlined here to make sense of the calculations.
  */
 class Matrix3 {
+  /**
+ * The type of data for unserialize.
+ *
+ * @type {number}
+ */
+  private type = GeomType.MATH_MATRIX3;
   public elements = [
     1, 0, 0,
     0, 1, 0,
@@ -5627,6 +5669,12 @@ class Matrix3 {
  * transpose of any matrices outlined here to make sense of the calculations.
  */
 class Matrix4 {
+  /**
+ * The type of data for unserialize.
+ *
+ * @type {number}
+ */
+  private type = GeomType.MATH_MATRIX4;
   public elements = [
     1, 0, 0, 0,
     0, 1, 0, 0,

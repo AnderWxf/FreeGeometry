@@ -6,6 +6,15 @@ enum DisplayLayers {
 }
 // 几何类型,名字也是创建命令
 enum GeomType {
+  MATH_VECTOR2 = -1,
+  MATH_VECTOR3 = -2,
+  MATH_VECTOR4 = -2,
+  MATH_EULER = -3,
+  MATH_QUATERNION = -4,
+  MATH_MATRIX2 = -5,
+  MATH_MATRIX3 = -6,
+  MATH_MATRIX4 = -7,
+
   //绘制类型的最后一段必须和绘制命令的枚举值保持一致。
   // 二维曲线绘制类型
   DRAW_CURVE2_L = 0,       // 两点直线段

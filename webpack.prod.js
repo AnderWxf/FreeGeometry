@@ -19,7 +19,7 @@ module.exports = {
             configFile: 'tsconfig.json'
           }
         },
-        exclude: /node_modules/,
+        exclude: '/node_modules/|/src/__tests__/',
       },
       {
         test: /\.tsx$/,
@@ -30,7 +30,7 @@ module.exports = {
             configFile: 'tsconfig.json'
           }
         },
-        exclude: /node_modules/,
+        exclude: '/node_modules/|/src/__tests__/',
       },
     ],
   },
