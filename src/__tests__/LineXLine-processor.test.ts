@@ -2,7 +2,7 @@
 import { describe, expect, test } from 'vitest';
 import fs from 'fs';
 import path from 'path';
-import { process } from './processors/LineXLine-001-processor';
+import { process } from './processors/EdgeXEdgeProcessor';
 import type { UserData } from '../helper/UserData';
 import { unserialize } from '../geometry/data/base/Unserialize';
 import { isEqualWith } from 'lodash';
@@ -29,9 +29,39 @@ function loadJSON(filename: string) {
 }
 
 describe('直线求交测试', () => {
-  test('测试样例001', () => {
+  test('测试样例001 中间相交', () => {
     const input = loadJSON('/data/curve/case-1-input.json');
     const expected = loadJSON('/data/curve/case-1-expected.json');
+    const result = process(input);
+    expect(isCloseTo(result, expected, 1e-12)).toBe(true);
+  });
+  test('测试样例002 端点对中间', () => {
+    const input = loadJSON('/data/curve/case-2-input.json');
+    const expected = loadJSON('/data/curve/case-2-expected.json');
+    const result = process(input);
+    expect(isCloseTo(result, expected, 1e-12)).toBe(true);
+  });
+  test('测试样例003 端点对端点', () => {
+    const input = loadJSON('/data/curve/case-3-input.json');
+    const expected = loadJSON('/data/curve/case-3-expected.json');
+    const result = process(input);
+    expect(isCloseTo(result, expected, 1e-12)).toBe(true);
+  });
+  test('测试样例004 平行不相交', () => {
+    const input = loadJSON('/data/curve/case-4-input.json');
+    const expected = loadJSON('/data/curve/case-4-expected.json');
+    const result = process(input);
+    expect(isCloseTo(result, expected, 1e-12)).toBe(true);
+  });
+  test('测试样例005 共线不相交', () => {
+    const input = loadJSON('/data/curve/case-5-input.json');
+    const expected = loadJSON('/data/curve/case-5-expected.json');
+    const result = process(input);
+    expect(isCloseTo(result, expected, 1e-12)).toBe(true);
+  });
+  test('测试样例006 分离不相交', () => {
+    const input = loadJSON('/data/curve/case-6-input.json');
+    const expected = loadJSON('/data/curve/case-6-expected.json');
     const result = process(input);
     expect(isCloseTo(result, expected, 1e-12)).toBe(true);
   });
