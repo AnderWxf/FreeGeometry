@@ -1,8 +1,7 @@
 # FreeGeometry
 Brep,Geometry
 
-
-Install:
+# Install:
 npm install -save typescrpt
 
 npm install -save three
@@ -15,11 +14,10 @@ npm install -save vitest
 
 npm install -save lodash
 
-
-# if show errr, build again.
-Build:
+# Build:
 ./build
+if show errr, build again.
 
-Test:
+# Test:
 npx vitest --ui
 
