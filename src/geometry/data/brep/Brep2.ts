@@ -419,6 +419,7 @@ class Face2 extends DataBase {
     let result = new Face2();
     result.curves = this.curves?.map((c) => c.clone());
     result.vertices = this.vertices?.map((v) => v.clone());
+    result.edges = this.edges?.map((e) => e.clone());
     result.border = this.border?.clone();
     result.holes = this.holes?.map((h) => h.clone());
     return result;

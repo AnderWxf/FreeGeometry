@@ -375,6 +375,21 @@ class Face3 extends DataBase {
    */
   private type = GeomType.DATA_TYPE_BREP3_FACE3;
   /**
+   *  vertices of Face.
+   */
+  vertices: Array<Vertice3>;
+
+  /**
+   * curves of Face.
+   */
+  curves: Array<Curve3Data>;
+
+  /**
+   *  edges of Face.
+   */
+  edges: Array<Edge3>;  
+
+  /**
    * border of Face.
    */
   border: Loop3;
@@ -409,6 +424,9 @@ class Face3 extends DataBase {
    */
   constructor() {
     super();
+    this.curves = [];
+    this.vertices = [];
+    this.edges = [];
     this.border = new Loop3();
     this.holes = [];
   }
@@ -420,6 +438,9 @@ class Face3 extends DataBase {
    */
   override clone() {
     let result = new Face3();
+    result.curves = this.curves?.map((c) => c.clone());
+    result.vertices = this.vertices?.map((v) => v.clone());
+    result.edges = this.edges?.map((e) => e.clone());
     result.border = this.border?.clone();
     result.holes = this.holes?.map((v) => v.clone());
     result.surface = this.surface?.clone();
@@ -446,6 +467,57 @@ class Face3 extends DataBase {
     ret.uuid = data.uuid;
     return ret;
   }
+}
+/**
+ * directed graph.
+ */
+class Digraph3 extends DataBase {
+  /**
+   * The type of data for unserialize.
+   *
+   * @type {number}
+   */
+  private type = GeomType.DATA_TYPE_BREP3_DIGRAPH3;
+  /**
+   *  vertices of Face.
+   */
+  vertice3s: Array<Vertice3>;
+
+  /**
+   * Coedges of Loop.
+   */
+
+  coedges: Array<Coedge3>;
+
+  /**
+   * Constructs a Digraph3.
+   *
+   */
+  constructor() {
+    super();
+    this.vertice3s = [];
+    this.coedges = [];
+  }
+
+  /**
+   * Returns a new Digraph3 with unserialize data.
+   *
+   * @return {Digraph3} a new instance.
+   */
+  static Unserialize(data: any): Digraph3 {
+    let ret = new Digraph3();
+    let vertice3s = data.vertice3s as [];
+    for (let i = 0; i < vertice3s.length; i++) {
+      ret.vertice3s.push(Vertice3.Unserialize(vertice3s[i]));
+    }
+    let coedges = data.coedges as [];
+    for (let i = 0; i < coedges.length; i++) {
+      ret.coedges.push(Coedge3.Unserialize(coedges[i]));
+    }
+    ret.uuid = data.uuid;
+    return ret;
+  }
+
 }
 
 /**
@@ -620,6 +692,7 @@ export {
   Coedge3,
   Loop3,
   Face3,
+  Digraph3,
   Shell3,
   Lump3,
   Body3
