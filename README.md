@@ -16,6 +16,7 @@ npm install -save lodash
 
 # Build:
 ./build
+
 if show errr, build again.
 
 # Test:
