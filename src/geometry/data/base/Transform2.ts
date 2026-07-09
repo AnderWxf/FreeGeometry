@@ -104,19 +104,19 @@ class Transform2 {
     return this;
   }
 
-  /**
-   * comput world matrix as a 2D translation trans.
-   *
-   * @return {Matrix3} A reference to this matrix.
-   */
-  makeWorldMatrix() {
-    let matrix = this.makeLocalMatrix();
-    if (this.parent) {
-      let world = this.parent.makeLocalMatrix();
-      matrix.multiply(world);
-    }
-    return matrix;
-  }
+  // /**
+  //  * comput world matrix as a 2D translation trans.
+  //  *
+  //  * @return {Matrix3} A reference to this matrix.
+  //  */
+  // makeWorldMatrix() {
+  //   let matrix = this.makeLocalMatrix();
+  //   if (this.parent) {
+  //     let world = this.parent.makeLocalMatrix();
+  //     matrix.multiply(world);
+  //   }
+  //   return matrix;
+  // }
 
   /**
    * Returns a new Transform2 with copied values from this instance.

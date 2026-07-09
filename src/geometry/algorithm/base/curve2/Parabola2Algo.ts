@@ -64,7 +64,7 @@ class Parabola2Algo extends Curve2Algo {
    */
   u(point: Vector2): number {
     let v = point.clone();
-    v.applyMatrix3(this.dat.trans.makeWorldMatrix().invert());
+    v.applyMatrix3(this.dat.trans.makeLocalMatrix().invert());
     return v.x;
   }
 
@@ -118,7 +118,7 @@ class Parabola2Algo extends Curve2Algo {
    */
   g(point: Vector2): number {
     let v = point.clone();
-    v.applyMatrix3(this.dat.trans.makeWorldMatrix().invert());
+    v.applyMatrix3(this.dat.trans.makeLocalMatrix().invert());
     const x = MATHJS.bignumber(v.x);
     const y = MATHJS.bignumber(v.y);
     let f = MATHJS.bignumber(this.dat.f);

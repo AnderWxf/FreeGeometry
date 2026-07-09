@@ -755,36 +755,56 @@ class Curve2Inter {
    * @param {number} [n] - The max number of intersection points.
    */
   static NurbsXNurbs(c0: Nurbs2Data, c1: Nurbs2Data, tol0: number, tol1: number, n: number = -1): Array<InterOfCurve2> {
-    if (c0.controls.length <= c1.controls.length) {
+    if (1) {
       // 先判断两条nurbs的凸包是否相交，如果不相交，则直接返回空
-      {
-        let algor0 = new Nurbs2Algo(c0);
-        let algor1 = new Nurbs2Algo(c1);
-        let pos0 = new Array<Vector2>();
-        let pos1 = new Array<Vector2>();
-        let m0 = c0.trans.makeLocalMatrix();
-        let m1 = c1.trans.makeLocalMatrix();
-        for (let i = 0; i < algor0.dat.controls.length; i++) {
-          let p = new Vector2(algor0.dat.controls[i].x, algor0.dat.controls[i].y);
-          p.applyMatrix3(m0);
-          pos0.push(p);
-        }
-        for (let i = 0; i < algor1.dat.controls.length; i++) {
-          let p = new Vector2(algor1.dat.controls[i].x, algor1.dat.controls[i].y);
-          p.applyMatrix3(m1);
-          pos1.push(p);
-        }
-        let polygon0 = new Face2Algo(Brep2Builder.BuildPolygonFace(pos0));
-        let polygon1 = new Face2Algo(Brep2Builder.BuildPolygonFace(pos1));
-        if (Brep2Inter.FaceXFace(polygon0, polygon1, tol0, tol1).length == 0) {
-          return [];
-        }
+      let algor0 = new Nurbs2Algo(c0);
+      let algor1 = new Nurbs2Algo(c1);
+      let pos0 = new Array<Vector2>();
+      let pos1 = new Array<Vector2>();
+      let m0 = c0.trans.makeLocalMatrix();
+      let m1 = c1.trans.makeLocalMatrix();
+      for (let i = 0; i < algor0.dat.controls.length; i++) {
+        let p = new Vector2(algor0.dat.controls[i].x, algor0.dat.controls[i].y);
+        p.applyMatrix3(m0);
+        pos0.push(p);
       }
-      let segment = c0.controls.length * 2;
-      return Curve2Inter.CurveXCurve(c0, c1, segment, tol0, tol1, n);
+      for (let i = 0; i < algor1.dat.controls.length; i++) {
+        let p = new Vector2(algor1.dat.controls[i].x, algor1.dat.controls[i].y);
+        p.applyMatrix3(m1);
+        pos1.push(p);
+      }
+      let polygon0 = new Face2Algo(Brep2Builder.BuildPolygonFace(pos0));
+      let polygon1 = new Face2Algo(Brep2Builder.BuildPolygonFace(pos1));
+      if (Brep2Inter.FaceXFace(polygon0, polygon1, tol0, tol1).length == 0) {
+        return [];
+      }
+      if (c0.controls.length <= c1.controls.length) {
+        let segment = c0.controls.length * 2;
+        return Curve2Inter.CurveXCurve(c0, c1, segment, tol0, tol1, n);
+      } else {
+        let segment = c1.controls.length * 2;
+        return Curve2Inter.SwapU(Curve2Inter.CurveXCurve(c1, c0, segment, tol0, tol1, n));
+      }
     } else {
-      let segment = c1.controls.length * 2;
-      return Curve2Inter.SwapU(Curve2Inter.CurveXCurve(c1, c0, segment, tol0, tol1, n));
+      // 使用verb求交，算法结果不稳定，精度只能稳定在1e-7左右。
+      let ret = new Array<InterOfCurve2>();
+      let algor0 = new Nurbs2Algo(c0);
+      let algor1 = new Nurbs2Algo(c1);
+
+      let verb0 = algor0.getVernurbs();
+      let verb1 = algor1.getVernurbs();
+
+      let inters0 = verb.eval.Intersect.curves(verb0._data, verb1._data, tol0);
+      let inters1 = verb.eval.Intersect.curves(verb0._data, verb1._data, tol0);
+      let inters2 = verb.eval.Intersect.curves(verb0._data, verb1._data, tol0);
+      let inters = verb.eval.Intersect.curves(verb0._data, verb1._data, tol0);
+      inters.forEach((inter: any) => {
+        let p = new Vector2(inter.point0[0], inter.point0[1]);
+        let u0 = inter.u0;
+        let u1 = inter.u1;
+        ret.push({ p, u0, u1 });
+      });
+      return ret;
     }
   }
 
@@ -937,8 +957,8 @@ class Curve2Inter {
   /**
    * compute curve to curve intersection point.
    *
-   * @param {Curve2Data} [c0] - The frist curve , binary search curve.
-   * @param {Curve2Data} [c1] - The second curve , general equation curve.
+   * @param {Curve2Data} [c0] - The frist curve.
+   * @param {Curve2Data} [c1] - The second curve.
    * @param {number} [tol0] - The tolerance of geometric.
    * @param {number} [tol1] - The tolerance of algebraic.
    */

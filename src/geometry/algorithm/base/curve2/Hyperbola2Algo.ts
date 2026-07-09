@@ -334,7 +334,7 @@ class Hyperbola2Algo extends Curve2Algo {
    */
   u(point: Vector2): number {
     let v = point.clone();
-    v.applyMatrix3(this.dat.trans.makeWorldMatrix().invert());
+    v.applyMatrix3(this.dat.trans.makeLocalMatrix().invert());
     const b = MATHJS.bignumber(this.dat.radius.y);
     const y = MATHJS.bignumber(point.y);
     const φ = MATHJS.atan(MATHJS.divide(y, b) as MATHJS.BigNumber);
@@ -414,7 +414,7 @@ class Hyperbola2Algo extends Curve2Algo {
    */
   g(point: Vector2): number {
     let v = point.clone();
-    v.applyMatrix3(this.dat.trans.makeWorldMatrix().invert());
+    v.applyMatrix3(this.dat.trans.makeLocalMatrix().invert());
     const x = MATHJS.bignumber(v.x);
     const y = MATHJS.bignumber(v.y);
     let a = MATHJS.bignumber(this.dat.radius.x);

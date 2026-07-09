@@ -77,8 +77,8 @@ function ExecuteDescribe(typeName: string, typeDir: string, process: (input: any
         }
       });
     });
-  });  
+  });
 }
 
-export { IsCloseTo , LoadJSON , DiscoverTestCases,ExecuteDescribe };
+export { IsCloseTo, LoadJSON, DiscoverTestCases, ExecuteDescribe };
 export type { TestCase };

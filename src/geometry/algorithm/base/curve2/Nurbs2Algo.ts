@@ -3,7 +3,6 @@ import { Nurbs2Data } from "../../../data/base/curve2/Nurbs2Data";
 import { Transform2 } from "../../../data/base/Transform2";
 import { Curve2Algo } from "../Curve2Algo";
 import verb from 'verb-nurbs';
-// import * as verb from 'verb-nurbs';
 
 /**
  * nurbs algorithm.
@@ -21,12 +20,12 @@ class Nurbs2Algo extends Curve2Algo {
   public override get dat(): Nurbs2Data {
     return this._dat;
   }
-
   public override set dat(dat: Nurbs2Data) {
     this._dat = dat;
     let controls: number[][] = [];
     for (let i = 0; i < dat.controls.length; i++) {
-      controls.push([dat.controls[i].x, dat.controls[i].y, dat.controls[i].z]);
+      let control = dat.controls[i].clone();
+      controls.push([control.x, control.y, control.z]);
     }
     this.curve_ = new verb.geom.NurbsCurve({
       degree: dat.degree, // 维度
@@ -46,13 +45,36 @@ class Nurbs2Algo extends Curve2Algo {
   }
 
   /**
+   * Get NurbsCurve with local matrix
+   *
+   * @retun {verb-nurbs.NurbsCurve}
+   */
+  // 
+  getVernurbs(): any {
+    let dat = this.dat;
+    let m = dat.trans.makeLocalMatrix();
+    let controls: number[][] = [];
+    for (let i = 0; i < dat.controls.length; i++) {
+      let control = dat.controls[i].clone();
+      control.applyMatrix3(m);
+      controls.push([control.x, control.y, control.z]);
+    }
+    let curve_ = new verb.geom.NurbsCurve({
+      degree: dat.degree, // 维度
+      knots: dat.knots, // 节点向量
+      controlPoints: controls
+    });
+    return curve_;
+  }
+
+  /**
    * the U function return u parameter at a position .
    * @param {Vector2} [point] - the point on curve.
    * @retun {number}
    */
   u(point: Vector2): number {
     let v = point.clone();
-    v.applyMatrix3(this.dat.trans.makeWorldMatrix().invert());
+    v.applyMatrix3(this.dat.trans.makeLocalMatrix().invert());
     let u = verb.eval.Analyze.rationalCurveClosestParam(this.curve_._data, [v.x, v.y]) as number;
     if (u == 0 || u == 1) {
       let d_ = verb.eval.Eval.rationalCurveDerivatives(this.curve_._data, u, 1) as number[][];
@@ -97,7 +119,7 @@ class Nurbs2Algo extends Curve2Algo {
    */
   g(point: Vector2): number {
     let v = point.clone();
-    v.applyMatrix3(this.dat.trans.makeWorldMatrix().invert());
+    v.applyMatrix3(this.dat.trans.makeLocalMatrix().invert());
     let u = verb.eval.Analyze.rationalCurveClosestParam(this.curve_._data, [v.x, v.y]) as number;
     let d_ = verb.eval.Eval.rationalCurveDerivatives(this.curve_._data, u, 1) as number[][];
     let p = new Vector2(d_[0][0], d_[0][1]);

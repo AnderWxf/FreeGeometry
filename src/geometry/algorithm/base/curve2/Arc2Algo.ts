@@ -38,7 +38,7 @@ class Arc2Algo extends Curve2Algo {
    */
   u(point: Vector2): number {
     let v = point.clone();
-    v.applyMatrix3(this.dat.trans.makeWorldMatrix().invert());
+    v.applyMatrix3(this.dat.trans.makeLocalMatrix().invert());
     // const x = MATHJS.bignumber(v.x);
     // const y = MATHJS.bignumber(v.y);
     // let a = MathUtils.clamp((MATHJS.divide(x, MATHJS.bignumber(this.dat.radius.x)) as MATHJS.BigNumber).toNumber(), -1, 1);
@@ -111,7 +111,7 @@ class Arc2Algo extends Curve2Algo {
    */
   g(point: Vector2): number {
     let v = point.clone();
-    v.applyMatrix3(this.dat.trans.makeWorldMatrix().invert());
+    v.applyMatrix3(this.dat.trans.makeLocalMatrix().invert());
     const x = MATHJS.bignumber(v.x);
     const y = MATHJS.bignumber(v.y);
     let a = MATHJS.bignumber(this.dat.radius.x);

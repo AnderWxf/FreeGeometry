@@ -50,7 +50,7 @@ class Nurbs3Algo extends Curve3Algo {
    */
   u(point: Vector3): number {
     let v = point.clone();
-    v.applyMatrix4(this.dat.trans.makeWorldMatrix().invert());
+    v.applyMatrix4(this.dat.trans.makeLocalMatrix().invert());
     let u = verb.eval.Analyze.rationalCurveClosestParam(this.curve_._data, [v.x, v.y]) as number;
     return u;
   }
@@ -85,7 +85,7 @@ class Nurbs3Algo extends Curve3Algo {
    */
   g(point: Vector3): Vector2 {
     // let v = point.clone();
-    // v.applyMatrix4(this.dat.trans.makeWorldMatrix().invert());
+    // v.applyMatrix4(this.dat.trans.makeLocalMatrix().invert());
     // let u = verb.eval.Analyze.rationalCurveClosestParam(this.curve_._data, [v.x, v.y]) as number;
     // let p_ = verb.eval.Eval.rationalCurvePoint(this.curve_._data, u) as number[];
     // let t_ = verb.eval.Eval.rationalCurveDerivatives(this.curve_._data, u, 1) as number[];
