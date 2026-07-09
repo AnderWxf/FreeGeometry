@@ -10,7 +10,6 @@ import { CommandType } from '../core/Constents';
 import { SaveFilled, EditTwoTone, BuildFilled, AppstoreFilled, CalculatorOutlined, LineChartOutlined, AreaChartOutlined, GlobalOutlined, RubyOutlined, BlockOutlined } from '@ant-design/icons';
 import type { MenuInfo } from 'rc-menu/lib/interface';
 
-
 const perspective: PerspectiveController = new PerspectiveController();
 const orthographic: OrthographicController = new OrthographicController();
 
@@ -104,9 +103,10 @@ let CamToolBarOnChange = (value: string) => {
 };
 const CamToolBar: React.FC = () => (
   <Space wrap>
+
     <Select
       defaultValue="前"
-      style={{ width: 50, position: 'fixed', top: 10, right: 10, zIndex: 1000 }}
+      style={{ width: 50, position: 'fixed', top: 10, right: 10, zIndex: 1000, backgroundColor: 'transparent' }}
       onSelect={(value: string) => {
         CamToolBarOnChange(value);
       }}
@@ -120,13 +120,14 @@ const CamToolBar: React.FC = () => (
         { value: '透', label: '透' },
       ]}
     />
+
   </Space>
 );
 
 const ComOptionBar: React.FC = () => (
   <Space wrap>
     <Checkbox
-      style={{ width: 100, position: 'fixed', top: 10, right: 70, zIndex: 1000, color: '#00A000', accentColor: '#00A000' }}
+      style={{ width: 100, position: 'fixed', top: 10, right: 70, zIndex: 1000, backgroundColor: 'transparent' }}
       onChange={(e) => {
         Global.select.isSnap = e.target.checked;
       }}
@@ -135,19 +136,19 @@ const ComOptionBar: React.FC = () => (
       }}
     >捕捉</Checkbox>
     <Checkbox
-      style={{ width: 100, position: 'fixed', top: 10, right: 180, zIndex: 1000, color: '#00A000' }}
-      onChange={(e) => {
-        Global.select.isSnapInter = e.target.checked;
-      }}
-    >捕捉交点</Checkbox>
-    <Checkbox
-      style={{ width: 100, position: 'fixed', top: 10, right: 300, zIndex: 1000, color: '#00A000' }}
+      style={{ width: 100, position: 'fixed', top: 10, right: 180, zIndex: 1000, backgroundColor: 'transparent' }}
       onChange={(e) => {
         Global.select.isEditor = e.target.checked;
       }}
     >编辑</Checkbox>
     {/* <Checkbox
-            style={{ width: 100, position:'fixed', top: 10, left: 75, zIndex: 1000, color:'#00A000' }}
+      style={{ width: 100, position: 'fixed', top: 10, right: 300, zIndex: 1000 }}
+      onChange={(e) => {
+        Global.select.isSnapInter = e.target.checked;
+      }}
+    >捕捉交点</Checkbox> */}
+    {/* <Checkbox
+            style={{ width: 100, position:'fixed', top: 10, left: 75, zIndex: 1000}}
             onChange={(e) => {
                 Global.isShowAssists = e.target.checked;
             }}
@@ -450,7 +451,7 @@ const MenuBar: React.FC = () => (
         components: {
           Menu: {
             itemBg: 'transparent',          // 菜单项背景色
-            itemColor: '#00A000',         // 菜单项文字颜色
+            // itemColor: TextColor,         // 菜单项文字颜色
             itemSelectedBg: 'transparent',  // 选中态背景色
             popupBg: 'transparent',
             colorSubItemBg: 'transparent',
@@ -476,7 +477,7 @@ const MenuBar: React.FC = () => (
 
 
     <Input id='CommandLine' placeholder="请输入命令"
-      style={{ position: 'fixed', width: '100%', bottom: 0, right: 0, color: "#00A000", backgroundColor: 'transparent' }}
+      style={{ position: 'fixed', width: '100%', bottom: 0, right: 0, backgroundColor: 'transparent' }}
       onPressEnter={(e) => {
         e.stopPropagation();
         let element = (e.target as HTMLInputElement);
@@ -518,10 +519,19 @@ export default { perspective, orthographic, grid_xz, grid_xy, grid_yz, CamToolBa
 const root = ReactDOM.createRoot(document.getElementById('ui'));
 root.render(
   <React.StrictMode>
-    <CamToolBar />
-    <ComOptionBar />
-    <MenuBar />
-    <CommandBar />
+    <ConfigProvider
+      theme={{
+        token: {
+          colorTextBase: '#00A000', // 修改为你需要的颜色，例如红色
+          colorBgBase: 'transparent'
+        },
+      }}
+    >
+      <CamToolBar />
+      <ComOptionBar />
+      <MenuBar />
+      <CommandBar />
+    </ConfigProvider>
   </React.StrictMode>
 );
 
