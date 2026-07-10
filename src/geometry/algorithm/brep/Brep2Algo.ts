@@ -117,6 +117,14 @@ class Edge2Algo {
   d(u: number): Vector2 {
     return this._e.isPositive() ? this._algo.d(u) : this._algo.d(u).negate();
   }
+  //U function
+  uf(p: Vector2): number {
+    return this._algo.u(p);
+  }
+  //the G(general) function 
+  gf(p: Vector2): number {
+    return this._algo.g(p);
+  }
   get e(): Edge2 {
     return this._e;
   }

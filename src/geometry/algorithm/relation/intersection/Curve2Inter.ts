@@ -756,28 +756,28 @@ class Curve2Inter {
    */
   static NurbsXNurbs(c0: Nurbs2Data, c1: Nurbs2Data, tol0: number, tol1: number, n: number = -1): Array<InterOfCurve2> {
     if (1) {
-      // 先判断两条nurbs的凸包是否相交，如果不相交，则直接返回空
-      let algor0 = new Nurbs2Algo(c0);
-      let algor1 = new Nurbs2Algo(c1);
-      let pos0 = new Array<Vector2>();
-      let pos1 = new Array<Vector2>();
-      let m0 = c0.trans.makeLocalMatrix();
-      let m1 = c1.trans.makeLocalMatrix();
-      for (let i = 0; i < algor0.dat.controls.length; i++) {
-        let p = new Vector2(algor0.dat.controls[i].x, algor0.dat.controls[i].y);
-        p.applyMatrix3(m0);
-        pos0.push(p);
-      }
-      for (let i = 0; i < algor1.dat.controls.length; i++) {
-        let p = new Vector2(algor1.dat.controls[i].x, algor1.dat.controls[i].y);
-        p.applyMatrix3(m1);
-        pos1.push(p);
-      }
-      let polygon0 = new Face2Algo(Brep2Builder.BuildPolygonFace(pos0));
-      let polygon1 = new Face2Algo(Brep2Builder.BuildPolygonFace(pos1));
-      if (Brep2Inter.FaceXFace(polygon0, polygon1, tol0, tol1).length == 0) {
-        return [];
-      }
+      // // 先判断两条nurbs的凸包是否相交，如果不相交，则直接返回空
+      // let algor0 = new Nurbs2Algo(c0);
+      // let algor1 = new Nurbs2Algo(c1);
+      // let pos0 = new Array<Vector2>();
+      // let pos1 = new Array<Vector2>();
+      // let m0 = c0.trans.makeLocalMatrix();
+      // let m1 = c1.trans.makeLocalMatrix();
+      // for (let i = 0; i < algor0.dat.controls.length; i++) {
+      //   let p = new Vector2(algor0.dat.controls[i].x, algor0.dat.controls[i].y);
+      //   p.applyMatrix3(m0);
+      //   pos0.push(p);
+      // }
+      // for (let i = 0; i < algor1.dat.controls.length; i++) {
+      //   let p = new Vector2(algor1.dat.controls[i].x, algor1.dat.controls[i].y);
+      //   p.applyMatrix3(m1);
+      //   pos1.push(p);
+      // }
+      // let polygon0 = new Face2Algo(Brep2Builder.BuildPolygonFace(pos0));
+      // let polygon1 = new Face2Algo(Brep2Builder.BuildPolygonFace(pos1));
+      // if (Brep2Inter.FaceXFace(polygon0, polygon1, tol0, tol1).length == 0) {
+      //   return [];
+      // }
       if (c0.controls.length <= c1.controls.length) {
         let segment = c0.controls.length * 2;
         return Curve2Inter.CurveXCurve(c0, c1, segment, tol0, tol1, n);

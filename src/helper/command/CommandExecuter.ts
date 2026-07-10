@@ -65,6 +65,9 @@ import { Bool2MulUnionCom } from "./coms/bool/Bool2MulUnionCom";
 import { Bool2MulDifferenceCom } from "./coms/bool/Bool2MulDifferenceCom";
 import { Bool2MulIntersectionCom } from "./coms/bool/Bool2MulIntersectionCom";
 import { ModifyCircleAreaCom } from "./coms/face/ModifyCircleAreaCom";
+import { CreateVector2Com } from "./coms/point/CreateVector2Com";
+import { CalculateCurve2UCom } from "./coms/calculate/CalculateCurve2UCom";
+import { CalculateCurve2GCom } from "./coms/calculate/CalculateCurve2GCom";
 
 /**
  * Command executer base class.
@@ -83,6 +86,8 @@ class CommandExecuter {
     this.InitCommand();
   }
   private InitCommand() {
+    this._commands.set(CommandType.CREATE_VECTOR2, CreateVector2Com);
+
     this._commands.set(CommandType.CREATE_LINE, CreateLine2Com);
     this._commands.set(CommandType.CREATE_CIRCLE, CreateCircle2Com);
     this._commands.set(CommandType.CREATE_ARC, CreateArc2Com);
@@ -122,6 +127,11 @@ class CommandExecuter {
     this._commands.set(CommandType.MODIFY_ELLIPSE_SURFACE, ModifyEllipseAreaCom);
     this._commands.set(CommandType.MODIFY_POLYGON_SURFACE, ModifyPolylineAreaCom);
     this._commands.set(CommandType.MODIFY_RECTANGLE_SURFACE, ModifyRectangleAreaCom);
+
+
+
+    this._commands.set(CommandType.CALCULATE_CURVE2_U, CalculateCurve2UCom);
+    this._commands.set(CommandType.CALCULATE_CURVE2_G, CalculateCurve2GCom);
 
     this._commands.set(CommandType.CALCULATE_LENGTH_2, CalculateLoop2LengthCom);
     this._commands.set(CommandType.CALCULATE_LENGTH_3, CalculateLoop3LengthCom);

@@ -12,16 +12,19 @@ class SceneLoadCom extends Command {
     this.results = [];
   }
   static this_: SceneLoadCom;
+  static input_: HTMLInputElement;
   async exec() {
     SceneLoadCom.this_ = this;
     try {
-      const fileInput = document.getElementById('fileInput');
-      // 克隆元素（包括所有子节点）
-      const newfileInput = fileInput.cloneNode(true) as HTMLElement;
-      // 用克隆的元素替换原元素
-      fileInput.parentNode.replaceChild(newfileInput, fileInput);
-      newfileInput.addEventListener('change', this.onLoaded);
-      newfileInput.click();
+      if (!SceneLoadCom.input_) {
+        SceneLoadCom.input_ = document.createElement('input');
+        SceneLoadCom.input_.type = 'file';
+        SceneLoadCom.input_.hidden = true;
+        SceneLoadCom.input_.accept = '.json,application/json';
+      }
+      SceneLoadCom.input_.addEventListener('change', this.onLoaded);
+      SceneLoadCom.input_.addEventListener('cancel', this.onCancel);
+      SceneLoadCom.input_.click();
     } catch (error) {
       if (error instanceof Error) {
         if (error.name === 'AbortError') {
@@ -33,7 +36,13 @@ class SceneLoadCom extends Command {
       }
     }
   }
+  onCancel(event: any): void {
+    // 清理监听器，防止内存泄漏
+    event.target.removeEventListener('change', this.onLoaded);
+    event.target.removeEventListener('cancel', this.onCancel);
+  }
   onLoaded(event: any): void {
+    SceneLoadCom.this_.onCancel(event);
     const file = event.target.files[0];
     if (!file) {
       alert('请选择一个文件');

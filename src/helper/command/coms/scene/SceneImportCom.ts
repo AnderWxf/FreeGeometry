@@ -11,16 +11,19 @@ class SceneImportCom extends Command {
     this.results = [];
   }
   static this_: SceneImportCom;
+  static input_: HTMLInputElement;
   async exec() {
     SceneImportCom.this_ = this;
     try {
-      const fileInput = document.getElementById('fileInput');
-      // 克隆元素（包括所有子节点）
-      const newfileInput = fileInput.cloneNode(true) as HTMLElement;
-      // 用克隆的元素替换原元素
-      fileInput.parentNode.replaceChild(newfileInput, fileInput);
-      newfileInput.addEventListener('change', this.onLoaded);
-      newfileInput.click();
+      if (!SceneImportCom.input_) {
+        SceneImportCom.input_ = document.createElement('input');
+        SceneImportCom.input_.type = 'file';
+        SceneImportCom.input_.hidden = true;
+        SceneImportCom.input_.accept = '.json,application/json';
+      }
+      SceneImportCom.input_.addEventListener('change', this.onLoaded);
+      SceneImportCom.input_.addEventListener('cancel', this.onCancel);
+      SceneImportCom.input_.click();
     } catch (error) {
       if (error instanceof Error) {
         if (error.name === 'AbortError') {
@@ -32,6 +35,11 @@ class SceneImportCom extends Command {
       }
     }
   }
+  onCancel(event: any): void {
+    // 清理监听器，防止内存泄漏
+    event.target.removeEventListener('change', this.onLoaded);
+    event.target.removeEventListener('cancel', this.onCancel);
+  }  
   onLoaded(event: any): void {
     const file = event.target.files[0];
     if (!file) {

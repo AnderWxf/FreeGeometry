@@ -7,7 +7,7 @@ import { OrthographicController } from '../helper/camera/OrthographicController'
 import { Grid } from '../helper/Grid';
 import { Global } from '../core/Global';
 import { CommandType } from '../core/Constents';
-import { SaveFilled, EditTwoTone, BuildFilled, AppstoreFilled, CalculatorOutlined, LineChartOutlined, AreaChartOutlined, GlobalOutlined, RubyOutlined, BlockOutlined } from '@ant-design/icons';
+import { SaveFilled, EditTwoTone, BuildFilled, AppstoreFilled, CalculatorOutlined, LineChartOutlined, AreaChartOutlined, GlobalOutlined, RubyOutlined, BlockOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import type { MenuInfo } from 'rc-menu/lib/interface';
 
 const perspective: PerspectiveController = new PerspectiveController();
@@ -126,6 +126,7 @@ const CamToolBar: React.FC = () => (
 
 const ComOptionBar: React.FC = () => (
   <Space wrap>
+
     <Checkbox
       style={{ width: 100, position: 'fixed', top: 10, right: 70, zIndex: 1000, backgroundColor: 'transparent' }}
       onChange={(e) => {
@@ -141,6 +142,7 @@ const ComOptionBar: React.FC = () => (
         Global.select.isEditor = e.target.checked;
       }}
     >编辑</Checkbox>
+    <div id='states' style={{ width: 150, position: 'fixed', fontSize: 14, top: 10, right: 300, color: '#00AA00', zIndex: 1000 }}> 光标位置 </div>
     {/* <Checkbox
       style={{ width: 100, position: 'fixed', top: 10, right: 300, zIndex: 1000 }}
       onChange={(e) => {
@@ -223,6 +225,16 @@ const MenuItems = [
     icon: <BuildFilled />,
     label: '创建',
     children: [
+      {
+        // 基本创建命令
+        key: 'vector',
+        icon: <PlusCircleOutlined />,
+        label: '点',
+        children: [
+          // 基础类型
+          { key: CommandType.CREATE_VECTOR2, label: '二维点' + ' ' + CommandType.CREATE_VECTOR2 },
+        ]
+      },
       {
         // 基本创建命令
         key: 'curve',
@@ -425,6 +437,8 @@ const MenuItems = [
     label: '计算',
     children: [
       //计算
+      { key: CommandType.CALCULATE_CURVE2_U, label: '计算U函数' + ' ' + CommandType.CALCULATE_CURVE2_U },
+      { key: CommandType.CALCULATE_CURVE2_G, label: '计算G函数' + ' ' + CommandType.CALCULATE_CURVE2_G },
       { key: CommandType.CALCULATE_LENGTH_2, label: '计算长度' + ' ' + CommandType.CALCULATE_LENGTH_2 },
       { key: CommandType.CALCULATE_AREA_2, label: '计算面积' + ' ' + CommandType.CALCULATE_AREA_2 },
       { key: CommandType.CALCULATE_LENGTH_3, label: '计算长度' + ' ' + CommandType.CALCULATE_LENGTH_3 },
@@ -445,7 +459,7 @@ const MenuBarOnChange = (info: MenuInfo): void => {
 };
 const MenuBar: React.FC = () => (
   <Space wrap>
-    <input type="file" id="fileInput" accept=".json,application/json" hidden></input>
+    {/* <Input type="file" id="fileInput" accept=".json,application/json" hidden ></Input> */}
     <ConfigProvider
       theme={{
         components: {
@@ -474,44 +488,6 @@ const MenuBar: React.FC = () => (
         items={MenuItems}
       />
     </ConfigProvider>
-
-
-    <Input id='CommandLine' placeholder="请输入命令"
-      style={{ position: 'fixed', width: '100%', bottom: 0, right: 0, backgroundColor: 'transparent' }}
-      onPressEnter={(e) => {
-        e.stopPropagation();
-        let element = (e.target as HTMLInputElement);
-        element.disabled = true;
-        const value = element.value;
-        inputs.push(value);
-        pos = inputs.length - 1;
-        CommandBarOnEnter(value);
-      }}
-      onBlur={(e) => {
-        let element = (e.target as HTMLInputElement);
-        // element.disabled = true;
-      }}
-      onKeyUp={(e) => {
-        e.stopPropagation();
-      }}
-      onKeyDown={(e) => {
-        switch (e.key) {
-          case 'ArrowUp':
-            if (pos > 0) {
-              pos--;
-              (e.target as HTMLInputElement).value = inputs[pos];
-            }
-            break;
-          case 'ArrowDown':
-            if (pos < inputs.length - 1) {
-              pos++;
-              (e.target as HTMLInputElement).value = inputs[pos];
-            }
-            break;
-        };
-        e.stopPropagation();
-      }}
-    />
   </Space>
 );
 export default { perspective, orthographic, grid_xz, grid_xy, grid_yz, CamToolBarOnChange };
@@ -522,8 +498,9 @@ root.render(
     <ConfigProvider
       theme={{
         token: {
-          colorTextBase: '#00A000', // 修改为你需要的颜色，例如红色
-          colorBgBase: 'transparent'
+          colorTextBase: '#00AA00', // 修改为你需要的颜色，例如红色
+          colorBgBase: 'transparent',
+          // fontWeightStrong: 700
         },
       }}
     >

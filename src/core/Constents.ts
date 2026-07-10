@@ -116,6 +116,8 @@ enum GeomType {
 // 命令类型
 enum CommandType {
   /********基本创建命令**********/
+  // 点类型
+  CREATE_VECTOR2 = 'P2',              // 点
   // 二维曲线类型
   CREATE_LINE = 'L',                  // 两点直线段
   CREATE_ARC = 'A',                   // 圆弧
@@ -223,6 +225,9 @@ enum CommandType {
   CALCULATE_LENGTH_3 = 'CL3',          // 计算长度
   CALCULATE_AREA_3 = 'CA3',            // 计算面积
   CALCULATE_VOLUME_3 = 'CV3',          // 计算体积
+
+  CALCULATE_CURVE2_U = 'CCU',           // 计算曲线U函数
+  CALCULATE_CURVE2_G = 'CCG',           // 计算曲线G函数
 
   //基础操作
   OPERATION_EDGE_INTERSECTION = 'OEI', // 边交点(多选对象组中的第一个与后面所有对象间的交点)

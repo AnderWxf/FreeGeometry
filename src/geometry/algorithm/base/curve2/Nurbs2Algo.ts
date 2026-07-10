@@ -81,7 +81,7 @@ class Nurbs2Algo extends Curve2Algo {
       let p = new Vector2(d_[0][0], d_[0][1]);
       let v0 = new Vector2(d_[1][0], d_[1][1]); // 切向量
       v0.normalize();
-      let v1 = v.sub(p);          // 投影点到目标点方向
+      let v1 = v.clone().sub(p);          // 投影点到目标点方向
       let dot = v1.dot(v0);
       u += dot;
     }
@@ -124,9 +124,16 @@ class Nurbs2Algo extends Curve2Algo {
     let d_ = verb.eval.Eval.rationalCurveDerivatives(this.curve_._data, u, 1) as number[][];
     let p = new Vector2(d_[0][0], d_[0][1]);
     let v0 = new Vector2(d_[1][0], d_[1][1]); // 切向量
-    let v1 = v.sub(p);          // 投影点到目标点方向
-    let ret = v1.length();
-    let d = v1.cross(v0);
+    let v0n = v0.clone().normalize();
+    let v1 = v.clone().sub(p);
+    // 投影点到目标点方向
+    let dot = v1.dot(v0n);
+    let off = v0n.clone().multiplyScalar(dot);
+    let proj = p.clone().add(off);
+    let v2 = v.clone().sub(proj);
+    let v2n = v2.clone().normalize();
+    let ret = v2.length();
+    let d = v2n.cross(v0n);
     // 叉乘>0,则v1在v0右侧，返回值取负数，反之取正数。
     if (d > 0) {
       ret = -ret;

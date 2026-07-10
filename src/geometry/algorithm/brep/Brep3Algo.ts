@@ -117,6 +117,14 @@ class Edge3Algo {
   d(u: number): Vector3 {
     return this._e.isPositive() ? this._algo.d(u) : this._algo.d(u).negate();
   }
+  //U function
+  uf(p: Vector3): number {
+    return this._algo.u(p);
+  }
+  //the G(general) function 
+  gf(p: Vector3): Vector2 {
+    return this._algo.g(p);
+  }
   get e(): Edge3 {
     return this._e;
   }
