@@ -142,7 +142,7 @@ const ComOptionBar: React.FC = () => (
         Global.select.isEditor = e.target.checked;
       }}
     >编辑</Checkbox>
-    <div id='states' style={{ width: 150, position: 'fixed', fontSize: 14, top: 10, right: 300, color: '#00AA00', zIndex: 1000 }}> 光标位置 </div>
+    <div id='states' style={{ width: 300, position: 'fixed', fontSize: 14, top: 10, right: 350, color: '#00AA00', zIndex: 1000 }}> 光标位置 </div>
     {/* <Checkbox
       style={{ width: 100, position: 'fixed', top: 10, right: 300, zIndex: 1000 }}
       onChange={(e) => {
@@ -436,7 +436,13 @@ const MenuItems = [
     icon: <CalculatorOutlined />,
     label: '计算',
     children: [
-      //计算
+      //参数关系计算
+      { key: CommandType.CALCULATE_CURVE2_U, label: '计算U函数' + ' ' + CommandType.CALCULATE_CURVE2_U },
+      { key: CommandType.CALCULATE_CURVE2_G, label: '计算G函数' + ' ' + CommandType.CALCULATE_CURVE2_G },
+      { key: CommandType.CALCULATE_POINT_EDGE2, label: '计算点边关系' + ' ' + CommandType.CALCULATE_POINT_EDGE2 },
+      { key: CommandType.CALCULATE_POINT_FACE2, label: '计算点面关系' + ' ' + CommandType.CALCULATE_POINT_FACE2 },
+
+      // 度量计算
       { key: CommandType.CALCULATE_CURVE2_U, label: '计算U函数' + ' ' + CommandType.CALCULATE_CURVE2_U },
       { key: CommandType.CALCULATE_CURVE2_G, label: '计算G函数' + ' ' + CommandType.CALCULATE_CURVE2_G },
       { key: CommandType.CALCULATE_LENGTH_2, label: '计算长度' + ' ' + CommandType.CALCULATE_LENGTH_2 },

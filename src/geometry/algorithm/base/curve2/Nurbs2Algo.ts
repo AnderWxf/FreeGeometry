@@ -76,6 +76,22 @@ class Nurbs2Algo extends Curve2Algo {
     let v = point.clone();
     v.applyMatrix3(this.dat.trans.makeLocalMatrix().invert());
     let u = verb.eval.Analyze.rationalCurveClosestParam(this.curve_._data, [v.x, v.y]) as number;
+    let points = verb.eval.Eval.curvePoint(this.curve_._data, u) as number[];
+    // rationalCurveClosestParam 返回的结果有时并不准确，需要检查。
+    let close = new Vector2(points[0] / points[2], points[1] / points[2]);
+    points = verb.eval.Eval.curvePoint(this.curve_._data, 0) as number[];
+    let begin = new Vector2(points[0] / points[2], points[1] / points[2]);
+    points = verb.eval.Eval.curvePoint(this.curve_._data, 1) as number[];
+    let end = new Vector2(points[0] / points[2], points[1] / points[2]);
+    let disc = close.distanceTo(v);
+    let disb = begin.distanceTo(v);
+    let dise = end.distanceTo(v);
+    if (u > 0 && disb < disc && disb < dise) {
+      u = 0;
+    }
+    if (u < 1 && dise < disc && dise < disb) {
+      u = 1;
+    }
     if (u == 0 || u == 1) {
       let d_ = verb.eval.Eval.rationalCurveDerivatives(this.curve_._data, u, 1) as number[][];
       let p = new Vector2(d_[0][0], d_[0][1]);

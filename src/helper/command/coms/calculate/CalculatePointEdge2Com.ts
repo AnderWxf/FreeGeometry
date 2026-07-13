@@ -11,11 +11,11 @@ import { Vector2 } from "../../../../math/Math";
 
 
 /**
- * Calculate curv2 g command class.
+ * Calculate point edge2 relation command class.
  * 
  */
-class CalculateCurve2GCom extends Command {
-  public results: number = 0;
+class CalculatePointEdge2Com extends Command {
+  public results: string;
   edge: Edge2;
   algo: Edge2Algo;
   constructor(executer: CommandExecuter, text: string) {
@@ -42,6 +42,10 @@ class CalculateCurve2GCom extends Command {
               let original = geo.userData.original as Edge2;
               this.edge = original;
             }
+            if (geo.userData.original instanceof Array) {
+              let original = geo.userData.original[0] as Edge2;
+              this.edge = original;
+            }
           }
         }
       }
@@ -51,8 +55,19 @@ class CalculateCurve2GCom extends Command {
     await act_pick_point.execute(context);
     if (this._isCancel || act_pick_point.isCancel) { this.cancel(); return; }
     let point = new Vector2(act_pick_point.result.x, act_pick_point.result.y);
-    this.results = this.algo.gf(point)
-    console.log('u: ', this.results);
+
+    let isAtSpace = this.algo.isSpacePoint(point, 1e-4, 1e-10);
+    let isAtInner = this.algo.isPointAtInner(point, 1e-4, 1e-10);
+    let isAtBoder = this.algo.isPointAtBoder(point, 1e-4, 1e-10);
+    let isAtOn = this.algo.isPointOn(point, 1e-4, 1e-10);
+
+    this.results = '';
+    this.results += ' ' + (isAtSpace ? 'as' : '!as');
+    this.results += ' ' + (isAtInner ? 'ai' : '!ai');
+    this.results += ' ' + (isAtBoder ? 'ab' : '!ab');
+    this.results += ' ' + (isAtOn ? 'ao' : '!ao');
+
+    console.log('p: ', this.results);
     this.done();
   }
 
@@ -60,12 +75,23 @@ class CalculateCurve2GCom extends Command {
     if (this._isCancel) { this.cancel(); return; }
     if (this.algo) {
       let point: Vector2 = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
-      let g = this.algo.gf(point);
+
+      let isAtSpace = this.algo.isSpacePoint(point, 1e-4, 1e-10);
+      let isAtInner = this.algo.isPointAtInner(point, 1e-4, 1e-10);
+      let isAtBoder = this.algo.isPointAtBoder(point, 1e-4, 1e-10);
+      let isAtOn = this.algo.isPointOn(point, 1e-4, 1e-10);
+
+      this.results = '';
+      this.results += ' ' + (isAtSpace ? 'as' : '!as');
+      this.results += ' ' + (isAtInner ? 'ai' : '!ai');
+      this.results += ' ' + (isAtBoder ? 'ab' : '!ab');
+      this.results += ' ' + (isAtOn ? 'ao' : '!ao');
+
       const states = document.getElementById('states');
       if (states) {
-        states.textContent += ' g: ' + g;
+        states.textContent += ' p: ' + this.results;
       }
     }
   };
 }
-export { CalculateCurve2GCom };
+export { CalculatePointEdge2Com };

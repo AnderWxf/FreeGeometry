@@ -68,6 +68,8 @@ import { ModifyCircleAreaCom } from "./coms/face/ModifyCircleAreaCom";
 import { CreateVector2Com } from "./coms/point/CreateVector2Com";
 import { CalculateCurve2UCom } from "./coms/calculate/CalculateCurve2UCom";
 import { CalculateCurve2GCom } from "./coms/calculate/CalculateCurve2GCom";
+import { CalculatePointEdge2Com } from "./coms/calculate/CalculatePointEdge2Com";
+import { CalculatePointFace2Com } from "./coms/calculate/CalculatePointFace2Com";
 
 /**
  * Command executer base class.
@@ -128,10 +130,10 @@ class CommandExecuter {
     this._commands.set(CommandType.MODIFY_POLYGON_SURFACE, ModifyPolylineAreaCom);
     this._commands.set(CommandType.MODIFY_RECTANGLE_SURFACE, ModifyRectangleAreaCom);
 
-
-
     this._commands.set(CommandType.CALCULATE_CURVE2_U, CalculateCurve2UCom);
     this._commands.set(CommandType.CALCULATE_CURVE2_G, CalculateCurve2GCom);
+    this._commands.set(CommandType.CALCULATE_POINT_EDGE2, CalculatePointEdge2Com);
+    this._commands.set(CommandType.CALCULATE_POINT_FACE2, CalculatePointFace2Com);
 
     this._commands.set(CommandType.CALCULATE_LENGTH_2, CalculateLoop2LengthCom);
     this._commands.set(CommandType.CALCULATE_LENGTH_3, CalculateLoop3LengthCom);

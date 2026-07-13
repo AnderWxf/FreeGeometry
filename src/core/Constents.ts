@@ -228,6 +228,9 @@ enum CommandType {
 
   CALCULATE_CURVE2_U = 'CCU',           // 计算曲线U函数
   CALCULATE_CURVE2_G = 'CCG',           // 计算曲线G函数
+  CALCULATE_POINT_EDGE2 = 'CPE',        // 计算点与边的关系
+  CALCULATE_POINT_FACE2 = 'CPF',        // 计算点与面的关系
+
 
   //基础操作
   OPERATION_EDGE_INTERSECTION = 'OEI', // 边交点(多选对象组中的第一个与后面所有对象间的交点)

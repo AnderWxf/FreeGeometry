@@ -51,13 +51,16 @@ class Edge2Algo {
   }
 
   /**
-   * point on ? (at boder or at inner)
+   * point at inner ? 
    *
    * @param {Vector2} [p] - The eoint.
    * @param {number} [tol0] - The tolerance of geometric.
    * @param {number} [tol1] - The tolerance of algebraic.
    */
   isPointAtInner(p: Vector2, tol0: number, tol1: number): boolean {
+    if (!this.isSpacePoint(p, tol0, tol1)) {
+      return false;
+    }
     let u = this._algo.u(p);
     let umin = Math.min(this._e.u.x, this._e.u.y);
     let umax = Math.max(this._e.u.x, this._e.u.y);
@@ -670,6 +673,9 @@ class Face2Algo {
    * @param {number} [tol1] - The tolerance of algebraic.
    */
   isPointAtInner(p: Vector2, tol0: number, tol1: number): boolean {
+    if (this.isPointAtBoder(p, tol0, tol1)) {
+      return false;
+    }
     if (this._balgo.isPointAtInner(p, tol0, tol1)) {
       let count = this._halgos.length;
       for (let i = 0; i < count; i++) {
