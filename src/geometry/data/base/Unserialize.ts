@@ -76,6 +76,12 @@ export function unserialize(data: any): any[] {
     case GeomType.DATA_TYPE_BREP3_LUMP3: return [Lump3.Unserialize(data)];
     case GeomType.DATA_TYPE_BREP3_BODY3: return [Body3.Unserialize(data)];
   }
+  if (typeof data === 'number'
+    || typeof data === 'string'
+    || typeof data === 'boolean'
+  ) {
+    return [data];
+  }
   if (data instanceof Array) {
     let rets: DataBase[] = [];
     for (let i = 0; i < data.length; i++) {

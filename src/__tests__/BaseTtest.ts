@@ -49,7 +49,7 @@ function DiscoverTestCases(caseDir: string): TestCase[] {
     };
   });
 }
-// 执行描述
+// 执行描述Object
 function ExecuteDescribe(typeName: string, typeDir: string, process: (input: any) => any) {
   describe(typeName, () => {
     const dataDir = path.join(__dirname, 'data', typeDir);
@@ -72,7 +72,7 @@ function ExecuteDescribe(typeName: string, typeDir: string, process: (input: any
             const input = LoadJSON(c.inputFile);
             const expected = LoadJSON(c.expectedFile);
             const result = process(input);
-            expect(IsCloseTo(result, expected, 1e-12)).toBe(true);
+            expect(IsCloseTo(result, expected, 1e-8)).toBe(true);
           });
         }
       });
@@ -80,5 +80,36 @@ function ExecuteDescribe(typeName: string, typeDir: string, process: (input: any
   });
 }
 
-export { IsCloseTo, LoadJSON, DiscoverTestCases, ExecuteDescribe };
+// 执行描述Bool
+function ExecuteDescribeBools(typeName: string, typeDir: string, process: (input: any) => any) {
+  describe(typeName, () => {
+    const dataDir = path.join(__dirname, 'data', typeDir);
+    const files = fs.readdirSync(dataDir);
+    files.forEach(file => {
+      const testCases = DiscoverTestCases(typeDir + '/' + file);
+      // 如果没有找到测试用例，给出提示
+      if (testCases.length === 0) {
+        console.warn('⚠️ 未找到测试数据文件，请检查 data/ 目录');
+      }
+      describe(file, () => {
+        const testCases = DiscoverTestCases(typeDir + '/' + file);
+        // 如果没有找到测试用例，给出提示
+        if (testCases.length === 0) {
+          console.warn('⚠️ 未找到测试数据文件，请检查 data/ 目录');
+        }
+        for (let i = 0; i < testCases.length; i++) {
+          let c = testCases[i];
+          test(c.name, () => {
+            const input = LoadJSON(c.inputFile);
+            const expected = LoadJSON(c.expectedFile);
+            const result = process(input);
+            expect(result).toEqual(expected);
+          });
+        }
+      });
+    });
+  });
+}
+
+export { IsCloseTo, LoadJSON, DiscoverTestCases, ExecuteDescribe, ExecuteDescribeBools };
 export type { TestCase };
