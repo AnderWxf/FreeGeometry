@@ -1,8 +1,5 @@
-import type { Vector2Function } from "three/src/nodes/TSL";
 import { Edge2Algo } from "../../geometry/algorithm/brep/Brep2Algo";
-import { Brep2Inter } from "../../geometry/algorithm/relation/intersection/Brep2Inter";
 import type { Edge2 } from "../../geometry/data/brep/Brep2";
-import type { AssisPoint } from "../../helper/UserData";
 import type { Vector2 } from "../../math/Math";
 
 export function process(input: any[]): any[] {
