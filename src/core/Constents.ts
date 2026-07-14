@@ -226,15 +226,16 @@ enum CommandType {
   CALCULATE_AREA_3 = 'CA3',            // 计算面积
   CALCULATE_VOLUME_3 = 'CV3',          // 计算体积
 
+  //计算
   CALCULATE_CURVE2_U = 'CCU',           // 计算曲线U函数
   CALCULATE_CURVE2_G = 'CCG',           // 计算曲线G函数
   CALCULATE_POINT_EDGE2 = 'CPE',        // 计算点与边的关系
   CALCULATE_POINT_FACE2 = 'CPF',        // 计算点与面的关系
+  CALCULATE_POINT_EDGE2_AUTO = 'CPEA',  // 自动计算点与边的关系
+  CALCULATE_POINT_FACE2_AUTO = 'CPFA',  // 自动计算点与面的关系
 
-
-  //基础操作
-  OPERATION_EDGE_INTERSECTION = 'OEI', // 边交点(多选对象组中的第一个与后面所有对象间的交点)
-  OPERATION_EDGE_CUTTING = 'OEC',      // 边切分(多选对象组中的第一个分割后面所有对象)
+  CALCULATE_EDGE_INTERSECTION = 'OEI',  // 边交点(多选对象组中的第一个与后面所有对象间的交点)
+  CALCULATE_EDGE_CUTTING = 'OEC',       // 边切分(多选对象组中的第一个分割后面所有对象)
 
   //布尔运算
   BOOL_2_INTERSECTION_MULTIPLE = 'BIM', // 2D布尔交(多对多)

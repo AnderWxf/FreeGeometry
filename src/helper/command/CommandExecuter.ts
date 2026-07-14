@@ -70,6 +70,8 @@ import { CalculateCurve2UCom } from "./coms/calculate/CalculateCurve2UCom";
 import { CalculateCurve2GCom } from "./coms/calculate/CalculateCurve2GCom";
 import { CalculatePointEdge2Com } from "./coms/calculate/CalculatePointEdge2Com";
 import { CalculatePointFace2Com } from "./coms/calculate/CalculatePointFace2Com";
+import { CalculatePointEdge2AutoCom } from "./coms/calculate/CalculatePointEdge2AutoCom";
+import { CalculatePointFace2AutoCom } from "./coms/calculate/CalculatePointFace2AutoCom";
 
 /**
  * Command executer base class.
@@ -124,7 +126,6 @@ class CommandExecuter {
     this._commands.set(CommandType.MODIFY_NURBS_CONTROL, ModifyNurbs2CtrlCom);
     this._commands.set(CommandType.MODIFY_RECTANGLE, ModifyRectangle2Com);
 
-
     this._commands.set(CommandType.MODIFY_CIRCLE_SURFACE, ModifyCircleAreaCom);
     this._commands.set(CommandType.MODIFY_ELLIPSE_SURFACE, ModifyEllipseAreaCom);
     this._commands.set(CommandType.MODIFY_POLYGON_SURFACE, ModifyPolylineAreaCom);
@@ -135,14 +136,17 @@ class CommandExecuter {
     this._commands.set(CommandType.CALCULATE_POINT_EDGE2, CalculatePointEdge2Com);
     this._commands.set(CommandType.CALCULATE_POINT_FACE2, CalculatePointFace2Com);
 
+    this._commands.set(CommandType.CALCULATE_POINT_EDGE2_AUTO, CalculatePointEdge2AutoCom);
+    this._commands.set(CommandType.CALCULATE_POINT_FACE2_AUTO, CalculatePointFace2AutoCom);
+
     this._commands.set(CommandType.CALCULATE_LENGTH_2, CalculateLoop2LengthCom);
     this._commands.set(CommandType.CALCULATE_LENGTH_3, CalculateLoop3LengthCom);
     this._commands.set(CommandType.CALCULATE_AREA_2, CalculateFace2AreaCom);
     this._commands.set(CommandType.CALCULATE_AREA_3, CalculateFace3AreaCom);
     this._commands.set(CommandType.CALCULATE_VOLUME_3, CalculateBody3VolumeCom);
 
-    this._commands.set(CommandType.OPERATION_EDGE_INTERSECTION, EdgeIntersectionCom);
-    this._commands.set(CommandType.OPERATION_EDGE_CUTTING, EdgeCuttingCom);
+    this._commands.set(CommandType.CALCULATE_EDGE_INTERSECTION, EdgeIntersectionCom);
+    this._commands.set(CommandType.CALCULATE_EDGE_CUTTING, EdgeCuttingCom);
 
     this._commands.set(CommandType.BOOL_2_INTERSECTION, Bool2IntersectionCom);
     this._commands.set(CommandType.BOOL_2_UNION, Bool2UnionCom);

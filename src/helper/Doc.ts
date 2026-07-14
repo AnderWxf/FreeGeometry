@@ -26,6 +26,12 @@ function ImportJson(json: string): THREE.Object3D[] {
     let originals = unserialize(userData.original);
     if (originals.length == 1) {
       let original = originals[0];
+      if (original instanceof Vector2) {
+        let geo = CreateAssistPoint({ p: original, c: userData.color });
+        userData.original = original;
+        geo.userData = userData;
+        results.push(geo);
+      }
       if (original instanceof Edge2) {
         let geo = BrepMeshBuilder.BuildEdge2Mesh(original, userData.color, null, null);
         userData.original = original;

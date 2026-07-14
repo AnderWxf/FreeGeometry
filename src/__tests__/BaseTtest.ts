@@ -17,13 +17,19 @@ function IsCloseTo(received: any, expected: any, tolerance: number = 1e-12): boo
   });
 }
 
-function LoadJSON(filename: string) {
+function LoadScene(filename: string) {
   const filePath = filename;
   let datas = JSON.parse(fs.readFileSync(filePath, 'utf-8')) as [any];
   for (let i = 0; i < datas.length; i++) {
     let userData = datas[i].userData as UserData;
     userData.original = unserialize(userData.original)[0];
   }
+  return datas as any;
+}
+
+function LoadJSON(filename: string) {
+  const filePath = filename;
+  let datas = JSON.parse(fs.readFileSync(filePath, 'utf-8')) as [any];
   return datas as any;
 }
 
@@ -69,8 +75,8 @@ function ExecuteDescribe(typeName: string, typeDir: string, process: (input: any
         for (let i = 0; i < testCases.length; i++) {
           let c = testCases[i];
           test(c.name, () => {
-            const input = LoadJSON(c.inputFile);
-            const expected = LoadJSON(c.expectedFile);
+            const input = LoadScene(c.inputFile);
+            const expected = LoadScene(c.expectedFile);
             const result = process(input);
             expect(IsCloseTo(result, expected, 1e-8)).toBe(true);
           });
@@ -100,7 +106,7 @@ function ExecuteDescribeBools(typeName: string, typeDir: string, process: (input
         for (let i = 0; i < testCases.length; i++) {
           let c = testCases[i];
           test(c.name, () => {
-            const input = LoadJSON(c.inputFile);
+            const input = LoadScene(c.inputFile);
             const expected = LoadJSON(c.expectedFile);
             const result = process(input);
             expect(result).toEqual(expected);
@@ -111,5 +117,5 @@ function ExecuteDescribeBools(typeName: string, typeDir: string, process: (input
   });
 }
 
-export { IsCloseTo, LoadJSON, DiscoverTestCases, ExecuteDescribe, ExecuteDescribeBools };
+export { IsCloseTo, LoadScene as LoadJSON, DiscoverTestCases, ExecuteDescribe, ExecuteDescribeBools };
 export type { TestCase };

@@ -7,7 +7,7 @@ import { OrthographicController } from '../helper/camera/OrthographicController'
 import { Grid } from '../helper/Grid';
 import { Global } from '../core/Global';
 import { CommandType } from '../core/Constents';
-import { SaveFilled, EditTwoTone, BuildFilled, AppstoreFilled, CalculatorOutlined, LineChartOutlined, AreaChartOutlined, GlobalOutlined, RubyOutlined, BlockOutlined, PlusCircleOutlined } from '@ant-design/icons';
+import { SaveFilled, EditTwoTone, BuildFilled, AppstoreFilled, CalculatorOutlined, LineChartOutlined, AreaChartOutlined, GlobalOutlined, RubyOutlined, BlockOutlined, PlusCircleOutlined, ArrowsAltOutlined } from '@ant-design/icons';
 import type { MenuInfo } from 'rc-menu/lib/interface';
 
 const perspective: PerspectiveController = new PerspectiveController();
@@ -441,22 +441,27 @@ const MenuItems = [
       { key: CommandType.CALCULATE_CURVE2_G, label: '计算G函数' + ' ' + CommandType.CALCULATE_CURVE2_G },
       { key: CommandType.CALCULATE_POINT_EDGE2, label: '计算点边关系' + ' ' + CommandType.CALCULATE_POINT_EDGE2 },
       { key: CommandType.CALCULATE_POINT_FACE2, label: '计算点面关系' + ' ' + CommandType.CALCULATE_POINT_FACE2 },
+      { key: CommandType.CALCULATE_POINT_EDGE2_AUTO, label: '自动计算点边关系' + ' ' + CommandType.CALCULATE_POINT_EDGE2_AUTO },
+      { key: CommandType.CALCULATE_POINT_FACE2_AUTO, label: '自动计算点面关系' + ' ' + CommandType.CALCULATE_POINT_FACE2_AUTO },
 
+      //基础操作
+      { key: CommandType.CALCULATE_EDGE_INTERSECTION, label: '边交点' + ' ' + CommandType.CALCULATE_EDGE_INTERSECTION },
+      { key: CommandType.CALCULATE_EDGE_CUTTING, label: '边切分' + ' ' + CommandType.CALCULATE_EDGE_CUTTING },
+    ]
+  },
+  {
+    key: 'measure',
+    icon: <ArrowsAltOutlined />,
+    label: '度量',
+    children: [
       // 度量计算
-      { key: CommandType.CALCULATE_CURVE2_U, label: '计算U函数' + ' ' + CommandType.CALCULATE_CURVE2_U },
-      { key: CommandType.CALCULATE_CURVE2_G, label: '计算G函数' + ' ' + CommandType.CALCULATE_CURVE2_G },
       { key: CommandType.CALCULATE_LENGTH_2, label: '计算长度' + ' ' + CommandType.CALCULATE_LENGTH_2 },
       { key: CommandType.CALCULATE_AREA_2, label: '计算面积' + ' ' + CommandType.CALCULATE_AREA_2 },
       { key: CommandType.CALCULATE_LENGTH_3, label: '计算长度' + ' ' + CommandType.CALCULATE_LENGTH_3 },
       { key: CommandType.CALCULATE_AREA_3, label: '计算面积' + ' ' + CommandType.CALCULATE_AREA_3 },
       { key: CommandType.CALCULATE_VOLUME_3, label: '计算体积' + ' ' + CommandType.CALCULATE_VOLUME_3 },
-
-      //基础操作
-      { key: CommandType.OPERATION_EDGE_INTERSECTION, label: '边交点' + ' ' + CommandType.OPERATION_EDGE_INTERSECTION },
-      { key: CommandType.OPERATION_EDGE_CUTTING, label: '边切分' + ' ' + CommandType.OPERATION_EDGE_CUTTING },
     ]
   },
-
 ];
 const MenuBarOnChange = (info: MenuInfo): void => {
   Global.gpu.focus();
@@ -474,9 +479,13 @@ const MenuBar: React.FC = () => (
             // itemColor: TextColor,         // 菜单项文字颜色
             itemSelectedBg: 'transparent',  // 选中态背景色
             popupBg: 'transparent',
-            colorSubItemBg: 'transparent',
+            subMenuItemBg: 'transparent',
             horizontalItemHoverBg: 'transparent',
-            itemHoverColor: '#FFFFFF',
+            itemHoverColor: '#00FF00',
+            horizontalItemHoverColor: '#00FF00',
+            horizontalItemSelectedColor: '#00AA00',
+            subMenuItemSelectedColor: '#00AA00',
+            itemSelectedColor: '#00AA00',
           },
         },
       }}
