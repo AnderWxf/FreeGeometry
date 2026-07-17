@@ -17,10 +17,11 @@ function ImportJson(json: string): THREE.Object3D[] {
   let datas = jsonData as Array<DocNode>;
   for (let i = 0; i < datas.length; i++) {
     let userData = datas[i].userData as UserData;
-    if (userData.type === undefined || userData.type === null) {
+    if ((userData.type === undefined || userData.type === null)
+      && (userData.original === undefined || userData.original === null)) {
       continue;
     }
-    userData.assistPoints.forEach((a) => {
+    userData.assistPoints?.forEach((a) => {
       a.p = Vector2.Unserialize(a.p);
     });
     let originals = unserialize(userData.original);

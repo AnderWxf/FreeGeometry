@@ -324,6 +324,12 @@ class Curve2Inter {
       if (c0.trans.pos.distanceTo(c1.trans.pos) > Math.max(c0.radius.x, c0.radius.y) + Math.max(c1.radius.x, c1.radius.y)) {
         return new Array<InterOfCurve2>();
       }
+      if (c0.trans.pos.distanceTo(c1.trans.pos) < Math.abs(Math.max(c0.radius.x, c0.radius.y) - Math.max(c1.radius.x, c1.radius.y))) {
+        return new Array<InterOfCurve2>();
+      }
+      if (c0.trans.pos.distanceTo(c1.trans.pos) < tol0) {
+        return new Array<InterOfCurve2>();
+      }
       if (Math.max(c0.radius.x, c0.radius.y) > Math.max(c1.radius.x, c1.radius.y)) {
         return Curve2Inter.SwapU(Curve2Inter.CurveXCurve(c1, c0, Math.round(Math.max(c1.radius.x, c1.radius.y) * Math.PI * 2), tol0, tol1, n, 0, Math.PI * 2));
       } else {
