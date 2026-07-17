@@ -38,7 +38,7 @@ function CloneUserData(src: UserData): UserData {
     isAssist: src.isAssist,
     assistPoints: src.assistPoints?.map(ap => ({ p: ap.p.clone(), c: ap.c })),
     color: src.color,
-    original: src.original
+    original: src.original.clone ? src.original.clone() : src.original,
   } as UserData;
 }
 

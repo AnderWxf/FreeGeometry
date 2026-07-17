@@ -12,6 +12,36 @@ export const PI_6 = Math.PI / 6;
 const DEG2RAD = Math.PI / 180;
 const RAD2DEG = 180 / Math.PI;
 
+/**
+ * u to [0,period]
+ *
+ * @return {number} The u ∈ [0,period].
+ */
+function toPeriod(u: number, period: number): number {
+  while (u < 0) {
+    u += period;
+  }
+  while (u > period) {
+    u -= period;
+  }
+  return u
+}
+
+/**
+ * when u % period ∈ [a,b],
+ * take u to [a,b], step is period.
+ *
+ * @return {number} The u ∈ [a,b].
+ */
+function toRange(u: number, a: number, b: number, period: number): number {
+  while (u < a) {
+    u += period;
+  }
+  while (u > b) {
+    u -= period;
+  }
+  return u
+}
 
 /**
  * Generate a [UUID]{@link https://en.wikipedia.org/wiki/Universally_unique_identifier}
@@ -21,19 +51,19 @@ const RAD2DEG = 180 / Math.PI;
  */
 function generateUUID() {
 
-    // http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript/21963136#21963136
+  // http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript/21963136#21963136
 
-    const d0 = Math.random() * 0xffffffff | 0;
-    const d1 = Math.random() * 0xffffffff | 0;
-    const d2 = Math.random() * 0xffffffff | 0;
-    const d3 = Math.random() * 0xffffffff | 0;
-    const uuid = ((_lut[d0 & 0xff]) || "") + ((_lut[d0 >> 8 & 0xff]) || "") + _lut[d0 >> 16 & 0xff] + _lut[d0 >> 24 & 0xff] + '-' +
-        _lut[d1 & 0xff] + _lut[d1 >> 8 & 0xff] + '-' + _lut[d1 >> 16 & 0x0f | 0x40] + _lut[d1 >> 24 & 0xff] + '-' +
-        _lut[d2 & 0x3f | 0x80] + _lut[d2 >> 8 & 0xff] + '-' + _lut[d2 >> 16 & 0xff] + _lut[d2 >> 24 & 0xff] +
-        _lut[d3 & 0xff] + _lut[d3 >> 8 & 0xff] + _lut[d3 >> 16 & 0xff] + _lut[d3 >> 24 & 0xff];
+  const d0 = Math.random() * 0xffffffff | 0;
+  const d1 = Math.random() * 0xffffffff | 0;
+  const d2 = Math.random() * 0xffffffff | 0;
+  const d3 = Math.random() * 0xffffffff | 0;
+  const uuid = ((_lut[d0 & 0xff]) || "") + ((_lut[d0 >> 8 & 0xff]) || "") + _lut[d0 >> 16 & 0xff] + _lut[d0 >> 24 & 0xff] + '-' +
+    _lut[d1 & 0xff] + _lut[d1 >> 8 & 0xff] + '-' + _lut[d1 >> 16 & 0x0f | 0x40] + _lut[d1 >> 24 & 0xff] + '-' +
+    _lut[d2 & 0x3f | 0x80] + _lut[d2 >> 8 & 0xff] + '-' + _lut[d2 >> 16 & 0xff] + _lut[d2 >> 24 & 0xff] +
+    _lut[d3 & 0xff] + _lut[d3 >> 8 & 0xff] + _lut[d3 >> 16 & 0xff] + _lut[d3 >> 24 & 0xff];
 
-    // .toLowerCase() here flattens concatenated strings to save heap memory space.
-    return uuid.toLowerCase();
+  // .toLowerCase() here flattens concatenated strings to save heap memory space.
+  return uuid.toLowerCase();
 
 }
 
@@ -47,7 +77,7 @@ function generateUUID() {
  */
 function clamp(value: number, min: number, max: number) {
 
-    return Math.max(min, Math.min(max, value));
+  return Math.max(min, Math.min(max, value));
 
 }
 
@@ -61,9 +91,9 @@ function clamp(value: number, min: number, max: number) {
  */
 function euclideanModulo(n: number, m: number) {
 
-    // https://en.wikipedia.org/wiki/Modulo_operation
+  // https://en.wikipedia.org/wiki/Modulo_operation
 
-    return ((n % m) + m) % m;
+  return ((n % m) + m) % m;
 
 }
 
@@ -80,7 +110,7 @@ function euclideanModulo(n: number, m: number) {
  */
 function mapLinear(x: number, a1: number, a2: number, b1: number, b2: number) {
 
-    return b1 + (x - a1) * (b2 - b1) / (a2 - a1);
+  return b1 + (x - a1) * (b2 - b1) / (a2 - a1);
 
 }
 
@@ -95,17 +125,17 @@ function mapLinear(x: number, a1: number, a2: number, b1: number, b2: number) {
  */
 function inverseLerp(x: number, y: number, value: number) {
 
-    // https://www.gamedev.net/tutorials/programming/general-and-gameplay-programming/inverse-lerp-a-super-useful-yet-often-overlooked-function-r5230/
+  // https://www.gamedev.net/tutorials/programming/general-and-gameplay-programming/inverse-lerp-a-super-useful-yet-often-overlooked-function-r5230/
 
-    if (x !== y) {
+  if (x !== y) {
 
-        return (value - x) / (y - x);
+    return (value - x) / (y - x);
 
-    } else {
+  } else {
 
-        return 0;
+    return 0;
 
-    }
+  }
 
 }
 
@@ -120,7 +150,7 @@ function inverseLerp(x: number, y: number, value: number) {
  */
 function lerp(x: number, y: number, t: number) {
 
-    return (1 - t) * x + t * y;
+  return (1 - t) * x + t * y;
 
 }
 
@@ -138,7 +168,7 @@ function lerp(x: number, y: number, t: number) {
  */
 function damp(x: number, y: number, lambda: number, dt: number) {
 
-    return lerp(x, y, 1 - Math.exp(- lambda * dt));
+  return lerp(x, y, 1 - Math.exp(- lambda * dt));
 
 }
 
@@ -151,9 +181,9 @@ function damp(x: number, y: number, lambda: number, dt: number) {
  */
 function pingpong(x: number, length = 1) {
 
-    // https://www.desmos.com/calculator/vcsjnyz7x4
+  // https://www.desmos.com/calculator/vcsjnyz7x4
 
-    return length - Math.abs(euclideanModulo(x, length * 2) - length);
+  return length - Math.abs(euclideanModulo(x, length * 2) - length);
 
 }
 
@@ -171,12 +201,12 @@ function pingpong(x: number, length = 1) {
  */
 function smoothstep(x: number, min: number, max: number) {
 
-    if (x <= min) return 0;
-    if (x >= max) return 1;
+  if (x <= min) return 0;
+  if (x >= max) return 1;
 
-    x = (x - min) / (max - min);
+  x = (x - min) / (max - min);
 
-    return x * x * (3 - 2 * x);
+  return x * x * (3 - 2 * x);
 
 }
 
@@ -191,12 +221,12 @@ function smoothstep(x: number, min: number, max: number) {
  */
 function smootherstep(x: number, min: number, max: number) {
 
-    if (x <= min) return 0;
-    if (x >= max) return 1;
+  if (x <= min) return 0;
+  if (x >= max) return 1;
 
-    x = (x - min) / (max - min);
+  x = (x - min) / (max - min);
 
-    return x * x * x * (x * (x * 6 - 15) + 10);
+  return x * x * x * (x * (x * 6 - 15) + 10);
 
 }
 
@@ -209,7 +239,7 @@ function smootherstep(x: number, min: number, max: number) {
  */
 function randInt(low: number, high: number) {
 
-    return low + Math.floor(Math.random() * (high - low + 1));
+  return low + Math.floor(Math.random() * (high - low + 1));
 
 }
 
@@ -222,7 +252,7 @@ function randInt(low: number, high: number) {
  */
 function randFloat(low: number, high: number) {
 
-    return low + Math.random() * (high - low);
+  return low + Math.random() * (high - low);
 
 }
 
@@ -234,7 +264,7 @@ function randFloat(low: number, high: number) {
  */
 function randFloatSpread(range: number) {
 
-    return range * (0.5 - Math.random());
+  return range * (0.5 - Math.random());
 
 }
 
@@ -246,17 +276,17 @@ function randFloatSpread(range: number) {
  */
 function seededRandom(s: number) {
 
-    if (s !== undefined) _seed = s;
+  if (s !== undefined) _seed = s;
 
-    // Mulberry32 generator
+  // Mulberry32 generator
 
-    let t = _seed += 0x6D2B79F5;
+  let t = _seed += 0x6D2B79F5;
 
-    t = Math.imul(t ^ t >>> 15, t | 1);
+  t = Math.imul(t ^ t >>> 15, t | 1);
 
-    t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+  t ^= t + Math.imul(t ^ t >>> 7, t | 61);
 
-    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  return ((t ^ t >>> 14) >>> 0) / 4294967296;
 
 }
 
@@ -268,7 +298,7 @@ function seededRandom(s: number) {
  */
 function degToRad(degrees: number) {
 
-    return degrees * DEG2RAD;
+  return degrees * DEG2RAD;
 
 }
 
@@ -280,7 +310,7 @@ function degToRad(degrees: number) {
  */
 function radToDeg(radians: number) {
 
-    return radians * RAD2DEG;
+  return radians * RAD2DEG;
 
 }
 
@@ -292,7 +322,7 @@ function radToDeg(radians: number) {
  */
 function isPowerOfTwo(value: number) {
 
-    return (value & (value - 1)) === 0 && value !== 0;
+  return (value & (value - 1)) === 0 && value !== 0;
 
 }
 
@@ -304,7 +334,7 @@ function isPowerOfTwo(value: number) {
  */
 function ceilPowerOfTwo(value: number) {
 
-    return Math.pow(2, Math.ceil(Math.log(value) / Math.LN2));
+  return Math.pow(2, Math.ceil(Math.log(value) / Math.LN2));
 
 }
 
@@ -316,7 +346,7 @@ function ceilPowerOfTwo(value: number) {
  */
 function floorPowerOfTwo(value: number) {
 
-    return Math.pow(2, Math.floor(Math.log(value) / Math.LN2));
+  return Math.pow(2, Math.floor(Math.log(value) / Math.LN2));
 
 }
 
@@ -329,41 +359,41 @@ function floorPowerOfTwo(value: number) {
  */
 function denormalize(value: number, array: any) {
 
-    switch (array.constructor) {
+  switch (array.constructor) {
 
-        case Float32Array:
+    case Float32Array:
 
-            return value;
+      return value;
 
-        case Uint32Array:
+    case Uint32Array:
 
-            return value / 4294967295.0;
+      return value / 4294967295.0;
 
-        case Uint16Array:
+    case Uint16Array:
 
-            return value / 65535.0;
+      return value / 65535.0;
 
-        case Uint8Array:
+    case Uint8Array:
 
-            return value / 255.0;
+      return value / 255.0;
 
-        case Int32Array:
+    case Int32Array:
 
-            return Math.max(value / 2147483647.0, - 1.0);
+      return Math.max(value / 2147483647.0, - 1.0);
 
-        case Int16Array:
+    case Int16Array:
 
-            return Math.max(value / 32767.0, - 1.0);
+      return Math.max(value / 32767.0, - 1.0);
 
-        case Int8Array:
+    case Int8Array:
 
-            return Math.max(value / 127.0, - 1.0);
+      return Math.max(value / 127.0, - 1.0);
 
-        default:
+    default:
 
-            throw new Error('Invalid component type.');
+      throw new Error('Invalid component type.');
 
-    }
+  }
 
 }
 
@@ -376,41 +406,41 @@ function denormalize(value: number, array: any) {
  */
 function normalize(value: number, array: any) {
 
-    switch (array.constructor) {
+  switch (array.constructor) {
 
-        case Float32Array:
+    case Float32Array:
 
-            return value;
+      return value;
 
-        case Uint32Array:
+    case Uint32Array:
 
-            return Math.round(value * 4294967295.0);
+      return Math.round(value * 4294967295.0);
 
-        case Uint16Array:
+    case Uint16Array:
 
-            return Math.round(value * 65535.0);
+      return Math.round(value * 65535.0);
 
-        case Uint8Array:
+    case Uint8Array:
 
-            return Math.round(value * 255.0);
+      return Math.round(value * 255.0);
 
-        case Int32Array:
+    case Int32Array:
 
-            return Math.round(value * 2147483647.0);
+      return Math.round(value * 2147483647.0);
 
-        case Int16Array:
+    case Int16Array:
 
-            return Math.round(value * 32767.0);
+      return Math.round(value * 32767.0);
 
-        case Int8Array:
+    case Int8Array:
 
-            return Math.round(value * 127.0);
+      return Math.round(value * 127.0);
 
-        default:
+    default:
 
-            throw new Error('Invalid component type.');
+      throw new Error('Invalid component type.');
 
-    }
+  }
 
 }
 
@@ -420,258 +450,273 @@ function normalize(value: number, array: any) {
  * @hideconstructor
  */
 const MathUtils = {
-    DEG2RAD: DEG2RAD,
-    RAD2DEG: RAD2DEG,
-    /**
-     * Generate a [UUID]{@link https://en.wikipedia.org/wiki/Universally_unique_identifier}
-     * (universally unique identifier).
-     *
-     * @static
-     * @method
-     * @return {string} The UUID.
-     */
-    generateUUID: generateUUID,
-    /**
-     * Clamps the given value between min and max.
-     *
-     * @static
-     * @method
-     * @param {number} value - The value to clamp.
-     * @param {number} min - The min value.
-     * @param {number} max - The max value.
-     * @return {number} The clamped value.
-     */
-    clamp: clamp,
-    /**
-     * Computes the Euclidean modulo of the given parameters that
-     * is `( ( n % m ) + m ) % m`.
-     *
-     * @static
-     * @method
-     * @param {number} n - The first parameter.
-     * @param {number} m - The second parameter.
-     * @return {number} The Euclidean modulo.
-     */
-    euclideanModulo: euclideanModulo,
-    /**
-     * Performs a linear mapping from range `<a1, a2>` to range `<b1, b2>`
-     * for the given value.
-     *
-     * @static
-     * @method
-     * @param {number} x - The value to be mapped.
-     * @param {number} a1 - Minimum value for range A.
-     * @param {number} a2 - Maximum value for range A.
-     * @param {number} b1 - Minimum value for range B.
-     * @param {number} b2 - Maximum value for range B.
-     * @return {number} The mapped value.
-     */
-    mapLinear: mapLinear,
-    /**
-     * Returns the percentage in the closed interval `[0, 1]` of the given value
-     * between the start and end point.
-     *
-     * @static
-     * @method
-     * @param {number} x - The start point
-     * @param {number} y - The end point.
-     * @param {number} value - A value between start and end.
-     * @return {number} The interpolation factor.
-     */
-    inverseLerp: inverseLerp,
-    /**
-     * Returns a value linearly interpolated from two known points based on the given interval -
-     * `t = 0` will return `x` and `t = 1` will return `y`.
-     *
-     * @static
-     * @method
-     * @param {number} x - The start point
-     * @param {number} y - The end point.
-     * @param {number} t - The interpolation factor in the closed interval `[0, 1]`.
-     * @return {number} The interpolated value.
-     */
-    lerp: lerp,
-    /**
-     * Smoothly interpolate a number from `x` to `y` in  a spring-like manner using a delta
-     * time to maintain frame rate independent movement. For details, see
-     * [Frame rate independent damping using lerp]{@link http://www.rorydriscoll.com/2016/03/07/frame-rate-independent-damping-using-lerp/}.
-     *
-     * @static
-     * @method
-     * @param {number} x - The current point.
-     * @param {number} y - The target point.
-     * @param {number} lambda - A higher lambda value will make the movement more sudden,
-     * and a lower value will make the movement more gradual.
-     * @param {number} dt - Delta time in seconds.
-     * @return {number} The interpolated value.
-     */
-    damp: damp,
-    /**
-     * Returns a value that alternates between `0` and the given `length` parameter.
-     *
-     * @static
-     * @method
-     * @param {number} x - The value to pingpong.
-     * @param {number} [length=1] - The positive value the function will pingpong to.
-     * @return {number} The alternated value.
-     */
-    pingpong: pingpong,
-    /**
-     * Returns a value in the range `[0,1]` that represents the percentage that `x` has
-     * moved between `min` and `max`, but smoothed or slowed down the closer `x` is to
-     * the `min` and `max`.
-     *
-     * See [Smoothstep]{@link http://en.wikipedia.org/wiki/Smoothstep} for more details.
-     *
-     * @static
-     * @method
-     * @param {number} x - The value to evaluate based on its position between min and max.
-     * @param {number} min - The min value. Any x value below min will be `0`.
-     * @param {number} max - The max value. Any x value above max will be `1`.
-     * @return {number} The alternated value.
-     */
-    smoothstep: smoothstep,
-    /**
-     * A [variation on smoothstep]{@link https://en.wikipedia.org/wiki/Smoothstep#Variations}
-     * that has zero 1st and 2nd order derivatives at x=0 and x=1.
-     *
-     * @static
-     * @method
-     * @param {number} x - The value to evaluate based on its position between min and max.
-     * @param {number} min - The min value. Any x value below min will be `0`.
-     * @param {number} max - The max value. Any x value above max will be `1`.
-     * @return {number} The alternated value.
-     */
-    smootherstep: smootherstep,
-    /**
-     * Returns a random integer from `<low, high>` interval.
-     *
-     * @static
-     * @method
-     * @param {number} low - The lower value boundary.
-     * @param {number} high - The upper value boundary
-     * @return {number} A random integer.
-     */
-    randInt: randInt,
-    /**
-     * Returns a random float from `<low, high>` interval.
-     *
-     * @static
-     * @method
-     * @param {number} low - The lower value boundary.
-     * @param {number} high - The upper value boundary
-     * @return {number} A random float.
-     */
-    randFloat: randFloat,
-    /**
-     * Returns a random integer from `<-range/2, range/2>` interval.
-     *
-     * @static
-     * @method
-     * @param {number} range - Defines the value range.
-     * @return {number} A random float.
-     */
-    randFloatSpread: randFloatSpread,
-    /**
-     * Returns a deterministic pseudo-random float in the interval `[0, 1]`.
-     *
-     * @static
-     * @method
-     * @param {number} [s] - The integer seed.
-     * @return {number} A random float.
-     */
-    seededRandom: seededRandom,
-    /**
-     * Converts degrees to radians.
-     *
-     * @static
-     * @method
-     * @param {number} degrees - A value in degrees.
-     * @return {number} The converted value in radians.
-     */
-    degToRad: degToRad,
-    /**
-     * Converts radians to degrees.
-     *
-     * @static
-     * @method
-     * @param {number} radians - A value in radians.
-     * @return {number} The converted value in degrees.
-     */
-    radToDeg: radToDeg,
-    /**
-     * Returns `true` if the given number is a power of two.
-     *
-     * @static
-     * @method
-     * @param {number} value - The value to check.
-     * @return {boolean} Whether the given number is a power of two or not.
-     */
-    isPowerOfTwo: isPowerOfTwo,
-    /**
-     * Returns the smallest power of two that is greater than or equal to the given number.
-     *
-     * @static
-     * @method
-     * @param {number} value - The value to find a POT for.
-     * @return {number} The smallest power of two that is greater than or equal to the given number.
-     */
-    ceilPowerOfTwo: ceilPowerOfTwo,
-    /**
-     * Returns the largest power of two that is less than or equal to the given number.
-     *
-     * @static
-     * @method
-     * @param {number} value - The value to find a POT for.
-     * @return {number} The largest power of two that is less than or equal to the given number.
-     */
-    floorPowerOfTwo: floorPowerOfTwo,
+  DEG2RAD: DEG2RAD,
+  RAD2DEG: RAD2DEG,
+  /**
+   * u to [0,period]
+   *
+   * @return {number} The u ∈ [0,period].
+   */
+  toPeriod: toPeriod,
+  /**
+   * when u % period ∈ [a,b],
+   * take u to [a,b], step is period.
+   *
+   * @return {number} The u ∈ [a,b].
+   */
+  toRange: toRange,
+  /**
+   * Generate a [UUID]{@link https://en.wikipedia.org/wiki/Universally_unique_identifier}
+   * (universally unique identifier).
+   *
+   * @static
+   * @method
+   * @return {string} The UUID.
+   */
+  generateUUID: generateUUID,
+  /**
+   * Clamps the given value between min and max.
+   *
+   * @static
+   * @method
+   * @param {number} value - The value to clamp.
+   * @param {number} min - The min value.
+   * @param {number} max - The max value.
+   * @return {number} The clamped value.
+   */
+  clamp: clamp,
+  /**
+   * Computes the Euclidean modulo of the given parameters that
+   * is `( ( n % m ) + m ) % m`.
+   *
+   * @static
+   * @method
+   * @param {number} n - The first parameter.
+   * @param {number} m - The second parameter.
+   * @return {number} The Euclidean modulo.
+   */
+  euclideanModulo: euclideanModulo,
+  /**
+   * Performs a linear mapping from range `<a1, a2>` to range `<b1, b2>`
+   * for the given value.
+   *
+   * @static
+   * @method
+   * @param {number} x - The value to be mapped.
+   * @param {number} a1 - Minimum value for range A.
+   * @param {number} a2 - Maximum value for range A.
+   * @param {number} b1 - Minimum value for range B.
+   * @param {number} b2 - Maximum value for range B.
+   * @return {number} The mapped value.
+   */
+  mapLinear: mapLinear,
+  /**
+   * Returns the percentage in the closed interval `[0, 1]` of the given value
+   * between the start and end point.
+   *
+   * @static
+   * @method
+   * @param {number} x - The start point
+   * @param {number} y - The end point.
+   * @param {number} value - A value between start and end.
+   * @return {number} The interpolation factor.
+   */
+  inverseLerp: inverseLerp,
+  /**
+   * Returns a value linearly interpolated from two known points based on the given interval -
+   * `t = 0` will return `x` and `t = 1` will return `y`.
+   *
+   * @static
+   * @method
+   * @param {number} x - The start point
+   * @param {number} y - The end point.
+   * @param {number} t - The interpolation factor in the closed interval `[0, 1]`.
+   * @return {number} The interpolated value.
+   */
+  lerp: lerp,
+  /**
+   * Smoothly interpolate a number from `x` to `y` in  a spring-like manner using a delta
+   * time to maintain frame rate independent movement. For details, see
+   * [Frame rate independent damping using lerp]{@link http://www.rorydriscoll.com/2016/03/07/frame-rate-independent-damping-using-lerp/}.
+   *
+   * @static
+   * @method
+   * @param {number} x - The current point.
+   * @param {number} y - The target point.
+   * @param {number} lambda - A higher lambda value will make the movement more sudden,
+   * and a lower value will make the movement more gradual.
+   * @param {number} dt - Delta time in seconds.
+   * @return {number} The interpolated value.
+   */
+  damp: damp,
+  /**
+   * Returns a value that alternates between `0` and the given `length` parameter.
+   *
+   * @static
+   * @method
+   * @param {number} x - The value to pingpong.
+   * @param {number} [length=1] - The positive value the function will pingpong to.
+   * @return {number} The alternated value.
+   */
+  pingpong: pingpong,
+  /**
+   * Returns a value in the range `[0,1]` that represents the percentage that `x` has
+   * moved between `min` and `max`, but smoothed or slowed down the closer `x` is to
+   * the `min` and `max`.
+   *
+   * See [Smoothstep]{@link http://en.wikipedia.org/wiki/Smoothstep} for more details.
+   *
+   * @static
+   * @method
+   * @param {number} x - The value to evaluate based on its position between min and max.
+   * @param {number} min - The min value. Any x value below min will be `0`.
+   * @param {number} max - The max value. Any x value above max will be `1`.
+   * @return {number} The alternated value.
+   */
+  smoothstep: smoothstep,
+  /**
+   * A [variation on smoothstep]{@link https://en.wikipedia.org/wiki/Smoothstep#Variations}
+   * that has zero 1st and 2nd order derivatives at x=0 and x=1.
+   *
+   * @static
+   * @method
+   * @param {number} x - The value to evaluate based on its position between min and max.
+   * @param {number} min - The min value. Any x value below min will be `0`.
+   * @param {number} max - The max value. Any x value above max will be `1`.
+   * @return {number} The alternated value.
+   */
+  smootherstep: smootherstep,
+  /**
+   * Returns a random integer from `<low, high>` interval.
+   *
+   * @static
+   * @method
+   * @param {number} low - The lower value boundary.
+   * @param {number} high - The upper value boundary
+   * @return {number} A random integer.
+   */
+  randInt: randInt,
+  /**
+   * Returns a random float from `<low, high>` interval.
+   *
+   * @static
+   * @method
+   * @param {number} low - The lower value boundary.
+   * @param {number} high - The upper value boundary
+   * @return {number} A random float.
+   */
+  randFloat: randFloat,
+  /**
+   * Returns a random integer from `<-range/2, range/2>` interval.
+   *
+   * @static
+   * @method
+   * @param {number} range - Defines the value range.
+   * @return {number} A random float.
+   */
+  randFloatSpread: randFloatSpread,
+  /**
+   * Returns a deterministic pseudo-random float in the interval `[0, 1]`.
+   *
+   * @static
+   * @method
+   * @param {number} [s] - The integer seed.
+   * @return {number} A random float.
+   */
+  seededRandom: seededRandom,
+  /**
+   * Converts degrees to radians.
+   *
+   * @static
+   * @method
+   * @param {number} degrees - A value in degrees.
+   * @return {number} The converted value in radians.
+   */
+  degToRad: degToRad,
+  /**
+   * Converts radians to degrees.
+   *
+   * @static
+   * @method
+   * @param {number} radians - A value in radians.
+   * @return {number} The converted value in degrees.
+   */
+  radToDeg: radToDeg,
+  /**
+   * Returns `true` if the given number is a power of two.
+   *
+   * @static
+   * @method
+   * @param {number} value - The value to check.
+   * @return {boolean} Whether the given number is a power of two or not.
+   */
+  isPowerOfTwo: isPowerOfTwo,
+  /**
+   * Returns the smallest power of two that is greater than or equal to the given number.
+   *
+   * @static
+   * @method
+   * @param {number} value - The value to find a POT for.
+   * @return {number} The smallest power of two that is greater than or equal to the given number.
+   */
+  ceilPowerOfTwo: ceilPowerOfTwo,
+  /**
+   * Returns the largest power of two that is less than or equal to the given number.
+   *
+   * @static
+   * @method
+   * @param {number} value - The value to find a POT for.
+   * @return {number} The largest power of two that is less than or equal to the given number.
+   */
+  floorPowerOfTwo: floorPowerOfTwo,
 
-    /**
-     * Normalizes the given value according to the given typed array.
-     *
-     * @static
-     * @method
-     * @param {number} value - The float value in the range `[0,1]` to normalize.
-     * @param {TypedArray} array - The typed array that defines the data type of the value.
-     * @return {number} The normalize value.
-     */
-    normalize: normalize,
-    /**
-     * Denormalizes the given value according to the given typed array.
-     *
-     * @static
-     * @method
-     * @param {number} value - The value to denormalize.
-     * @param {TypedArray} array - The typed array that defines the data type of the value.
-     * @return {number} The denormalize (float) value in the range `[0,1]`.
-     */
-    denormalize: denormalize
+  /**
+   * Normalizes the given value according to the given typed array.
+   *
+   * @static
+   * @method
+   * @param {number} value - The float value in the range `[0,1]` to normalize.
+   * @param {TypedArray} array - The typed array that defines the data type of the value.
+   * @return {number} The normalize value.
+   */
+  normalize: normalize,
+  /**
+   * Denormalizes the given value according to the given typed array.
+   *
+   * @static
+   * @method
+   * @param {number} value - The value to denormalize.
+   * @param {TypedArray} array - The typed array that defines the data type of the value.
+   * @return {number} The denormalize (float) value in the range `[0,1]`.
+   */
+  denormalize: denormalize
 };
 
 export {
-    DEG2RAD,
-    RAD2DEG,
-    generateUUID,
-    clamp,
-    euclideanModulo,
-    mapLinear,
-    inverseLerp,
-    lerp,
-    damp,
-    pingpong,
-    smoothstep,
-    smootherstep,
-    randInt,
-    randFloat,
-    randFloatSpread,
-    seededRandom,
-    degToRad,
-    radToDeg,
-    isPowerOfTwo,
-    ceilPowerOfTwo,
-    floorPowerOfTwo,
-    normalize,
-    denormalize,
-    MathUtils
+  DEG2RAD,
+  RAD2DEG,
+  toPeriod,
+  toRange,
+  generateUUID,
+  clamp,
+  euclideanModulo,
+  mapLinear,
+  inverseLerp,
+  lerp,
+  damp,
+  pingpong,
+  smoothstep,
+  smootherstep,
+  randInt,
+  randFloat,
+  randFloatSpread,
+  seededRandom,
+  degToRad,
+  radToDeg,
+  isPowerOfTwo,
+  ceilPowerOfTwo,
+  floorPowerOfTwo,
+  normalize,
+  denormalize,
+  MathUtils
 };

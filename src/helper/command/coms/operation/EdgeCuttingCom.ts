@@ -56,15 +56,10 @@ class EdgeCuttingCom extends Command {
             this.src.push(...original);
           } else {
             original.forEach((e: Edge2) => {
-              let u: UserData = {
-                type: GeomType.DRAW_CURVE2_L,
-                canPick: userData.canPick,
-                isAssist: false,
-                assistPoints: null,
-                color: userData.color,
-                original: e,
-              };
-              this.des.push({ e: e, u: u });
+              let u: UserData = CloneUserData(userData);
+              u.assistPoints = null;
+              u.original = e.clone();
+              this.des.push({ e: u.original, u: u });
             });
 
             this.olds.push(geo);
@@ -75,70 +70,65 @@ class EdgeCuttingCom extends Command {
           if (this.src.length == 0) {
             this.src.push(original);
           } else {
-            let u: UserData = {
-              type: GeomType.DRAW_CURVE2_L,
-              canPick: userData.canPick,
-              isAssist: false,
-              assistPoints: null,
-              color: userData.color,
-              original: original,
-            };
-            this.des.push({ e: original, u: u });
+            let u: UserData = CloneUserData(userData);
+            u.assistPoints = null;
+            u.original = original.clone();
+            this.des.push({ e: u.original, u: u });
             this.olds.push(geo);
           }
         }
       }
     }
     if (this.src.length > 0 && this.des.length > 0) {
-      let assists = new Array<AssisPoint>();
-      // 第一轮使用选择的的目标
-      let edges: Array<{ e: Edge2, u: UserData }> = this.des;
-      let edgeTemps: Array<{ e: Edge2, u: UserData }> = [];
-      for (let i = 0; i < this.src.length; i++) {
-        let src = this.src[i];
-        for (let j = 0; j < edges.length; j++) {
-          let des = edges[j];
-          let inters = Brep2Inter.EdgeXEdge(src, des.e, 1e-4, 1e-10);
-          if (inters.length == 0) {
-            edgeTemps.push(des);
+
+      let edges: Array<{ e: Edge2, u: UserData }> = [];
+      let sort = (a: InterOfCurve2, b: InterOfCurve2): number => {
+        if (a.u1 < b.u1) {
+          return -1;
+        }
+        if (a.u1 > b.u1) {
+          return 1;
+        }
+        return 0;
+      }
+      // 每一个目标被所有的源边分割
+      for (let i = 0; i < this.des.length; i++) {
+        let des = this.des[i];
+        let inters: Array<InterOfCurve2> = [];
+        for (let j = 0; j < this.src.length; j++) {
+          let src = this.src[j];
+          let inter = Brep2Inter.EdgeXEdge(src, des.e, 1e-4, 1e-10);
+          inters.push(...inter);
+        }
+        // 按照交点的U参数值，由低到高排序。
+        inters.sort(sort);
+        // 将目标用交点分割成若干段
+        for (let j = 0; j < inters.length; j++) {
+          let inter = inters[j];
+          if (inter.u1 == des.e.u.x) {
             continue;
           }
-          // 将目标用交点分割成若干段
-          let segs: Array<{ e: Edge2, u: UserData }> = [];
-          let segTemps: Array<{ e: Edge2, u: UserData }> = [];
-          segs.push(des);
-          for (let k = 0; k < inters.length; k++) {
-            let inter = inters[k];
-            assists.push({ p: inter.p, c: THREE.Color.NAMES.blue });
-            for (let l = 0; l < segs.length; l++) {
-              let seg = segs[l];
-              if (inter.u1 > seg.e.u.x && inter.u1 < seg.e.u.y) {
-                let before = seg.e.clone();
-                before.u.y = inter.u1;
-                let u = CloneUserData(seg.u);
-                u.original = before;
-                segTemps.push({ e: before, u: u });
-                let after = seg.e;
-                after.u.x = inter.u1;
-                segTemps.push(seg);
-              } else {
-                segTemps.push(seg);
-              }
-            }
-            segs = segTemps;
-            segTemps = [];
+          if (inter.u1 == des.e.u.y) {
+            edges.push(des);
+            break;
           }
-          edgeTemps.push(...segs);
+          let e = des.e.clone();
+          e.u.y = inter.u1;
+          des.e.u.x = inter.u1;
+          let u = CloneUserData(des.u);
+          u.original = e;
+          edges.push({ e: e, u: u });
+          // 最后一个交点时补充最后一段
+          if (j == inters.length - 1) {
+            edges.push(des);
+          }
         }
-        // 从第二轮开始使用上一轮的计算结果，作为这一轮的目标
-        edges = edgeTemps;
-        edgeTemps = [];
       }
       for (let i = 0; i < edges.length; i++) {
         let algo = new Edge2Algo(edges[i].e);
         let geo = BrepMeshBuilder.BuildEdge2Mesh(edges[i].e, THREE.Color.NAMES.red);
         let begin = algo.getBeginPoint();
-        let end = algo.getBeginPoint();
+        let end = algo.getEndPoint();
         edges[i].u.assistPoints = [];
         edges[i].u.assistPoints.push({ p: begin, c: THREE.Color.NAMES.blue });
         edges[i].u.assistPoints.push({ p: end, c: THREE.Color.NAMES.blue });

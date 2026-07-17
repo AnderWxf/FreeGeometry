@@ -1,5 +1,6 @@
 import { GeomType } from "../../../core/Constents";
 import { Vector2 } from "../../../math/Math";
+import { toPeriod } from "../../../math/MathUtils";
 import type { Curve2Data } from "../base/Curve2Data";
 import { unserialize } from "../base/Unserialize";
 import { DataBase } from "../DataBase";
@@ -192,6 +193,50 @@ class Edge2 extends DataBase {
       || Math.abs(u - ur.y) <= tol1
       || this.isInURange(u);
   }
+
+  // u ∈ (a,b) ∈ [0,period]
+  isInURangePeriod(u: number, period: number): boolean {
+    u = toPeriod(u, period);
+    let ur = this.ur;
+    let off = ur.y - ur.x;
+    ur.x = toPeriod(ur.x, period);
+    ur.y = ur.x + off;
+    let up = u > ur.x && u < ur.y;
+    if (up) {
+      return up;
+    }
+    ur = this.ur;
+    off = ur.y - ur.x;
+    ur.y = toPeriod(ur.y, period);
+    ur.x = ur.y - off;
+    let down = u > ur.x && u < ur.y;
+    if (down) {
+      return down;
+    }
+    return false;
+  }
+  // u ∈ [a,b] ∈ [0,period]
+  isOnURangePeriod(u: number, period: number, tol1: number,): boolean {
+    let ur = this.ur;
+    u = toPeriod(u, period);
+    let off = ur.y - ur.x;
+    ur.x = toPeriod(ur.x, period);
+    ur.y = ur.x + off;
+    let up = Math.abs(u - ur.x) <= tol1 || Math.abs(u - ur.y) <= tol1 || u > ur.x && u < ur.y;
+    if (up) {
+      return up;
+    }
+    ur = this.ur;
+    off = ur.y - ur.x;
+    ur.y = toPeriod(ur.y, period);
+    ur.x = ur.y - off;
+    let down = Math.abs(u - ur.x) <= tol1 || Math.abs(u - ur.y) <= tol1 || u > ur.x && u < ur.y;
+    if (down) {
+      return down;
+    }
+    return false;
+  }
+
 
   /**
    * Returns a new Edge2 with unserialize data.

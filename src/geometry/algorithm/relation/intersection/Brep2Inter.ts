@@ -1,3 +1,4 @@
+import { PI2, toRange } from "../../../../math/MathUtils";
 import { Arc2Data } from "../../../data/base/curve2/Arc2Data";
 import { Hyperbola2Data } from "../../../data/base/curve2/Hyperbola2Data";
 import { Line2Data } from "../../../data/base/curve2/Line2Data";
@@ -34,8 +35,25 @@ class Brep2Inter {
     let inters = Curve2Inter.X(c0, c1, tol0, tol1);
     for (let i = 0; i < inters.length; i++) {
       let inter = inters[i];
-      if (e0.isOnURange(inter.u0, tol1)
-        && e1.isOnURange(inter.u1, tol1)) {
+      let e0IsOnURange = false;
+      let e1IsOnURange = false;
+      if (c0 instanceof Arc2Data) {
+        e0IsOnURange = e0.isOnURangePeriod(inter.u0, PI2, tol1);
+        if (e0IsOnURange) {
+          inter.u0 = toRange(inter.u0, e0.umin, e0.umax, PI2);
+        }
+      } else {
+        e0IsOnURange = e0.isOnURange(inter.u0, tol1)
+      }
+      if (c1 instanceof Arc2Data) {
+        e1IsOnURange = e1.isOnURangePeriod(inter.u1, PI2, tol1);
+        if (e1IsOnURange) {
+          inter.u1 = toRange(inter.u1, e1.umin, e1.umax, PI2);
+        }
+      } else {
+        e1IsOnURange = e1.isOnURange(inter.u1, tol1)
+      }
+      if (e0IsOnURange && e1IsOnURange) {
         result.push(inter);
       }
     }
