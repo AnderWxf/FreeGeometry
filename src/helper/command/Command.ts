@@ -38,6 +38,7 @@ class Command {
     mesh.userData.isAssist = true;
     mesh.userData.color = a.c;
     mesh.userData.original = a.p;
+    mesh.visible = Global.isShowAssists;
     return mesh;
   }
   onMouseMove = (event: MouseEvent) => {

@@ -128,7 +128,7 @@ const ComOptionBar: React.FC = () => (
   <Space wrap>
 
     <Checkbox
-      style={{ width: 100, position: 'fixed', top: 10, right: 70, zIndex: 1000, backgroundColor: 'transparent' }}
+      style={{ width: 60, position: 'fixed', top: 10, right: 70, zIndex: 1000, backgroundColor: 'transparent' }}
       onChange={(e) => {
         Global.select.isSnap = e.target.checked;
       }}
@@ -137,11 +137,19 @@ const ComOptionBar: React.FC = () => (
       }}
     >捕捉</Checkbox>
     <Checkbox
-      style={{ width: 100, position: 'fixed', top: 10, right: 180, zIndex: 1000, backgroundColor: 'transparent' }}
+      style={{ width: 60, position: 'fixed', top: 10, right: 140, zIndex: 1000, backgroundColor: 'transparent' }}
       onChange={(e) => {
         Global.select.isEditor = e.target.checked;
       }}
     >编辑</Checkbox>
+    <Checkbox
+      style={{ width: 80, position: 'fixed', top: 10, right: 200, zIndex: 1000 }}
+      defaultChecked={true}
+      onChange={(e) => {
+        Global.isShowAssists = e.target.checked;
+        Global.comExector.execute(CommandType.SCENE_SHOW_ASSISTS);
+      }}
+    >辅助点</Checkbox>
     <div id='states' style={{ width: 300, position: 'fixed', fontSize: 14, top: 10, right: 350, color: '#00AA00', zIndex: 1000 }}> 光标位置 </div>
     {/* <Checkbox
       style={{ width: 100, position: 'fixed', top: 10, right: 300, zIndex: 1000 }}
@@ -149,12 +157,7 @@ const ComOptionBar: React.FC = () => (
         Global.select.isSnapInter = e.target.checked;
       }}
     >捕捉交点</Checkbox> */}
-    {/* <Checkbox
-            style={{ width: 100, position:'fixed', top: 10, left: 75, zIndex: 1000}}
-            onChange={(e) => {
-                Global.isShowAssists = e.target.checked;
-            }}
-        >控制</Checkbox> */}
+
   </Space>
 );
 

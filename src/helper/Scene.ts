@@ -36,6 +36,16 @@ class Scene {
     }
     return result;
   }
+  get allObjects(): THREE.Object3D[] {
+    const result: THREE.Object3D[] = [];
+    for (const value of this._objects.values()) {
+      result.push(value);
+      if (value.children.length) {
+        result.push(...value.children);
+      }
+    }
+    return result;
+  }
 }
 export {
   Scene,

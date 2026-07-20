@@ -258,6 +258,7 @@ enum CommandType {
   SCENE_IMPORT = 'IMPORT',              // 导入
   SCENE_EXPORT = 'EXPORT',              // 导出
   SCENE_CLEAR = 'CLEAR',                // 清空
+  SCENE_SHOW_ASSISTS = 'SHOW_ASSISTS',  // 显示/隐藏辅助对象
 
   // 其他
   OTHER_DELETE = 'D',                   // 删除

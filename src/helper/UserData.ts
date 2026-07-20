@@ -2,6 +2,7 @@ import type { GeomType } from "../core/Constents";
 import type { Vector2, Vector3 } from "../math/Math";
 import * as THREE from "three";
 import { Command } from "./command/Command";
+import { Global } from "../core/Global";
 
 // 用户数据类型，挂在显示对象的userData属性上。
 type AssisPoint = {
@@ -62,6 +63,7 @@ function CreateAssistPoint(a: AssisPoint): THREE.Mesh {
   mesh.userData.isAssist = true;
   mesh.userData.color = a.c;
   mesh.userData.original = a.p;
+  mesh.visible = Global.isShowAssists;
   return mesh;
 }
 

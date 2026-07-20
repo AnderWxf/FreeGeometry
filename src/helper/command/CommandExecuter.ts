@@ -72,6 +72,7 @@ import { CalculatePointEdge2Com } from "./coms/calculate/CalculatePointEdge2Com"
 import { CalculatePointFace2Com } from "./coms/calculate/CalculatePointFace2Com";
 import { CalculatePointEdge2AutoCom } from "./coms/calculate/CalculatePointEdge2AutoCom";
 import { CalculatePointFace2AutoCom } from "./coms/calculate/CalculatePointFace2AutoCom";
+import { SceneShowAssistsCom } from "./coms/scene/SceneShowAssistsCom";
 
 /**
  * Command executer base class.
@@ -160,6 +161,7 @@ class CommandExecuter {
     this._commands.set(CommandType.SCENE_LOAD, SceneLoadCom);
     this._commands.set(CommandType.SCENE_IMPORT, SceneImportCom);
     this._commands.set(CommandType.SCENE_CLEAR, SceneClearCom);
+    this._commands.set(CommandType.SCENE_SHOW_ASSISTS, SceneShowAssistsCom);
 
     this._commands.set(CommandType.OTHER_DELETE, ComDelete);
     this._commands.set(CommandType.OTHER_MOVE, ComMove);

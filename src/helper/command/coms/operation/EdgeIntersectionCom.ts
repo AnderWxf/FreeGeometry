@@ -75,6 +75,9 @@ class EdgeIntersectionCom extends Command {
           this.assists.push(this.createAssistPoint({ p: this.results[i].is[j].p, c: THREE.Color.NAMES.blue }));
         }
       }
+      for (let i = 0; i < this.assists.length; i++) {
+        this.assists[i].visible = true;
+      }
       this.done();
     } else {
       this.cancel();

@@ -57,6 +57,17 @@ class Brep2Inter {
         result.push(inter);
       }
     }
+    for (let i = result.length - 1; i > 0; i--) {
+      let curr = result[i];
+      let pre = result[i - 1];
+      if (curr.p.distanceTo(pre.p) < tol0
+        && Math.abs(curr.u0 - pre.u0) < tol1
+        && Math.abs(curr.u1 - pre.u1) < tol1
+      ) {
+        result.splice(i, 1);
+      }
+    }
+
     return result;
   }
 

@@ -3,6 +3,8 @@ import { Vector2, Vector3 } from '../math/Math';
 import { Global } from '../core/Global';
 import type { UserData } from './UserData';
 import { LineBasicMaterial, Material, type LineBasicMaterialProperties } from 'three';
+import { Edge2 } from '../geometry/data/brep/Brep2';
+import { Edge2Algo } from '../geometry/algorithm/brep/Brep2Algo';
 
 /**
  * Select controller.
@@ -232,9 +234,49 @@ class Select {
     if (intersects.length > 0) {
       for (let i = intersects.length - 1; i >= 0; i--) {
         const obj = intersects[i].object;
+        if (!obj.visible) { continue; }
         let userData = obj.userData as UserData;
         if (userData.canPick) {
-          this.overedPoint = intersects[i].point; // 交点的世界坐标                    
+          this.overedPoint = intersects[i].point; // 交点的世界坐标         
+          // if (this._isSnap) {
+          let p = new Vector2(this.overedPoint.x, this.overedPoint.y);
+          let mind = 1;
+          if (userData.assistPoints?.length) {
+            for (let j = 0; j < userData.assistPoints.length; j++) {
+              let assistPoint = userData.assistPoints[j];
+              let d = p.distanceTo(assistPoint.p);
+              if (d < mind) {
+                mind = d;
+                this.overedPoint.x = assistPoint.p.x;
+                this.overedPoint.y = assistPoint.p.y;
+              }
+            }
+            if (userData.original instanceof Edge2) {
+              let algo = new Edge2Algo(userData.original);
+              let b = algo.getBeginPoint();
+              let e = algo.getBeginPoint();
+              let m = algo.p((userData.original.u.x + userData.original.u.y) * 0.5);
+              let d = p.distanceTo(b);
+              if (d < mind) {
+                mind = d;
+                this.overedPoint.x = b.x;
+                this.overedPoint.y = b.y;
+              }
+              d = p.distanceTo(e);
+              if (d < mind) {
+                mind = d;
+                this.overedPoint.x = e.x;
+                this.overedPoint.y = e.y;
+              }
+              d = p.distanceTo(m);
+              if (d < mind) {
+                mind = d;
+                this.overedPoint.x = m.x;
+                this.overedPoint.y = m.y;
+              }
+            }
+          }
+          // }
           isCanPick = true;
           if (!this.overObjects.includes(obj) && !this.selectedObjects.includes(obj)) {
             (obj as any).material?.color?.setHex(THREE.Color.NAMES.cornflowerblue);
