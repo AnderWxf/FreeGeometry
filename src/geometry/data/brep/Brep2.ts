@@ -194,12 +194,12 @@ class Edge2 extends DataBase {
       || this.isInURange(u);
   }
 
-  // u ∈ (a,b) ∈ [0,period]
-  isInURangePeriod(u: number, period: number): boolean {
-    u = toPeriod(u, period);
+  // u ∈ (a,b) ∈ [0,period)
+  isInURangePeriod(u: number, period: number, tol1: number): boolean {
+    u = toPeriod(u, period, tol1);
     let ur = this.ur;
     let off = ur.y - ur.x;
-    ur.x = toPeriod(ur.x, period);
+    ur.x = toPeriod(ur.x, period, tol1);
     ur.y = ur.x + off;
     let up = u > ur.x && u < ur.y;
     if (up) {
@@ -207,7 +207,7 @@ class Edge2 extends DataBase {
     }
     ur = this.ur;
     off = ur.y - ur.x;
-    ur.y = toPeriod(ur.y, period);
+    ur.y = toPeriod(ur.y, period, tol1);
     ur.x = ur.y - off;
     let down = u > ur.x && u < ur.y;
     if (down) {
@@ -215,12 +215,12 @@ class Edge2 extends DataBase {
     }
     return false;
   }
-  // u ∈ [a,b] ∈ [0,period]
-  isOnURangePeriod(u: number, period: number, tol1: number,): boolean {
+  // u ∈ [a,b] ∈ [0,period)
+  isOnURangePeriod(u: number, period: number, tol1: number): boolean {
     let ur = this.ur;
-    u = toPeriod(u, period);
+    u = toPeriod(u, period, tol1);
     let off = ur.y - ur.x;
-    ur.x = toPeriod(ur.x, period);
+    ur.x = toPeriod(ur.x, period, tol1);
     ur.y = ur.x + off;
     let up = Math.abs(u - ur.x) <= tol1 || Math.abs(u - ur.y) <= tol1 || u > ur.x && u < ur.y;
     if (up) {
@@ -228,7 +228,7 @@ class Edge2 extends DataBase {
     }
     ur = this.ur;
     off = ur.y - ur.x;
-    ur.y = toPeriod(ur.y, period);
+    ur.y = toPeriod(ur.y, period, tol1);
     ur.x = ur.y - off;
     let down = Math.abs(u - ur.x) <= tol1 || Math.abs(u - ur.y) <= tol1 || u > ur.x && u < ur.y;
     if (down) {

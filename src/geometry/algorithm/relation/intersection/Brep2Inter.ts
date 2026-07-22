@@ -6,7 +6,7 @@ import { Nurbs2Data } from "../../../data/base/curve2/Nurbs2Data";
 import { Parabola2Data } from "../../../data/base/curve2/Parabola2Data";
 import type { Curve2Data } from "../../../data/base/Curve2Data";
 import type { Edge2, Face2 } from "../../../data/brep/Brep2";
-import type { Face2Algo, Face2Algos } from "../../brep/Brep2Algo";
+import { Edge2Algo, type Face2Algo, type Face2Algos } from "../../brep/Brep2Algo";
 import { Curve2Inter, type InterOfCurve2 } from "./Curve2Inter";
 
 /**
@@ -31,12 +31,24 @@ class Brep2Inter {
   public static EdgeXEdge(e0: Edge2, e1: Edge2, tol0: number, tol1: number): Array<InterOfCurve2> {
     let c0 = e0.curve;
     let c1 = e1.curve;
+    let e0a = new Edge2Algo(e0);
+    let e1a = new Edge2Algo(e1);
     let result: Array<InterOfCurve2> = [];
     let inters = Curve2Inter.X(c0, c1, tol0, tol1);
     for (let i = 0; i < inters.length; i++) {
       let inter = inters[i];
       let e0IsOnURange = false;
       let e1IsOnURange = false;
+      if (e0a.getBeginPoint().distanceTo(inter.p) <= tol0) {
+        inter.u0 = e0.u.x;
+      } else if (e0a.getEndPoint().distanceTo(inter.p) <= tol0) {
+        inter.u0 = e0.u.y;
+      }
+      if (e1a.getBeginPoint().distanceTo(inter.p) <= tol0) {
+        inter.u1 = e1.u.x;
+      } else if (e1a.getEndPoint().distanceTo(inter.p) <= tol0) {
+        inter.u1 = e1.u.y;
+      }
       if (c0 instanceof Arc2Data) {
         e0IsOnURange = e0.isOnURangePeriod(inter.u0, PI2, tol1);
         if (e0IsOnURange) {
@@ -60,9 +72,9 @@ class Brep2Inter {
     for (let i = result.length - 1; i > 0; i--) {
       let curr = result[i];
       let pre = result[i - 1];
-      if (curr.p.distanceTo(pre.p) < tol0
-        && Math.abs(curr.u0 - pre.u0) < tol1
-        && Math.abs(curr.u1 - pre.u1) < tol1
+      if (curr.p.distanceTo(pre.p) <= tol0
+        && Math.abs(curr.u0 - pre.u0) <= tol1
+        && Math.abs(curr.u1 - pre.u1) <= tol1
       ) {
         result.splice(i, 1);
       }

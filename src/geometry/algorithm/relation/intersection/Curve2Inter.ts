@@ -324,32 +324,35 @@ class Curve2Inter {
       if (c0.trans.pos.distanceTo(c1.trans.pos) > Math.max(c0.radius.x, c0.radius.y) + Math.max(c1.radius.x, c1.radius.y)) {
         return new Array<InterOfCurve2>();
       }
-      if (c0.trans.pos.distanceTo(c1.trans.pos) < Math.abs(Math.max(c0.radius.x, c0.radius.y) - Math.max(c1.radius.x, c1.radius.y))) {
+      if (c0.trans.pos.distanceTo(c1.trans.pos) < Math.min(c0.radius.x, c0.radius.y) - Math.max(c1.radius.x, c1.radius.y)) {
         return new Array<InterOfCurve2>();
       }
-      if (c0.trans.pos.distanceTo(c1.trans.pos) < tol0) {
+      if (c0.trans.pos.distanceTo(c1.trans.pos) < Math.min(c1.radius.x, c1.radius.y) - Math.max(c0.radius.x, c0.radius.y)) {
         return new Array<InterOfCurve2>();
       }
-      if (Math.max(c0.radius.x, c0.radius.y) > Math.max(c1.radius.x, c1.radius.y)) {
-        return Curve2Inter.SwapU(Curve2Inter.CurveXCurve(c1, c0, Math.round(Math.max(c1.radius.x, c1.radius.y) * Math.PI * 2), tol0, tol1, n, 0, Math.PI * 2));
-      } else {
-        return Curve2Inter.CurveXCurve(c0, c1, Math.round(Math.max(c0.radius.x, c0.radius.y) * Math.PI * 2), tol0, tol1, n, 0, Math.PI * 2);
+      if (c0.trans.pos.distanceTo(c1.trans.pos) < tol0 && c0.radius.x == c0.radius.y && c1.radius.x == c1.radius.y) {
+        return new Array<InterOfCurve2>();
       }
+      // if (Math.max(c0.radius.x, c0.radius.y) > Math.max(c1.radius.x, c1.radius.y)) {
+      //   return Curve2Inter.SwapU(Curve2Inter.CurveXCurve(c1, c0, Math.round(Math.max(c1.radius.x, c1.radius.y) * Math.PI * 2), tol0, tol1, n, 0, Math.PI * 2));
+      // } else {
+      //   return Curve2Inter.CurveXCurve(c0, c1, Math.round(Math.max(c0.radius.x, c0.radius.y) * Math.PI * 2), tol0, tol1, n, 0, Math.PI * 2);
+      // }
     }
-    if (c0 instanceof Arc2Data) {
-      if (c0.radius.x > c0.radius.y) {
-        return Curve2Inter.CurveXCurve(c0, c1, Math.round(c0.radius.x * Math.PI * 2), tol0, tol1, n, 0, Math.PI * 2);
-      } else {
-        return Curve2Inter.CurveXCurve(c0, c1, Math.round(c0.radius.y * Math.PI * 2), tol0, tol1, n, 0, Math.PI * 2);
-      }
-    }
-    if (c1 instanceof Arc2Data) {
-      if (c1.radius.x > c1.radius.y) {
-        return Curve2Inter.SwapU(Curve2Inter.CurveXCurve(c1, c0, Math.round(c1.radius.x * Math.PI * 2), tol0, tol1, n, 0, Math.PI * 2));
-      } else {
-        return Curve2Inter.SwapU(Curve2Inter.CurveXCurve(c1, c0, Math.round(c1.radius.y * Math.PI * 2), tol0, tol1, n, 0, Math.PI * 2));
-      }
-    }
+    // if (c0 instanceof Arc2Data) {
+    //   if (c0.radius.x > c0.radius.y) {
+    //     return Curve2Inter.CurveXCurve(c0, c1, Math.round(c0.radius.x * Math.PI * 2), tol0, tol1, n, 0, Math.PI * 2);
+    //   } else {
+    //     return Curve2Inter.CurveXCurve(c0, c1, Math.round(c0.radius.y * Math.PI * 2), tol0, tol1, n, 0, Math.PI * 2);
+    //   }
+    // }
+    // if (c1 instanceof Arc2Data) {
+    //   if (c1.radius.x > c1.radius.y) {
+    //     return Curve2Inter.SwapU(Curve2Inter.CurveXCurve(c1, c0, Math.round(c1.radius.x * Math.PI * 2), tol0, tol1, n, 0, Math.PI * 2));
+    //   } else {
+    //     return Curve2Inter.SwapU(Curve2Inter.CurveXCurve(c1, c0, Math.round(c1.radius.y * Math.PI * 2), tol0, tol1, n, 0, Math.PI * 2));
+    //   }
+    // }
     let c0a = CurveBuilder.Algorithm2ByData(c0) as Arc2Algo | Hyperbola2Algo | Parabola2Algo;
     let c1a = CurveBuilder.Algorithm2ByData(c1) as Arc2Algo | Hyperbola2Algo | Parabola2Algo;
 
@@ -436,7 +439,8 @@ class Curve2Inter {
         let g0 = c0a.g(inter.p);
         let g1 = c1a.g(inter.p);
         if (Math.abs(g0) < tol1 && Math.abs(g1) < tol1) {
-          ret.push({ p: inter.p, u0: inter.u1, u1: c1a.u(inter.p) });
+          inter.u0 = c0a.u(inter.p); inter.u1 = c1a.u(inter.p);
+          ret.push(inter);
         }
         else if (Math.abs(g0) < tol1) {
           inter.u0 = c0a.u(inter.p);
@@ -445,7 +449,8 @@ class Curve2Inter {
           g1 = c1a.g(inter.p);
           if (Math.abs(g0) < tol1 && Math.abs(g1) < tol1) {
             if (!isExist(inter.p)) {
-              ret.push({ p: inter.p, u0: inter.u1, u1: c1a.u(inter.p) });
+              inter.u0 = c0a.u(inter.p); inter.u1 = c1a.u(inter.p);
+              ret.push(inter);
             }
 
           }
@@ -457,7 +462,8 @@ class Curve2Inter {
           g1 = c1a.g(inter.p);
           if (Math.abs(g0) < tol1 && Math.abs(g1) < tol1) {
             if (!isExist(inter.p)) {
-              ret.push({ p: inter.p, u0: inter.u1, u1: c1a.u(inter.p) });
+              inter.u0 = c0a.u(inter.p); inter.u1 = c1a.u(inter.p);
+              ret.push(inter);
             }
           }
         }
@@ -601,7 +607,7 @@ class Curve2Inter {
             if (ret.length >= n) {
               break;
             }
-            inters = Curve2Inter.LineXConic({ A: l[0], B: l[1], C: l[2] }, c1, null, c0a, tol0, tol1, 2);
+            inters = Curve2Inter.LineXConic({ A: l[0], B: l[1], C: l[2] }, c1, null, c1a, tol0, tol1, 2);
             checkAndPush(inters);
             if (ret.length >= n) {
               break;
@@ -610,6 +616,7 @@ class Curve2Inter {
         }
       }
     }
+
     return ret;
   }
 
@@ -682,7 +689,7 @@ class Curve2Inter {
       }
       // 扩张时，反向
       else if (Math.abs(dg) > Math.abs(g)) {
-        du = -du; //* 0.75;
+        du = -du * 0.75;
       }
       // 收缩时
       // else if (Math.abs(dg) < Math.abs(g)) {
@@ -947,16 +954,24 @@ class Curve2Inter {
       return 0;
     });
     for (let i = ret.length - 1; i > 0; i--) {
-      if (ret[i].p.distanceTo(ret[i - 1].p) < tol0) {
-        ret.splice(i, 1);
+      for (let j = 0; j < i; j++) {
+        if (ret[i].p.distanceTo(ret[j].p) < tol0) {
+          ret.splice(i, 1);
+          break;
+        }
       }
     }
+
     if (times > 100) {
       console.warn("times :" + times);
     } else {
       console.log("times :" + times);
     }
     Curve2Inter.totaltimes += times;
+    // 数量超出理论上限，曲线是重合的
+    if (n != -1 && ret.length > n) {
+      return [];
+    }
     return ret;
   }
 

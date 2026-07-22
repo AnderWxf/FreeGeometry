@@ -1,5 +1,5 @@
 // user-processor.test.ts
 import { process } from './processors/Edge2XEdge2Processor';
-import { ExecuteDescribe } from './BaseTtest';
+import { ExecuteDescribeInsertPoint3 } from './BaseTtest';
 
-ExecuteDescribe('curve3求交测试', '02_curve3Xcurve3', process);
+ExecuteDescribeInsertPoint3('curve3求交测试', '02_curve3Xcurve3', process);

@@ -100,10 +100,10 @@ class Edge2Algo {
   }
 
   getBeginPoint(): Vector2 {
-    return this.p(this.u.y);
+    return this.p(this.u.x);
   }
   getEndPoint(): Vector2 {
-    return this.p(this.u.x);
+    return this.p(this.u.y);
   }
   getBeginTangent(): Vector2 {
     return this.t(this.u.x);

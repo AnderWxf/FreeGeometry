@@ -5,6 +5,8 @@ import type { UserData } from '../helper/UserData';
 import { unserialize } from '../geometry/data/base/Unserialize';
 import { isEqualWith } from 'lodash';
 import { describe, expect, test } from 'vitest';
+import { Vector2, Vector3 } from '../math/Math';
+import { vec2 } from 'three/src/nodes/TSL';
 
 function IsCloseTo(received: any, expected: any, tolerance: number = 1e-12): boolean {
   return isEqualWith(received, expected, (objVal, othVal) => {
@@ -86,6 +88,97 @@ function ExecuteDescribe(typeName: string, typeDir: string, process: (input: any
   });
 }
 
+// 执行描述Object 2维交点集合
+function ExecuteDescribeInsertPoint2(typeName: string, typeDir: string, process: (input: any) => any) {
+  describe(typeName, () => {
+    const dataDir = path.join(__dirname, 'data', typeDir);
+    const files = fs.readdirSync(dataDir);
+    files.forEach(file => {
+      const testCases = DiscoverTestCases(typeDir + '/' + file);
+      // 如果没有找到测试用例，给出提示
+      if (testCases.length === 0) {
+        console.warn('⚠️ 未找到测试数据文件，请检查 data/ 目录');
+      }
+      describe(file, () => {
+        const testCases = DiscoverTestCases(typeDir + '/' + file);
+        // 如果没有找到测试用例，给出提示
+        if (testCases.length === 0) {
+          console.warn('⚠️ 未找到测试数据文件，请检查 data/ 目录');
+        }
+        for (let i = 0; i < testCases.length; i++) {
+          let c = testCases[i];
+          test(c.name, () => {
+            const input = LoadScene(c.inputFile);
+            const expected = LoadScene(c.expectedFile) as [any];
+            const result = process(input) as [any];
+            // 交点距离判定，
+            for (let j = expected.length - 1; j >= 0; j--) {
+              let exp = expected[j].userData as UserData;
+              for (let k = result.length - 1; k >= 0; k--) {
+                let ret = result[k].userData as UserData;
+                if (exp.original instanceof Vector2
+                  && ret.original instanceof Vector2
+                  && exp.original.distanceTo(ret.original) < 1e-4
+                ) {
+                  result.splice(k, 1);
+                  expected.splice(j, 1);
+                  break;
+                }
+              }
+            }
+            expect(IsCloseTo(result, expected, 1e-8)).toBe(true);
+          });
+        }
+      });
+    });
+  });
+}
+
+// 执行描述Object 3维交点集合
+function ExecuteDescribeInsertPoint3(typeName: string, typeDir: string, process: (input: any) => any) {
+  describe(typeName, () => {
+    const dataDir = path.join(__dirname, 'data', typeDir);
+    const files = fs.readdirSync(dataDir);
+    files.forEach(file => {
+      const testCases = DiscoverTestCases(typeDir + '/' + file);
+      // 如果没有找到测试用例，给出提示
+      if (testCases.length === 0) {
+        console.warn('⚠️ 未找到测试数据文件，请检查 data/ 目录');
+      }
+      describe(file, () => {
+        const testCases = DiscoverTestCases(typeDir + '/' + file);
+        // 如果没有找到测试用例，给出提示
+        if (testCases.length === 0) {
+          console.warn('⚠️ 未找到测试数据文件，请检查 data/ 目录');
+        }
+        for (let i = 0; i < testCases.length; i++) {
+          let c = testCases[i];
+          test(c.name, () => {
+            const input = LoadScene(c.inputFile);
+            const expected = LoadScene(c.expectedFile) as [any];
+            const result = process(input) as [any];
+            // 交点距离判定，
+            for (let j = expected.length - 1; j >= 0; j--) {
+              let exp = expected[j].userData as UserData;
+              for (let k = result.length - 1; k >= 0; k--) {
+                let ret = result[k].userData as UserData;
+                if (exp.original instanceof Vector3
+                  && ret.original instanceof Vector3
+                  && exp.original.distanceTo(ret.original) < 1e-4
+                ) {
+                  result.splice(k, 1);
+                  expected.splice(j, 1);
+                  break;
+                }
+              }
+            }
+            expect(IsCloseTo(result, expected, 1e-8)).toBe(true);
+          });
+        }
+      });
+    });
+  });
+}
 // 执行描述Bool
 function ExecuteDescribeBools(typeName: string, typeDir: string, process: (input: any) => any) {
   describe(typeName, () => {
@@ -117,5 +210,13 @@ function ExecuteDescribeBools(typeName: string, typeDir: string, process: (input
   });
 }
 
-export { IsCloseTo, LoadScene as LoadJSON, DiscoverTestCases, ExecuteDescribe, ExecuteDescribeBools };
+export {
+  IsCloseTo,
+  LoadScene,
+  DiscoverTestCases,
+  ExecuteDescribe,
+  ExecuteDescribeBools,
+  ExecuteDescribeInsertPoint2,
+  ExecuteDescribeInsertPoint3,
+};
 export type { TestCase };

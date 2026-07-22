@@ -13,16 +13,22 @@ const DEG2RAD = Math.PI / 180;
 const RAD2DEG = 180 / Math.PI;
 
 /**
- * u to [0,period]
+ * u to [0,period)
  *
- * @return {number} The u ∈ [0,period].
+ * @return {number} The u ∈ [0,period).
  */
-function toPeriod(u: number, period: number): number {
+function toPeriod(u: number, period: number, tol1: number): number {
   while (u < 0) {
     u += period;
   }
-  while (u > period) {
+  while (u >= period) {
     u -= period;
+  }
+  if (Math.abs(u) < tol1) {
+    u = 0;
+  }
+  if (Math.abs(u - period) < tol1) {
+    u = 0;
   }
   return u
 }
@@ -453,9 +459,9 @@ const MathUtils = {
   DEG2RAD: DEG2RAD,
   RAD2DEG: RAD2DEG,
   /**
-   * u to [0,period]
+   * u to [0,period)
    *
-   * @return {number} The u ∈ [0,period].
+   * @return {number} The u ∈ [0,period).
    */
   toPeriod: toPeriod,
   /**
