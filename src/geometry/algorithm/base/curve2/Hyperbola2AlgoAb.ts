@@ -197,9 +197,9 @@ class Hyperbola2AlgoAb extends Curve2Algo {
     let v = point.clone();
     v.applyMatrix3(this.dat.trans.makeLocalMatrix().invert());
     const b = MATHJS.bignumber(this.dat.radius.y);
-    const y = MATHJS.bignumber(point.y);
+    const y = MATHJS.bignumber(v.y);
     const φ = MATHJS.atan(MATHJS.divide(y, b) as MATHJS.BigNumber);
-    if (point.x > 0) {
+    if (v.x > 0) {
       return φ.toNumber();
     } else {
       return φ.toNumber() + Math.PI;

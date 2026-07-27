@@ -823,6 +823,7 @@ class Curve2Inter {
 
   /**
    * compute curve to curve intersection point.
+   * 此函数使用交叉逼近的方式获得近似解，适用于圆锥曲线间的求交计算无法处理的情况。
    *
    * @param {Curve2Data} [c0] - The frist curve , binary search curve.
    * @param {Curve2Data} [c1] - The second curve , general equation curve.
