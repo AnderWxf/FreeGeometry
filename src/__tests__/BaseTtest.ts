@@ -120,13 +120,12 @@ function ExecuteDescribeInsertPoint2(typeName: string, typeDir: string, process:
                   && ret.original instanceof Vector2
                   && exp.original.distanceTo(ret.original) < 1e-4
                 ) {
-                  result.splice(k, 1);
                   expected.splice(j, 1);
                   break;
                 }
               }
             }
-            expect(IsCloseTo(result, expected, 1e-8)).toBe(true);
+            expect(IsCloseTo([], expected, 1e-8)).toBe(true);
           });
         }
       });

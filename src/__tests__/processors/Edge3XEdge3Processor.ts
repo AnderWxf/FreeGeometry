@@ -18,5 +18,17 @@ export function process(input: any[]): any[] {
     };
     resut.push({ userData: userData });
   }
+  inters = Brep3Inter.EdgeXEdge(edge2, edge1, 1e-4, 1e-10);
+  for (let i = 0; i < inters.length; i++) {
+    let inter = inters[i];
+    let p = inter.p;
+    let userData = {
+      "canPick": true,
+      "isAssist": true,
+      "color": 255,
+      "original": p
+    };
+    resut.push({ userData: userData });
+  }  
   return resut;
 }
