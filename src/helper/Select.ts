@@ -251,31 +251,42 @@ class Select {
                 this.overedPoint.y = assistPoint.p.y;
               }
             }
-            if (userData.original instanceof Edge2) {
-              let algo = new Edge2Algo(userData.original);
-              let b = algo.getBeginPoint();
-              let e = algo.getBeginPoint();
-              let m = algo.p((userData.original.u.x + userData.original.u.y) * 0.5);
-              let d = p.distanceTo(b);
-              if (d < mind) {
-                mind = d;
-                this.overedPoint.x = b.x;
-                this.overedPoint.y = b.y;
-              }
+          }
+          if (userData.original instanceof Edge2) {
+            let algo = new Edge2Algo(userData.original);
+            let b = algo.getBeginPoint();
+            let e = algo.getEndPoint();
+            let m = algo.p((userData.original.u.x + userData.original.u.y) * 0.5);
+            let d = p.distanceTo(b);
+            // 起点
+            if (d < mind) {
+              mind = d;
+              this.overedPoint.x = b.x;
+              this.overedPoint.y = b.y;
+            } else {
+              // 终点
               d = p.distanceTo(e);
               if (d < mind) {
                 mind = d;
                 this.overedPoint.x = e.x;
                 this.overedPoint.y = e.y;
-              }
-              d = p.distanceTo(m);
-              if (d < mind) {
-                mind = d;
-                this.overedPoint.x = m.x;
-                this.overedPoint.y = m.y;
+              } else {
+                // 中心点
+                d = p.distanceTo(m);
+                if (d < mind) {
+                  mind = d;
+                  this.overedPoint.x = m.x;
+                  this.overedPoint.y = m.y;
+                } else {
+                  // 最近点
+                  p = algo.p(algo.uf(p));
+                  this.overedPoint.x = p.x;
+                  this.overedPoint.y = p.y;
+                }
               }
             }
           }
+
           // }
           isCanPick = true;
           if (!this.overObjects.includes(obj) && !this.selectedObjects.includes(obj)) {

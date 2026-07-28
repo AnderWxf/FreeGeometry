@@ -4,6 +4,7 @@ let _seed = 1234567;
 
 export const PI = Math.PI;
 export const PI2 = Math.PI * 2;
+export const PI4 = Math.PI * 4;
 export const PI_2 = Math.PI / 2;
 export const PI_3 = Math.PI / 3;
 export const PI_4 = Math.PI / 4;

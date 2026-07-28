@@ -217,9 +217,9 @@ const MenuItems = [
     icon: <SaveFilled />,
     label: '文件',
     children: [
-      { key: CommandType.SCENE_SAVE, label: '保存' + ' ' + CommandType.SCENE_SAVE },
-      { key: CommandType.SCENE_LOAD, label: '加载' + ' ' + CommandType.SCENE_LOAD },
-      { key: CommandType.SCENE_IMPORT, label: '导入' + ' ' + CommandType.SCENE_IMPORT },
+      { key: CommandType.SCENE_SAVE, label: '保存' + ' ' + CommandType.SCENE_SAVE + ' Ctrl + S' },
+      { key: CommandType.SCENE_LOAD, label: '加载' + ' ' + CommandType.SCENE_LOAD + ' Ctrl + O' },
+      { key: CommandType.SCENE_IMPORT, label: '导入' + ' ' + CommandType.SCENE_IMPORT + ' Ctrl + I' },
       { key: CommandType.SCENE_CLEAR, label: '清空' + ' ' + CommandType.SCENE_CLEAR },
     ],
   },
@@ -403,9 +403,9 @@ const MenuItems = [
     label: '操作',
     children: [
       //其他
-      { key: CommandType.OTHER_DELETE, label: '删除' + ' ' + CommandType.OTHER_DELETE },
-      { key: CommandType.OTHER_UNDO, label: '撤销' + ' ' + CommandType.OTHER_UNDO },
-      { key: CommandType.OTHER_REDO, label: '重做' + ' ' + CommandType.OTHER_REDO },
+      { key: CommandType.OTHER_DELETE, label: '删除' + ' ' + CommandType.OTHER_DELETE + ' Delete' },
+      { key: CommandType.OTHER_UNDO, label: '撤销' + ' ' + CommandType.OTHER_UNDO + ' Ctrl + Z' },
+      { key: CommandType.OTHER_REDO, label: '重做' + ' ' + CommandType.OTHER_REDO + ' Ctrl + Y' },
       { key: CommandType.OTHER_MOVE, label: '移动' + ' ' + CommandType.OTHER_MOVE },
       { key: CommandType.OTHER_ROTATE, label: '旋转' + ' ' + CommandType.OTHER_ROTATE },
       { key: CommandType.OTHER_SCALE, label: '缩放' + ' ' + CommandType.OTHER_SCALE },

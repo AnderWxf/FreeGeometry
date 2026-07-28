@@ -5,6 +5,7 @@ import { Command } from "../../Command";
 import * as THREE from "three";
 
 class SceneSaveCom extends Command {
+  static link: HTMLAnchorElement = null;
   async exec() {
     let scene = Global.scene;
     let os = scene.objects;
@@ -15,23 +16,39 @@ class SceneSaveCom extends Command {
     }
     // 1. 将数据对象转为格式化的 JSON 字符串
     const jsonString = JSON.stringify(data, null, 2);
+    let filename = 'Scene_' + new Date().toLocaleString() + '.json';
 
-    // 2. 创建一个 Blob 对象，它就像是文件数据
-    const blob = new Blob([jsonString], { type: 'application/json' });
-    // 3. 为这个 Blob 创建一个临时的 URL
-    const url = URL.createObjectURL(blob);
-    // 4. 创建一个隐藏的 <a> 标签，并设置下载属性
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'Scene_' + new Date().toLocaleString() + '.json'; // 指定下载的文件名
+    // 检测是否支持 File System Access API
+    if ('showSaveFilePicker' in window) {
+      const handle = await (window as any).showSaveFilePicker({
+        suggestedName: filename,
+        types: [{
+          description: 'JSON Files',
+          accept: { 'application/json': ['.json'] }
+        }]
+      });
 
-    // 5. 模拟点击下载
-    document.body.appendChild(link);
-    link.click();
+      const writable = await handle.createWritable();
+      await writable.write(JSON.stringify(data, null, 2));
+      await writable.close();
 
-    // 6. 清理资源
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    } else {
+      // 2. 创建一个 Blob 对象，它就像是文件数据
+      const blob = new Blob([jsonString], { type: 'application/json' });
+      // 3. 为这个 Blob 创建一个临时的 URL
+      const url = URL.createObjectURL(blob);
+      // 4. 创建一个隐藏的 <a> 标签，并设置下载属性
+      if (!SceneSaveCom.link) {
+        SceneSaveCom.link = document.createElement('a');
+        document.body.appendChild(SceneSaveCom.link);
+      }
+      let link = SceneSaveCom.link;
+      link.href = url;
+      link.download = filename; // 指定下载的文件名
+
+      // 5. 模拟点击下载
+      link.click();
+    }
     this.done();
   }
 }

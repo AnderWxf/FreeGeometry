@@ -475,10 +475,12 @@ class Curve2Inter {
     let ret = new Array<InterOfCurve2>();
 
     // 1. 构造对称矩阵 ( A1, A2 ) 表示两条二次曲线。
-    let A_1 = Curve2Inter.QuadraticMatrix(c0);
-    let A_2 = Curve2Inter.QuadraticMatrix(c1);
     let a_1 = c0.A, b_1 = c0.B, c_1 = c0.C, d_1 = c0.D, e_1 = c0.E, f_1 = c0.F;
     let a_2 = c1.A, b_2 = c1.B, c_2 = c1.C, d_2 = c1.D, e_2 = c1.E, f_2 = c1.F;
+
+    let A_1 = Curve2Inter.QuadraticMatrix(c0);
+    let A_2 = Curve2Inter.QuadraticMatrix(c1);
+
     //2. 解广义特征值问题 (det(A1 + λA2) = 0)，得到 λ（最多三个）。
     // det(A_1 + λ A_2) = C_3 λ^3 + C_2 λ^2 + C_1 λ + C_0 = 0
     // C_0 = a_1 c_1 f_1 
@@ -526,13 +528,13 @@ class Curve2Inter {
       MATHJS.multiply(MATHJS.add(MATHJS.multiply(a_2, e_2), MATHJS.multiply(b_2, d_2, -0.5)), e_1, 0.5),
     ) as MATHJS.BigNumber;
 
-    const C3 = MATHJS.bignumber(1)
-    const C2 = MATHJS.divide(C_2, C_3) as MATHJS.BigNumber;
-    const C1 = MATHJS.divide(C_1, C_3) as MATHJS.BigNumber;
-    const C0 = MATHJS.divide(C_0, C_3) as MATHJS.BigNumber;
+    // const C3 = MATHJS.bignumber(1);
+    // const C2 = MATHJS.divide(C_2, C_3) as MATHJS.BigNumber;
+    // const C1 = MATHJS.divide(C_1, C_3) as MATHJS.BigNumber;
+    // const C0 = MATHJS.divide(C_0, C_3) as MATHJS.BigNumber;
 
     //3. 对每个 λ 构造 ( B = A1 + λ A2 )。
-    const λs = SolveEquation.SolveCubicNumberical(C3, C2, C1, C0);
+    const λs = SolveEquation.SolveCubicNumberical(C_3, C_2, C_1, C_0);
     for (let i = 0; i < λs.length; i++) {
       if (ret.length >= n) {
         break;

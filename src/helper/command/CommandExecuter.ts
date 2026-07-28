@@ -235,9 +235,13 @@ class CommandExecuter {
   * 'O',                 偏移，产生新对象
   * 'DELETE',            删除
   * 'G',                 组合
-  * 'ControlLeft' + 'G', 解组
-  * 'ControlLeft' + 'Z', UNDO
-  * 'ControlLeft' + 'Y', REDO
+  * 'Ctrl' + 'G', 解组
+  * 'Ctrl' + 'Z', UNDO
+  * 'Ctrl' + 'Y', REDO
+  * 'Ctrl' + 'S', SAVE 
+  * 'Ctrl' + 'O', LOAD 
+  * 'Ctrl' + 'I', IMPORT 
+  * 'Ctrl' + 'X', CLEAR  
   */
   onKeyDown = (event: KeyboardEvent) => {
     event.stopPropagation();
@@ -253,7 +257,7 @@ class CommandExecuter {
         }
         break;
       case "Delete":
-        com = new ComDelete(this, 'Delete');
+        com = new ComDelete(this, CommandType.OTHER_DELETE);
         break;
       // E：选中后编辑
       case 'KeyE':
@@ -264,23 +268,44 @@ class CommandExecuter {
         break;
       // I：镜像
       case 'KeyI':
-        com = new ComMirror(this, 'I');
+        if (this.KeyCtrlDown) {
+          this.KeyCtrlDown = false;
+          event.preventDefault();
+          this.execute(CommandType.SCENE_IMPORT);
+          return;
+        } else {
+          com = new ComMirror(this, CommandType.OTHER_MIRROR);
+        }
         break;
       // M：移动
       case 'KeyM':
-        com = new ComMove(this, 'M');
+        com = new ComMove(this, CommandType.OTHER_MOVE);
         break;
       // R：旋转
       case 'KeyR':
-        com = new ComRotate(this, 'R');
+        com = new ComRotate(this, CommandType.OTHER_ROTATE);
         break;
       // O：偏移
       case 'KeyO':
-        com = new ComOffset(this, 'O');
+        if (this.KeyCtrlDown) {
+          this.KeyCtrlDown = false;
+          event.preventDefault();
+          this.execute(CommandType.SCENE_LOAD);
+          return;
+        } else {
+          com = new ComOffset(this, CommandType.OTHER_OFFSET);
+        }
         break;
       // S：拉伸
       case 'KeyS':
-        com = new ComScale(this, 'S');
+        if (this.KeyCtrlDown) {
+          this.KeyCtrlDown = false;
+          event.preventDefault();
+          this.execute(CommandType.SCENE_SAVE);
+          return;
+        } else {
+          com = new ComScale(this, CommandType.OTHER_SCALE);
+        }
         break;
       // Ctrl+Z Undo
       case "KeyZ":
@@ -296,10 +321,20 @@ class CommandExecuter {
           return;
         };
         break;
+      // Ctrl+X Clear
+      case "KeyX":
+        if (this.KeyCtrlDown) {
+          event.preventDefault();
+          this.execute(CommandType.SCENE_CLEAR);
+          return;
+        };
+        break;
       case "ControlLeft":
+      case "ControlRight":
         this.KeyCtrlDown = true;
         break;
       case "ShiftLeft":
+      case "ShiftRight":
         this.KeyShiftDown = true;
         break;
     }
@@ -320,9 +355,11 @@ class CommandExecuter {
   onKeyUp = (event: KeyboardEvent) => {
     switch (event.code) {
       case "ControlLeft":
+      case "ControlRight":
         this.KeyCtrlDown = false;
         break;
       case "ShiftLeft":
+      case "ShiftRight":
         this.KeyShiftDown = false;
         break;
     }

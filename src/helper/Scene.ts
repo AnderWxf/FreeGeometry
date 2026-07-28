@@ -8,18 +8,21 @@ class Scene {
     this._objects = new Map<number, THREE.Object3D>();
   }
   add(...object: THREE.Object3D[]) {
+    if (object.length == 0) return;
     object.forEach((o) => {
       this._objects.set(o.id, o);
     });
     this._scene.add(...object);
   }
   remove(...object: THREE.Object3D[]) {
+    if (object.length == 0) return;
     object.forEach((o) => {
       this._objects.delete(o.id);
     });
     this._scene.remove(...object);
   }
   clear() {
+    if (this._objects.size == 0) return;
     this._scene.remove(...this._objects.values());
     this._objects.clear();
   }
