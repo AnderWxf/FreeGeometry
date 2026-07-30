@@ -16,10 +16,11 @@ class SolveEquation {
     let a = MATHJS.bignumber(a_);
     let b = MATHJS.bignumber(b_);
     let c = MATHJS.bignumber(c_);
+    const ZERO = MATHJS.bignumber(0);
     // 输入验证
-    if (a.equals(0)) {
+    if (a.equals(ZERO)) {
       // 这不是一元二次方程（a不能为0）, 解一元一次方程 bx + c = 0
-      if (b.equals(0)) {
+      if (b.equals(ZERO)) {
         // 这不是一元一次方程（b不能为0）
         return roots;
       }
@@ -32,13 +33,13 @@ class SolveEquation {
     // 计算判别式
     const discriminant = MATHJS.subtract(MATHJS.multiply(b, b), MATHJS.multiply(a, c, 4)) as MATHJS.BigNumber;
 
-    if (MATHJS.larger(discriminant, 0)) {
+    if (MATHJS.larger(discriminant, ZERO)) {
       // 两个不等实根
       const sqrtDiscriminant = MATHJS.sqrt(discriminant);
       const root1 = MATHJS.divide(MATHJS.add(_b, sqrtDiscriminant), _2a) as MATHJS.BigNumber;
       const root2 = MATHJS.divide(MATHJS.subtract(_b, sqrtDiscriminant), _2a) as MATHJS.BigNumber;
       roots.push(root1, root2);
-    } else if (MATHJS.equal(discriminant, 0)) {
+    } else if (MATHJS.equal(discriminant, ZERO)) {
       // 两个相等实根
       const root = MATHJS.divide(_b, _2a) as MATHJS.BigNumber;
       roots = [root, root];
@@ -46,7 +47,7 @@ class SolveEquation {
       // 两个共轭复根
       const realPart = MATHJS.divide(_b, _2a) as MATHJS.BigNumber;
       const imaginaryPart = MATHJS.divide(MATHJS.sqrt(MATHJS.unaryMinus(discriminant)), _2a) as MATHJS.BigNumber;
-      roots.push(MATHJS.complex(realPart.toNumber(), imaginaryPart.toNumber()), MATHJS.complex(realPart.toNumber(), -imaginaryPart.toNumber()));
+      roots.push(MATHJS.complex(realPart.toNumber(), imaginaryPart.toNumber()), MATHJS.complex(realPart.toNumber(), MATHJS.unaryMinus(imaginaryPart).toNumber()));
     }
     return roots;
   }
@@ -192,7 +193,7 @@ class SolveEquation {
   // }
   /**
    * 使用MATHJS.js求解一元三次方程
-   * @param {number} a  三次项系数为1
+   * @param {number} a - 三次项系数为1
    * @param {number} b - 二次项系数
    * @param {number} c - 一次项系数
    * @param {number} d - 常数项
@@ -206,13 +207,14 @@ class SolveEquation {
       return roots;
     }
 
-    // 后面使用归一化方程： x^3 + ax^2 + bx + c = 0;
-    let a = MATHJS.divide(b_, a_);
-    let b = MATHJS.divide(c_, a_);
-    let c = MATHJS.divide(d_, a_);
+    // 后面使用归一化方程： λ^3 + aλ^2 + bλ + c = 0;
+    let a = MATHJS.divide(b_, a_) as MATHJS.BigNumber;
+    let b = MATHJS.divide(c_, a_) as MATHJS.BigNumber;
+    let c = MATHJS.divide(d_, a_) as MATHJS.BigNumber;
+    console.log(`λ^3 + aλ^2 + bλ + c = 0 => a:${a.toNumber()}, b:${b.toNumber()}, c:${c.toNumber()}`);
 
     // Δ = 18abc − 4a^3c + a^2b^2 − 4b^3 − 27c^2
-    let Δ = MATHJS.add(
+    let Δ0 = MATHJS.add(
       MATHJS.multiply(a, b, c, 18),
       MATHJS.multiply(a, a, a, c, -4),
       MATHJS.multiply(a, a, b, b),
@@ -220,45 +222,67 @@ class SolveEquation {
       MATHJS.multiply(c, c, -27),
     )
 
+    // 令λ = x − a/3​ ，方程变为：x^3 + px + q = 0 
     // p = b − a^2/3
-    // q = 2a^3/27 ​−ab/3 + c
-    let p = MATHJS.add(b, MATHJS.multiply(a, a, -1 / 3));
-    let q = MATHJS.add(MATHJS.multiply(a, a, a, 2 / 27), MATHJS.multiply(a, b, -1 / 3), c);
+    // q = 2a^3/27 ​− ab/3 + c
+    const p = MATHJS.subtract(b, MATHJS.divide(MATHJS.multiply(a, a), 3)) as MATHJS.BigNumber;
+    const q = MATHJS.add(
+      MATHJS.divide(MATHJS.multiply(MATHJS.multiply(a, a, a), 2), 27),
+      MATHJS.divide(MATHJS.multiply(a, b), -3),
+      c
+    ) as MATHJS.BigNumber;
+    console.log(`p = b − a^2/3 => p:${p.toNumber()}`);
+    console.log(`q = 2a^3/27 ​− ab/3 + c => q:${q.toNumber()}`);
+    // 判别式简化公式
+    // Δ = − 4p^3 − 27q^2
+    let Δ = MATHJS.add(
+      MATHJS.multiply(p, p, p, -4),
+      MATHJS.multiply(q, q, -27),
+    ) as MATHJS.BigNumber;
+    console.log(`Δ = − 4p^3 − 27q^2 => Δ:${Δ.toNumber()}`);
 
-    const shift = MATHJS.divide(a, 3);
+    const shift = MATHJS.divide(a, 3) as MATHJS.BigNumber;
+    console.log(`λ = x − a/3 => shift:${shift.toNumber()}`);
 
     let roots = new Array<MATHJS.Complex | MATHJS.BigNumber>();
-
     // Δ = 0：有重根(abs(Δ) < 1e-10)
     if (MATHJS.larger(1e-10, MATHJS.abs(Δ))) {
       // 三个实根（至少两个相等）
       // x1​ = 3 (−q/2) ^ 1/3 ,
-      // x2​ = x3​ =−3 (−q/4) ^ 1/3
+      // x2​ = x3​ = −3 (−q/4) ^ 1/3
       let x1 = MATHJS.multiply(MATHJS.cbrt(MATHJS.multiply(q, -0.5) as BigNumber), 3) as BigNumber;
       let x2 = MATHJS.multiply(MATHJS.cbrt(MATHJS.multiply(q, -0.25) as BigNumber), -3) as BigNumber;
-      let x3 = x2;
+      let x3 = MATHJS.multiply(MATHJS.cbrt(MATHJS.multiply(q, -0.25) as BigNumber), -3) as BigNumber;
 
-      x1 = MATHJS.subtract(x1, shift) as BigNumber;
-      x2 = MATHJS.subtract(x2, shift) as BigNumber;
-      x3 = MATHJS.subtract(x3, shift) as BigNumber;
-      roots.push(x1, x2, x3);
+      console.log(`x1​ = 3 (−q/2) ^ 1/3 => x1:${x1.toNumber()}`);
+      console.log(`x2​ = x3​ = −3 (−q/4) ^ 1/3 => x2:${x2.toNumber()}`);
+
+      let λ1 = MATHJS.subtract(x1, shift) as BigNumber;
+      let λ2 = MATHJS.subtract(x2, shift) as BigNumber;
+      let λ3 = MATHJS.subtract(x3, shift) as BigNumber;
+      roots.push(λ1, λ2, λ3);
     }
     // Δ > 0：三个不同的实根
     else if (MATHJS.larger(Δ, 0)) {
       // R = sqrt(−p^3/27)
-      // θ = arccos(−q/2R )
-      let R = MATHJS.sqrt(MATHJS.multiply(p, p, p, -1 / 27) as BigNumber);
+      // θ = arccos(−q/2R)
+      let R = MATHJS.sqrt(MATHJS.divide(MATHJS.multiply(p, p, p), -27) as BigNumber);
       let θ = MATHJS.acos(MATHJS.divide(MATHJS.multiply(-q, -0.5), R) as BigNumber);
+      console.log(`R = sqrt(−p^3/27) => R:${R.toNumber()}`);
+      console.log(`θ = arccos(−q/2R) => θ:${θ.toNumber()}`);
       // x1​ =2R^1/3​ cos(θ / 3)
       // x2 =2R^1/3 cos⁡(θ+2π / 3)
       // x3 =2R^1/3 cos⁡(θ+4π / 3)
       let x1 = MATHJS.multiply(MATHJS.cbrt(R), MATHJS.cos(MATHJS.divide(θ, 3) as BigNumber), 2) as BigNumber;
       let x2 = MATHJS.multiply(MATHJS.cbrt(R), MATHJS.cos(MATHJS.divide(MATHJS.add(θ, PI2), 3) as BigNumber), 2) as BigNumber;
       let x3 = MATHJS.multiply(MATHJS.cbrt(R), MATHJS.cos(MATHJS.divide(MATHJS.add(θ, PI4), 3) as BigNumber), 2) as BigNumber;
-      x1 = MATHJS.subtract(x1, shift) as BigNumber;
-      x2 = MATHJS.subtract(x2, shift) as BigNumber;
-      x3 = MATHJS.subtract(x3, shift) as BigNumber;
-      roots.push(x1, x2, x3);
+      console.log(`x1​ =2R^1/3​ cos(θ / 3) => x1​:${x1.toNumber()}`);
+      console.log(`x2 =2R^1/3 cos⁡(θ+2π / 3) => x2:${x2.toNumber()}`);
+      console.log(`x3 =2R^1/3 cos⁡(θ+4π / 3) => x3​:${x3.toNumber()}`);
+      let λ1 = MATHJS.subtract(x1, shift) as BigNumber;
+      let λ2 = MATHJS.subtract(x2, shift) as BigNumber;
+      let λ3 = MATHJS.subtract(x3, shift) as BigNumber;
+      roots.push(λ1, λ2, λ3);
     }
     // Δ < 0：一个实根 + 两个复根
     else {
@@ -268,8 +292,10 @@ class SolveEquation {
       // x1 = A + B
       // x2 = -x1/2 + isqrt(3)/2(A - B)
       // x3 = -x1/2 - isqrt(3)/2(A - B)
-      let A = MATHJS.cbrt(MATHJS.add(MATHJS.multiply(q, -0.5), MATHJS.sqrt(MATHJS.divide(MATHJS.unaryMinus(Δ), 108) as BigNumber)) as BigNumber);
-      let B = MATHJS.cbrt(MATHJS.add(MATHJS.multiply(q, -0.5), -MATHJS.sqrt(MATHJS.divide(MATHJS.unaryMinus(Δ), 108) as BigNumber)) as BigNumber);
+      let A = MATHJS.cbrt(MATHJS.add(MATHJS.multiply(q, -0.5), MATHJS.sqrt(MATHJS.divide(Δ, -108) as BigNumber)) as BigNumber);
+      let B = MATHJS.cbrt(MATHJS.add(MATHJS.multiply(q, -0.5), MATHJS.unaryMinus(MATHJS.sqrt(MATHJS.divide(Δ, -108) as BigNumber))) as BigNumber);
+      console.log(`A = (-q/2 + (-Δ/108)^1/2)^1/3 => A:${A.toNumber()}`);
+      console.log(`B = (-q/2 - (-Δ/108)^1/2)^1/3 => B:${B.toNumber()}`);
 
       let x1 = MATHJS.add(A, B) as MATHJS.BigNumber;
       let x2_r = MATHJS.multiply(x1, -0.5) as MATHJS.BigNumber;
@@ -277,11 +303,17 @@ class SolveEquation {
       let x3_r = MATHJS.multiply(x1, -0.5) as MATHJS.BigNumber;
       const x3_i = MATHJS.multiply(MATHJS.sqrt(MATHJS.bignumber(3)), MATHJS.add(A, MATHJS.unaryMinus(B)), -0.5) as MATHJS.BigNumber;
 
-      x1 = MATHJS.subtract(x1, shift) as BigNumber;
-      x2_r = MATHJS.subtract(x2_r, shift) as BigNumber;
-      x3_r = MATHJS.subtract(x3_r, shift) as BigNumber;
+      console.log(`x1 = A + B => x1:${x1.toNumber()}`);
+      console.log(`x2 = -x1/2 + isqrt(3)/2(A - B) => x2_r:${x2_r.toNumber()},x2_i:${x2_i.toNumber()}`);
+      console.log(`x3 = -x1/2 - isqrt(3)/2(A - B) => x3_r:${x2_r.toNumber()},x3_i:${x3_i.toNumber()}`);
 
-      roots.push(x1, MATHJS.complex(x2_r.toNumber(), x2_i.toNumber()), MATHJS.complex(x3_r.toNumber(), x3_i.toNumber()));
+      let λ1 = MATHJS.subtract(x1, shift) as BigNumber;
+      let λ2_r = MATHJS.subtract(x2_r, shift) as BigNumber;
+      let λ2_i = x2_i;
+      let λ3_r = MATHJS.subtract(x3_r, shift) as BigNumber;
+      let λ3_i = x3_i;
+
+      roots.push(λ1, MATHJS.complex(λ2_r.toNumber(), λ2_i.toNumber()), MATHJS.complex(λ3_r.toNumber(), λ3_i.toNumber()));
     }
     // roots.sort();
     return roots;

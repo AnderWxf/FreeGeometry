@@ -386,3 +386,553 @@ x_3 = -\frac{x_1}{2} - i\frac{\sqrt{3}}{2} \cdot \sqrt[3]{\frac{-q}{2} + \sqrt{-
 - \(\Delta < 0\)：1个实根 + 2个复根
 
 你的数据 \(\Delta < 0\)，所以只有 1 个实 \(\lambda\)，其他两个是复共轭根。
+
+
+好的！我来推导结式方法中计算 \(R_4, R_3, R_2, R_1, R_0\) 的过程。
+
+---
+# 五、曲线交点的结式计算
+
+## 1. 两条曲线的多项式形式
+
+对于两条二次曲线：
+\[
+F_1(x,y) = a_1x^2 + b_1xy + c_1y^2 + d_1x + e_1y + f_1 = 0
+\]
+\[
+F_2(x,y) = a_2x^2 + b_2xy + c_2y^2 + d_2x + e_2y + f_2 = 0
+\]
+
+将 \(y\) 视为参数，\(x\) 视为变量，写成关于 \(x\) 的多项式：
+\[
+F_1 = A_1 x^2 + B_1 x + C_1
+\]
+\[
+F_2 = A_2 x^2 + B_2 x + C_2
+\]
+
+其中：
+\[
+A_1 = a_1,\quad B_1 = b_1 y + d_1,\quad C_1 = c_1 y^2 + e_1 y + f_1
+\]
+\[
+A_2 = a_2,\quad B_2 = b_2 y + d_2,\quad C_2 = c_2 y^2 + e_2 y + f_2
+\]
+
+---
+
+## 2. 结式定义
+
+两个二次多项式 \(F_1 = A_1 x^2 + B_1 x + C_1\) 和 \(F_2 = A_2 x^2 + B_2 x + C_2\) 的结式为：
+\[
+\text{Res}_x(F_1, F_2) = \det
+\begin{bmatrix}
+A_1 & B_1 & C_1 & 0 & 0 \\
+0 & A_1 & B_1 & C_1 & 0 \\
+0 & 0 & A_1 & B_1 & C_1 \\
+A_2 & B_2 & C_2 & 0 & 0 \\
+0 & A_2 & B_2 & C_2 & 0 \\
+0 & 0 & A_2 & B_2 & C_2
+\end{bmatrix}
+\]
+
+这个 5×5 矩阵的行列式展开后，得到一个关于 \(y\) 的**四次多项式**：
+\[
+R(y) = R_4 y^4 + R_3 y^3 + R_2 y^2 + R_1 y + R_0
+\]
+
+---
+
+## 3. 推导 \(R_4, R_3, R_2, R_1, R_0\)
+
+虽然 5×5 行列式展开非常冗长，但可以分步计算。
+
+### 方法：先计算 \(F_1\) 和 \(F_2\) 的结式公式
+
+对于两个二次多项式 \(F_1 = A_1 x^2 + B_1 x + C_1\) 和 \(F_2 = A_2 x^2 + B_2 x + C_2\)，结式有一个**已知的闭式公式**：
+\[
+\text{Res} = (A_1 C_2 - A_2 C_1)^2 - (A_1 B_2 - A_2 B_1)(B_1 C_2 - B_2 C_1)
+\]
+
+这是 Sylvester 矩阵的简化形式。
+
+### 验证
+
+展开这个公式：
+\[
+\text{Res} = (A_1 C_2 - A_2 C_1)^2 - (A_1 B_2 - A_2 B_1)(B_1 C_2 - B_2 C_1)
+\]
+
+各项都是关于 \(y\) 的多项式，展开后合并同类项即可得到 \(R_4, R_3, R_2, R_1, R_0\)。
+
+---
+
+## 4. 展开计算（高精度）
+
+### 4.1 定义基本量
+
+\[
+A_1 = a_1
+\]
+\[
+B_1 = b_1 y + d_1
+\]
+\[
+C_1 = c_1 y^2 + e_1 y + f_1
+\]
+\[
+A_2 = a_2
+\]
+\[
+B_2 = b_2 y + d_2
+\]
+\[
+C_2 = c_2 y^2 + e_2 y + f_2
+\]
+
+### 4.2 计算中间量
+
+**\(D = A_1 C_2 - A_2 C_1\)**：
+\[
+D = a_1(c_2 y^2 + e_2 y + f_2) - a_2(c_1 y^2 + e_1 y + f_1)
+\]
+\[
+= (a_1 c_2 - a_2 c_1) y^2 + (a_1 e_2 - a_2 e_1) y + (a_1 f_2 - a_2 f_1)
+\]
+
+**\(E = A_1 B_2 - A_2 B_1\)**：
+\[
+E = a_1(b_2 y + d_2) - a_2(b_1 y + d_1)
+\]
+\[
+= (a_1 b_2 - a_2 b_1) y + (a_1 d_2 - a_2 d_1)
+\]
+
+**\(F = B_1 C_2 - B_2 C_1\)**：
+\[
+F = (b_1 y + d_1)(c_2 y^2 + e_2 y + f_2) - (b_2 y + d_2)(c_1 y^2 + e_1 y + f_1)
+\]
+
+展开 \(F\)：
+\[
+F = b_1 c_2 y^3 + (b_1 e_2 + d_1 c_2) y^2 + (b_1 f_2 + d_1 e_2) y + d_1 f_2
+\]
+\[
+- [b_2 c_1 y^3 + (b_2 e_1 + d_2 c_1) y^2 + (b_2 f_1 + d_2 e_1) y + d_2 f_1]
+\]
+
+合并同类项：
+\[
+F = (b_1 c_2 - b_2 c_1) y^3 + (b_1 e_2 + d_1 c_2 - b_2 e_1 - d_2 c_1) y^2
+\]
+\[
++ (b_1 f_2 + d_1 e_2 - b_2 f_1 - d_2 e_1) y + (d_1 f_2 - d_2 f_1)
+\]
+
+### 4.3 计算结式
+
+\[
+R(y) = D^2 - E \cdot F
+\]
+
+展开 \(D^2\)：
+\[
+D^2 = \Delta_D^2 y^4 + 2\Delta_D \Delta_E y^3 + (\Delta_E^2 + 2\Delta_D \Delta_F) y^2 + 2\Delta_E \Delta_F y + \Delta_F^2
+\]
+
+其中：
+\[
+\Delta_D = a_1 c_2 - a_2 c_1
+\]
+\[
+\Delta_E = a_1 e_2 - a_2 e_1
+\]
+\[
+\Delta_F = a_1 f_2 - a_2 f_1
+\]
+
+展开 \(E \cdot F\)：
+\[
+E \cdot F = (\alpha_E y + \beta_E) \cdot (\alpha_F y^3 + \beta_F y^2 + \gamma_F y + \delta_F)
+\]
+\[
+= \alpha_E \alpha_F y^4 + (\alpha_E \beta_F + \beta_E \alpha_F) y^3 + (\alpha_E \gamma_F + \beta_E \beta_F) y^2 + (\alpha_E \delta_F + \beta_E \gamma_F) y + \beta_E \delta_F
+\]
+
+其中：
+\[
+\alpha_E = a_1 b_2 - a_2 b_1
+\]
+\[
+\beta_E = a_1 d_2 - a_2 d_1
+\]
+\[
+\alpha_F = b_1 c_2 - b_2 c_1
+\]
+\[
+\beta_F = b_1 e_2 + d_1 c_2 - b_2 e_1 - d_2 c_1
+\]
+\[
+\gamma_F = b_1 f_2 + d_1 e_2 - b_2 f_1 - d_2 e_1
+\]
+\[
+\delta_F = d_1 f_2 - d_2 f_1
+\]
+
+---
+
+## 5. 最终系数
+
+\[
+\boxed{
+\begin{aligned}
+R_4 &= \Delta_D^2 - \alpha_E \alpha_F \\
+R_3 &= 2\Delta_D \Delta_E - (\alpha_E \beta_F + \beta_E \alpha_F) \\
+R_2 &= \Delta_E^2 + 2\Delta_D \Delta_F - (\alpha_E \gamma_F + \beta_E \beta_F) \\
+R_1 &= 2\Delta_E \Delta_F - (\alpha_E \delta_F + \beta_E \gamma_F) \\
+R_0 &= \Delta_F^2 - \beta_E \delta_F
+\end{aligned}
+}
+\]
+
+其中：
+\[
+\begin{aligned}
+\Delta_D &= a_1 c_2 - a_2 c_1 \\
+\Delta_E &= a_1 e_2 - a_2 e_1 \\
+\Delta_F &= a_1 f_2 - a_2 f_1 \\
+\alpha_E &= a_1 b_2 - a_2 b_1 \\
+\beta_E &= a_1 d_2 - a_2 d_1 \\
+\alpha_F &= b_1 c_2 - b_2 c_1 \\
+\beta_F &= b_1 e_2 + d_1 c_2 - b_2 e_1 - d_2 c_1 \\
+\gamma_F &= b_1 f_2 + d_1 e_2 - b_2 f_1 - d_2 e_1 \\
+\delta_F &= d_1 f_2 - d_2 f_1
+\end{aligned}
+\]
+
+---
+
+## 6. 代码实现
+
+```javascript
+function computeResultantCoefficients(c0, c1) {
+    const {a1, b1, c1: C1, d1, e1, f1} = c0;
+    const {a2, b2, c2, d2, e2, f2} = c1;
+    
+    // 计算中间变量
+    const ΔD = a1*c2 - a2*C1;
+    const ΔE = a1*e2 - a2*e1;
+    const ΔF = a1*f2 - a2*f1;
+    const αE = a1*b2 - a2*b1;
+    const βE = a1*d2 - a2*d1;
+    const αF = b1*c2 - b2*C1;
+    const βF = b1*e2 + d1*c2 - b2*e1 - d2*C1;
+    const γF = b1*f2 + d1*e2 - b2*f1 - d2*e1;
+    const δF = d1*f2 - d2*f1;
+    
+    // 计算 R4, R3, R2, R1, R0
+    const R4 = ΔD*ΔD - αE*αF;
+    const R3 = 2*ΔD*ΔE - (αE*βF + βE*αF);
+    const R2 = ΔE*ΔE + 2*ΔD*ΔF - (αE*γF + βE*βF);
+    const R1 = 2*ΔE*ΔF - (αE*δF + βE*γF);
+    const R0 = ΔF*ΔF - βE*δF;
+    
+    return { R4, R3, R2, R1, R0 };
+}
+```
+**是的！** 结式多项式计算的结果中，**所有实交点都对应实根**。
+
+---
+
+## 7. 结式方法与实交点的关系
+
+### 核心结论
+
+对于两条二次曲线：
+\[
+F_1(x,y) = 0,\quad F_2(x,y) = 0
+\]
+
+结式 \(R(y) = \text{Res}_x(F_1, F_2) = 0\) 是关于 \(y\) 的四次方程。
+
+- **每个实根 \(y\)** → 对应一个实交点（或几个）
+- **每个复根 \(y\)** → 对应一个复交点
+
+所以，**要得到所有实交点，只需要解出结式的所有实根！**
+
+---
+
+## 8. 为什么？
+
+因为结式 \(R(y)\) 定义为：
+> 两个多项式 \(F_1(x,y)\) 和 \(F_2(x,y)\) 在 \(x\) 方向上**有公共根**的条件。
+
+对于给定的 \(y\)：
+- 如果 \(R(y) = 0\)，则存在 \(x\) 使得 \(F_1(x,y) = 0\) 和 \(F_2(x,y) = 0\) 同时成立
+- 如果 \(R(y)\) 是实数，那么对应的 \(x\) 可能是实数或复数
+
+**关键定理**：
+- 如果 \(y\) 是实数且 \(R(y) = 0\)，那么对应的 \(x\) **一定是实数或一对共轭复数**
+- 如果 \(x\) 是实数，则 \((x, y)\) 是实交点
+- 如果 \(x\) 是共轭复数，则交点在复数域
+
+---
+
+## 9. 如何提取实交点？
+
+### 步骤：
+
+1. **解四次方程** \(R(y) = 0\)，得到 4 个根（实数和复数）
+
+2. **筛选实根**：取所有实根 \(y_i\)
+
+3. **对每个实根 \(y_i\)**：
+   - 代入 \(F_1(x, y_i) = 0\)，解出 \(x\)
+   - 检查 \(x\) 是否为实数
+   - 如果是实数，则 \((x, y_i)\) 是实交点
+
+### 代码示例：
+
+```javascript
+function findRealIntersectionsByResultant(c0, c1) {
+    // 1. 计算结式系数
+    const { R4, R3, R2, R1, R0 } = computeResultantCoefficients(c0, c1);
+    
+    // 2. 解四次方程 R(y) = R4*y⁴ + R3*y³ + R2*y² + R1*y + R0 = 0
+    const roots = math.roots([R4, R3, R2, R1, R0]);
+    
+    // 3. 筛选实根
+    const realYRoots = roots.filter(r => Math.abs(math.im(r)) < 1e-10)
+                            .map(r => math.re(r));
+    
+    // 4. 对每个实根 y，求对应的 x
+    const intersections = [];
+    for (const y of realYRoots) {
+        // 代入 F1(x, y) = 0，得到关于 x 的二次方程
+        // A1*x² + B1*x + C1 = 0
+        const A1 = a1;
+        const B1 = b1 * y + d1;
+        const C1 = c1 * y * y + e1 * y + f1;
+        
+        const xRoots = solveQuadratic(A1, B1, C1);
+        for (const x of xRoots) {
+            if (Math.abs(math.im(x)) < 1e-10) {
+                intersections.push({
+                    x: math.re(x),
+                    y: y,
+                    type: 'real'
+                });
+            } else {
+                intersections.push({
+                    x: math.re(x),
+                    y: y,
+                    type: 'complex'
+                });
+            }
+        }
+    }
+    
+    return intersections;
+}
+```
+
+
+---
+# 六、曲线交点的矩阵束方法
+## 1. 问题定义
+
+给定两条二次曲线：
+\[
+F_1(x,y) = a_1x^2 + b_1xy + c_1y^2 + d_1x + e_1y + f_1 = 0
+\]
+\[
+F_2(x,y) = a_2x^2 + b_2xy + c_2y^2 + d_2x + e_2y + f_2 = 0
+\]
+
+求它们的交点（实数或复数）。
+
+---
+
+## 2. 核心思想
+
+两条二次曲线的交点，也是它们**线性组合**形成的退化二次曲线的交点。
+
+考虑曲线束：
+\[
+F_\lambda = F_1 + \lambda F_2 = 0
+\]
+
+对于特定的 \(\lambda\)，\(F_\lambda\) 可能**退化**（成为一对直线）。这些退化曲线包含原曲线的所有交点。
+
+---
+
+## 3. 算法步骤
+
+### 步骤 1：转换为矩阵形式
+
+在齐次坐标 \(\mathbf{x} = [x, y, 1]^T\) 下，每条二次曲线对应一个对称矩阵：
+\[
+A_i = \begin{bmatrix}
+a_i & b_i/2 & d_i/2 \\
+b_i/2 & c_i & e_i/2 \\
+d_i/2 & e_i/2 & f_i
+\end{bmatrix}
+\]
+
+所以：
+\[
+F_i(\mathbf{x}) = \mathbf{x}^T A_i \mathbf{x} = 0
+\]
+
+---
+
+### 步骤 2：构造矩阵束
+
+\[
+B(\lambda) = A_1 + \lambda A_2
+\]
+
+当 \(\det(B(\lambda)) = 0\) 时，\(B(\lambda)\) 是奇异的，对应的二次曲线退化为两条直线。
+
+---
+
+### 步骤 3：求解特征方程
+
+\[
+\det(A_1 + \lambda A_2) = C_3\lambda^3 + C_2\lambda^2 + C_1\lambda + C_0 = 0
+\]
+
+这个三次方程称为**特征方程**，其根 \(\lambda_i\) 对应退化二次曲线。
+
+**系数公式**：
+
+- \(C_3 = \det(A_2)\)
+- \(C_2 = (c_2 f_2 - e_2^2/4) a_1 + (a_2 f_2 - d_2^2/4) c_1 + (a_2 c_2 - b_2^2/4) f_1 + \frac{1}{2}(b_2 f_2 - d_2 e_2/2) b_1 + \frac{1}{2}(b_2 e_2/2 - c_2 d_2) d_1 + \frac{1}{2}(a_2 e_2 - b_2 d_2/2) e_1\)
+- \(C_1 = (c_1 f_1 - e_1^2/4) a_2 + (a_1 f_1 - d_1^2/4) c_2 + (a_1 c_1 - b_1^2/4) f_2 + \frac{1}{2}(b_1 f_1 - d_1 e_1/2) b_2 + \frac{1}{2}(b_1 e_1/2 - c_1 d_1) d_2 + \frac{1}{2}(a_1 e_1 - b_1 d_1/2) e_2\)
+- \(C_0 = \det(A_1)\)
+
+---
+
+### 步骤 4：解三次方程
+
+\[
+C_3\lambda^3 + C_2\lambda^2 + C_1\lambda + C_0 = 0
+\]
+
+得到三个根（可能实数或复数）：
+\[
+\lambda_1, \lambda_2, \lambda_3
+\]
+
+---
+
+### 步骤 5：对每个实根 \(\lambda_i\)，构造退化矩阵
+
+\[
+B = A_1 + \lambda_i A_2
+\]
+
+---
+
+### 步骤 6：分解退化矩阵为两条直线
+
+#### 方法 A：特征分解（对称矩阵）
+
+1. 对 \(B\) 做特征分解：\(B = U \Sigma U^T\)
+2. 取两个非零特征值 \(\sigma_1, \sigma_2\) 对应的特征向量 \(\mathbf{u}_1, \mathbf{u}_2\)
+3. 构造直线：
+   \[
+   \mathbf{p} = \sqrt{|\sigma_1|} \mathbf{u}_1,\quad \mathbf{q} = \sqrt{|\sigma_2|} \mathbf{u}_2
+   \]
+   \[
+   \mathbf{l}_1 = \mathbf{p} + \mathbf{q},\quad \mathbf{l}_2 = \mathbf{p} - \mathbf{q}
+   \]
+
+#### 方法 B：SVD 分解（更稳定）
+
+1. 对 \(B\) 做 SVD：\(B = U \Sigma V^T\)
+2. 取非零奇异值对应的右奇异向量
+3. 构造直线（同上）
+
+---
+
+### 步骤 7：求直线与曲线的交点
+
+对每条直线 \(\mathbf{l} = [A, B, C]^T\)，解：
+\[
+Ax + By + C = 0
+\]
+\[
+F_1(x,y) = 0
+\]
+
+得到交点。
+
+---
+
+### 步骤 8：合并去重
+
+将所有交点合并，去重后得到最终结果。
+
+---
+
+## 4. 特殊情况处理
+
+### 情况 1：只有一个实根
+
+- 说明另外两个交点是复数
+- 或者两条曲线相切（有重根）
+
+### 情况 2：B 矩阵秩为 1
+
+- 退化二次曲线是**双重直线**
+- 无法分解为两条不同的直线
+- 需要用零空间向量法或相切法求交点
+
+### 情况 3：复共轭直线对
+
+- 两个非零特征值同号
+- 直线是复共轭的
+- 用零空间向量法提取实交点
+
+---
+
+## 5. 完整流程图
+
+```
+开始
+  ↓
+输入两条曲线 A₁, A₂
+  ↓
+计算特征方程系数 C₀, C₁, C₂, C₃
+  ↓
+解三次方程 C₃λ³ + C₂λ² + C₁λ + C₀ = 0
+  ↓
+对每个实根 λᵢ：
+  ↓
+构造 B = A₁ + λᵢA₂
+  ↓
+B 的秩？
+  ├── 秩 = 2 → 分解为两条直线
+  │              ↓
+  │         直线与曲线求交
+  │              ↓
+  │         收集交点
+  │
+  └── 秩 = 1 → 零空间向量法
+                 ↓
+            提取交点
+  ↓
+合并去重
+  ↓
+输出交点
+```
+
+---
+
+## 6. 数值注意事项
+
+1. **使用高精度**（BigNumber）避免数值误差
+2. **判断零特征值**时使用容差（如 1e-10）
+3. **SVD 比特征分解更稳定**，推荐使用
+4. **验证交点**：代入两条曲线检查是否为零

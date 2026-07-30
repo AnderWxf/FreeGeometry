@@ -83,15 +83,18 @@ class Line2Algo extends Curve2Algo {
   ge(): { A: MATHJS.BigNumber, B: MATHJS.BigNumber, C: MATHJS.BigNumber } {
     // Qnew = T^-T * Qold * T^-1
     let dat = this.dat;
-    let t_1 = dat.trans.makeLocalMatrix().invert();
-    let t_t = t_1.clone().transpose();
+    let T = dat.trans.makeLocalMatrix();
+    let T_1 = T.clone().invert();
+    let T_T = T_1.clone().transpose();
     let e = 0.5;
     let Qold = new Matrix3().set(
       0, 0, 0,
       0, 0, e,
       0, e, 0
     );
-    let Qnew = t_t.multiply(Qold).multiply(t_1);
+    let Qnew = T_T.clone();
+    Qnew.multiply(Qold);
+    Qnew.multiply(T_1);
 
     let A = Qnew.elements[2] + Qnew.elements[6];
     let B = Qnew.elements[5] + Qnew.elements[7];

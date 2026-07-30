@@ -130,16 +130,19 @@ class Arc2Algo extends Curve2Algo {
   ge(): { A: MATHJS.BigNumber, B: MATHJS.BigNumber, C: MATHJS.BigNumber, D: MATHJS.BigNumber, E: MATHJS.BigNumber, F: MATHJS.BigNumber } {
     // Qnew = T^-T * Qold * T^-1
     let dat = this.dat;
+    let T = dat.trans.makeLocalMatrix();
+    let T_1 = T.clone().invert();
+    let T_T = T_1.clone().transpose();
     let a = (MATHJS.divide(MATHJS.bignumber(1), MATHJS.multiply(dat.radius.x, dat.radius.x)) as MATHJS.BigNumber).toNumber();
     let c = (MATHJS.divide(MATHJS.bignumber(1), MATHJS.multiply(dat.radius.y, dat.radius.y)) as MATHJS.BigNumber).toNumber();
-    let t_1 = dat.trans.makeLocalMatrix().invert();
-    let t_t = t_1.clone().transpose();
     let Qold = new Matrix3().set(
       a, 0, 0,
       0, c, 0,
       0, 0, -1
     );
-    let Qnew = t_t.multiply(Qold).multiply(t_1);
+    let Qnew = T_T.clone();
+    Qnew.multiply(Qold);
+    Qnew.multiply(T_1);
     return {
       A: MATHJS.bignumber(Qnew.elements[0]),
       B: MATHJS.bignumber(Qnew.elements[1] + Qnew.elements[3]),
