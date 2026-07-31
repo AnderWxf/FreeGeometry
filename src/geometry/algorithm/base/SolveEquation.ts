@@ -31,22 +31,22 @@ class SolveEquation {
     let _b = MATHJS.unaryMinus(b);
     let _2a = MATHJS.multiply(a, 2);
     // 计算判别式
-    const discriminant = MATHJS.subtract(MATHJS.multiply(b, b), MATHJS.multiply(a, c, 4)) as MATHJS.BigNumber;
+    const Δ = MATHJS.subtract(MATHJS.multiply(b, b), MATHJS.multiply(a, c, 4)) as MATHJS.BigNumber;
 
-    if (MATHJS.larger(discriminant, ZERO)) {
+    if (MATHJS.larger(Δ, ZERO)) {
       // 两个不等实根
-      const sqrtDiscriminant = MATHJS.sqrt(discriminant);
-      const root1 = MATHJS.divide(MATHJS.add(_b, sqrtDiscriminant), _2a) as MATHJS.BigNumber;
-      const root2 = MATHJS.divide(MATHJS.subtract(_b, sqrtDiscriminant), _2a) as MATHJS.BigNumber;
+      const sqrtΔ = MATHJS.sqrt(Δ);
+      const root1 = MATHJS.divide(MATHJS.add(_b, sqrtΔ), _2a) as MATHJS.BigNumber;
+      const root2 = MATHJS.divide(MATHJS.subtract(_b, sqrtΔ), _2a) as MATHJS.BigNumber;
       roots.push(root1, root2);
-    } else if (MATHJS.equal(discriminant, ZERO)) {
+    } else if (MATHJS.equal(Δ, ZERO)) {
       // 两个相等实根
       const root = MATHJS.divide(_b, _2a) as MATHJS.BigNumber;
       roots = [root, root];
     } else {
       // 两个共轭复根
       const realPart = MATHJS.divide(_b, _2a) as MATHJS.BigNumber;
-      const imaginaryPart = MATHJS.divide(MATHJS.sqrt(MATHJS.unaryMinus(discriminant)), _2a) as MATHJS.BigNumber;
+      const imaginaryPart = MATHJS.divide(MATHJS.sqrt(MATHJS.unaryMinus(Δ)), _2a) as MATHJS.BigNumber;
       roots.push(MATHJS.complex(realPart.toNumber(), imaginaryPart.toNumber()), MATHJS.complex(realPart.toNumber(), MATHJS.unaryMinus(imaginaryPart).toNumber()));
     }
     return roots;
@@ -115,11 +115,11 @@ class SolveEquation {
   //     r) as MATHJS.BigNumber;
 
   //   // 计算判别式
-  //   //discriminant = MATHJS.pow(depressedQ / 2, 2) + MATHJS.pow(depressedP / 3, 3)
+  //   //Δ = MATHJS.pow(depressedQ / 2, 2) + MATHJS.pow(depressedP / 3, 3)
   //   const depressedQ_2 = MATHJS.multiply(depressedQ, 0.5) as MATHJS.BigNumber;
   //   const depressedP_3 = MATHJS.multiply(depressedP, 1 / 3) as MATHJS.BigNumber;
 
-  //   const discriminant = MATHJS.add(
+  //   const Δ = MATHJS.add(
   //     MATHJS.multiply(depressedQ_2, depressedQ_2),
   //     MATHJS.multiply(depressedP_3, depressedP_3, depressedP_3)) as MATHJS.BigNumber;
 
@@ -133,13 +133,13 @@ class SolveEquation {
   //   )
 
   //   let roots = new Array<MATHJS.Complex | MATHJS.BigNumber>();
-  //   if (MATHJS.larger(discriminant, 0)) {
+  //   if (MATHJS.larger(Δ, 0)) {
   //     // 一个实根，两个共轭复根
-  //     // const u = MATHJS.cubeRoot(-depressedQ / 2 + MATHJS.sqrt(discriminant));
-  //     // const v = MATHJS.cubeRoot(-depressedQ / 2 - MATHJS.sqrt(discriminant));      
+  //     // const u = MATHJS.cubeRoot(-depressedQ / 2 + MATHJS.sqrt(Δ));
+  //     // const v = MATHJS.cubeRoot(-depressedQ / 2 - MATHJS.sqrt(Δ));      
 
   //     const dep_ = MATHJS.unaryMinus(depressedQ_2);//-depressedQ / 2
-  //     const sqrt_ = MATHJS.sqrt(discriminant);
+  //     const sqrt_ = MATHJS.sqrt(Δ);
   //     const u = MATHJS.cbrt(MATHJS.add(dep_, sqrt_));
   //     const v = MATHJS.cbrt(MATHJS.subtract(dep_, sqrt_));
 
@@ -153,7 +153,7 @@ class SolveEquation {
   //     const complexRoot2 = MATHJS.complex(realPart.toNumber(), -imaginaryPart.toNumber());
   //     roots.push(realRoot, complexRoot1, complexRoot2);
 
-  //   } else if (MATHJS.equal(discriminant, 0)) {
+  //   } else if (MATHJS.equal(Δ, 0)) {
   //     // 三个实根（至少两个相等）
   //     // const u = MATHJS.cubeRoot(-depressedQ / 2);
   //     // const root1 = 2 * u - p / 3;
@@ -491,18 +491,55 @@ class SolveEquation {
       return roots;
     }
 
+    const ZERO = MATHJS.bignumber(0);
     // 将方程化为简化形式: x⁴ + px³ + qx² + rx + s = 0
     // const p = b / a;
     // const q = c / a;
     // const r = d / a;
     // const s = e / a;
 
-    const p = MATHJS.divide(b, a) as MATHJS.BigNumber;
-    const q = MATHJS.divide(c, a) as MATHJS.BigNumber;
-    const r = MATHJS.divide(d, a) as MATHJS.BigNumber;
-    const s = MATHJS.divide(e, a) as MATHJS.BigNumber;
+    let p = MATHJS.divide(b, a) as MATHJS.BigNumber;
+    let q = MATHJS.divide(c, a) as MATHJS.BigNumber;
+    let r = MATHJS.divide(d, a) as MATHJS.BigNumber;
+    let s = MATHJS.divide(e, a) as MATHJS.BigNumber;
+    console.log(`方程化为简化形式 x⁴ + px³ + qx² + rx + s = 0 p:${p.toNumber()} q :${q.toNumber()}, r:${r.toNumber()}, s:${s.toNumber()}`);
+
+    // 原始归一化方程: x⁴ + p x³ + q x² + r x + s = 0
+    // 令 x = t * z，则方程变为:
+    // t⁴ z⁴ + p t³ z³ + q t² z² + r t z + s = 0
+    // 除以 t⁴: z⁴ + (p/t) z³ + (q/t²) z² + (r/t³) z + (s/t⁴) = 0
+
+    // 选择 t 使得系数尽可能接近 1
+    const p_abs = MATHJS.abs(p);
+    const q_abs = MATHJS.abs(q);
+    const r_abs = MATHJS.abs(r);
+    const s_abs = MATHJS.abs(s);
+
+    // 选择 t 使得最大缩放后的系数接近 1
+    // 简单方法：取 t = max(|p|, |q|^(1/2), |r|^(1/3), |s|^(1/4))
+    const t = MATHJS.max(
+      MATHJS.pow(p_abs, 1) as MATHJS.BigNumber,
+      MATHJS.pow(q_abs, 0.5) as MATHJS.BigNumber,
+      MATHJS.pow(r_abs, 1 / 3) as MATHJS.BigNumber,
+      MATHJS.pow(s_abs, 1 / 4) as MATHJS.BigNumber
+    );
+    console.log(`二次缩放参数t:${t.toNumber()}`);
+
+    // 缩放后的系数
+    const p_scaled = MATHJS.divide(p, t) as MATHJS.BigNumber;
+    const q_scaled = MATHJS.divide(q, MATHJS.multiply(t, t)) as MATHJS.BigNumber;
+    const r_scaled = MATHJS.divide(r, MATHJS.multiply(t, t, t)) as MATHJS.BigNumber;
+    const s_scaled = MATHJS.divide(s, MATHJS.multiply(t, t, t, t)) as MATHJS.BigNumber;
+
+    p = p_scaled;
+    q = q_scaled;
+    r = r_scaled;
+    s = s_scaled;
+
+    console.log(`二次缩放形式 x⁴ + px³ + qx² + rx + s = 0 p:${p.toNumber()} q :${q.toNumber()}, r:${r.toNumber()}, s:${s.toNumber()}`);
 
     const p_4 = MATHJS.divide(p, 4) as MATHJS.BigNumber;
+    console.log(`p_4:${p_4.toNumber()} `);
 
     // 转换为缺项四次方程: y⁴ + Ay² + By + C = 0 (通过代换 x = y - p/4)
     // const A = q - (3 * p * p) / 8;
@@ -513,6 +550,28 @@ class SolveEquation {
     const B = MATHJS.subtract(MATHJS.add(r, MATHJS.divide(MATHJS.pow(p, 3), 8)), MATHJS.divide(MATHJS.multiply(p, q), 2)) as MATHJS.BigNumber;
     const C = MATHJS.subtract(MATHJS.add(MATHJS.subtract(s, MATHJS.divide(MATHJS.multiply(MATHJS.pow(p, 4), 3), 256)), MATHJS.divide(MATHJS.multiply(MATHJS.pow(p, 2), q), 16)), MATHJS.divide(MATHJS.multiply(p, r), 4)) as MATHJS.BigNumber;
 
+    console.log(`缺项四次方程 y⁴ + Ay² + By + C = 0: A :${A.toNumber()}, B:${B.toNumber()}, C:${C.toNumber()}`);
+    let roots = new Array<MATHJS.Complex | MATHJS.BigNumber>();
+
+    if (MATHJS.equal(B, ZERO)) {
+      // 退化情况：y⁴ + A*y² + C = 0
+      // 令 z = y²，解 z² + A*z + C = 0
+      const zRoots = SolveEquation.SolveQuadraticEquation(1, A, C);
+      for (const z of zRoots) {
+        if (MATHJS.typeOf(z) === 'BigNumber') {
+          const y1 = MATHJS.sqrt(z);
+          const y2 = MATHJS.unaryMinus(y1);
+          roots.push(MATHJS.subtract(y1, p_4));
+          roots.push(MATHJS.subtract(y2, p_4));
+        } else if (MATHJS.typeOf(z) === 'Complex') {
+          const zc = z as MATHJS.Complex;
+          const y = MATHJS.sqrt(zc);
+          roots.push(MATHJS.subtract(y, p_4) as (MATHJS.Complex | MATHJS.BigNumber));
+          roots.push(MATHJS.subtract(MATHJS.unaryMinus(y), p_4) as (MATHJS.Complex | MATHJS.BigNumber));
+        }
+      }
+      return roots;
+    }
     // 求解三次预解方程: m³ - (A/2)m² - Cm + (A*C/2 - B²/8) = 0
     // const cubicA = 1;
     // const cubicB = -A / 2;
@@ -526,113 +585,178 @@ class SolveEquation {
 
     // 使用三次方程求解器
     // const mRoots = SolveEquation.SolveCubicEquation(cubicA, cubicB.toNumber(), cubicC.toNumber(), cubicD.toNumber());
-    const mRoots = SolveEquation.SolveCubicNumberical(cubicA, cubicB, cubicC, cubicD);
+    console.log(`求解三次预解方程 C_3 m^3 + C_2 m^2 + C_1 m + C_0=> C_3:${cubicA}, C_2:${cubicB.toNumber()}, C_1:${cubicC.toNumber()}, C_0:${cubicD.toNumber()}`);
+    const ms = SolveEquation.SolveCubicNumberical(cubicA, cubicB, cubicC, cubicD);
+    console.log(`三次预解方程 ms: ${ms[0]}, ${ms[1]}, ${ms[2]}`);
 
-    // 选择实数根作为m
-    let m: MATHJS.BigNumber = MATHJS.bignumber(-Infinity);
-    for (let root of mRoots) {
-      if (MATHJS.typeOf(root) === 'BigNumber') {
-        if (MATHJS.larger(root, m))
-          m = root as MATHJS.BigNumber;
-        continue;
+    // 选择绝对值最小的实数根作为m
+    let m: MATHJS.BigNumber = undefined;
+    let setm = (r: MATHJS.Complex | MATHJS.BigNumber) => {
+      if (MATHJS.typeOf(r) === 'BigNumber') {
+        if (m === undefined) {
+          m = r as MATHJS.BigNumber;
+        } else {
+          let root = r as MATHJS.BigNumber;
+          if (MATHJS.abs(root) < MATHJS.abs(m)) {
+            m = root;
+          }
+        }
       }
-      if (MATHJS.typeOf(root) === 'Complex') {
-        root = root as MATHJS.Complex;
-        if (root.im === 0) {
-          if (MATHJS.larger(root.re, m))
+      if (MATHJS.typeOf(r) === 'Complex') {
+        let root = r as MATHJS.Complex;
+        if (MATHJS.abs(root.im) < 1e-10) {
+          if (m === undefined) {
             m = MATHJS.bignumber(root.re);
-          continue;
+          } else {
+            if (MATHJS.abs(MATHJS.bignumber(root.re)) < MATHJS.abs(m)) {
+              m = MATHJS.bignumber(root.re);
+            }
+          }
         }
       }
     }
+    let r0 = ms[0];
+    let r1 = ms[1];
+    let r2 = ms[2];
+    setm(r0);
+    setm(r1);
+    setm(r2);
 
-    if (m === undefined) {
-      throw new Error('无法找到合适的实数预解根');
-    }
     let m_ = MATHJS.bignumber(m);
+    console.log(`m: ${m.toNumber()}`);
     // 构建二次方程参数
     // const sqrt2mMinusA = MATHJS.sqrt(2 * m - A);
     // const sqrtM2MinusC = MATHJS.sqrt(m * m - C);
-    const sqrt2mMinusA_ = MATHJS.sqrt(MATHJS.subtract(MATHJS.multiply(m_, 2), A) as MATHJS.BigNumber);
-    const sqrtM2MinusC_ = MATHJS.sqrt(MATHJS.subtract(MATHJS.multiply(m_, m_), C) as MATHJS.BigNumber);
-    let sqrt2mMinusA: MATHJS.BigNumber;
-    let sqrtM2MinusC: MATHJS.BigNumber;
-    if (MATHJS.isNumeric(sqrt2mMinusA_)) {
-      sqrt2mMinusA = sqrt2mMinusA_;
-    } else {
-      sqrt2mMinusA = MATHJS.bignumber((sqrt2mMinusA_ as MATHJS.Complex).re);
-    }
-    if (MATHJS.isNumeric(sqrtM2MinusC_)) {
-      sqrtM2MinusC = sqrtM2MinusC_;
-    } else {
-      sqrtM2MinusC = MATHJS.bignumber((sqrtM2MinusC_ as MATHJS.Complex).re);
-    }
+    const sqrt2mMinusA = MATHJS.sqrt(MATHJS.subtract(MATHJS.multiply(m_, 2), A) as MATHJS.BigNumber);
+    const sqrtM2MinusC = MATHJS.sqrt(MATHJS.subtract(MATHJS.multiply(m_, m_), C) as MATHJS.BigNumber);
 
-    let roots = new Array<MATHJS.Complex | MATHJS.BigNumber>();
+
     // 情况1: B >= 0
     // const signB = B >= 0 ? 1 : -1;
     // const alpha = sqrt2mMinusA;
     // const beta = signB * sqrtM2MinusC;
     const alpha = sqrt2mMinusA;
     let beta = sqrtM2MinusC;
-    if (B.lessThan(0)) {
+    if (B.lessThan(ZERO)) {
       beta = MATHJS.unaryMinus(beta);
     }
 
+    console.log(`alpha: ${alpha} beta: ${beta}`);
+
     // 解第一个二次方程: y² - αy + (m + β) = 0
-    // const discriminant1 = alpha * alpha - 4 * (m + beta);
-    const discriminant1 = MATHJS.subtract(MATHJS.multiply(alpha, alpha), MATHJS.multiply(MATHJS.add(m_, beta), 4)) as MATHJS.BigNumber;
-    if (MATHJS.largerEq(discriminant1, 0)) {
-      // const root1 = (alpha + MATHJS.sqrt(discriminant1)) / 2;
-      // const root2 = (alpha - MATHJS.sqrt(discriminant1)) / 2;
-      const root1 = MATHJS.divide(MATHJS.add(alpha, MATHJS.sqrt(discriminant1)), 2);
-      const root2 = MATHJS.divide(MATHJS.subtract(alpha, MATHJS.sqrt(discriminant1)), 2);
+    // const Δ1 = alpha * alpha - 4 * (m + beta);
+    const Δ1 = MATHJS.subtract(MATHJS.multiply(alpha, alpha), MATHJS.multiply(MATHJS.add(m_, beta), 4));
+    console.log(`Δ1: ${Δ1}`);
+    // 检查 Δ1 是否为复数
+    if (MATHJS.typeOf(Δ1) === 'Complex') {
+      let Δ = Δ1 as MATHJS.Complex;
+      // 复数判别式，使用复数公式
+      const sqrtDisc = MATHJS.sqrt(Δ);
+      console.log(`sqrtDisc: ${sqrtDisc}`);
+      const root1 = MATHJS.divide(MATHJS.add(alpha, sqrtDisc), 2);
+      const root2 = MATHJS.divide(MATHJS.subtract(alpha, sqrtDisc), 2);
+      console.log(`root1:${root1.toString()} root1:${root1.toString()} `);
+      roots.push(MATHJS.subtract(root1, p_4) as any);
+      roots.push(MATHJS.subtract(root2, p_4) as any);
+    }
+    else if (MATHJS.largerEq(Δ1, ZERO)) {
+      let Δ = Δ1 as MATHJS.BigNumber;
+      // const root1 = (alpha + MATHJS.sqrt(Δ1)) / 2;
+      // const root2 = (alpha - MATHJS.sqrt(Δ1)) / 2;
+      const root1 = MATHJS.divide(MATHJS.add(alpha, MATHJS.sqrt(Δ)), 2);
+      const root2 = MATHJS.divide(MATHJS.subtract(alpha, MATHJS.sqrt(Δ)), 2);
+      console.log(`root1:${root1.toString()} root1:${root1.toString()} `);
       // roots.push(root1 - p / 4, root2 - p / 4);
       const r1 = MATHJS.subtract(root1, p_4) as any;
       const r2 = MATHJS.subtract(root2, p_4) as any;
       roots.push(r1);
       roots.push(r2);
     } else {
-      // const realPart = alpha / 2;
-      // const imagPart = MATHJS.sqrt(-discriminant1) / 2;
-      // roots.push(
-      //     MATHJS.complex(realPart, imagPart) - p / 4,
-      //     MATHJS.complex(realPart, -imagPart) - p / 4
-      // );
-      const realPart = MATHJS.subtract(MATHJS.divide(alpha, 2), p_4) as MATHJS.BigNumber;
-      const imagPart = MATHJS.divide(MATHJS.sqrt(MATHJS.unaryMinus(discriminant1)), 2) as MATHJS.BigNumber;
-      const root1 = MATHJS.complex(realPart.toNumber(), imagPart.toNumber());
-      const root2 = MATHJS.complex(realPart.toNumber(), -imagPart.toNumber());
-      roots.push(root1, root2);
+      let Δ = Δ1 as MATHJS.BigNumber;
+
+      if (MATHJS.typeOf(alpha) === 'Complex') {
+        // 如果 alpha 是复数，使用复数公式
+        const sqrtDisc = MATHJS.sqrt(MATHJS.unaryMinus(Δ));
+        const root1 = MATHJS.divide(MATHJS.add(alpha, sqrtDisc), 2);
+        const root2 = MATHJS.divide(MATHJS.subtract(alpha, sqrtDisc), 2);
+        console.log(`root1:${root1.toString()} root1:${root1.toString()} `);
+        roots.push(MATHJS.subtract(root1, p_4) as any);
+        roots.push(MATHJS.subtract(root2, p_4) as any);
+      } else {
+        // const realPart = alpha / 2;
+        // const imagPart = MATHJS.sqrt(-Δ1) / 2;
+        // roots.push(
+        //     MATHJS.complex(realPart, imagPart) - p / 4,
+        //     MATHJS.complex(realPart, -imagPart) - p / 4
+        // );
+        const realPart = MATHJS.subtract(MATHJS.divide(alpha, 2), p_4) as MATHJS.BigNumber;
+        const imagPart = MATHJS.divide(MATHJS.sqrt(MATHJS.unaryMinus(Δ)), 2) as MATHJS.BigNumber;
+        console.log(`realPart:${realPart.toNumber()} realPart:${realPart.toNumber()} `);
+        const root1 = MATHJS.complex(realPart.toNumber(), imagPart.toNumber());
+        const root2 = MATHJS.complex(realPart.toNumber(), -imagPart.toNumber());
+        console.log(`root1:${root1.toString()} root1:${root1.toString()} `);
+        roots.push(root1, root2);
+      }
     }
 
     // 解第二个二次方程: y² + αy + (m - β) = 0
-    // const discriminant2 = alpha * alpha - 4 * (m - beta);
-    const discriminant2 = MATHJS.subtract(MATHJS.multiply(alpha, alpha), MATHJS.multiply(MATHJS.subtract(m_, beta), 4)) as MATHJS.BigNumber;
-    if (MATHJS.largerEq(discriminant2, 0)) {
-      // const root3 = (-alpha + MATHJS.sqrt(discriminant2)) / 2;
-      // const root4 = (-alpha - MATHJS.sqrt(discriminant2)) / 2;
+    // const Δ2 = alpha * alpha - 4 * (m - beta);
+    const Δ2 = MATHJS.subtract(MATHJS.multiply(alpha, alpha), MATHJS.multiply(MATHJS.subtract(m_, beta), 4));
+    console.log(`Δ2: ${Δ2}`);
+    // 检查 Δ2 是否为复数
+    if (MATHJS.typeOf(Δ2) === 'Complex') {
+      let Δ = Δ2 as MATHJS.Complex;
+      // 复数判别式，使用复数公式
+      const sqrtDisc = MATHJS.sqrt(Δ);
+      console.log(`sqrtDisc: ${sqrtDisc}`);
+      const root3 = MATHJS.divide(MATHJS.add(alpha, sqrtDisc), 2);
+      const root4 = MATHJS.divide(MATHJS.subtract(alpha, sqrtDisc), 2);
+      console.log(`root3:${root3.toString()} root4:${root4.toString()} `);
+      roots.push(MATHJS.subtract(root3, p_4) as any);
+      roots.push(MATHJS.subtract(root4, p_4) as any);
+    }
+    else if (MATHJS.largerEq(Δ2, ZERO)) {
+      let Δ = Δ2 as MATHJS.BigNumber;
+      // const root3 = (-alpha + MATHJS.sqrt(Δ2)) / 2;
+      // const root4 = (-alpha - MATHJS.sqrt(Δ2)) / 2;
       // roots.push(root3 - p / 4, root4 - p / 4);
-      const root3 = MATHJS.divide(MATHJS.add(MATHJS.unaryMinus(alpha), MATHJS.sqrt(discriminant2)), 2);
-      const root4 = MATHJS.divide(MATHJS.subtract(MATHJS.unaryMinus(alpha), MATHJS.sqrt(discriminant2)), 2);
+      const root3 = MATHJS.divide(MATHJS.add(MATHJS.unaryMinus(alpha), MATHJS.sqrt(Δ)), 2);
+      const root4 = MATHJS.divide(MATHJS.subtract(MATHJS.unaryMinus(alpha), MATHJS.sqrt(Δ)), 2);
+      console.log(`root3:${root3.toString()} root4:${root4.toString()} `);
       const r3 = MATHJS.subtract(root3, p_4) as any;
       const r4 = MATHJS.subtract(root4, p_4) as any;
       roots.push(r3);
       roots.push(r4);
     } else {
-      // const realPart = -alpha / 2;
-      // const imagPart = MATHJS.sqrt(-discriminant2) / 2;
-      // roots.push(
-      //     MATHJS.complex(realPart, imagPart) - p / 4,
-      //     MATHJS.complex(realPart, -imagPart) - p / 4
-      // );
-      const realPart = MATHJS.subtract(MATHJS.divide(alpha, -2), p_4) as MATHJS.BigNumber;
-      const imagPart = MATHJS.divide(MATHJS.sqrt(MATHJS.unaryMinus(discriminant2)), 2) as MATHJS.BigNumber;
-      const root3 = MATHJS.complex(realPart.toNumber(), imagPart.toNumber());
-      const root4 = MATHJS.complex(realPart.toNumber(), -imagPart.toNumber());
-      roots.push(root3, root4);
+      let Δ = Δ2 as MATHJS.BigNumber;
+
+      if (MATHJS.typeOf(alpha) === 'Complex') {
+        // 如果 alpha 是复数，使用复数公式
+        const sqrtDisc = MATHJS.sqrt(MATHJS.unaryMinus(Δ));
+        const root3 = MATHJS.divide(MATHJS.add(alpha, sqrtDisc), 2);
+        const root4 = MATHJS.divide(MATHJS.subtract(alpha, sqrtDisc), 2);
+        console.log(`root3:${root3.toString()} root4:${root4.toString()} `);
+        roots.push(MATHJS.subtract(root3, p_4) as any);
+        roots.push(MATHJS.subtract(root4, p_4) as any);
+      } else {
+        // const realPart = -alpha / 2;
+        // const imagPart = MATHJS.sqrt(-Δ2) / 2;
+        // roots.push(
+        //     MATHJS.complex(realPart, imagPart) - p / 4,
+        //     MATHJS.complex(realPart, -imagPart) - p / 4
+        // );
+        const realPart = MATHJS.subtract(MATHJS.divide(alpha, -2), p_4) as MATHJS.BigNumber;
+        const imagPart = MATHJS.divide(MATHJS.sqrt(MATHJS.unaryMinus(Δ)), 2) as MATHJS.BigNumber;
+        console.log(`realPart:${realPart.toNumber()} realPart:${realPart.toNumber()} `);
+        const root3 = MATHJS.complex(realPart.toNumber(), imagPart.toNumber());
+        const root4 = MATHJS.complex(realPart.toNumber(), -imagPart.toNumber());
+        console.log(`root3:${root3.toString()} root4:${root4.toString()} `);
+        roots.push(root3, root4);
+      }
     }
-    roots.sort();
+    for (let i = 0; i < roots.length; i++) {
+      roots[i] = MATHJS.multiply(roots[i], t) as (MATHJS.BigNumber | MATHJS.Complex);
+    }
     return roots;
   }
 

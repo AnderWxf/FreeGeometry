@@ -390,8 +390,8 @@ class Curve2Inter {
     //     return ret;
     // }
 
-    // return Curve2Inter.ConicXConicMatrixPencil(c0a.ge(), c1a.ge(), c0a, c1a, tol0, tol1, n);
-    return Curve2Inter.ConicXConicResultant(c0a.ge(), c1a.ge(), c0a, c1a, tol0, tol1, n);
+    return Curve2Inter.ConicXConicMatrixPencil(c0a.ge(), c1a.ge(), c0a, c1a, tol0, tol1, n);
+    // return Curve2Inter.ConicXConicResultant(c0a.ge(), c1a.ge(), c0a, c1a, tol0, tol1, n);
   }
 
   /**
@@ -493,7 +493,8 @@ class Curve2Inter {
     // 1. 构造对称矩阵 ( A1, A2 ) 表示两条二次曲线。
     let a_1 = c0.A, b_1 = c0.B, c_1 = c0.C, d_1 = c0.D, e_1 = c0.E, f_1 = c0.F;
     let a_2 = c1.A, b_2 = c1.B, c_2 = c1.C, d_2 = c1.D, e_2 = c1.E, f_2 = c1.F;
-
+    console.log(`曲线参数 c0 a_1:${a_1.toNumber()}, b_1:${b_1.toNumber()}, c_1:${c_1.toNumber()}, d_1:${d_1.toNumber()}, e_1:${e_1.toNumber()}, f_1:${f_1.toNumber()}`);
+    console.log(`曲线参数 c1 a_2:${a_2.toNumber()}, b_2:${b_2.toNumber()}, c_2:${c_2.toNumber()}, d_2:${d_2.toNumber()}, e_2:${e_2.toNumber()}, f_2:${f_2.toNumber()}`);
     // 计算中间变量
     // const ΔD = a_1 * c_2 - a_2 * c_1;
     // const ΔE = a_1 * e_2 - a_2 * e_1;
@@ -530,9 +531,9 @@ class Curve2Inter {
     const R0 = MATHJS.subtract(MATHJS.multiply(ΔF, ΔF), MATHJS.multiply(βE, δF)) as MATHJS.BigNumber;
 
     // 解四次方程
-    console.log(`R4 y^4 + R3 y^3 + R2 y^2 + R1 y + R0 => R4:${R4.toNumber()}, R3:${R3.toNumber()}, R2:${R2.toNumber()}, R1:${R1.toNumber()}, R0:${R0.toNumber()}`);
+    console.log(`四次方程 R4 y^4 + R3 y^3 + R2 y^2 + R1 y + R0 => R4:${R4.toNumber()}, R3:${R3.toNumber()}, R2:${R2.toNumber()}, R1:${R1.toNumber()}, R0:${R0.toNumber()}`);
     const Rs = SolveEquation.SolveQuarticNumberical(R4, R3, R2, R1, R0);
-    console.log(`跟 Rs: ${Rs[0]}, ${Rs[1]}, ${Rs[2]}, ${Rs[3]}`);
+    console.log(`四次方程根 Rs: ${Rs[0]}, ${Rs[1]}, ${Rs[2]}, ${Rs[3]}`);
     for (let i = 0; i < Rs.length; i++) {
       if (ret.length >= n) {
         break;
@@ -629,6 +630,11 @@ class Curve2Inter {
       if (ret.length >= n) {
         break;
       }
+    }
+
+    console.log(`结式多项式计算的交点 :`);
+    for (let i = 0; i < ret.length; i++) {
+      console.log(`Point , ${i}: ${ret[i].p} , ${ret[i].u0},${ret[i].u1}`);
     }
     return ret;
   }
