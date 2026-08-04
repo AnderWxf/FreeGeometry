@@ -390,8 +390,8 @@ class Curve2Inter {
     //     return ret;
     // }
 
-    return Curve2Inter.ConicXConicMatrixPencil(c0a.ge(), c1a.ge(), c0a, c1a, tol0, tol1, n);
-    // return Curve2Inter.ConicXConicResultant(c0a.ge(), c1a.ge(), c0a, c1a, tol0, tol1, n);
+    // return Curve2Inter.ConicXConicMatrixPencil(c0a.ge(), c1a.ge(), c0a, c1a, tol0, tol1, n);
+    return Curve2Inter.ConicXConicResultant(c0a.ge(), c1a.ge(), c0a, c1a, tol0, tol1, n);
   }
 
   /**
@@ -634,7 +634,7 @@ class Curve2Inter {
 
     console.log(`结式多项式计算的交点 :`);
     for (let i = 0; i < ret.length; i++) {
-      console.log(`Point , ${i}: ${ret[i].p} , ${ret[i].u0},${ret[i].u1}`);
+      console.log(`Point${i} , x:${ret[i].p.x} ,y:${ret[i].p.y} , u0:${ret[i].u0},u1:${ret[i].u1}`);
     }
     return ret;
   }

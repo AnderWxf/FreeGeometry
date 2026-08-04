@@ -206,12 +206,25 @@ class SolveEquation {
       let roots = SolveEquation.SolveQuadraticEquation(b_, c_, d_);
       return roots;
     }
+    let roots = new Array<MATHJS.Complex | MATHJS.BigNumber>();
 
     // 后面使用归一化方程： λ^3 + aλ^2 + bλ + c = 0;
     let a = MATHJS.divide(b_, a_) as MATHJS.BigNumber;
     let b = MATHJS.divide(c_, a_) as MATHJS.BigNumber;
     let c = MATHJS.divide(d_, a_) as MATHJS.BigNumber;
-    console.log(`λ^3 + aλ^2 + bλ + c = 0 => a:${a.toNumber()}, b:${b.toNumber()}, c:${c.toNumber()}`);
+    console.log(`归一化方程: λ^3 + aλ^2 + bλ + c = 0 => a:${a.toNumber()}, b:${b.toNumber()}, c:${c.toNumber()}`);
+
+    let rs = MATHJS.polynomialRoot(c.toNumber(), b.toNumber(), a.toNumber(), 1);
+    console.log(`MATHJS.polynomialRoot rs:${rs}`);
+    rs.forEach(root => {
+      if (MATHJS.typeOf(root) === 'Complex') {
+        roots.push(root as MATHJS.Complex);
+      }
+      if (MATHJS.typeOf(root) === 'number') {
+        roots.push(MATHJS.bignumber(root as number));
+      }
+    });
+    return roots;
 
     // Δ = 18abc − 4a^3c + a^2b^2 − 4b^3 − 27c^2
     let Δ0 = MATHJS.add(
@@ -221,6 +234,7 @@ class SolveEquation {
       MATHJS.multiply(b, b, b, -4),
       MATHJS.multiply(c, c, -27),
     )
+    console.log(`Δ = 18abc − 4a^3c + a^2b^2 − 4b^3 − 27c^2 => Δ:${Δ0.toString()}`);
 
     // 令λ = x − a/3​ ，方程变为：x^3 + px + q = 0 
     // p = b − a^2/3
@@ -244,9 +258,9 @@ class SolveEquation {
     const shift = MATHJS.divide(a, 3) as MATHJS.BigNumber;
     console.log(`λ = x − a/3 => shift:${shift.toNumber()}`);
 
-    let roots = new Array<MATHJS.Complex | MATHJS.BigNumber>();
-    // Δ = 0：有重根(abs(Δ) < 1e-10)
-    if (MATHJS.larger(1e-10, MATHJS.abs(Δ))) {
+
+    // Δ = 0：有重根(abs(Δ) < 1e-5)
+    if (MATHJS.larger(1e-5, MATHJS.abs(Δ))) {
       // 三个实根（至少两个相等）
       // x1​ = 3 (−q/2) ^ 1/3 ,
       // x2​ = x3​ = −3 (−q/4) ^ 1/3
@@ -569,6 +583,9 @@ class SolveEquation {
           roots.push(MATHJS.subtract(y, p_4) as (MATHJS.Complex | MATHJS.BigNumber));
           roots.push(MATHJS.subtract(MATHJS.unaryMinus(y), p_4) as (MATHJS.Complex | MATHJS.BigNumber));
         }
+      }
+      for (let i = 0; i < roots.length; i++) {
+        roots[i] = MATHJS.multiply(roots[i], t) as (MATHJS.BigNumber | MATHJS.Complex);
       }
       return roots;
     }
