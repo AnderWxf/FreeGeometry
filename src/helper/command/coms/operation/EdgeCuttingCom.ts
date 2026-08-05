@@ -36,18 +36,20 @@ class EdgeCuttingCom extends Command {
     let str = this._text;
     let paras = str.split(' ');
 
-
-
     this.bind(window);
     let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);
-
-    let act_pick_objs = new ActPickObjects();
-    await act_pick_objs.execute(context);
-    if (this._isCancel || act_pick_objs.isCancel) { this.cancel(); return; }
-
+    let selects: Array<THREE.Object3D> = null;
+    if (context.select.selectedObjects.length) {
+      selects = context.select.selectedObjects;
+    } else {
+      let act_pick_objs = new ActPickObjects();
+      await act_pick_objs.execute(context);
+      if (this._isCancel || act_pick_objs.isCancel) { this.cancel(); return; }
+      selects = act_pick_objs.results;
+    }
     // 只能选择二维曲线类型
-    for (let i = 0; i < act_pick_objs.results.length; i++) {
-      let geo = act_pick_objs.results[i];
+    for (let i = 0; i < selects.length; i++) {
+      let geo = selects[i];
       let userData = geo.userData as UserData;
       if (userData.type < GeomType.DRAW_CURVE2_RC) {
         if (userData.type == GeomType.DRAW_CURVE2_PO || userData.type == GeomType.DRAW_CURVE2_RC) {

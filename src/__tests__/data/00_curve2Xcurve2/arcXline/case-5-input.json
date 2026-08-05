@@ -1,61 +1,6 @@
 [
   {
     "userData": {
-      "type": 0,
-      "canPick": true,
-      "isAssist": false,
-      "assistPoints": [
-        {
-          "p": {
-            "type": -1,
-            "x": -8,
-            "y": 2
-          },
-          "c": 11403055
-        },
-        {
-          "p": {
-            "type": -1,
-            "x": 9,
-            "y": 2
-          },
-          "c": 3329330
-        }
-      ],
-      "color": 16711680,
-      "original": {
-        "uuid": "575c436e-e27f-4ab8-8912-8e9589d49b90",
-        "type": 296,
-        "v0i": -1,
-        "v1i": -1,
-        "curvei": -1,
-        "u": {
-          "type": -1,
-          "x": 0,
-          "y": 17
-        },
-        "curve": {
-          "uuid": "31cac923-d5ae-4737-b956-b78db1bb4aab",
-          "trans": {
-            "pos": {
-              "type": -1,
-              "x": -8,
-              "y": 2
-            },
-            "rot": 0,
-            "scale": {
-              "type": -1,
-              "x": 1,
-              "y": 1
-            }
-          },
-          "type": 257
-        }
-      }
-    }
-  },
-  {
-    "userData": {
       "type": 3,
       "canPick": true,
       "isAssist": false,
@@ -110,6 +55,61 @@
             "x": 5,
             "y": 5
           }
+        }
+      }
+    }
+  },
+  {
+    "userData": {
+      "type": 0,
+      "canPick": true,
+      "isAssist": false,
+      "assistPoints": [
+        {
+          "p": {
+            "type": -1,
+            "x": 0,
+            "y": 2
+          },
+          "c": 11403055
+        },
+        {
+          "p": {
+            "type": -1,
+            "x": 17,
+            "y": 2
+          },
+          "c": 3329330
+        }
+      ],
+      "color": 16711680,
+      "original": {
+        "uuid": "38fb9068-b382-4ad5-ba3c-6a107dd148be",
+        "type": 296,
+        "v0i": -1,
+        "v1i": -1,
+        "curvei": -1,
+        "curve": {
+          "uuid": "d564be5e-f9eb-46db-be03-7cabaa5339f7",
+          "trans": {
+            "pos": {
+              "type": -1,
+              "x": 0,
+              "y": 2
+            },
+            "rot": 0,
+            "scale": {
+              "type": -1,
+              "x": 1,
+              "y": 1
+            }
+          },
+          "type": 257
+        },
+        "u": {
+          "type": -1,
+          "x": 0,
+          "y": 17
         }
       }
     }

@@ -53,17 +53,21 @@ function CopyUserData(src: UserData, dest: UserData): void {
 }
 
 // 创建一个辅助点
-function CreateAssistPoint(a: AssisPoint): THREE.Mesh {
+function CreateAssistPoint(a: AssisPoint, isAssist: boolean = true): THREE.Mesh {
   const material = new THREE.MeshBasicMaterial({ color: a.c });
   const mesh = new THREE.Mesh(Command.geometry, material);
   mesh.position.x = a.p.x;
   mesh.position.y = a.p.y;
   mesh.name = "assist";
   mesh.userData.canPick = true;
-  mesh.userData.isAssist = true;
+  mesh.userData.isAssist = isAssist;
   mesh.userData.color = a.c;
   mesh.userData.original = a.p;
-  mesh.visible = Global.isShowAssists;
+  if (isAssist) {
+    mesh.visible = Global.isShowAssists;
+  } else {
+    mesh.visible = true;
+  }
   return mesh;
 }
 

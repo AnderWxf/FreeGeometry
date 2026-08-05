@@ -1,5 +1,5 @@
 import { Global } from "../../core/Global";
-import { type AssisPoint } from "../UserData";
+import { CreateAssistPoint, type AssisPoint } from "../UserData";
 import type { CommandExecuter } from "./CommandExecuter";
 import * as THREE from "three";
 
@@ -28,18 +28,8 @@ class Command {
     return this._isDone;
   }
   // 创建一个辅助点
-  protected createAssistPoint(a: AssisPoint): THREE.Mesh {
-    const material = new THREE.MeshBasicMaterial({ color: a.c });
-    const mesh = new THREE.Mesh(Command.geometry, material);
-    mesh.position.x = a.p.x;
-    mesh.position.y = a.p.y;
-    mesh.name = "assist";
-    mesh.userData.canPick = true;
-    mesh.userData.isAssist = true;
-    mesh.userData.color = a.c;
-    mesh.userData.original = a.p;
-    mesh.visible = Global.isShowAssists;
-    return mesh;
+  protected createAssistPoint(a: AssisPoint, isAssist: boolean = true): THREE.Mesh {
+    return CreateAssistPoint(a, isAssist);
   }
   onMouseMove = (event: MouseEvent) => {
     this.onMouseMoveExec(event);

@@ -1,62 +1,7 @@
 [
   {
     "userData": {
-      "type": 0,
-      "canPick": true,
-      "isAssist": false,
-      "assistPoints": [
-        {
-          "p": {
-            "type": -1,
-            "x": -8,
-            "y": 2
-          },
-          "c": 11403055
-        },
-        {
-          "p": {
-            "type": -1,
-            "x": 9,
-            "y": 2
-          },
-          "c": 3329330
-        }
-      ],
-      "color": 16711680,
-      "original": {
-        "uuid": "575c436e-e27f-4ab8-8912-8e9589d49b90",
-        "type": 296,
-        "v0i": -1,
-        "v1i": -1,
-        "curvei": -1,
-        "u": {
-          "type": -1,
-          "x": 0,
-          "y": 17
-        },
-        "curve": {
-          "uuid": "31cac923-d5ae-4737-b956-b78db1bb4aab",
-          "trans": {
-            "pos": {
-              "type": -1,
-              "x": -8,
-              "y": 2
-            },
-            "rot": 0,
-            "scale": {
-              "type": -1,
-              "x": 1,
-              "y": 1
-            }
-          },
-          "type": 257
-        }
-      }
-    }
-  },
-  {
-    "userData": {
-      "type": 3,
+      "type": 5,
       "canPick": true,
       "isAssist": false,
       "assistPoints": [
@@ -71,15 +16,23 @@
         {
           "p": {
             "type": -1,
-            "x": 5,
+            "x": 10,
             "y": 0
           },
           "c": 3329330
+        },
+        {
+          "p": {
+            "type": -1,
+            "x": 6.123233995736766e-16,
+            "y": 5
+          },
+          "c": 139
         }
       ],
       "color": 16711680,
       "original": {
-        "uuid": "3b14531c-35b3-4d5f-8d55-919570de6b76",
+        "uuid": "e48a835e-8b60-4948-944c-10f782ea0f67",
         "type": 296,
         "v0i": -1,
         "v1i": -1,
@@ -90,7 +43,7 @@
           "y": 6.283185307179586
         },
         "curve": {
-          "uuid": "fcc7d259-8ae7-4ae8-8e0b-091a564c3573",
+          "uuid": "6d5dded7-a3c3-48c0-8871-bdcb7b04568a",
           "trans": {
             "pos": {
               "type": -1,
@@ -107,9 +60,64 @@
           "type": 255,
           "radius": {
             "type": -1,
-            "x": 5,
+            "x": 10,
             "y": 5
           }
+        }
+      }
+    }
+  },
+  {
+    "userData": {
+      "type": 0,
+      "canPick": true,
+      "isAssist": false,
+      "assistPoints": [
+        {
+          "p": {
+            "type": -1,
+            "x": -24,
+            "y": -5
+          },
+          "c": 11403055
+        },
+        {
+          "p": {
+            "type": -1,
+            "x": 0,
+            "y": -5
+          },
+          "c": 3329330
+        }
+      ],
+      "color": 16711680,
+      "original": {
+        "uuid": "a8c28fdb-9d92-4c90-9936-edecb808aa33",
+        "type": 296,
+        "v0i": -1,
+        "v1i": -1,
+        "curvei": -1,
+        "curve": {
+          "uuid": "43ca7d42-30a3-4e3f-aa31-698e086607b6",
+          "trans": {
+            "pos": {
+              "type": -1,
+              "x": -24,
+              "y": -5
+            },
+            "rot": 0,
+            "scale": {
+              "type": -1,
+              "x": 1,
+              "y": 1
+            }
+          },
+          "type": 257
+        },
+        "u": {
+          "type": -1,
+          "x": 0,
+          "y": 24
         }
       }
     }

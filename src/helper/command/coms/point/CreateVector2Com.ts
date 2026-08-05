@@ -39,7 +39,7 @@ class CreateVector2Com extends ComCreate {
     // 创建一个点
     userData.color = THREE.Color.NAMES.greenyellow;
     userData.original = this.point;
-    let geo = this.createAssistPoint({ p: this.point, c: userData.color });
+    let geo = this.createAssistPoint({ p: this.point, c: userData.color }, false);
     geo.userData = userData;
     this.results = geo;
     this.done();

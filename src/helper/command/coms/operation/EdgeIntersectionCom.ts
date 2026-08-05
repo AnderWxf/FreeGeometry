@@ -34,14 +34,18 @@ class EdgeIntersectionCom extends Command {
 
     this.bind(window);
     let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);
-
-    let act_pick_objs = new ActPickObjects();
-    await act_pick_objs.execute(context);
-    if (this._isCancel || act_pick_objs.isCancel) { this.cancel(); return; }
-
+    let selects: Array<THREE.Object3D> = null;
+    if (context.select.selectedObjects.length) {
+      selects = context.select.selectedObjects;
+    } else { 
+      let act_pick_objs = new ActPickObjects();
+      await act_pick_objs.execute(context);
+      if (this._isCancel || act_pick_objs.isCancel) { this.cancel(); return; }
+      selects = act_pick_objs.results;
+    }
     // 只能选择二维曲线类型
-    for (let i = 0; i < act_pick_objs.results.length; i++) {
-      let geo = act_pick_objs.results[i];
+    for (let i = 0; i < selects.length; i++) {
+      let geo = selects[i];
       if (geo.userData.type < GeomType.DRAW_CURVE2_RC) {
         if (geo.userData.type == GeomType.DRAW_CURVE2_PO || geo.userData.type == GeomType.DRAW_CURVE2_RC) {
           let original = geo.userData.original as Array<Edge2>;
@@ -61,6 +65,8 @@ class EdgeIntersectionCom extends Command {
         }
       }
     }
+
+
     if (this.src.length > 0 && this.des.length > 0) {
       for (let i = 0; i < this.src.length; i++) {
         let src = this.src[i];
@@ -72,7 +78,7 @@ class EdgeIntersectionCom extends Command {
       }
       for (let i = 0; i < this.results.length; i++) {
         for (let j = 0; j < this.results[i].is.length; j++) {
-          this.assists.push(this.createAssistPoint({ p: this.results[i].is[j].p, c: THREE.Color.NAMES.blue }));
+          this.assists.push(this.createAssistPoint({ p: this.results[i].is[j].p, c: THREE.Color.NAMES.blue }, false));
         }
       }
       for (let i = 0; i < this.assists.length; i++) {
