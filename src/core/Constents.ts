@@ -117,7 +117,7 @@ enum GeomType {
 enum CommandType {
   /********基本创建命令**********/
   // 点类型
-  CREATE_VECTOR2 = 'P2',              // 点
+  CREATE_POINT2 = 'P2',               // 点
   // 二维曲线类型
   CREATE_LINE = 'L',                  // 两点直线段
   CREATE_ARC = 'A',                   // 圆弧
@@ -169,6 +169,8 @@ enum CommandType {
   CREATE_LOFT_BODY = 'LOFT',           // 放样体
 
   /*******基本修改命令 = 'M' + 基本创建命令 *********/
+  // 点类型
+  MODIFY_POINT2 = 'MP2',               // 点
   // 二维曲线类型
   MODIFY_LINE = 'ML',                  // 两点直线段
   MODIFY_ARC = 'MA',                   // 圆弧

@@ -235,7 +235,7 @@ const MenuItems = [
         label: '点',
         children: [
           // 基础类型
-          { key: CommandType.CREATE_VECTOR2, label: '二维点' + ' ' + CommandType.CREATE_VECTOR2 },
+          { key: CommandType.CREATE_POINT2, label: '二维点' + ' ' + CommandType.CREATE_POINT2 },
         ]
       },
       {

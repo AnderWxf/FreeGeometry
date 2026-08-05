@@ -13,7 +13,7 @@ import { CreateGeomUserData } from "../../../UserData";
  * Create command class.
  * 
  */
-class CreateVector2Com extends ComCreate {
+class CreatePoint2Com extends ComCreate {
   point: Vector2;
   constructor(executer: CommandExecuter, text: string) {
     super(executer, text);
@@ -23,7 +23,7 @@ class CreateVector2Com extends ComCreate {
     let str = this._text;
     let paras = str.split(' ');
     let userData = CreateGeomUserData(this.type);
-    if (paras.length == 7) {
+    if (paras.length == 3) {
       // 创建一个点
       this.point = new Vector2(new Number(paras[1]).valueOf(), new Number(paras[2]).valueOf());
     } else {
@@ -46,4 +46,4 @@ class CreateVector2Com extends ComCreate {
   }
 
 }
-export { CreateVector2Com };
+export { CreatePoint2Com };

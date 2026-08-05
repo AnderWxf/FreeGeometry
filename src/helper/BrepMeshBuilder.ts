@@ -8,13 +8,14 @@ import { Brep2Builder } from '../geometry/algorithm/builder/Brep2Builder';
 import { Line2Data } from '../geometry/data/base/curve2/Line2Data';
 import { Line3Data } from '../geometry/data/base/curve3/Line3Data';
 import { Brep3Builder } from '../geometry/algorithm/builder/Brep3Builder';
+import type { Vector2 } from '../math/Math';
+import { Command } from './command/Command';
 
 /**
  * brep mesh builder.
  *
  */
 class BrepMeshBuilder {
-
   /**
    * build edge2 mesh WireframeGeometry.
    *

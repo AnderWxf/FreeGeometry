@@ -63,8 +63,17 @@ class ComTransform extends ComBatch {
     for (let i = 0; i < this.olds.length; i++) {
       let old = this.olds[i];
       let userData = CloneUserData(old.userData as UserData);
+      // 点
+      if (old.userData.type == GeomType.MATH_VECTOR2) {
+        let point = (old.userData.original as Vector2).clone();
+        point.applyMatrix3(trans);
+        userData.original = point;
+        let geo = this.createAssistPoint({ p: point, c: userData.color }, false);
+        geo.userData = userData;
+        this.results.push(geo);
+      }
       // 线
-      if (old.userData.type < GeomType.DRAW_SURFACE_CI) {
+      else if (old.userData.type < GeomType.DRAW_SURFACE_CI) {
         // 数组
         if (old.userData.original instanceof Array) {
           let array = old.userData.original as Array<any>;
@@ -175,6 +184,31 @@ class ComTransform extends ComBatch {
       for (let i = 0; i < this.olds.length; i++) {
         let old = this.olds[i];
         let userData = CloneUserData(old.userData as UserData);
+        // 点
+        if (old.userData.type < GeomType.MATH_VECTOR2) {
+          // 单例
+          if (old.userData.original instanceof Vector2) {
+            let point = (old.userData.original as Vector2).clone();
+            point.applyMatrix3(trans);
+            let t = this.createAssistPoint({ p: point, c: THREE.Color.NAMES.gray }, false);
+            t.name = "temp";
+            this.tempResults.push(t);
+          }
+          // 数组
+          if (old.userData.original instanceof Array) {
+            let array = old.userData.original as Array<any>;
+            for (let i = 0; i < array.length; i++) {
+              if (array[i] instanceof Vector2) {
+                let point = (array[i] as Vector2).clone();
+                point.applyMatrix3(trans);
+                let t = this.createAssistPoint({ p: point, c: THREE.Color.NAMES.gray }, false);
+                t.userData.type = old.userData.type;
+                t.name = "temp";
+                this.tempResults.push(t);
+              }
+            }
+          }
+        }
         // 线
         if (old.userData.type < GeomType.DRAW_SURFACE_CI) {
           // 单例

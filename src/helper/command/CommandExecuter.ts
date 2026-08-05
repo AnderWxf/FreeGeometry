@@ -65,7 +65,7 @@ import { Bool2MulUnionCom } from "./coms/bool/Bool2MulUnionCom";
 import { Bool2MulDifferenceCom } from "./coms/bool/Bool2MulDifferenceCom";
 import { Bool2MulIntersectionCom } from "./coms/bool/Bool2MulIntersectionCom";
 import { ModifyCircleAreaCom } from "./coms/face/ModifyCircleAreaCom";
-import { CreateVector2Com } from "./coms/point/CreateVector2Com";
+import { CreatePoint2Com } from "./coms/point/CreatePoint2Com";
 import { CalculateCurve2UCom } from "./coms/calculate/CalculateCurve2UCom";
 import { CalculateCurve2GCom } from "./coms/calculate/CalculateCurve2GCom";
 import { CalculatePointEdge2Com } from "./coms/calculate/CalculatePointEdge2Com";
@@ -73,6 +73,7 @@ import { CalculatePointFace2Com } from "./coms/calculate/CalculatePointFace2Com"
 import { CalculatePointEdge2AutoCom } from "./coms/calculate/CalculatePointEdge2AutoCom";
 import { CalculatePointFace2AutoCom } from "./coms/calculate/CalculatePointFace2AutoCom";
 import { SceneShowAssistsCom } from "./coms/scene/SceneShowAssistsCom";
+import { ModifyPoint2Com } from "./coms/point/ModifyPoint2Com";
 
 /**
  * Command executer base class.
@@ -91,7 +92,7 @@ class CommandExecuter {
     this.InitCommand();
   }
   private InitCommand() {
-    this._commands.set(CommandType.CREATE_VECTOR2, CreateVector2Com);
+    this._commands.set(CommandType.CREATE_POINT2, CreatePoint2Com);
 
     this._commands.set(CommandType.CREATE_LINE, CreateLine2Com);
     this._commands.set(CommandType.CREATE_CIRCLE, CreateCircle2Com);
@@ -112,6 +113,8 @@ class CommandExecuter {
     this._commands.set(CommandType.CREATE_POLYGON_SURFACE, CreatePolylineAreaCom);
     this._commands.set(CommandType.CREATE_RECTANGLE_SURFACE, CreateRectangleAreaCom);
     this._commands.set(CommandType.CREATE_SECTION_SURFACE, CreateSectionCom);
+
+    this._commands.set(CommandType.MODIFY_POINT2, ModifyPoint2Com);
 
     this._commands.set(CommandType.MODIFY_LINE, ModifyLine2Com);
     this._commands.set(CommandType.MODIFY_CIRCLE, ModifyCircle2Com);
@@ -204,8 +207,15 @@ class CommandExecuter {
     let seleced = Global.select.selectedObjects[0];
     let userData = seleced.userData as UserData;
     let type = userData.type;
+    if (type === undefined || type === null) {
+      return;
+    }
     let typeName = GeomType[type] as string;
-    typeName = typeName.split('_')[2];//DRAW_CURVE2_L = 0, // 两点直线段
+    if (type == GeomType.MATH_VECTOR2) {
+      typeName = CommandType.CREATE_POINT2;
+    } else {
+      typeName = typeName.split('_')[2];//DRAW_CURVE2_L = 0, // 两点直线段
+    }
     if (typeName) {
       let command = 'M' + typeName;
       let c = this._commands.get(command) as Function;

@@ -37,7 +37,7 @@ class EdgeIntersectionCom extends Command {
     let selects: Array<THREE.Object3D> = null;
     if (context.select.selectedObjects.length) {
       selects = context.select.selectedObjects;
-    } else { 
+    } else {
       let act_pick_objs = new ActPickObjects();
       await act_pick_objs.execute(context);
       if (this._isCancel || act_pick_objs.isCancel) { this.cancel(); return; }
@@ -78,7 +78,9 @@ class EdgeIntersectionCom extends Command {
       }
       for (let i = 0; i < this.results.length; i++) {
         for (let j = 0; j < this.results[i].is.length; j++) {
-          this.assists.push(this.createAssistPoint({ p: this.results[i].is[j].p, c: THREE.Color.NAMES.blue }, false));
+          let point = this.createAssistPoint({ p: this.results[i].is[j].p, c: THREE.Color.NAMES.blue }, false)
+          point.userData.type = GeomType.MATH_VECTOR2;
+          this.assists.push(point);
         }
       }
       for (let i = 0; i < this.assists.length; i++) {
