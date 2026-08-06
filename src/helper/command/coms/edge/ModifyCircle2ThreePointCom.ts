@@ -79,6 +79,10 @@ class ModifyCircle2ThreePointCom extends ComModify {
     }
     // 创建一个曲线段
     let edge = Brep2Builder.BuildCircleFromBeginMiddleEndPoint(beginPoint, middlePoint, endPoint);
+    if (edge == null) {
+      this.cancel();
+      return;
+    }
     let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, userData.color);
     userData.original = edge;
     geo.userData = userData;
@@ -104,6 +108,7 @@ class ModifyCircle2ThreePointCom extends ComModify {
 
       // 创建一个临时曲线段
       let edge = Brep2Builder.BuildCircleFromBeginMiddleEndPoint(beginPoint, middlePoint, endPoint);
+      if (edge == null) { return; }
       let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0);
       t.name = "temp";
       this.tempResult = t;

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import * as THREE from 'three';
 import ReactDOM from 'react-dom/client';
 import { Input, Select, Space, Checkbox, Menu, ConfigProvider } from 'antd';
@@ -8,7 +8,6 @@ import { Grid } from '../helper/Grid';
 import { Global } from '../core/Global';
 import { CommandType } from '../core/Constents';
 import { SaveFilled, EditTwoTone, BuildFilled, AppstoreFilled, CalculatorOutlined, LineChartOutlined, AreaChartOutlined, GlobalOutlined, RubyOutlined, BlockOutlined, PlusCircleOutlined, ArrowsAltOutlined } from '@ant-design/icons';
-import type { MenuInfo } from 'rc-menu/lib/interface';
 
 const perspective: PerspectiveController = new PerspectiveController();
 const orthographic: OrthographicController = new OrthographicController();
@@ -169,11 +168,40 @@ let CommandBarOnEnter = (value: string) => {
   Global.comExector.execute(value.toUpperCase());
 };
 
+const CommandBar: React.FC = () => {
+  const [filename, setFilename] = useState(Global.filename);
 
-const CommandBar: React.FC = () => (
-  <Space wrap>
-    <Input id='CommandLine' placeholder="请输入命令"
-      style={{ position: 'fixed', width: '100%', bottom: 0, left: 0, zIndex: 1000, background: 'transparent' }}
+  useEffect(() => {
+    const handler = (e: CustomEvent) => {
+      setFilename(e.detail);
+    };
+    window.addEventListener('filenameChanged' as any, handler);
+    return () => {
+      window.removeEventListener('filenameChanged' as any, handler);
+    };
+  }, []);
+
+  return <Space wrap>
+    <Input type="text" id='filename' placeholder="文件名" spellCheck={false} value={filename}
+      style={{ position: 'fixed', width: '20%', bottom: 0, left: 0, zIndex: 1000, background: 'transparent' }}
+      onPressEnter={(e) => {
+        const value = (e.target as HTMLInputElement).value;
+        Global.filename = value;
+        setFilename(value);
+      }}
+      onChange={(e) => {
+        let element = (e.target as HTMLInputElement);
+        setFilename(element.value);
+      }}
+      onKeyUp={(e) => {
+        e.stopPropagation();
+      }}
+      onKeyDown={(e) => {
+        e.stopPropagation();
+      }}
+    />
+    <Input type="text" id='CommandLine' placeholder="请输入命令" spellCheck={false}
+      style={{ position: 'fixed', width: '80%', bottom: 0, right: 0, zIndex: 1000, background: 'transparent' }}
       onPressEnter={(e) => {
         e.stopPropagation();
         let element = (e.target as HTMLInputElement);
@@ -209,7 +237,7 @@ const CommandBar: React.FC = () => (
       }}
     />
   </Space>
-);
+};
 
 const MenuItems = [
   {
@@ -218,6 +246,7 @@ const MenuItems = [
     label: '文件',
     children: [
       { key: CommandType.SCENE_SAVE, label: '保存' + ' ' + CommandType.SCENE_SAVE + ' Ctrl + S' },
+      { key: CommandType.SCENE_SAVEAS, label: '另存为' + ' ' + CommandType.SCENE_SAVEAS + ' Ctrl + Shift + S' },
       { key: CommandType.SCENE_LOAD, label: '加载' + ' ' + CommandType.SCENE_LOAD + ' Ctrl + O' },
       { key: CommandType.SCENE_IMPORT, label: '导入' + ' ' + CommandType.SCENE_IMPORT + ' Ctrl + I' },
       { key: CommandType.SCENE_CLEAR, label: '清空' + ' ' + CommandType.SCENE_CLEAR },
@@ -466,7 +495,7 @@ const MenuItems = [
     ]
   },
 ];
-const MenuBarOnChange = (info: MenuInfo): void => {
+const MenuBarOnChange = (info: any): void => {
   Global.gpu.focus();
   let command = info.key.toUpperCase();
   Global.comExector.execute(command);

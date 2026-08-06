@@ -74,6 +74,7 @@ class Brep2Builder {
   static BuildCircleFromBeginMiddleEndPoint(b: Vector2, m: Vector2, e: Vector2): Edge2 {
     let ret = new Edge2();
     let curve = CurveBuilder.BuildCircle2FromBeginMiddleEndPoint(b, m, e);
+    if (curve == null) { return null; }
     ret.u = new Vector2(0, Math.PI * 2);
     ret.curve = curve;
     return ret;

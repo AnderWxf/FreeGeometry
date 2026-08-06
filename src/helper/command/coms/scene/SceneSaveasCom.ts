@@ -5,7 +5,7 @@ import type { UserData } from "../../../UserData";
 import { Command } from "../../Command";
 import * as THREE from "three";
 
-class SceneSaveCom extends Command {
+class SceneSaveasCom extends Command {
   static link: HTMLAnchorElement = null;
   async exec() {
     let scene = Global.scene;
@@ -19,11 +19,7 @@ class SceneSaveCom extends Command {
     const jsonString = JSON.stringify(data, null, 2);
 
     let filename = 'Scene_' + new Date().toLocaleString() + '.json';
-    if (Global.filename) {
-      filename = Global.filename;
-    } else {
-      Global.filename = filename;
-    }
+    Global.filename = filename;
     // 触发 React 组件更新（通过自定义事件）
     window.dispatchEvent(new CustomEvent('filenameChanged', { detail: Global.filename }));
     // 检测是否支持 File System Access API
@@ -46,11 +42,11 @@ class SceneSaveCom extends Command {
       // 3. 为这个 Blob 创建一个临时的 URL
       const url = URL.createObjectURL(blob);
       // 4. 创建一个隐藏的 <a> 标签，并设置下载属性
-      if (!SceneSaveCom.link) {
-        SceneSaveCom.link = document.createElement('a');
-        document.body.appendChild(SceneSaveCom.link);
+      if (!SceneSaveasCom.link) {
+        SceneSaveasCom.link = document.createElement('a');
+        document.body.appendChild(SceneSaveasCom.link);
       }
-      let link = SceneSaveCom.link;
+      let link = SceneSaveasCom.link;
       link.href = url;
       link.download = filename; // 指定下载的文件名
 
@@ -60,4 +56,4 @@ class SceneSaveCom extends Command {
     this.done();
   }
 }
-export { SceneSaveCom }
+export { SceneSaveasCom }

@@ -20,5 +20,7 @@ export class Global {
 
   static isShowAssists: boolean = true;
   static comExector: CommandExecuter;
+
+  static filename: string = '';
 }
 

@@ -3,6 +3,7 @@ import { Command } from "../../Command";
 import * as THREE from "three";
 import { Global } from "../../../../core/Global";
 import type { CommandExecuter } from "../../CommandExecuter";
+import { useState } from "react";
 class SceneLoadCom extends Command {
   public olds: THREE.Object3D[];
   public results: THREE.Object3D[];
@@ -55,6 +56,9 @@ class SceneLoadCom extends Command {
       this.cancel();
       return;
     }
+    Global.filename = file.name;
+    // 触发 React 组件更新（通过自定义事件）
+    window.dispatchEvent(new CustomEvent('filenameChanged', { detail: Global.filename }));
     const reader = new FileReader();
     const this_ = SceneLoadCom.this_;
     reader.onload = function (e: any) {

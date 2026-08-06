@@ -2,6 +2,7 @@ import { Global } from "../../../../core/Global";
 import { Command } from "../../Command";
 import * as THREE from "three";
 import type { CommandExecuter } from "../../CommandExecuter";
+import { useState } from "react";
 
 class SceneClearCom extends Command {
   public olds: THREE.Object3D[];
@@ -13,6 +14,9 @@ class SceneClearCom extends Command {
     let scene = Global.scene;
     this.olds.push(...scene.objects);
     scene.clear();
+    Global.filename = '';
+    // 触发 React 组件更新（通过自定义事件）
+    window.dispatchEvent(new CustomEvent('filenameChanged', { detail: Global.filename }));
     this.done();
   }
   override undo() {

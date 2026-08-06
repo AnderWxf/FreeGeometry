@@ -64,6 +64,10 @@ class CreateCircle2ThreePointCom extends ComCreate {
     }
     // 创建一个曲线段
     let edge = Brep2Builder.BuildCircleFromBeginMiddleEndPoint(this.beginPoint, this.middlePoint, this.endPoint);
+    if (edge == null) {
+      this.cancel();
+      return;
+    }
     let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, userData.color);
     userData.original = edge;
     geo.userData = userData;
@@ -94,6 +98,7 @@ class CreateCircle2ThreePointCom extends ComCreate {
       let endPoint: Vector2 = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
       // 创建一个临时曲线段
       let edge = Brep2Builder.BuildCircleFromBeginMiddleEndPoint(this.beginPoint, this.middlePoint, endPoint);
+      if (edge == null) { return; }
       let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0);
       t.name = "temp";
       this.tempResult = t;

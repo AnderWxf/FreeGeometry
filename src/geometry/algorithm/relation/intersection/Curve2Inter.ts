@@ -609,22 +609,30 @@ class Curve2Inter {
         intersX2.push(new Vector2(x.toNumber(), y.toNumber()));
       }
 
-      // 两个关于x的二次方程结果都存在的才是交点
-      for (let j = intersX1.length - 1; j > -1; j--) {
+      // // 两个关于x的二次方程结果都存在的才是交点
+      // for (let j = intersX1.length - 1; j > -1; j--) {
+      //   let p1 = intersX1[j];
+      //   let isFound = false;
+      //   for (let k = intersX2.length - 1; k > -1; k--) {
+      //     let p2 = intersX2[k];
+      //     if (p1.distanceTo(p2) < tol0) {
+      //       inters.push({ p: p1, u0: null, u1: null });
+      //       intersX2.splice(k, 1);
+      //       isFound = true;
+      //       break;
+      //     }
+      //   }
+      //   if (isFound) {
+      //     intersX1.splice(j, 1);
+      //   }
+      // }
+      for (let j = 0; j < intersX1.length; j++) {
         let p1 = intersX1[j];
-        let isFound = false;
-        for (let k = intersX2.length - 1; k > -1; k--) {
-          let p2 = intersX2[k];
-          if (p1.distanceTo(p2) < tol0) {
-            inters.push({ p: p1, u0: null, u1: null });
-            intersX2.splice(k, 1);
-            isFound = true;
-            break;
-          }
-        }
-        if (isFound) {
-          intersX1.splice(j, 1);
-        }
+        inters.push({ p: p1, u0: null, u1: null });
+      }
+      for (let j = 0; j < intersX2.length; j++) {
+        let p2 = intersX2[j];
+        inters.push({ p: p2, u0: null, u1: null });
       }
       checkAndPush(inters);
       if (ret.length >= n) {

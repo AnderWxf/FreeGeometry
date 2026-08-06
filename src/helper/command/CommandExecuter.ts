@@ -74,6 +74,7 @@ import { CalculatePointEdge2AutoCom } from "./coms/calculate/CalculatePointEdge2
 import { CalculatePointFace2AutoCom } from "./coms/calculate/CalculatePointFace2AutoCom";
 import { SceneShowAssistsCom } from "./coms/scene/SceneShowAssistsCom";
 import { ModifyPoint2Com } from "./coms/point/ModifyPoint2Com";
+import { SceneSaveasCom } from "./coms/scene/SceneSaveasCom";
 
 /**
  * Command executer base class.
@@ -161,6 +162,7 @@ class CommandExecuter {
     this._commands.set(CommandType.BOOL_2_DIFFERENCE_MULTIPLE, Bool2MulDifferenceCom);
 
     this._commands.set(CommandType.SCENE_SAVE, SceneSaveCom);
+    this._commands.set(CommandType.SCENE_SAVEAS, SceneSaveasCom);
     this._commands.set(CommandType.SCENE_LOAD, SceneLoadCom);
     this._commands.set(CommandType.SCENE_IMPORT, SceneImportCom);
     this._commands.set(CommandType.SCENE_CLEAR, SceneClearCom);
@@ -249,6 +251,7 @@ class CommandExecuter {
   * 'Ctrl' + 'Z', UNDO
   * 'Ctrl' + 'Y', REDO
   * 'Ctrl' + 'S', SAVE 
+  * 'Ctrl' + 'Shift' + 'S', SAVEAS  
   * 'Ctrl' + 'O', LOAD 
   * 'Ctrl' + 'I', IMPORT 
   * 'Ctrl' + 'X', CLEAR  
@@ -308,12 +311,20 @@ class CommandExecuter {
         break;
       // S：拉伸
       case 'KeyS':
-        if (this.KeyCtrlDown) {
+        if (this.KeyCtrlDown && !this.KeyShiftDown) {
           this.KeyCtrlDown = false;
           event.preventDefault();
           this.execute(CommandType.SCENE_SAVE);
           return;
-        } else {
+        }
+        else if (this.KeyCtrlDown && this.KeyShiftDown) {
+          this.KeyCtrlDown = false;
+          this.KeyShiftDown = false;
+          event.preventDefault();
+          this.execute(CommandType.SCENE_SAVEAS);
+          return;
+        }
+        else {
           com = new ComScale(this, CommandType.OTHER_SCALE);
         }
         break;
