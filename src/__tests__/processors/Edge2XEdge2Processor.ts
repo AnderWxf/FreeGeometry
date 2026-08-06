@@ -1,22 +1,7 @@
 import { Brep2Inter } from "../../geometry/algorithm/relation/intersection/Brep2Inter";
 import { Edge2 } from "../../geometry/data/brep/Brep2";
 
-export function process(input: any[]): any[] {
-  let edge1: Edge2 = null;
-  let edge2: Edge2 = null;
-
-  for (let i = 0; i < input.length; i++) {
-    if (input[i].userData.original instanceof Edge2) {
-      if (edge1 === null) {
-        edge1 = input[i].userData.original;
-        continue;
-      }
-      if (edge2 === null) {
-        edge2 = input[i].userData.original;
-        continue;
-      }
-    }
-  }
+export function process(edge1: Edge2, edge2: Edge2): any[] {
 
   let resut: any[] = [];
   if (edge1 === null || edge2 === null) {

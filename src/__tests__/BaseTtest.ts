@@ -7,6 +7,7 @@ import { isEqualWith } from 'lodash';
 import { describe, expect, test } from 'vitest';
 import { Vector2, Vector3 } from '../math/Math';
 import { vec2 } from 'three/src/nodes/TSL';
+import { Edge2 } from '../geometry/data/brep/Brep2';
 
 function IsCloseTo(received: any, expected: any, tolerance: number = 1e-12): boolean {
   return isEqualWith(received, expected, (objVal, othVal) => {
@@ -41,6 +42,11 @@ type TestCase = {
   inputFile: string;
   expectedFile: string;
 };
+type TestCaseInsertPoint2 = {
+  dir: string;
+  name: string;
+  inputFile: string;
+};
 // 扫描 data 目录，自动发现测试用例
 function DiscoverTestCases(caseDir: string): TestCase[] {
   const dataDir = path.join(__dirname, 'data', caseDir);
@@ -54,6 +60,21 @@ function DiscoverTestCases(caseDir: string): TestCase[] {
       name: baseName,
       inputFile: path.join(dataDir, inputFile),
       expectedFile: path.join(dataDir, `${baseName}-expected.json`),
+    };
+  });
+}
+// 扫描 data 目录，自动发现测试用例
+function DiscoverTestCasesInsertPoint2(caseDir: string): TestCaseInsertPoint2[] {
+  const dataDir = path.join(__dirname, 'data', caseDir);
+  const files = fs.readdirSync(dataDir);
+  // 匹配 所有的json,这些json内部包含求交的曲线和交点数据
+
+  return files.map(inputFile => {
+    const baseName = inputFile.replace('.json', '');
+    return {
+      dir: caseDir,
+      name: baseName,
+      inputFile: path.join(dataDir, inputFile),
     };
   });
 }
@@ -89,18 +110,13 @@ function ExecuteDescribe(typeName: string, typeDir: string, process: (input: any
 }
 
 // 执行描述Object 2维交点集合
-function ExecuteDescribeInsertPoint2(typeName: string, typeDir: string, process: (input: any) => any) {
+function ExecuteDescribeInsertPoint2(typeName: string, typeDir: string, process: (edge1: Edge2, edge2: Edge2) => any) {
   describe(typeName, () => {
     const dataDir = path.join(__dirname, 'data', typeDir);
     const files = fs.readdirSync(dataDir);
     files.forEach(file => {
-      const testCases = DiscoverTestCases(typeDir + '/' + file);
-      // 如果没有找到测试用例，给出提示
-      if (testCases.length === 0) {
-        console.warn('⚠️ 未找到测试数据文件，请检查 data/ 目录');
-      }
       describe(file, () => {
-        const testCases = DiscoverTestCases(typeDir + '/' + file);
+        const testCases = DiscoverTestCasesInsertPoint2(typeDir + '/' + file);
         // 如果没有找到测试用例，给出提示
         if (testCases.length === 0) {
           console.warn('⚠️ 未找到测试数据文件，请检查 data/ 目录');
@@ -109,8 +125,27 @@ function ExecuteDescribeInsertPoint2(typeName: string, typeDir: string, process:
           let c = testCases[i];
           test(c.name, () => {
             const input = LoadScene(c.inputFile);
-            const expected = LoadScene(c.expectedFile) as [any];
-            const result = process(input) as [any];
+            // 获取所有的预设交点和需要求交的边
+            let expected: Array<any> = [];
+            let edge1: Edge2 = null;
+            let edge2: Edge2 = null;
+            for (let i = 0; i < input.length; i++) {
+              if (input[i].userData.original instanceof Vector2) {
+                expected.push(input[i]);
+              }
+              if (input[i].userData.original instanceof Edge2) {
+                if (edge1 === null) {
+                  edge1 = input[i].userData.original;
+                  continue;
+                }
+                if (edge2 === null) {
+                  edge2 = input[i].userData.original;
+                  continue;
+                }
+              }
+            }
+
+            const result = process(edge1, edge2) as [any];
             // 交点距离判定，
             for (let j = expected.length - 1; j >= 0; j--) {
               let exp = expected[j].userData as UserData;
