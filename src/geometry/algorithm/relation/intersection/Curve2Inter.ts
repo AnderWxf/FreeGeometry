@@ -1198,6 +1198,10 @@ class Curve2Inter {
             bin(a, { p, u, g });
             break;
           }
+          // 迭代结果不变，认为已经收敛，或者du已经很小。
+          else if (Math.abs(g - a.g) < tol1 || Math.abs(du) < 1e-15) {
+            break;
+          }
           // 扩张时，反向
           else if (Math.abs(g) > Math.abs(a.g)) {
             du = -du * 0.75;
@@ -1207,10 +1211,6 @@ class Curve2Inter {
             a.u = u;
             a.g = g;
             a.p = p;
-          }
-          // 迭代结果不变，认为已经收敛，或者du已经很小。
-          else if (Math.abs(g - a.g) < tol1 && du_ == du || Math.abs(du) < 1e-15) {
-            break;
           }
           else {
             a.g = g;
@@ -1230,22 +1230,42 @@ class Curve2Inter {
         ret.push({ p: cur.p, u0: cur.u, u1: algor1.u(cur.p) });
         continue;
       }
-      // 符号相反，则至少一个交点在这个区间内。
+      // 与前一个符号相反，则至少一个交点在这个区间内。
       if (pre?.g * cur?.g < 0) {
         bin(pre, cur);
         continue;
       }
-      // 端点后面不处理
-      if (i == 0 || i == ps.length - 1) {
+      // 与后一个符号相反，直接跳过
+      if (cur?.g * nex?.g < 0) {
         continue;
       }
-      // 局部最小，附近可能有交点。
-      let preg = Math.abs(pre.g);
-      let curg = Math.abs(cur.g);
-      let nexg = Math.abs(nex.g);
-      if (curg < preg && curg < nexg) {
-        close(cur, (u1 - u0) / segment);
+      // 起点局部最小，附近可能有交点。
+      if (i == 0) {
+        let curg = Math.abs(cur.g);
+        let nexg = Math.abs(nex.g);
+        if (curg < nexg) {
+          close(cur, (u1 - u0) / segment);
+        }
         continue;
+      }
+      // 终点局部最小，附近可能有交点。
+      else if (i == ps.length - 1) {
+        let preg = Math.abs(pre.g);
+        let curg = Math.abs(cur.g);
+        if (curg < preg) {
+          close(cur, (u1 - u0) / segment);
+        }
+        continue;
+      }
+      else {
+        // 中部局部最小，附近可能有交点。
+        let preg = Math.abs(pre.g);
+        let curg = Math.abs(cur.g);
+        let nexg = Math.abs(nex.g);
+        if (curg < preg && curg < nexg) {
+          close(cur, (u1 - u0) / segment);
+          continue;
+        }
       }
     }
     // 去重
@@ -1328,26 +1348,20 @@ class Curve2Inter {
       }
     }
     else if (c0 instanceof Arc2Data || c0 instanceof Hyperbola2Data || c0 instanceof Parabola2Data) {
-      if (c0 instanceof Arc2Data && c1 instanceof Arc2Data) {
-        if (c0.radius.x === c0.radius.y && c1.radius.x === c1.radius.y) {
-          inters.push(...Curve2Inter.QuadraticXQuadratic(c0, c1, tol0, tol1, 2));
-        } else {
-          inters.push(...Curve2Inter.QuadraticXQuadratic(c0, c1, tol0, tol1, 4));
-        }
-      }
-      else if (c1 instanceof Arc2Data || c1 instanceof Hyperbola2Data || c1 instanceof Parabola2Data) {
-        inters.push(...Curve2Inter.QuadraticXQuadratic(c0, c1, tol0, tol1));
+      if (c1 instanceof Arc2Data || c1 instanceof Hyperbola2Data || c1 instanceof Parabola2Data) {
+        inters.push(...Curve2Inter.QuadraticXQuadratic(c0, c1, tol0, tol1, 4));
       }
       else if (c1 instanceof Nurbs2Data) {
         inters.push(...Curve2Inter.QuadraticXNurbs(c0, c1, tol0, tol1));
       }
     }
-    else if (c0 instanceof Nurbs2Data) {
-      if (c1 instanceof Nurbs2Data) {
-        inters.push(...Curve2Inter.NurbsXNurbs(c0, c1, tol0, tol1));
+    else if (c1 instanceof Arc2Data || c1 instanceof Hyperbola2Data || c1 instanceof Parabola2Data) {
+      if (c0 instanceof Nurbs2Data) {
+        inters.push(...Curve2Inter.SwapU(Curve2Inter.QuadraticXNurbs(c1, c0, tol0, tol1)));
       }
-    } else {
-      inters.push(...Curve2Inter.CurveXCurve(c0, c1, 512, tol0, tol1));
+    }
+    else if (c0 instanceof Nurbs2Data && c1 instanceof Nurbs2Data) {
+      inters.push(...Curve2Inter.NurbsXNurbs(c0, c1, tol0, tol1));
     }
     return inters;
   }

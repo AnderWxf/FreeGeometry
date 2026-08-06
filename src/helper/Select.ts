@@ -175,6 +175,42 @@ class Select {
               this.selectedAssist = obj;
             }
           }
+          if (userData.original instanceof Edge2) {
+            let p = new Vector2(this.pickedPoint.x, this.pickedPoint.y);
+            let mind = 1;
+            let algo = new Edge2Algo(userData.original);
+            let b = algo.getBeginPoint();
+            let e = algo.getEndPoint();
+            let m = algo.p((userData.original.u.x + userData.original.u.y) * 0.5);
+            let d = p.distanceTo(b);
+            // 起点
+            if (d < mind) {
+              mind = d;
+              this.pickedPoint.x = b.x;
+              this.pickedPoint.y = b.y;
+            } else {
+              // 终点
+              d = p.distanceTo(e);
+              if (d < mind) {
+                mind = d;
+                this.pickedPoint.x = e.x;
+                this.pickedPoint.y = e.y;
+              } else {
+                // 中心点
+                d = p.distanceTo(m);
+                if (d < mind) {
+                  mind = d;
+                  this.pickedPoint.x = m.x;
+                  this.pickedPoint.y = m.y;
+                } else {
+                  // 最近点
+                  p = algo.p(algo.uf(p));
+                  this.pickedPoint.x = p.x;
+                  this.pickedPoint.y = p.y;
+                }
+              }
+            }
+          }
           if (!this.selectedObjects.includes(obj)) {
             if (this.overObjects.includes(obj)) {
               this.overObjects.splice(this.overObjects.indexOf(obj), 1);

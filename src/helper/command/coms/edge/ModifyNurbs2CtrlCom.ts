@@ -74,6 +74,7 @@ class ModifyNurbs2CtrlCom extends ComModify {
         let point = new Vector2(this.old.children[i].position.x, this.old.children[i].position.y);
         points.push(point);
       }
+      userData.assistPoints[this.assistIndex].p.set(act_pick_new_pos.result.x, act_pick_new_pos.result.y);
       points[this.assistIndex] = act_pick_new_pos.result;
     }
 
