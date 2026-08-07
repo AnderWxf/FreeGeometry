@@ -10,12 +10,84 @@ import { Line3Data } from '../geometry/data/base/curve3/Line3Data';
 import { Brep3Builder } from '../geometry/algorithm/builder/Brep3Builder';
 import type { Vector2 } from '../math/Math';
 import { Command } from './command/Command';
+import { Global } from '../core/Global';
 
 /**
  * brep mesh builder.
  *
  */
 class BrepMeshBuilder {
+
+  /**
+   * re build mesh WireframeGeometry.
+   *
+   * @param {THREE.Line} [mesh] - The segment of edge2 object.
+   * @param {number} [scale] - 2,3,4... || -2,-3,-4
+   */
+  private static SegmentDetail(segment: number): number {
+    if (segment > 1) {
+      if (Global.scene.detail > 0) {
+        segment *= Global.scene.detail;
+      }
+      if (Global.scene.detail < 0) {
+        segment /= -Global.scene.detail;
+      }
+      segment = Math.round(segment);
+      if (segment < 1) {
+        segment = 1;
+      }
+    }
+    return segment;
+  }
+  /**
+   * re build mesh WireframeGeometry.
+   *
+   * @param {THREE.Line} [mesh] - The segment of edge2 object.
+   * @param {number} [scale] - 2,3,4... || -2,-3,-4
+   */
+  static ReDetialBuildEdge2sMesh(mesh: THREE.Mesh | THREE.Line, scale: number): void {
+    let buff = mesh.geometry;
+    let postion = buff.attributes.position;
+    let vertices = new Array<number>;
+    if (scale > 1) {
+      for (let i = 0; i < postion.count - 1; i++) {
+        let cx = postion.array[i * 3 + 0];
+        let cy = postion.array[i * 3 + 1];
+        let cz = postion.array[i * 3 + 2];
+        let nx = postion.array[i * 3 + 3];
+        let ny = postion.array[i * 3 + 4];
+        let nz = postion.array[i * 3 + 5];
+        for (let j = 0; j < scale; j++) {
+          let t = 1 - (j % scale) / scale;// 插值系数
+          vertices.push(cx * t + nx * (1 - t));
+          vertices.push(cy * t + ny * (1 - t));
+          vertices.push(cz * t + nz * (1 - t));
+        }
+      }
+      vertices.push(postion.array[(postion.count - 1) * 3 + 0]);
+      vertices.push(postion.array[(postion.count - 1) * 3 + 1]);
+      vertices.push(postion.array[(postion.count - 1) * 3 + 2]);
+    } else if (scale < 1) {
+      scale = -scale;
+      for (let i = 0; i < postion.count; i++) {
+        if ((i % scale) == 0) {
+          let cx = postion.array[i * 3 + 0];
+          let cy = postion.array[i * 3 + 1];
+          let cz = postion.array[i * 3 + 2];
+          vertices.push(cx);
+          vertices.push(cy);
+          vertices.push(cz);
+        }
+      }
+      if (postion.count % scale != 0) {
+        vertices.push(postion.array[(postion.count - 1) * 3 + 0]);
+        vertices.push(postion.array[(postion.count - 1) * 3 + 1]);
+        vertices.push(postion.array[(postion.count - 1) * 3 + 2]);
+      }
+    }
+    buff.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+    buff.setDrawRange(0, vertices.length / 3);
+  }
   /**
    * build edge2 mesh WireframeGeometry.
    *
@@ -35,6 +107,7 @@ class BrepMeshBuilder {
           segment = Math.ceil(MathUtils.clamp(Brep2Builder.Length(edge.curve, edge.u, 1, 512), 64, 512));
         }
       }
+      segment = BrepMeshBuilder.SegmentDetail(segment);
 
       let algor = CurveBuilder.Algorithm2ByData(edge.curve, sub);
       let step = (edge.u.y - edge.u.x) / segment;
@@ -75,6 +148,7 @@ class BrepMeshBuilder {
         segment = Math.ceil(MathUtils.clamp(l, 64, 1024));
       }
     }
+    segment = BrepMeshBuilder.SegmentDetail(segment);
 
     let algor = CurveBuilder.Algorithm2ByData(edge.curve, sub);
     let step = (edge.u.y - edge.u.x) / segment;
@@ -110,7 +184,6 @@ class BrepMeshBuilder {
         segment = Math.ceil(MathUtils.clamp(Brep2Builder.Length(edge.curve, edge.u, 1, 512), 32, 512));
       }
     }
-
     let algor = CurveBuilder.Algorithm2ByData(edge.curve);
     let step = (edge.u.y - edge.u.x) / segment;
     let vertices = new Array<number>;
@@ -193,6 +266,7 @@ class BrepMeshBuilder {
         segment = Math.ceil(MathUtils.clamp(Brep3Builder.Length(edge, 1), 32, 512));
       }
     }
+    segment = BrepMeshBuilder.SegmentDetail(segment);
 
     let algor = CurveBuilder.Algorithm3ByData(edge.curve);
     let step = (edge.u.y - edge.u.x) / segment;
@@ -303,6 +377,7 @@ class BrepMeshBuilder {
    * @param {Face2} [face] - The face2 object.
    */
   static BuildFace2Mesh(face: Face2, color: number, segment?: number, drawOutLine: boolean = true): THREE.Mesh {
+
     let points = new Array<THREE.Vector2>();
     let holes = new Array<THREE.Path>();
     face.border.coedges.forEach(coedge => {
@@ -319,6 +394,7 @@ class BrepMeshBuilder {
           edgeSegment = Math.ceil(MathUtils.clamp(Brep2Builder.Length(curve, edge.u, 1, 512), 64, 512));
         }
       }
+      edgeSegment = BrepMeshBuilder.SegmentDetail(edgeSegment);
 
       let algor = CurveBuilder.Algorithm2ByData(curve);
       let ub = edge.u.x;
@@ -348,6 +424,7 @@ class BrepMeshBuilder {
             edgeSegment = Math.ceil(MathUtils.clamp(Brep2Builder.Length(curve, edge.u, 1, 512), 64, 512));
           }
         }
+        edgeSegment = BrepMeshBuilder.SegmentDetail(edgeSegment);
         let algor = CurveBuilder.Algorithm2ByData(curve);
         let ub = edge.u.x;
         let ue = edge.u.y;
@@ -436,6 +513,7 @@ class BrepMeshBuilder {
             edgeSegment = Math.ceil(MathUtils.clamp(Brep2Builder.Length(curve, edge.u, 1, 512), 64, 512));
           }
         }
+        edgeSegment = BrepMeshBuilder.SegmentDetail(edgeSegment);
 
         let algor = CurveBuilder.Algorithm2ByData(curve);
         let ub = edge.u.x;
@@ -465,6 +543,7 @@ class BrepMeshBuilder {
               edgeSegment = Math.ceil(MathUtils.clamp(Brep2Builder.Length(curve, edge.u, 1, 512), 64, 512));
             }
           }
+          edgeSegment = BrepMeshBuilder.SegmentDetail(edgeSegment);
           let algor = CurveBuilder.Algorithm2ByData(curve);
           let ub = edge.u.x;
           let ue = edge.u.y;

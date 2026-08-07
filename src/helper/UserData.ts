@@ -11,12 +11,13 @@ type AssisPoint = {
 };
 
 type UserData = {
-  type: GeomType;
-  canPick: boolean;
-  isAssist: boolean;
-  assistPoints: AssisPoint[];
-  color: number;
-  original: any;
+  type: GeomType;   // 几何类型
+  canPick: boolean; // 是否可拾取
+  isAssist: boolean;// 是否是辅助物体
+  assistPoints: AssisPoint[];// 辅助点数组
+  color: number;    // 颜色
+  original: any;    // 原始数据对象
+  detail: number;   // 造型的精细等级
 };
 
 function CreateGeomUserData(type: GeomType): UserData {
@@ -26,11 +27,10 @@ function CreateGeomUserData(type: GeomType): UserData {
     isAssist: false,
     assistPoints: [],
     color: THREE.Color.NAMES.red,
-    original: null
+    original: null,
+    detail: Global.scene.detail
   } as UserData;
 };
-
-
 
 function CloneUserData(src: UserData): UserData {
   return {
@@ -40,16 +40,18 @@ function CloneUserData(src: UserData): UserData {
     assistPoints: src.assistPoints?.map(ap => ({ p: ap.p.clone(), c: ap.c })),
     color: src.color,
     original: src.original.clone ? src.original.clone() : src.original,
+    detail: Global.scene.detail // 以事件发生时的场景精细度为准
   } as UserData;
 }
 
-function CopyUserData(src: UserData, dest: UserData): void {
-  dest.type = src.type;
-  dest.canPick = src.canPick;
-  dest.isAssist = src.isAssist;
-  dest.assistPoints = src.assistPoints?.map(ap => ({ p: ap.p.clone(), c: ap.c }));
-  dest.color = src.color;
-  dest.original = src.original;
+function CopyUserData(src: UserData, des: UserData): void {
+  des.type = src.type;
+  des.canPick = src.canPick;
+  des.isAssist = src.isAssist;
+  des.assistPoints = src.assistPoints?.map(ap => ({ p: ap.p.clone(), c: ap.c }));
+  des.color = src.color;
+  des.original = src.original;
+  des.detail = Global.scene.detail;// 以事件发生时的场景精细度为准
 }
 
 // 创建一个辅助点
@@ -63,6 +65,7 @@ function CreateAssistPoint(a: AssisPoint, isAssist: boolean = true): THREE.Mesh 
   mesh.userData.isAssist = isAssist;
   mesh.userData.color = a.c;
   mesh.userData.original = a.p;
+  mesh.userData.detail = 1;
   if (isAssist) {
     mesh.visible = Global.isShowAssists;
   } else {

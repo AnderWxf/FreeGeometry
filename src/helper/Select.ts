@@ -37,11 +37,11 @@ class Select {
     this._raycasterForSelect.params.LOD.threshold = 0.1;
 
     this._raycasterForOver = new THREE.Raycaster();
-    this._raycasterForOver.params.Points.threshold = 0.2;
-    this._raycasterForOver.params.Line.threshold = 0.2;
-    this._raycasterForOver.params.Mesh.threshold = 0.2;
-    this._raycasterForOver.params.Sprite.threshold = 0.2;
-    this._raycasterForOver.params.LOD.threshold = 0.2;
+    this._raycasterForOver.params.Points.threshold = 0.05;
+    this._raycasterForOver.params.Line.threshold = 0.05;
+    this._raycasterForOver.params.Mesh.threshold = 0.05;
+    this._raycasterForOver.params.Sprite.threshold = 0.05;
+    this._raycasterForOver.params.LOD.threshold = 0.05;
   }
   get isMultiple(): boolean {
     return this._isMultiple;
@@ -131,6 +131,9 @@ class Select {
       }
     }
     // 创建射线投射器
+    if (this._camera instanceof THREE.OrthographicCamera) {
+      // this._raycasterForOver.params.Line.threshold = 1 / this._camera.zoom;
+    }
     const raycaster = this._raycasterForSelect;
     const mouse = new THREE.Vector2();
     // 计算鼠标在canvas上的位置
@@ -145,6 +148,7 @@ class Select {
     // 计算物体和射线的交点
     const intersects = raycaster.intersectObjects(this._scene.children);
     if (intersects.length > 0) {
+      let mind = 1;
       for (let i = 0; i < intersects.length; i++) {
         const obj = intersects[i].object;
         let userData = obj.userData as UserData;
@@ -177,7 +181,7 @@ class Select {
           }
           if (userData.original instanceof Edge2) {
             let p = new Vector2(this.pickedPoint.x, this.pickedPoint.y);
-            let mind = 1;
+
             let algo = new Edge2Algo(userData.original);
             let b = algo.getBeginPoint();
             let e = algo.getEndPoint();
@@ -188,27 +192,28 @@ class Select {
               mind = d;
               this.pickedPoint.x = b.x;
               this.pickedPoint.y = b.y;
-            } else {
-              // 终点
-              d = p.distanceTo(e);
-              if (d < mind) {
-                mind = d;
-                this.pickedPoint.x = e.x;
-                this.pickedPoint.y = e.y;
-              } else {
-                // 中心点
-                d = p.distanceTo(m);
-                if (d < mind) {
-                  mind = d;
-                  this.pickedPoint.x = m.x;
-                  this.pickedPoint.y = m.y;
-                } else {
-                  // 最近点
-                  p = algo.p(algo.uf(p));
-                  this.pickedPoint.x = p.x;
-                  this.pickedPoint.y = p.y;
-                }
-              }
+            }
+            // 终点
+            d = p.distanceTo(e);
+            if (d < mind) {
+              mind = d;
+              this.pickedPoint.x = e.x;
+              this.pickedPoint.y = e.y;
+            }
+            // 中心点
+            d = p.distanceTo(m);
+            if (d < mind) {
+              mind = d;
+              this.pickedPoint.x = m.x;
+              this.pickedPoint.y = m.y;
+            }
+            // 最近点
+            let p_ = algo.p(algo.uf(p));
+            d = p.distanceTo(p_);
+            if (d < mind) {
+              mind = d;
+              this.pickedPoint.x = p_.x;
+              this.pickedPoint.y = p_.y;
             }
           }
           if (!this.selectedObjects.includes(obj)) {
@@ -254,6 +259,9 @@ class Select {
     }
     this.overObjects = [];
     // 创建射线投射器
+    if (this._camera instanceof THREE.OrthographicCamera) {
+      // this._raycasterForOver.params.Line.threshold = 1 / this._camera.zoom;
+    }
     const raycaster = this._raycasterForOver;
     const mouse = new THREE.Vector2();
     // 计算鼠标在canvas上的位置
@@ -268,6 +276,7 @@ class Select {
     // 计算物体和射线的交点
     const intersects = raycaster.intersectObjects(this._scene.children);
     if (intersects.length > 0) {
+      let mind = 1;
       for (let i = intersects.length - 1; i >= 0; i--) {
         const obj = intersects[i].object;
         if (!obj.visible) { continue; }
@@ -276,7 +285,7 @@ class Select {
           this.overedPoint = intersects[i].point; // 交点的世界坐标         
           // if (this._isSnap) {
           let p = new Vector2(this.overedPoint.x, this.overedPoint.y);
-          let mind = 1;
+
           if (userData.assistPoints?.length) {
             for (let j = 0; j < userData.assistPoints.length; j++) {
               let assistPoint = userData.assistPoints[j];
@@ -299,31 +308,30 @@ class Select {
               mind = d;
               this.overedPoint.x = b.x;
               this.overedPoint.y = b.y;
-            } else {
-              // 终点
-              d = p.distanceTo(e);
-              if (d < mind) {
-                mind = d;
-                this.overedPoint.x = e.x;
-                this.overedPoint.y = e.y;
-              } else {
-                // 中心点
-                d = p.distanceTo(m);
-                if (d < mind) {
-                  mind = d;
-                  this.overedPoint.x = m.x;
-                  this.overedPoint.y = m.y;
-                } else {
-                  // 最近点
-                  p = algo.p(algo.uf(p));
-                  this.overedPoint.x = p.x;
-                  this.overedPoint.y = p.y;
-                }
-              }
+            }
+            // 终点
+            d = p.distanceTo(e);
+            if (d < mind) {
+              mind = d;
+              this.overedPoint.x = e.x;
+              this.overedPoint.y = e.y;
+            }
+            // 中心点
+            d = p.distanceTo(m);
+            if (d < mind) {
+              mind = d;
+              this.overedPoint.x = m.x;
+              this.overedPoint.y = m.y;
+            }
+            // 最近点
+            let p_ = algo.p(algo.uf(p));
+            d = p.distanceTo(p_);
+            if (d < mind) {
+              mind = d;
+              this.overedPoint.x = p_.x;
+              this.overedPoint.y = p_.y;
             }
           }
-
-          // }
           isCanPick = true;
           if (!this.overObjects.includes(obj) && !this.selectedObjects.includes(obj)) {
             (obj as any).material?.color?.setHex(THREE.Color.NAMES.cornflowerblue);
@@ -342,7 +350,8 @@ class Select {
 
     const states = document.getElementById('states');
     if (states) {
-      states.textContent = 'X: ' + Math.floor(this.overedPoint.x * 1000) / 1000 + ' Y:' + Math.floor(this.overedPoint.y * 1000) / 1000;
+      // states.textContent = 'X: ' + Math.floor(this.overedPoint.x * 1000) / 1000 + ' Y:' + Math.floor(this.overedPoint.y * 1000) / 1000;
+      states.textContent = 'X: ' + Math.floor(mouse.x * 10000) / 10000 + ' Y:' + Math.floor(mouse.y * 10000) / 10000;
     }
   };
 

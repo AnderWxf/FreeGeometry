@@ -153,7 +153,11 @@ class OrthographicController {
   onMouseUp = (event: MouseEvent) => {
     if (event.target != Global.canvas) return;
     if (event.button == 0) { this.MouseLeftDown = false; }
-    if (event.button == 1) { this.MouseMiddleDown = false; }
+    if (event.button == 1) {
+      this.MouseMiddleDown = false;
+      // 触发通过自定义事件
+      window.dispatchEvent(new CustomEvent('ScreenZoom', { detail: this._camera.zoom }));
+    }
     if (event.button == 2) { this.MouseRightDown = false; }
   };
 
@@ -183,8 +187,8 @@ class OrthographicController {
       let distance = Math.abs(event.movementX) > Math.abs(event.movementY) ? event.movementX : event.movementY;
       let _camera = this._camera;
       _camera.zoom += distance * keyScale * 0.01;
-      if (_camera.zoom < 0.001) {
-        _camera.zoom = 0.001;
+      if (_camera.zoom < 0.00001) {
+        _camera.zoom = 0.00001;
       }
       _camera.updateProjectionMatrix();
     }
