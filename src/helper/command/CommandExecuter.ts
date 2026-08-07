@@ -75,6 +75,7 @@ import { CalculatePointFace2AutoCom } from "./coms/calculate/CalculatePointFace2
 import { SceneShowAssistsCom } from "./coms/scene/SceneShowAssistsCom";
 import { ModifyPoint2Com } from "./coms/point/ModifyPoint2Com";
 import { SceneSaveasCom } from "./coms/scene/SceneSaveasCom";
+import { SceneClearPointCom } from "./coms/scene/SceneClearPointCom";
 
 /**
  * Command executer base class.
@@ -166,6 +167,7 @@ class CommandExecuter {
     this._commands.set(CommandType.SCENE_LOAD, SceneLoadCom);
     this._commands.set(CommandType.SCENE_IMPORT, SceneImportCom);
     this._commands.set(CommandType.SCENE_CLEAR, SceneClearCom);
+    this._commands.set(CommandType.SCENE_CLEAR_POINT, SceneClearPointCom);
     this._commands.set(CommandType.SCENE_SHOW_ASSISTS, SceneShowAssistsCom);
 
     this._commands.set(CommandType.OTHER_DELETE, ComDelete);

@@ -19,6 +19,7 @@ class SceneSaveCom extends Command {
     const jsonString = JSON.stringify(data, null, 2);
 
     let filename = 'Scene_' + new Date().toLocaleString() + '.json';
+    filename = filename.replace(/[\/\\:*?"<>|]/g, '_'); // 替换非法字符
     if (Global.filename) {
       filename = Global.filename;
     } else {

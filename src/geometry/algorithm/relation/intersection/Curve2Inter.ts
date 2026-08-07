@@ -561,7 +561,9 @@ class Curve2Inter {
       const A1 = a_1;
       const B1 = MATHJS.add(MATHJS.multiply(b_1, y), d_1) as MATHJS.BigNumber;
       const C1 = MATHJS.add(MATHJS.multiply(c_1, y, y), MATHJS.multiply(e_1, y), f_1) as MATHJS.BigNumber;
+      console.log(`二次方程 A1*x² + B1*x + C1 = 0 => A1:${A1.toNumber()}, B1:${B1.toNumber()}, C1:${C1.toNumber()}`);
       const Xs1 = SolveEquation.SolveQuadraticEquation(A1, B1, C1);
+      console.log(`二次方程根 Xs1: ${Xs1[0]}, ${Xs1[1]}`);
       let inters = new Array<InterOfCurve2>();
       let intersX1 = new Array<Vector2>();
       let intersX2 = new Array<Vector2>();
@@ -590,7 +592,9 @@ class Curve2Inter {
       const A2 = a_2;
       const B2 = MATHJS.add(MATHJS.multiply(b_2, y), d_2) as MATHJS.BigNumber;
       const C2 = MATHJS.add(MATHJS.multiply(c_2, y, y), MATHJS.multiply(e_2, y), f_2) as MATHJS.BigNumber;
+      console.log(`二次方程 A2*x² + B2*x + C2 = 0 => A2:${A2.toNumber()}, B2:${B1.toNumber()}, C2:${C2.toNumber()}`);
       const Xs2 = SolveEquation.SolveQuadraticEquation(A2, B2, C2);
+      console.log(`二次方程根 Xs2: ${Xs2[0]}, ${Xs2[1]}`);
       for (let j = 0; j < Xs2.length; j++) {
         let x: MATHJS.BigNumber = null;
         let X = Xs2[j];

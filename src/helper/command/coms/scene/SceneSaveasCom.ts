@@ -19,6 +19,7 @@ class SceneSaveasCom extends Command {
     const jsonString = JSON.stringify(data, null, 2);
 
     let filename = 'Scene_' + new Date().toLocaleString() + '.json';
+    filename = filename.replace(/[\/\\:*?"<>|]/g, '_'); // 替换非法字符
     Global.filename = filename;
     // 触发 React 组件更新（通过自定义事件）
     window.dispatchEvent(new CustomEvent('filenameChanged', { detail: Global.filename }));

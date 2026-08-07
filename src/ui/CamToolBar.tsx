@@ -250,6 +250,7 @@ const MenuItems = [
       { key: CommandType.SCENE_LOAD, label: '加载' + ' ' + CommandType.SCENE_LOAD + ' Ctrl + O' },
       { key: CommandType.SCENE_IMPORT, label: '导入' + ' ' + CommandType.SCENE_IMPORT + ' Ctrl + I' },
       { key: CommandType.SCENE_CLEAR, label: '清空' + ' ' + CommandType.SCENE_CLEAR },
+      { key: CommandType.SCENE_CLEAR_POINT, label: '清空点' + ' ' + CommandType.SCENE_CLEAR_POINT },
     ],
   },
   {

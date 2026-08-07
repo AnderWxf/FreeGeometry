@@ -206,6 +206,7 @@ class SolveEquation {
       let roots = SolveEquation.SolveQuadraticEquation(b_, c_, d_);
       return roots;
     }
+    const ZERO = MATHJS.bignumber(0);
     let roots = new Array<MATHJS.Complex | MATHJS.BigNumber>();
 
     // 后面使用归一化方程： λ^3 + aλ^2 + bλ + c = 0;
@@ -213,6 +214,28 @@ class SolveEquation {
     let b = MATHJS.divide(c_, a_) as MATHJS.BigNumber;
     let c = MATHJS.divide(d_, a_) as MATHJS.BigNumber;
     console.log(`归一化方程: λ^3 + aλ^2 + bλ + c = 0 => a:${a.toNumber()}, b:${b.toNumber()}, c:${c.toNumber()}`);
+
+    // 输入验证,c不是0，其他是0。
+    if (a.equals(ZERO) && b.equals(ZERO) && !c.equals(ZERO)) {
+      // 实根
+      let realRoot = MATHJS.cbrt(MATHJS.unaryMinus(c));
+      roots.push(realRoot);
+      // 两个共轭复根：旋转 120° 和 240°
+      // 复根 = realRoot * (-1/2 ± i*sqrt(3)/2)
+      const half = MATHJS.bignumber(-0.5);
+      const sqrt3over2 = MATHJS.divide(MATHJS.sqrt(3), 2);
+
+      roots.push(MATHJS.complex((MATHJS.multiply(realRoot, half) as MATHJS.BigNumber).toNumber(), (MATHJS.multiply(realRoot, sqrt3over2) as MATHJS.BigNumber).toNumber()));
+      roots.push(MATHJS.complex((MATHJS.multiply(realRoot, half) as MATHJS.BigNumber).toNumber(), (MATHJS.multiply(MATHJS.unaryMinus(realRoot), sqrt3over2) as MATHJS.BigNumber).toNumber()));
+      return roots;
+    }
+
+    // 输入验证,c是0，其他不是0。
+    if (!a.equals(ZERO) && !b.equals(ZERO) && c.equals(ZERO)) {
+      let roots = SolveEquation.SolveQuadraticEquation(1, a, b);
+      roots.push(ZERO);
+      return roots;
+    }
 
     let rs = MATHJS.polynomialRoot(c.toNumber(), b.toNumber(), a.toNumber(), 1);
     console.log(`MATHJS.polynomialRoot rs:${rs}`);
@@ -498,31 +521,84 @@ class SolveEquation {
     let c = MATHJS.bignumber(c_);
     let d = MATHJS.bignumber(d_);
     let e = MATHJS.bignumber(e_);
+    const ZERO = MATHJS.bignumber(0);
     // 输入验证
-    if (a.equals(0)) {
+    if (a.equals(ZERO)) {
       // 这不是一元四次方程（a不能为0），解一元三次方程 bx³ + cx² + dx + e = 0
       let roots = SolveEquation.SolveCubicNumberical(b, c, d, e);
       return roots;
     }
 
-    const ZERO = MATHJS.bignumber(0);
     // 将方程化为简化形式: x⁴ + px³ + qx² + rx + s = 0
     // const p = b / a;
     // const q = c / a;
     // const r = d / a;
     // const s = e / a;
-
     let p = MATHJS.divide(b, a) as MATHJS.BigNumber;
     let q = MATHJS.divide(c, a) as MATHJS.BigNumber;
     let r = MATHJS.divide(d, a) as MATHJS.BigNumber;
     let s = MATHJS.divide(e, a) as MATHJS.BigNumber;
     console.log(`方程化为简化形式 x⁴ + px³ + qx² + rx + s = 0 p:${p.toNumber()} q :${q.toNumber()}, r:${r.toNumber()}, s:${s.toNumber()}`);
 
+    // 输入验证,s为不是0，其他系数都为0。
+    if (p.equals(ZERO) && q.equals(ZERO) && r.equals(ZERO) && !s.equals(ZERO)) {
+      let roots = new Array<MATHJS.Complex | MATHJS.BigNumber>();
+      if (s.lessThan(ZERO)) {
+        // s < 0：两个实根 + 两个纯虚根
+        const r = MATHJS.pow(MATHJS.unaryMinus(s), 0.25) as MATHJS.BigNumber;  // 正的四次方根
+        roots.push(r);          // +√⁴(-s)
+        roots.push(MATHJS.unaryMinus(r));         // -√⁴(-s)
+        roots.push(MATHJS.complex(0, r.toNumber()));          // +i√⁴(-s)
+        roots.push(MATHJS.complex(0, -r.toNumber()));         // -i√⁴(-s)
+      } else {
+        // s > 0：四个复根
+        const r = MATHJS.pow(s, 0.25) as MATHJS.BigNumber;  // 正的四次方根
+        const sqrt2 = MATHJS.bignumber(Math.SQRT2);
+        const half = MATHJS.bignumber(0.5);
+        // 四个根在复平面上旋转 45°
+        roots.push(MATHJS.complex((MATHJS.multiply(r, half, sqrt2) as MATHJS.BigNumber).toNumber(), (MATHJS.multiply(r, half, sqrt2) as MATHJS.BigNumber).toNumber()));    // 第一象限
+        roots.push(MATHJS.complex((MATHJS.multiply(MATHJS.unaryMinus(r), half, sqrt2) as MATHJS.BigNumber).toNumber(), (MATHJS.multiply(r, half, sqrt2) as MATHJS.BigNumber).toNumber()));   // 第二象限
+        roots.push(MATHJS.complex((MATHJS.multiply(MATHJS.unaryMinus(r), half, sqrt2) as MATHJS.BigNumber).toNumber(), (MATHJS.multiply(MATHJS.unaryMinus(r), half, sqrt2) as MATHJS.BigNumber).toNumber()));  // 第三象限
+        roots.push(MATHJS.complex((MATHJS.multiply(r, half, sqrt2) as MATHJS.BigNumber).toNumber(), (MATHJS.multiply(MATHJS.unaryMinus(r), half, sqrt2) as MATHJS.BigNumber).toNumber()));   // 第四象限
+      }
+      return roots;
+    }
+    // 输入验证,s是0，其他不是0。
+    if (!p.equals(ZERO) && !q.equals(ZERO) && !r.equals(ZERO) && s.equals(ZERO)) {
+      let roots = SolveEquation.SolveCubicNumberical(1, p, q, r);
+      roots.push(ZERO);
+      return roots;
+    }
+    // 输入验证,r、s是0，其他不是0。
+    if (!p.equals(ZERO) && !q.equals(ZERO) && r.equals(ZERO) && s.equals(ZERO)) {
+      let roots = SolveEquation.SolveQuadraticEquation(1, p, q);
+      roots.push(ZERO);
+      // roots.push(ZERO);
+      return roots;
+    }
+    // 输入验证,q、r、s是0，其他不是0。
+    if (!p.equals(ZERO) && q.equals(ZERO) && r.equals(ZERO) && s.equals(ZERO)) {
+      let roots = new Array<MATHJS.Complex | MATHJS.BigNumber>();
+      roots.push(MATHJS.unaryMinus(p));
+      roots.push(ZERO);
+      // roots.push(ZERO);
+      // roots.push(ZERO);
+      return roots;
+    }
+    // 输入验证,p、q、r、s是0，其他不是0。
+    if (p.equals(ZERO) && q.equals(ZERO) && r.equals(ZERO) && s.equals(ZERO)) {
+      let roots = new Array<MATHJS.Complex | MATHJS.BigNumber>();
+      roots.push(ZERO);
+      // roots.push(ZERO);
+      // roots.push(ZERO);
+      // roots.push(ZERO);
+      return roots;
+    }
+
     // 原始归一化方程: x⁴ + p x³ + q x² + r x + s = 0
     // 令 x = t * z，则方程变为:
     // t⁴ z⁴ + p t³ z³ + q t² z² + r t z + s = 0
     // 除以 t⁴: z⁴ + (p/t) z³ + (q/t²) z² + (r/t³) z + (s/t⁴) = 0
-
     // 选择 t 使得系数尽可能接近 1
     const p_abs = MATHJS.abs(p);
     const q_abs = MATHJS.abs(q);
