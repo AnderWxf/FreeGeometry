@@ -12,17 +12,17 @@ import { SaveFilled, EditTwoTone, BuildFilled, AppstoreFilled, CalculatorOutline
 const perspective: PerspectiveController = new PerspectiveController();
 const orthographic: OrthographicController = new OrthographicController();
 
-const grid_xz = new THREE.LineSegments(new Grid(100, 5, 1, "xz"));
+const grid_xz = new THREE.LineSegments(new Grid(100, 5, 1, 0.1, "xz"));
 grid_xz.name = "Grid_xz";
 grid_xz.visible = true;
 grid_xz.renderOrder = -Infinity;
 (grid_xz.material as THREE.LineBasicMaterial).vertexColors = true;
-const grid_xy = new THREE.LineSegments(new Grid(100, 5, 1, "xy"));
+const grid_xy = new THREE.LineSegments(new Grid(100, 5, 1, 0.1, "xy"));
 grid_xy.name = "Grid_xy";
 grid_xy.visible = false;
 grid_xy.renderOrder = -Infinity;
 (grid_xy.material as THREE.LineBasicMaterial).vertexColors = true;
-const grid_yz = new THREE.LineSegments(new Grid(100, 5, 1, "yz"));
+const grid_yz = new THREE.LineSegments(new Grid(100, 5, 1, 0.1, "yz"));
 grid_yz.name = "Grid_yz";
 grid_yz.visible = false;
 grid_yz.renderOrder = -Infinity;

@@ -13,7 +13,8 @@ class Scene {
     this._objects = new Map<number, THREE.Object3D>();
     const ScreenZoom = (e: CustomEvent) => {
       let zoom = e.detail;
-      let detail = MATHJS.round(MATHJS.log(zoom, 4));
+      // let detail = MATHJS.round(MATHJS.log(zoom, 4));
+      let detail = MATHJS.round(zoom / 10);
       if (detail > 0) {
         detail += 1;
       }
@@ -25,10 +26,9 @@ class Scene {
       this._detail = detail;
       for (const value of this._objects.values()) {
         let userData = value.userData as UserData;
-        if (userData.original instanceof Edge2
-          && value instanceof THREE.Mesh || value instanceof THREE.Line
-          && userData.detail != detail) {
-          BrepMeshBuilder.ReDetialBuildEdge2sMesh(value, detail);
+        if ((value instanceof THREE.Mesh || value instanceof THREE.Line)
+          && (userData.detail == undefined || userData.detail < detail)) {
+          BrepMeshBuilder.ReDetialBuildEdge2sMesh(userData, value);
           userData.detail = detail;
         }
       }

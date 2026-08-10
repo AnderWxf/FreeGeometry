@@ -33,7 +33,7 @@ class OrthographicController {
   private MoveSpeed: number = 10;
 
   private _isActive: boolean = false;
-  private _size: number = 100;
+  private _size: number = 50;
 
   /**
    * Constructs a Orthographic controller.

@@ -13,7 +13,9 @@ class SceneSaveCom extends Command {
     let data: DocNode[] = [];
     for (let i = 0; i < os.length; i++) {
       const o = os[i] as THREE.Object3D;
-      data.push({ userData: o.userData as UserData });
+      let userData = o.userData as UserData;
+      userData.detail = undefined
+      data.push({ userData: userData });
     }
     // 1. 将数据对象转为格式化的 JSON 字符串
     const jsonString = JSON.stringify(data, null, 2);

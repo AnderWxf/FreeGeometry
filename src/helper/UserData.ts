@@ -13,11 +13,11 @@ type AssisPoint = {
 type UserData = {
   type: GeomType;   // 几何类型
   canPick: boolean; // 是否可拾取
+  color: number;    // 颜色
+  detail: number;   // 造型的精细等级（此值序列化是应该忽略）
   isAssist: boolean;// 是否是辅助物体
   assistPoints: AssisPoint[];// 辅助点数组
-  color: number;    // 颜色
   original: any;    // 原始数据对象
-  detail: number;   // 造型的精细等级
 };
 
 function CreateGeomUserData(type: GeomType): UserData {

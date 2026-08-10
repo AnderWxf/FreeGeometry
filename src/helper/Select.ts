@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { Vector2, Vector3 } from '../math/Math';
 import { Global } from '../core/Global';
 import type { UserData } from './UserData';
-import { LineBasicMaterial, Material, type LineBasicMaterialProperties } from 'three';
+import * as MATHJS from '../mathjs';
 import { Edge2 } from '../geometry/data/brep/Brep2';
 import { Edge2Algo } from '../geometry/algorithm/brep/Brep2Algo';
 
@@ -14,7 +14,6 @@ class Select {
   private _camera: THREE.Camera;
   private _scene: THREE.Scene;
 
-  private _raycasterForSelect: THREE.Raycaster;
   private _raycasterForOver: THREE.Raycaster;
 
   private _isEditor: boolean = false;     // 编辑
@@ -29,12 +28,6 @@ class Select {
   overedPoint: THREE.Vector3;             // 滑过的坐标
   constructor(scene: THREE.Scene) {
     this._scene = scene;
-    this._raycasterForSelect = new THREE.Raycaster();
-    this._raycasterForSelect.params.Points.threshold = 0.1;
-    this._raycasterForSelect.params.Line.threshold = 0.1;
-    this._raycasterForSelect.params.Mesh.threshold = 0.1;
-    this._raycasterForSelect.params.Sprite.threshold = 0.1;
-    this._raycasterForSelect.params.LOD.threshold = 0.1;
 
     this._raycasterForOver = new THREE.Raycaster();
     this._raycasterForOver.params.Points.threshold = 0.05;
@@ -130,11 +123,7 @@ class Select {
         this.selectedObjects.splice(i, 1);
       }
     }
-    // 创建射线投射器
-    if (this._camera instanceof THREE.OrthographicCamera) {
-      // this._raycasterForOver.params.Line.threshold = 1 / this._camera.zoom;
-    }
-    const raycaster = this._raycasterForSelect;
+    const raycaster = this._raycasterForOver;
     const mouse = new THREE.Vector2();
     // 计算鼠标在canvas上的位置
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -145,93 +134,117 @@ class Select {
     let isCanPick = false;
     // 默认的点
     this.pickedPoint = raycaster.ray.origin; // 没有交点时，设置射线源点
-    // 计算物体和射线的交点
-    const intersects = raycaster.intersectObjects(this._scene.children);
-    if (intersects.length > 0) {
-      let mind = 1;
+    let objects: THREE.Object3D[] = [];
+    // 有高亮物体时，从高亮物体中选择
+    if (this.overObjects.length > 0) {
+      // 计算物体和射线的交点
+      objects = this.overObjects;
+      this.pickedPoint = this.overedPoint; // 交点的世界坐标
+    }
+    // 没有高亮物体时，从场景中选择
+    else {
+      // 计算物体和射线的交点
+      const intersects = raycaster.intersectObjects(this._scene.children);
       for (let i = 0; i < intersects.length; i++) {
         const obj = intersects[i].object;
-        let userData = obj.userData as UserData;
-        this.pickedPoint = intersects[i].point; // 交点的世界坐标
-        if (userData.canPick) {
-          isCanPick = true;
+        objects.push(obj);
+      }
+    }
+    let mind = 1;
+    for (let i = 0; i < objects.length; i++) {
+      const obj = objects[i];
+      let userData = obj.userData as UserData;
+      if (userData.canPick) {
+        isCanPick = true;
+        //拾取的是一个存在的点对象
+        if (userData.original instanceof Vector2) {
+          this.pickedPoint.set(userData.original.x, userData.original.y, 0);
+        }
+        else if (userData.original instanceof Vector3) {
+          this.pickedPoint.set(userData.original.x, userData.original.y, userData.original.z);
+        }
+        else if (userData.original.p instanceof Vector2) {
+          this.pickedPoint.set(userData.original.p.x, userData.original.p.y, 0);
+        }
+        else if (userData.original.p instanceof Vector3) {
+          this.pickedPoint.set(userData.original.p.x, userData.original.p.y, userData.original.p.z);
+        }
+        if (userData.isAssist) {
           //拾取的是一个存在的点对象
-          if (userData.original instanceof Vector2) {
-            this.pickedPoint.set(userData.original.x, userData.original.y, 0);
-          }
-          else if (userData.original instanceof Vector3) {
-            this.pickedPoint.set(userData.original.x, userData.original.y, userData.original.z);
-          }
-          else if (userData.original.p instanceof Vector2) {
-            this.pickedPoint.set(userData.original.p.x, userData.original.p.y, 0);
-          }
-          else if (userData.original.p instanceof Vector3) {
-            this.pickedPoint.set(userData.original.p.x, userData.original.p.y, userData.original.p.z);
-          }
-          if (userData.isAssist) {
-            //拾取的是一个存在的点对象
-            this.pickedPoint.set(obj.position.x, obj.position.y, 0);
-            if (this.selectedAssist != obj) {
-              if (this.overObjects.includes(obj)) {
-                this.overObjects.splice(this.overObjects.indexOf(obj), 1);
-              }
-              (obj as any).material?.color?.setHex(THREE.Color.NAMES.aqua);
-              this.selectedAssist = obj;
-            }
-          }
-          if (userData.original instanceof Edge2) {
-            let p = new Vector2(this.pickedPoint.x, this.pickedPoint.y);
-
-            let algo = new Edge2Algo(userData.original);
-            let b = algo.getBeginPoint();
-            let e = algo.getEndPoint();
-            let m = algo.p((userData.original.u.x + userData.original.u.y) * 0.5);
-            let d = p.distanceTo(b);
-            // 起点
-            if (d < mind) {
-              mind = d;
-              this.pickedPoint.x = b.x;
-              this.pickedPoint.y = b.y;
-            }
-            // 终点
-            d = p.distanceTo(e);
-            if (d < mind) {
-              mind = d;
-              this.pickedPoint.x = e.x;
-              this.pickedPoint.y = e.y;
-            }
-            // 中心点
-            d = p.distanceTo(m);
-            if (d < mind) {
-              mind = d;
-              this.pickedPoint.x = m.x;
-              this.pickedPoint.y = m.y;
-            }
-            // 最近点
-            let p_ = algo.p(algo.uf(p));
-            d = p.distanceTo(p_);
-            if (d < mind) {
-              mind = d;
-              this.pickedPoint.x = p_.x;
-              this.pickedPoint.y = p_.y;
-            }
-          }
-          if (!this.selectedObjects.includes(obj)) {
+          this.pickedPoint.set(obj.position.x, obj.position.y, 0);
+          if (this.selectedAssist != obj) {
             if (this.overObjects.includes(obj)) {
               this.overObjects.splice(this.overObjects.indexOf(obj), 1);
             }
             (obj as any).material?.color?.setHex(THREE.Color.NAMES.aqua);
-            this.selectedObjects.push(obj);
-            break;
+            this.selectedAssist = obj;
           }
         }
+        if (userData.original instanceof Edge2) {
+          let p = new Vector2(this.pickedPoint.x, this.pickedPoint.y);
+          let algo = new Edge2Algo(userData.original);
+          let b = algo.getBeginPoint();
+          let e = algo.getEndPoint();
+          let m = algo.p((userData.original.u.x + userData.original.u.y) * 0.5);
+          let d = p.distanceTo(b);
+          // 起点
+          if (d < mind) {
+            mind = d;
+            this.pickedPoint.x = b.x;
+            this.pickedPoint.y = b.y;
+          }
+          // 终点
+          d = p.distanceTo(e);
+          if (d < mind) {
+            mind = d;
+            this.pickedPoint.x = e.x;
+            this.pickedPoint.y = e.y;
+          }
+          // 中心点
+          d = p.distanceTo(m);
+          if (d < mind) {
+            mind = d;
+            this.pickedPoint.x = m.x;
+            this.pickedPoint.y = m.y;
+          }
+          // 最近点
+          let p_ = algo.p(algo.uf(p));
+          d = p.distanceTo(p_);
+          if (d < mind) {
+            mind = d;
+            this.pickedPoint.x = p_.x;
+            this.pickedPoint.y = p_.y;
+          }
+        }
+        if (!this.selectedObjects.includes(obj)) {
+          if (this.overObjects.includes(obj)) {
+            this.overObjects.splice(this.overObjects.indexOf(obj), 1);
+          }
+          (obj as any).material?.color?.setHex(THREE.Color.NAMES.aqua);
+          this.selectedObjects.push(obj);
+          break;
+        }
       }
+
     }
     if (this._isSnap) {
       // 没有得到一个可拾取对象
       if (!isCanPick) {
-        this.pickedPoint.x = Math.round(this.pickedPoint.x);
-        this.pickedPoint.y = Math.round(this.pickedPoint.y);
+        // 创建射线投射器
+        if (this._camera instanceof THREE.OrthographicCamera) {
+          let detail = MATHJS.round(this._camera.zoom);
+          if (detail < 1) {
+            detail = 1;
+          }
+          else if (detail > 5) {
+            detail = 10;
+          }
+          this.pickedPoint.x = Math.round(this.pickedPoint.x * detail) / detail;
+          this.pickedPoint.y = Math.round(this.pickedPoint.y * detail) / detail;
+        } else {
+          this.pickedPoint.x = Math.round(this.pickedPoint.x);
+          this.pickedPoint.y = Math.round(this.pickedPoint.y);
+        }
       }
     }
     // 编辑模式
@@ -239,6 +252,11 @@ class Select {
       if (!Global.comExector.isExecuting()) {
         Global.comExector.onEidtor();
       }
+    }
+    const states = document.getElementById('states');
+    if (states) {
+      states.textContent = 'X: ' + Math.floor(this.pickedPoint.x * 10000) / 10000 + ' Y:' + Math.floor(this.pickedPoint.y * 10000) / 10000;
+      // states.textContent = 'X: ' + Math.floor(mouse.x * 10000) / 10000 + ' Y:' + Math.floor(mouse.y * 10000) / 10000;
     }
   };
 
@@ -260,7 +278,11 @@ class Select {
     this.overObjects = [];
     // 创建射线投射器
     if (this._camera instanceof THREE.OrthographicCamera) {
-      // this._raycasterForOver.params.Line.threshold = 1 / this._camera.zoom;
+      let detail = 1 / this._camera.zoom;
+      if (detail > 0.05) {
+        detail = 0.05;
+      }
+      this._raycasterForOver.params.Line.threshold = detail;
     }
     const raycaster = this._raycasterForOver;
     const mouse = new THREE.Vector2();
@@ -343,15 +365,28 @@ class Select {
     if (this._isSnap) {
       // 没有得到一个可拾取对象
       if (!isCanPick) {
-        this.overedPoint.x = Math.round(this.overedPoint.x);
-        this.overedPoint.y = Math.round(this.overedPoint.y);
+        // 创建射线投射器
+        if (this._camera instanceof THREE.OrthographicCamera) {
+          let detail = MATHJS.round(this._camera.zoom);
+          if (detail < 1) {
+            detail = 1;
+          }
+          else if (detail > 5) {
+            detail = 10;
+          }
+          this.overedPoint.x = Math.round(this.overedPoint.x * detail) / detail;
+          this.overedPoint.y = Math.round(this.overedPoint.y * detail) / detail;
+        } else {
+          this.overedPoint.x = Math.round(this.overedPoint.x);
+          this.overedPoint.y = Math.round(this.overedPoint.y);
+        }
       }
     }
 
     const states = document.getElementById('states');
     if (states) {
-      // states.textContent = 'X: ' + Math.floor(this.overedPoint.x * 1000) / 1000 + ' Y:' + Math.floor(this.overedPoint.y * 1000) / 1000;
-      states.textContent = 'X: ' + Math.floor(mouse.x * 10000) / 10000 + ' Y:' + Math.floor(mouse.y * 10000) / 10000;
+      states.textContent = 'X: ' + Math.floor(this.overedPoint.x * 10000) / 10000 + ' Y:' + Math.floor(this.overedPoint.y * 10000) / 10000;
+      // states.textContent = 'X: ' + Math.floor(mouse.x * 10000) / 10000 + ' Y:' + Math.floor(mouse.y * 10000) / 10000;
     }
   };
 

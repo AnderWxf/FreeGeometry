@@ -1,6 +1,5 @@
 import * as THREE from 'three';
-// import * as polyDecomp from 'poly-decomp'
-import type { Edge2, Face2 } from '../geometry/data/brep/Brep2';
+import { Edge2, Face2 } from '../geometry/data/brep/Brep2';
 import type { Edge3, Face3 } from '../geometry/data/brep/Brep3';
 import { CurveBuilder } from '../geometry/algorithm/builder/CurveBuilder';
 import { MathUtils } from '../math/MathUtils';
@@ -8,9 +7,8 @@ import { Brep2Builder } from '../geometry/algorithm/builder/Brep2Builder';
 import { Line2Data } from '../geometry/data/base/curve2/Line2Data';
 import { Line3Data } from '../geometry/data/base/curve3/Line3Data';
 import { Brep3Builder } from '../geometry/algorithm/builder/Brep3Builder';
-import type { Vector2 } from '../math/Math';
-import { Command } from './command/Command';
 import { Global } from '../core/Global';
+import type { UserData } from './UserData';
 
 /**
  * brep mesh builder.
@@ -22,7 +20,6 @@ class BrepMeshBuilder {
    * re build mesh WireframeGeometry.
    *
    * @param {THREE.Line} [mesh] - The segment of edge2 object.
-   * @param {number} [scale] - 2,3,4... || -2,-3,-4
    */
   private static SegmentDetail(segment: number): number {
     if (segment > 1) {
@@ -45,48 +42,22 @@ class BrepMeshBuilder {
    * @param {THREE.Line} [mesh] - The segment of edge2 object.
    * @param {number} [scale] - 2,3,4... || -2,-3,-4
    */
-  static ReDetialBuildEdge2sMesh(mesh: THREE.Mesh | THREE.Line, scale: number): void {
-    let buff = mesh.geometry;
-    let postion = buff.attributes.position;
-    let vertices = new Array<number>;
-    if (scale > 1) {
-      for (let i = 0; i < postion.count - 1; i++) {
-        let cx = postion.array[i * 3 + 0];
-        let cy = postion.array[i * 3 + 1];
-        let cz = postion.array[i * 3 + 2];
-        let nx = postion.array[i * 3 + 3];
-        let ny = postion.array[i * 3 + 4];
-        let nz = postion.array[i * 3 + 5];
-        for (let j = 0; j < scale; j++) {
-          let t = 1 - (j % scale) / scale;// 插值系数
-          vertices.push(cx * t + nx * (1 - t));
-          vertices.push(cy * t + ny * (1 - t));
-          vertices.push(cz * t + nz * (1 - t));
-        }
+  static ReDetialBuildEdge2sMesh(userData: UserData, mesh: THREE.Mesh | THREE.Line): void {
+    let original = userData.original;
+    if (original instanceof Edge2) {
+      BrepMeshBuilder.BuildEdge2Mesh(original, userData.color, null, 0, mesh as THREE.Line);
+    }
+    else if (original instanceof Face2) {
+      BrepMeshBuilder.BuildFace2Mesh(original, userData.color, null, true, mesh as THREE.Mesh);
+    }
+    else if (original instanceof Array) {
+      if (original[0] instanceof Edge2) {
+        BrepMeshBuilder.BuildEdge2sMesh(original, userData.color, null, 0, mesh as THREE.Line);
       }
-      vertices.push(postion.array[(postion.count - 1) * 3 + 0]);
-      vertices.push(postion.array[(postion.count - 1) * 3 + 1]);
-      vertices.push(postion.array[(postion.count - 1) * 3 + 2]);
-    } else if (scale < 1) {
-      scale = -scale;
-      for (let i = 0; i < postion.count; i++) {
-        if ((i % scale) == 0) {
-          let cx = postion.array[i * 3 + 0];
-          let cy = postion.array[i * 3 + 1];
-          let cz = postion.array[i * 3 + 2];
-          vertices.push(cx);
-          vertices.push(cy);
-          vertices.push(cz);
-        }
-      }
-      if (postion.count % scale != 0) {
-        vertices.push(postion.array[(postion.count - 1) * 3 + 0]);
-        vertices.push(postion.array[(postion.count - 1) * 3 + 1]);
-        vertices.push(postion.array[(postion.count - 1) * 3 + 2]);
+      else if (original[0] instanceof Face2) {
+        BrepMeshBuilder.BuildFace2sMesh(original, userData.color, null, true, mesh as THREE.Mesh);
       }
     }
-    buff.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-    buff.setDrawRange(0, vertices.length / 3);
   }
   /**
    * build edge2 mesh WireframeGeometry.
@@ -96,7 +67,7 @@ class BrepMeshBuilder {
    * @param {number} [segment] - The segment of edge2 object.
    * @param {number} [sub] - The sub type of edge2 object.
    */
-  static BuildEdge2sMesh(edges: Edge2[], color: number, segment?: number, sub: number = 0): THREE.Line {
+  static BuildEdge2sMesh(edges: Edge2[], color: number, segment?: number, sub: number = 0, mesh: THREE.Line = null): THREE.Line {
     let vertices = new Array<number>;
     for (let i = 0; i < edges.length; i++) {
       let edge = edges[i];
@@ -122,14 +93,19 @@ class BrepMeshBuilder {
       }
     }
 
-    let buff = new THREE.BufferGeometry()
-    // buff.setIndex(indices);
-    buff.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-
-    const materialline = new THREE.MeshBasicMaterial({ color: color });
-    let ret = new THREE.Line(buff, materialline);
-    ret.frustumCulled = false;
-    return ret;
+    if (mesh) {
+      let buff = mesh.geometry;
+      buff.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+      buff.setDrawRange(0, vertices.length / 3);
+      return mesh;
+    } else {
+      let buff = new THREE.BufferGeometry();
+      buff.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+      const materialline = new THREE.MeshBasicMaterial({ color: color });
+      let ret = new THREE.Line(buff, materialline);
+      ret.frustumCulled = false;
+      return ret;
+    }
   }
   /**
    * build edge2 mesh WireframeGeometry.
@@ -139,7 +115,7 @@ class BrepMeshBuilder {
    * @param {number} [segment] - The segment of edge2 object.
    * @param {number} [sub] - The sub type of edge2 object.
    */
-  static BuildEdge2Mesh(edge: Edge2, color: number, segment?: number, sub: number = 0): THREE.Line {
+  static BuildEdge2Mesh(edge: Edge2, color: number, segment?: number, sub: number = 0, mesh: THREE.Line = null): THREE.Line {
     if (segment == undefined) {
       if (edge.curve instanceof Line2Data) {
         segment = 1;
@@ -161,14 +137,19 @@ class BrepMeshBuilder {
       vertices.push(0);
       // indices.push(i);
     }
-    let buff = new THREE.BufferGeometry()
-    // buff.setIndex(indices);
-    buff.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-
-    const materialline = new THREE.MeshBasicMaterial({ color: color });
-    let ret = new THREE.Line(buff, materialline);
-    ret.frustumCulled = false;
-    return ret;
+    if (mesh) {
+      let buff = mesh.geometry;
+      buff.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+      buff.setDrawRange(0, vertices.length / 3);
+      return mesh;
+    } else {
+      let buff = new THREE.BufferGeometry();
+      buff.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+      const materialline = new THREE.MeshBasicMaterial({ color: color });
+      let ret = new THREE.Line(buff, materialline);
+      ret.frustumCulled = false;
+      return ret;
+    }
   }
 
   /**
@@ -258,7 +239,7 @@ class BrepMeshBuilder {
    *
    * @param {Edge3} [edge] - The edge2 object.
    */
-  static BuildEdge3Mesh(edge: Edge3, color: number, segment?: number): THREE.Line {
+  static BuildEdge3Mesh(edge: Edge3, color: number, segment?: number, mesh: THREE.Line = null): THREE.Line {
     if (segment == undefined) {
       if (edge.curve instanceof Line2Data) {
         segment = 1;
@@ -271,22 +252,25 @@ class BrepMeshBuilder {
     let algor = CurveBuilder.Algorithm3ByData(edge.curve);
     let step = (edge.u.y - edge.u.x) / segment;
     let vertices = new Array<number>;
-    let indices = Array<number>();
     for (let i = edge.u.x, index = 0; index <= segment; i += step, index++) {
       let p = algor.p(i);
       vertices.push(p.x);
       vertices.push(p.y);
       vertices.push(0);
-      indices.push(index);
     }
-    let buff = new THREE.BufferGeometry()
-    buff.setIndex(indices);
-    buff.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-
-    const materialline = new THREE.MeshBasicMaterial({ color: color });
-    let ret = new THREE.Line(buff, materialline);
-    ret.frustumCulled = false;
-    return ret;
+    if (mesh) {
+      let buff = mesh.geometry;
+      buff.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+      buff.setDrawRange(0, vertices.length / 3);
+      return mesh;
+    } else {
+      let buff = new THREE.BufferGeometry();
+      buff.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+      const materialline = new THREE.MeshBasicMaterial({ color: color });
+      let ret = new THREE.Line(buff, materialline);
+      ret.frustumCulled = false;
+      return ret;
+    }
   }
 
   /**
@@ -376,7 +360,7 @@ class BrepMeshBuilder {
    *
    * @param {Face2} [face] - The face2 object.
    */
-  static BuildFace2Mesh(face: Face2, color: number, segment?: number, drawOutLine: boolean = true): THREE.Mesh {
+  static BuildFace2Mesh(face: Face2, color: number, segment?: number, drawOutLine: boolean = true, mesh: THREE.Mesh = null): THREE.Mesh {
 
     let points = new Array<THREE.Vector2>();
     let holes = new Array<THREE.Path>();
@@ -443,8 +427,14 @@ class BrepMeshBuilder {
     shape.holes = holes;
     const material = new THREE.MeshBasicMaterial({ color: color, opacity: 0.25, transparent: true });
     let buff = new THREE.ShapeGeometry(shape);
-    let ret = new THREE.Mesh(buff, material);
-    ret.frustumCulled = false;
+    let ret: THREE.Mesh;
+    if (mesh) {
+      ret = mesh;
+      ret.geometry = buff;
+    } else {
+      ret = new THREE.Mesh(buff, material);
+      ret.frustumCulled = false;
+    }
 
     // 绘制边界线
     if (drawOutLine) {
@@ -491,7 +481,7 @@ class BrepMeshBuilder {
    *
    * @param {Face2} [face] - The face2 object.
    */
-  static BuildFace2sMesh(faces: Face2[], color: number, segment?: number, drawOutLine: boolean = true): THREE.Mesh {
+  static BuildFace2sMesh(faces: Face2[], color: number, segment?: number, drawOutLine: boolean = true, mesh: THREE.Mesh = null): THREE.Mesh {
     let pointss = new Array<Array<THREE.Vector2>>();
     let holess = new Array<Array<THREE.Path>>();
     let shapes: THREE.Shape[] = [];
@@ -567,8 +557,14 @@ class BrepMeshBuilder {
 
     const material = new THREE.MeshBasicMaterial({ color: color, opacity: 0.25, transparent: true });
     let buff = new THREE.ShapeGeometry(shapes);
-    let ret = new THREE.Mesh(buff, material);
-    ret.frustumCulled = false;
+    let ret: THREE.Mesh;
+    if (mesh) {
+      ret = mesh;
+      ret.geometry = buff;
+    } else {
+      ret = new THREE.Mesh(buff, material);
+      ret.frustumCulled = false;
+    }
 
     // 绘制边界线
     if (drawOutLine) {
