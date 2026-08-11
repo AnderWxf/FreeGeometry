@@ -11,16 +11,16 @@ class SolveEquation {
    * @param {number} c - 常数项
    * @returns {Object} 解的结果
    */
-  static SolveQuadraticEquation(a_: number | MATHJS.BigNumber, b_: number | MATHJS.BigNumber, c_: number | MATHJS.BigNumber): Array<MATHJS.Complex | MATHJS.BigNumber> {
+  static SolveQuadraticEquation(a_: number | MATHJS.BigNumber, b_: number | MATHJS.BigNumber, c_: number | MATHJS.BigNumber, tol1: MATHJS.BigNumber = MATHJS.bignumber(1e-12)): Array<MATHJS.Complex | MATHJS.BigNumber> {
     let roots = new Array<MATHJS.Complex | MATHJS.BigNumber>();
     let a = MATHJS.bignumber(a_);
     let b = MATHJS.bignumber(b_);
     let c = MATHJS.bignumber(c_);
     const ZERO = MATHJS.bignumber(0);
     // 输入验证
-    if (a.equals(ZERO)) {
+    if (MATHJS.abs(a).lessThanOrEqualTo(tol1)) {
       // 这不是一元二次方程（a不能为0）, 解一元一次方程 bx + c = 0
-      if (b.equals(ZERO)) {
+      if (MATHJS.abs(b).lessThanOrEqualTo(tol1)) {
         // 这不是一元一次方程（b不能为0）
         return roots;
       }
@@ -39,7 +39,7 @@ class SolveEquation {
       const root1 = MATHJS.divide(MATHJS.add(_b, sqrtΔ), _2a) as MATHJS.BigNumber;
       const root2 = MATHJS.divide(MATHJS.subtract(_b, sqrtΔ), _2a) as MATHJS.BigNumber;
       roots.push(root1, root2);
-    } else if (MATHJS.equal(Δ, ZERO)) {
+    } else if (MATHJS.abs(MATHJS.subtract(Δ, ZERO)).lessThanOrEqualTo(tol1)) {
       // 两个相等实根
       const root = MATHJS.divide(_b, _2a) as MATHJS.BigNumber;
       roots = [root, root];
@@ -199,14 +199,15 @@ class SolveEquation {
    * @param {number} d - 常数项
    * @returns {Object} 解的结果
    */
-  static SolveCubicNumberical(a_: number | MATHJS.BigNumber, b_: number | MATHJS.BigNumber, c_: number | MATHJS.BigNumber, d_: number | MATHJS.BigNumber): Array<MATHJS.Complex | MATHJS.BigNumber> {
+  static SolveCubicNumberical(a_: number | MATHJS.BigNumber, b_: number | MATHJS.BigNumber, c_: number | MATHJS.BigNumber, d_: number | MATHJS.BigNumber, tol1: MATHJS.BigNumber = MATHJS.bignumber(1e-12)): Array<MATHJS.Complex | MATHJS.BigNumber> {
+    const ZERO = MATHJS.bignumber(0);
     // 输入验证
-    if (a_ == 0) {
+    if (MATHJS.abs(MATHJS.bignumber(a_)).lessThanOrEqualTo(tol1)) {
       // 这不是一元三次方程（a不能为0），解一元二次方程 bx² + cx + d = 0
-      let roots = SolveEquation.SolveQuadraticEquation(b_, c_, d_);
+      let roots = SolveEquation.SolveQuadraticEquation(b_, c_, d_, tol1);
       return roots;
     }
-    const ZERO = MATHJS.bignumber(0);
+
     let roots = new Array<MATHJS.Complex | MATHJS.BigNumber>();
 
     // 后面使用归一化方程： λ^3 + aλ^2 + bλ + c = 0;
@@ -216,7 +217,10 @@ class SolveEquation {
     console.log(`归一化方程: λ^3 + aλ^2 + bλ + c = 0 => a:${a.toNumber()}, b:${b.toNumber()}, c:${c.toNumber()}`);
 
     // 输入验证,c不是0，其他是0。
-    if (a.equals(ZERO) && b.equals(ZERO) && !c.equals(ZERO)) {
+
+    if (MATHJS.abs(a).lessThanOrEqualTo(tol1)
+      && MATHJS.abs(b).lessThanOrEqualTo(tol1)
+      && !MATHJS.abs(c).lessThanOrEqualTo(tol1)) {
       // 实根
       let realRoot = MATHJS.cbrt(MATHJS.unaryMinus(c));
       roots.push(realRoot);
@@ -231,7 +235,9 @@ class SolveEquation {
     }
 
     // 输入验证,c是0，其他不是0。
-    if (!a.equals(ZERO) && !b.equals(ZERO) && c.equals(ZERO)) {
+    if (!MATHJS.abs(a).lessThanOrEqualTo(tol1)
+      && !MATHJS.abs(b).lessThanOrEqualTo(tol1)
+      && MATHJS.abs(c).lessThanOrEqualTo(tol1)) {
       let roots = SolveEquation.SolveQuadraticEquation(1, a, b);
       roots.push(ZERO);
       return roots;
@@ -515,7 +521,7 @@ class SolveEquation {
    * @param {number} e - 常数项
    * @returns {Object} 解的结果
    */
-  static SolveQuarticNumberical(a_: number | MATHJS.BigNumber, b_: number | MATHJS.BigNumber, c_: number | MATHJS.BigNumber, d_: number | MATHJS.BigNumber, e_: number | MATHJS.BigNumber): Array<MATHJS.Complex | MATHJS.BigNumber> {
+  static SolveQuarticNumberical(a_: number | MATHJS.BigNumber, b_: number | MATHJS.BigNumber, c_: number | MATHJS.BigNumber, d_: number | MATHJS.BigNumber, e_: number | MATHJS.BigNumber, tol1: MATHJS.BigNumber = MATHJS.bignumber(1e-12)): Array<MATHJS.Complex | MATHJS.BigNumber> {
     let a = MATHJS.bignumber(a_);
     let b = MATHJS.bignumber(b_);
     let c = MATHJS.bignumber(c_);
@@ -523,9 +529,9 @@ class SolveEquation {
     let e = MATHJS.bignumber(e_);
     const ZERO = MATHJS.bignumber(0);
     // 输入验证
-    if (a.equals(ZERO)) {
+    if (MATHJS.abs(a).lessThanOrEqualTo(tol1)) {
       // 这不是一元四次方程（a不能为0），解一元三次方程 bx³ + cx² + dx + e = 0
-      let roots = SolveEquation.SolveCubicNumberical(b, c, d, e);
+      let roots = SolveEquation.SolveCubicNumberical(b, c, d, e, tol1);
       return roots;
     }
 
@@ -541,7 +547,10 @@ class SolveEquation {
     console.log(`方程化为简化形式 x⁴ + px³ + qx² + rx + s = 0 p:${p.toNumber()} q :${q.toNumber()}, r:${r.toNumber()}, s:${s.toNumber()}`);
 
     // 输入验证,s为不是0，其他系数都为0。
-    if (p.equals(ZERO) && q.equals(ZERO) && r.equals(ZERO) && !s.equals(ZERO)) {
+    if (MATHJS.abs(p).lessThanOrEqualTo(tol1)
+      && MATHJS.abs(q).lessThanOrEqualTo(tol1)
+      && MATHJS.abs(r).lessThanOrEqualTo(tol1)
+      && !MATHJS.abs(s).lessThanOrEqualTo(tol1)) {
       let roots = new Array<MATHJS.Complex | MATHJS.BigNumber>();
       if (s.lessThan(ZERO)) {
         // s < 0：两个实根 + 两个纯虚根
@@ -564,20 +573,29 @@ class SolveEquation {
       return roots;
     }
     // 输入验证,s是0，其他不是0。
-    if (!p.equals(ZERO) && !q.equals(ZERO) && !r.equals(ZERO) && s.equals(ZERO)) {
+    if (!MATHJS.abs(p).lessThanOrEqualTo(tol1)
+      && !MATHJS.abs(q).lessThanOrEqualTo(tol1)
+      && !MATHJS.abs(r).lessThanOrEqualTo(tol1)
+      && MATHJS.abs(s).lessThanOrEqualTo(tol1)) {
       let roots = SolveEquation.SolveCubicNumberical(1, p, q, r);
       roots.push(ZERO);
       return roots;
     }
     // 输入验证,r、s是0，其他不是0。
-    if (!p.equals(ZERO) && !q.equals(ZERO) && r.equals(ZERO) && s.equals(ZERO)) {
+    if (!MATHJS.abs(p).lessThanOrEqualTo(tol1)
+      && !MATHJS.abs(q).lessThanOrEqualTo(tol1)
+      && MATHJS.abs(r).lessThanOrEqualTo(tol1)
+      && MATHJS.abs(s).lessThanOrEqualTo(tol1)) {
       let roots = SolveEquation.SolveQuadraticEquation(1, p, q);
       roots.push(ZERO);
       // roots.push(ZERO);
       return roots;
     }
     // 输入验证,q、r、s是0，其他不是0。
-    if (!p.equals(ZERO) && q.equals(ZERO) && r.equals(ZERO) && s.equals(ZERO)) {
+    if (!MATHJS.abs(p).lessThanOrEqualTo(tol1)
+      && MATHJS.abs(q).lessThanOrEqualTo(tol1)
+      && MATHJS.abs(r).lessThanOrEqualTo(tol1)
+      && MATHJS.abs(s).lessThanOrEqualTo(tol1)) {
       let roots = new Array<MATHJS.Complex | MATHJS.BigNumber>();
       roots.push(MATHJS.unaryMinus(p));
       roots.push(ZERO);
@@ -586,7 +604,10 @@ class SolveEquation {
       return roots;
     }
     // 输入验证,p、q、r、s是0，其他不是0。
-    if (p.equals(ZERO) && q.equals(ZERO) && r.equals(ZERO) && s.equals(ZERO)) {
+    if (MATHJS.abs(p).lessThanOrEqualTo(tol1)
+      && MATHJS.abs(q).lessThanOrEqualTo(tol1)
+      && MATHJS.abs(r).lessThanOrEqualTo(tol1)
+      && MATHJS.abs(s).lessThanOrEqualTo(tol1)) {
       let roots = new Array<MATHJS.Complex | MATHJS.BigNumber>();
       roots.push(ZERO);
       // roots.push(ZERO);
@@ -643,7 +664,7 @@ class SolveEquation {
     console.log(`缺项四次方程 y⁴ + Ay² + By + C = 0: A :${A.toNumber()}, B:${B.toNumber()}, C:${C.toNumber()}`);
     let roots = new Array<MATHJS.Complex | MATHJS.BigNumber>();
 
-    if (MATHJS.equal(B, ZERO)) {
+    if (MATHJS.abs(B).lessThanOrEqualTo(tol1)) {
       // 退化情况：y⁴ + A*y² + C = 0
       // 令 z = y²，解 z² + A*z + C = 0
       const zRoots = SolveEquation.SolveQuadraticEquation(1, A, C);

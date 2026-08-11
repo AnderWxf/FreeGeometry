@@ -457,7 +457,7 @@ class Curve2Inter {
           inter.u0 = c0a.u(inter.p); inter.u1 = c1a.u(inter.p);
           ret.push(inter);
         }
-        else if (Math.abs(g0) < tol1) {
+        else if (Math.abs(g0) < tol1 && Math.abs(g1) < 1) {
           inter.u0 = c0a.u(inter.p);
           Curve2Inter.Binary(c0a, c1a, inter, tol0, tol1);
           g0 = c0a.g(inter.p);
@@ -470,7 +470,7 @@ class Curve2Inter {
 
           }
         }
-        else if (Math.abs(g1) < tol1) {
+        else if (Math.abs(g1) < tol1 && Math.abs(g0) < 1) {
           inter.u0 = c1a.u(inter.p);
           Curve2Inter.Binary(c1a, c0a, inter, tol0, tol1);
           g0 = c0a.g(inter.p);
@@ -532,7 +532,7 @@ class Curve2Inter {
 
     // 解四次方程
     console.log(`四次方程 R4 y^4 + R3 y^3 + R2 y^2 + R1 y + R0 => R4:${R4.toNumber()}, R3:${R3.toNumber()}, R2:${R2.toNumber()}, R1:${R1.toNumber()}, R0:${R0.toNumber()}`);
-    const Rs = SolveEquation.SolveQuarticNumberical(R4, R3, R2, R1, R0);
+    const Rs = SolveEquation.SolveQuarticNumberical(R4, R3, R2, R1, R0, MATHJS.bignumber(tol1 * 0.01));
     console.log(`四次方程根 Rs: ${Rs[0]}, ${Rs[1]}, ${Rs[2]}, ${Rs[3]}`);
     for (let i = 0; i < Rs.length; i++) {
       if (ret.length >= n) {
@@ -638,13 +638,17 @@ class Curve2Inter {
         let p2 = intersX2[j];
         inters.push({ p: p2, u0: null, u1: null });
       }
+      console.log(`结式多项式计算的未验证交点 :`);
+      for (let j = 0; j < inters.length; j++) {
+        console.log(`Point${j} , x:${inters[j].p.x} ,y:${inters[j].p.y} , u0:${inters[j].u0},u1:${inters[j].u1}`);
+      }
       checkAndPush(inters);
       if (ret.length >= n) {
         break;
       }
     }
 
-    console.log(`结式多项式计算的交点 :`);
+    console.log(`结式多项式计算的已验证交点 :`);
     for (let i = 0; i < ret.length; i++) {
       console.log(`Point${i} , x:${ret[i].p.x} ,y:${ret[i].p.y} , u0:${ret[i].u0},u1:${ret[i].u1}`);
     }
@@ -970,6 +974,7 @@ class Curve2Inter {
 
     // 符号相反二分法递归细分
     let bin = (a: ValueOfBinary, b: ValueOfBinary) => {
+      let maxg = Math.max(Math.abs(a.g), Math.abs(b.g));
       while (true) {
         times++;
         let u = (a.u + b.u) * 0.5;
@@ -982,7 +987,11 @@ class Curve2Inter {
           ret.u1 = c1a.u(p);
           break;
         } else {
-          if (a.g * g < 0) {
+          //中间的参数带来了扩张的g值，说明没有跨过根，直接返回。
+          if (Math.abs(g) / maxg > 10) {
+            break;
+          }
+          else if (a.g * g < 0) {
             b = { p, u, g };
           }
           else if (b.g * g < 0) {
@@ -1172,6 +1181,7 @@ class Curve2Inter {
     let times = 0;
     // 符号相反二分法递归细分
     let bin = (a: ValueOfBinary, b: ValueOfBinary) => {
+      let maxg = Math.max(Math.abs(a.g), Math.abs(b.g));
       while (true) {
         times++;
         let u = (a.u + b.u) * 0.5;
@@ -1182,7 +1192,11 @@ class Curve2Inter {
           ret.push({ p: p, u0: u, u1: algor1.u(p) });
           break;
         } else {
-          if (a.g * g < 0) {
+          //中间的参数带来了扩张的g值，说明没有跨过根，直接返回。
+          if (Math.abs(g) / maxg > 10) {
+            break;
+          }
+          else if (a.g * g < 0) {
             b = { p, u, g };
           }
           else if (b.g * g < 0) {
