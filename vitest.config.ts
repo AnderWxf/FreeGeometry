@@ -6,7 +6,7 @@ export default defineConfig({
     environment: 'jsdom', // 👈 使用 jsdom 模拟浏览器环境
     // 指定测试文件匹配模式
     include: [
-      'src/**/__tests__/**/*.{test,spec}.{ts,js}',
+      '__tests__/**/*.{test,spec}.{ts,js}',
     ],
     // 排除某些目录
     exclude: [
