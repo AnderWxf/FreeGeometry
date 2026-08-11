@@ -49,7 +49,9 @@ type TestCaseInsertPoint2 = {
 };
 // 扫描 data 目录，自动发现测试用例
 function DiscoverTestCases(caseDir: string): TestCase[] {
-  const dataDir = path.join(__dirname, 'data', caseDir);
+  let dir = __dirname;
+  dir = dir.replace(/\\/g, '/').replace(/\/src/, '');
+  const dataDir = path.join(dir, 'data', caseDir);
   const files = fs.readdirSync(dataDir);
   // 匹配 pattern: xxx-input.json 和 xxx-expected.json
   const inputFiles = files.filter(f => f.endsWith('-input.json'));
@@ -65,7 +67,9 @@ function DiscoverTestCases(caseDir: string): TestCase[] {
 }
 // 扫描 data 目录，自动发现测试用例
 function DiscoverTestCasesInsertPoint2(caseDir: string): TestCaseInsertPoint2[] {
-  const dataDir = path.join(__dirname, 'data', caseDir);
+  let dir = __dirname;
+  dir = dir.replace(/\\/g, '/').replace(/\/src/, '');
+  const dataDir = path.join(dir, 'data', caseDir);
   const files = fs.readdirSync(dataDir);
   // 匹配 所有的json,这些json内部包含求交的曲线和交点数据
 
@@ -80,8 +84,10 @@ function DiscoverTestCasesInsertPoint2(caseDir: string): TestCaseInsertPoint2[] 
 }
 // 执行描述Object
 function ExecuteDescribe(typeName: string, typeDir: string, process: (input: any) => any) {
+  let dir = __dirname;
+  dir = dir.replace(/\\/g, '/').replace(/\/src/, '');
   describe(typeName, () => {
-    const dataDir = path.join(__dirname, 'data', typeDir);
+    const dataDir = path.join(dir, 'data', typeDir);
     const files = fs.readdirSync(dataDir);
     files.forEach(file => {
       const testCases = DiscoverTestCases(typeDir + '/' + file);
@@ -111,8 +117,10 @@ function ExecuteDescribe(typeName: string, typeDir: string, process: (input: any
 
 // 执行描述Object 2维交点集合
 function ExecuteDescribeInsertPoint2(typeName: string, typeDir: string, process: (edge1: Edge2, edge2: Edge2) => any) {
+  let dir = __dirname;
+  dir = dir.replace(/\\/g, '/').replace(/\/src/, '');
   describe(typeName, () => {
-    const dataDir = path.join(__dirname, 'data', typeDir);
+    const dataDir = path.join(dir, 'data', typeDir);
     const files = fs.readdirSync(dataDir);
     files.forEach(file => {
       describe(file, () => {
@@ -170,8 +178,10 @@ function ExecuteDescribeInsertPoint2(typeName: string, typeDir: string, process:
 
 // 执行描述Object 3维交点集合
 function ExecuteDescribeInsertPoint3(typeName: string, typeDir: string, process: (input: any) => any) {
+  let dir = __dirname;
+  dir = dir.replace(/\\/g, '/').replace(/\/src/, '');
   describe(typeName, () => {
-    const dataDir = path.join(__dirname, 'data', typeDir);
+    const dataDir = path.join(dir, 'data', typeDir);
     const files = fs.readdirSync(dataDir);
     files.forEach(file => {
       const testCases = DiscoverTestCases(typeDir + '/' + file);
@@ -215,8 +225,10 @@ function ExecuteDescribeInsertPoint3(typeName: string, typeDir: string, process:
 }
 // 执行描述Bool
 function ExecuteDescribeBools(typeName: string, typeDir: string, process: (input: any) => any) {
+  let dir = __dirname;
+  dir = dir.replace(/\\/g, '/').replace(/\/src/, '');
   describe(typeName, () => {
-    const dataDir = path.join(__dirname, 'data', typeDir);
+    const dataDir = path.join(dir, 'data', typeDir);
     const files = fs.readdirSync(dataDir);
     files.forEach(file => {
       const testCases = DiscoverTestCases(typeDir + '/' + file);
