@@ -1,4 +1,5 @@
 import type { BigNumber } from '../../../../mathjs';
+import { multiply as mul, add, unaryMinus as un, bignumber as big, subtract as sub, equal, largerEq, divide as div } from '../../../../mathjs';
 import { Vector2 } from "../../../../math/Math";
 import * as MATHJS from '../../../../mathjs';
 import { Arc2Data } from "../../../data/base/curve2/Arc2Data";
@@ -19,6 +20,7 @@ import { Nurbs2Algo } from '../../base/curve2/Nurbs2Algo';
 import { Brep2Builder } from '../../builder/Brep2Builder';
 import { Brep2Inter } from './Brep2Inter';
 import { Face2Algo } from '../../brep/Brep2Algo';
+// import { multiply } from 'mathjs';
 // import * as SVD from "svd-js";
 
 /**
@@ -62,8 +64,8 @@ class Curve2Inter {
     // 获取一般方程参数
     let { A: A0, B: B0, C: C0 } = c0a.ge();
     let { A: A1, B: B1, C: C1 } = c1a.ge();
-    let c0_ = MATHJS.unaryMinus(C0);
-    let c1_ = MATHJS.unaryMinus(C1);
+    let c0_ = un(C0);
+    let c1_ = un(C1);
 
     // 克莱姆法则求解方程组
     // A0x + B0y + C0 = 0
@@ -72,14 +74,14 @@ class Curve2Inter {
     let detx = MATHJS.det([[c0_, B0], [c1_, B1]]);
     let dety = MATHJS.det([[A0, c0_], [A1, c1_]]);
 
-    let x = MATHJS.divide(detx, det);
-    let y = MATHJS.divide(dety, det);
+    let x = div(detx, det);
+    let y = div(dety, det);
 
     if (typeof x === 'object') {
-      x = (x as MATHJS.BigNumber).toNumber();
+      x = (x as BigNumber).toNumber();
     }
     if (typeof y === 'object') {
-      y = (y as MATHJS.BigNumber).toNumber();
+      y = (y as BigNumber).toNumber();
     }
     let p = new Vector2(x, y);
 
@@ -159,8 +161,8 @@ class Curve2Inter {
    * @param {number} [tol1] - The tolerance of algebraic.
    * @param {number} [n] - The max number of intersection points.
    */
-  static LineXConic(c0: { A: MATHJS.BigNumber, B: MATHJS.BigNumber, C: MATHJS.BigNumber },
-    c1: { A: MATHJS.BigNumber, B: MATHJS.BigNumber, C: MATHJS.BigNumber, D: MATHJS.BigNumber, E: MATHJS.BigNumber, F: MATHJS.BigNumber },
+  static LineXConic(c0: { A: BigNumber, B: BigNumber, C: BigNumber },
+    c1: { A: BigNumber, B: BigNumber, C: BigNumber, D: BigNumber, E: BigNumber, F: BigNumber },
     c0a: Curve2Algo,
     c1a: Curve2Algo,
     tol0: number,
@@ -180,31 +182,31 @@ class Curve2Inter {
     console.log('直线:', `A0=${A0.toNumber()}, B0=${B0.toNumber()}, C0=${C0.toNumber()}`);
     console.log('二次曲线:', `A1=${A1.toNumber()}, B1=${B1.toNumber()}, C1=${C1.toNumber()}, D1=${D1.toNumber()}, E1=${E1.toNumber()}, F1=${F1.toNumber()}`);
 
-    const ZERO = MATHJS.bignumber(0);
+    const ZERO = big(0);
     // 求解方程组
     // A0x + B0y + C0 = 0 (1) 
     // A1x² + B1xy + C1y² + D1x + E1y + F1 = 0 (2)
     // (1) >> x = (-C0 - B0y) / A0 带入方程（2）
-    if (!MATHJS.equal(A0, ZERO) && !MATHJS.equal(B0, ZERO)) {
+    if (!equal(A0, ZERO) && !equal(B0, ZERO)) {
       // 关于x的方程 Ax² + Bx + C = 0
       // A​ = A1 B0² - B1 A0 B0 + C1 A0²​
       // B =-B1​ B0​ C0​ + 2C1​ A0​ C0 + D1​ B0²​ - E1 A0 B0​
       // C​ = C1​ C0²​ - E1​ B0​ C0​ + F1​ B0²​
-      let A = MATHJS.add(
-        MATHJS.multiply(A1, B0, B0),
-        MATHJS.unaryMinus(MATHJS.multiply(B1, A0, B0)),
-        MATHJS.multiply(C1, A0, A0)
+      let A = add(
+        mul(A1, B0, B0),
+        un(mul(B1, A0, B0)),
+        mul(C1, A0, A0)
       ) as BigNumber;
-      let B = MATHJS.add(
-        MATHJS.unaryMinus(MATHJS.multiply(B1, B0, C0)),
-        MATHJS.multiply(C1, A0, C0, 2),
-        MATHJS.multiply(D1, B0, B0),
-        MATHJS.unaryMinus(MATHJS.multiply(E1, A0, B0))
+      let B = add(
+        un(mul(B1, B0, C0)),
+        mul(C1, A0, C0, 2),
+        mul(D1, B0, B0),
+        un(mul(E1, A0, B0))
       ) as BigNumber;
-      let C = MATHJS.add(
-        MATHJS.multiply(C1, C0, C0),
-        MATHJS.unaryMinus(MATHJS.multiply(E1, B0, C0)),
-        MATHJS.multiply(F1, B0, B0)
+      let C = add(
+        mul(C1, C0, C0),
+        un(mul(E1, B0, C0)),
+        mul(F1, B0, B0)
       ) as BigNumber;
 
       console.log('二次方程系数:', `A=${A.toNumber()}, B=${B.toNumber()}, C=${C.toNumber()}`);
@@ -218,34 +220,34 @@ class Curve2Inter {
           if (Math.abs(xi.im) > tol0) {
             continue;
           }
-          x = MATHJS.bignumber(xi.re);
+          x = big(xi.re);
         }
         if (MATHJS.typeOf(xi) === 'BigNumber') {
           x = xi as BigNumber;
         }
         // y= -(A0/B0​)x − C0/B0​ ​ = - (xA0 + c0)/B0
-        let y = MATHJS.unaryMinus(MATHJS.divide(MATHJS.add((MATHJS.multiply(x, A0)), C0), B0)) as BigNumber;
+        let y = un(div(add((mul(x, A0)), C0), B0)) as BigNumber;
         let p = new Vector2(x.toNumber(), y.toNumber());
         let u0 = c0a?.u(p);
         let u1 = c1a?.u(p);
         ret.push({ p, u0, u1 });
       }
-    } else if (!MATHJS.equal(A0, ZERO) && MATHJS.equal(B0, ZERO)) {
+    } else if (!equal(A0, ZERO) && equal(B0, ZERO)) {
       // 关于y的方程 A0x + B0y + C0 = 0 >> x = -C0/A0
-      let x = MATHJS.unaryMinus(MATHJS.divide(C0, A0)) as BigNumber;
+      let x = un(div(C0, A0)) as BigNumber;
       // 带入二次方程得到关于y的方程
       // A1x² + B1xy + C1y² + D1x + E1y + F1 = 0             
       // A​ = C1
       // B = B1x + E1​
       // C​ = A1x²​ + D1x + F1​
       let A = C1 as BigNumber;
-      let B = MATHJS.add(
-        MATHJS.multiply(B1, x),
+      let B = add(
+        mul(B1, x),
         E1
       ) as BigNumber;
-      let C = MATHJS.add(
-        MATHJS.multiply(A1, x, x),
-        MATHJS.multiply(D1, x),
+      let C = add(
+        mul(A1, x, x),
+        mul(D1, x),
         F1) as BigNumber;
       console.log('二次方程系数:', `A=${A.toNumber()}, B=${B.toNumber()}, C=${C.toNumber()}`);
       let ys = SolveEquation.SolveQuadraticEquation(A, B, C);
@@ -258,7 +260,7 @@ class Curve2Inter {
           if (Math.abs(yi.im) > tol0) {
             continue;
           }
-          y = MATHJS.bignumber(yi.re);
+          y = big(yi.re);
         }
         if (MATHJS.typeOf(yi) === 'BigNumber') {
           y = yi as BigNumber;
@@ -268,21 +270,21 @@ class Curve2Inter {
         let u1 = c1a?.u(p);
         ret.push({ p, u0, u1 });
       }
-    } else if (MATHJS.equal(A0, ZERO) && !MATHJS.equal(B0, ZERO)) {
+    } else if (equal(A0, ZERO) && !equal(B0, ZERO)) {
       // 关于y的方程 A0x + B0y + C0 = 0 >> y = -C0/B0
-      let y = MATHJS.unaryMinus(MATHJS.divide(C0, B0)) as BigNumber;
+      let y = un(div(C0, B0)) as BigNumber;
       // 带入二次方程得到关于x的方程
       // A1x² + B1xy + C1y² + D1x + E1y + F1 = 0 
       // A​ = A1​
       // B = B1y + D1​
       // C​ = C1y²​ + E1y + F1​
       let A = A1 as BigNumber;
-      let B = MATHJS.add(
-        MATHJS.multiply(B1, y),
+      let B = add(
+        mul(B1, y),
         D1) as BigNumber;
-      let C = MATHJS.add(
-        MATHJS.multiply(C1, y, y),
-        MATHJS.multiply(E1, y),
+      let C = add(
+        mul(C1, y, y),
+        mul(E1, y),
         F1) as BigNumber;
       console.log('二次方程系数:', `A=${A.toNumber()}, B=${B.toNumber()}, C=${C.toNumber()}`);
       let xs = SolveEquation.SolveQuadraticEquation(A, B, C);
@@ -295,7 +297,7 @@ class Curve2Inter {
           if (Math.abs(xi.im) > tol0) {
             continue;
           }
-          x = MATHJS.bignumber(xi.re);
+          x = big(xi.re);
         }
         if (MATHJS.typeOf(xi) === 'BigNumber') {
           x = xi as BigNumber;
@@ -412,7 +414,8 @@ class Curve2Inter {
    * compute arc to arc intersection point.
    * 结式方法
    * 结式方法是求解两个多项式方程组的经典代数方法。对于两条二次曲线：
-   * F1(x,y) = 0 , F2(x,y) = 0
+   * F1(x,y) = Ax^2 + Bxy + Cy^2 + Dx + Ey + F = 0 
+   * F2(x,y) = Ax^2 + Bxy + Cy^2 + Dx + Ey + F = 0 
    * 将y 视为参数，x 视为变量，计算两个多项式关于 x 的结式（Resultant）：
    * R(y) = Resx(F1,F2) 得到关于 y 的四次方程：
    * R(y) = R4y^4 + R3y^3 + R2y^2 + R1y + R0 = 0
@@ -425,8 +428,8 @@ class Curve2Inter {
    * @param {number} [n] - The max number of intersection points.
    */
   static ConicXConicResultant(
-    c0: { A: MATHJS.BigNumber, B: MATHJS.BigNumber, C: MATHJS.BigNumber, D: MATHJS.BigNumber, E: MATHJS.BigNumber, F: MATHJS.BigNumber },
-    c1: { A: MATHJS.BigNumber, B: MATHJS.BigNumber, C: MATHJS.BigNumber, D: MATHJS.BigNumber, E: MATHJS.BigNumber, F: MATHJS.BigNumber },
+    c0: { A: BigNumber, B: BigNumber, C: BigNumber, D: BigNumber, E: BigNumber, F: BigNumber },
+    c1: { A: BigNumber, B: BigNumber, C: BigNumber, D: BigNumber, E: BigNumber, F: BigNumber },
     c0a: Curve2Algo,
     c1a: Curve2Algo,
     tol0: number,
@@ -457,7 +460,7 @@ class Curve2Inter {
           inter.u0 = c0a.u(inter.p); inter.u1 = c1a.u(inter.p);
           ret.push(inter);
         }
-        else if (Math.abs(g0) < tol1 && Math.abs(g1) < 1) {
+        else if (Math.abs(g0) < tol1 /*&& Math.abs(g1) < 1*/) {
           inter.u0 = c0a.u(inter.p);
           Curve2Inter.Binary(c0a, c1a, inter, tol0, tol1);
           g0 = c0a.g(inter.p);
@@ -470,7 +473,7 @@ class Curve2Inter {
 
           }
         }
-        else if (Math.abs(g1) < tol1 && Math.abs(g0) < 1) {
+        else if (Math.abs(g1) < tol1 /*&& Math.abs(g0) < 1*/) {
           inter.u0 = c1a.u(inter.p);
           Curve2Inter.Binary(c1a, c0a, inter, tol0, tol1);
           g0 = c0a.g(inter.p);
@@ -511,43 +514,42 @@ class Curve2Inter {
     // const R2 = ΔE * ΔE + 2 * ΔD * ΔF - (αE * γF + βE * βF);
     // const R1 = 2 * ΔE * ΔF - (αE * δF + βE * γF);
     // const R0 = ΔF * ΔF - βE * δF;    
-
     // 计算中间变量
-    const ΔD = MATHJS.subtract(MATHJS.multiply(a_1, c_2), MATHJS.multiply(a_2, c_1));
-    const ΔE = MATHJS.subtract(MATHJS.multiply(a_1, e_2), MATHJS.multiply(a_2, e_1));
-    const ΔF = MATHJS.subtract(MATHJS.multiply(a_1, f_2), MATHJS.multiply(a_2, f_1));
-    const αE = MATHJS.subtract(MATHJS.multiply(a_1, b_2), MATHJS.multiply(a_2, b_1));
-    const βE = MATHJS.subtract(MATHJS.multiply(a_1, d_2), MATHJS.multiply(a_2, d_1));
-    const αF = MATHJS.subtract(MATHJS.multiply(b_1, c_2), MATHJS.multiply(b_2, c_1));
-    const βF = MATHJS.subtract(MATHJS.subtract(MATHJS.add(MATHJS.multiply(b_1, e_2), MATHJS.multiply(d_1, c_2)), MATHJS.multiply(b_2, e_1)), MATHJS.multiply(d_2, c_1));
-    const γF = MATHJS.subtract(MATHJS.subtract(MATHJS.add(MATHJS.multiply(b_1, f_2), MATHJS.multiply(d_1, e_2)), MATHJS.multiply(b_2, f_1)), MATHJS.multiply(d_2, e_1));
-    const δF = MATHJS.subtract(MATHJS.multiply(d_1, f_2), MATHJS.multiply(d_2, f_1));
+    const ΔD = sub(mul(a_1, c_2), mul(a_2, c_1));
+    const ΔE = sub(mul(a_1, e_2), mul(a_2, e_1));
+    const ΔF = sub(mul(a_1, f_2), mul(a_2, f_1));
+    const αE = sub(mul(a_1, b_2), mul(a_2, b_1));
+    const βE = sub(mul(a_1, d_2), mul(a_2, d_1));
+    const αF = sub(mul(b_1, c_2), mul(b_2, c_1));
+    const βF = sub(sub(add(mul(b_1, e_2), mul(d_1, c_2)), mul(b_2, e_1)), mul(d_2, c_1));
+    const γF = sub(sub(add(mul(b_1, f_2), mul(d_1, e_2)), mul(b_2, f_1)), mul(d_2, e_1));
+    const δF = sub(mul(d_1, f_2), mul(d_2, f_1));
 
     // 计算 R4, R3, R2, R1, R0
-    const R4 = MATHJS.subtract(MATHJS.multiply(ΔD, ΔD), MATHJS.multiply(αE, αF)) as MATHJS.BigNumber;
-    const R3 = MATHJS.subtract(MATHJS.multiply(ΔD, ΔE, 2), MATHJS.add(MATHJS.multiply(αE, βF), MATHJS.multiply(βE, αF))) as MATHJS.BigNumber;
-    const R2 = MATHJS.subtract(MATHJS.add(MATHJS.multiply(ΔE, ΔE), MATHJS.multiply(ΔD, ΔF, 2)), MATHJS.add(MATHJS.multiply(αE, γF), MATHJS.multiply(βE, βF))) as MATHJS.BigNumber;
-    const R1 = MATHJS.subtract(MATHJS.multiply(ΔE, ΔF, 2), MATHJS.add(MATHJS.multiply(αE, δF), MATHJS.multiply(βE, γF))) as MATHJS.BigNumber;
-    const R0 = MATHJS.subtract(MATHJS.multiply(ΔF, ΔF), MATHJS.multiply(βE, δF)) as MATHJS.BigNumber;
+    const R4 = sub(mul(ΔD, ΔD), mul(αE, αF)) as BigNumber;
+    const R3 = sub(mul(ΔD, ΔE, 2), add(mul(αE, βF), mul(βE, αF))) as BigNumber;
+    const R2 = sub(add(mul(ΔE, ΔE), mul(ΔD, ΔF, 2)), add(mul(αE, γF), mul(βE, βF))) as BigNumber;
+    const R1 = sub(mul(ΔE, ΔF, 2), add(mul(αE, δF), mul(βE, γF))) as BigNumber;
+    const R0 = sub(mul(ΔF, ΔF), mul(βE, δF)) as BigNumber;
 
     // 解四次方程
     console.log(`四次方程 R4 y^4 + R3 y^3 + R2 y^2 + R1 y + R0 => R4:${R4.toNumber()}, R3:${R3.toNumber()}, R2:${R2.toNumber()}, R1:${R1.toNumber()}, R0:${R0.toNumber()}`);
-    const Rs = SolveEquation.SolveQuarticNumberical(R4, R3, R2, R1, R0, MATHJS.bignumber(tol1 * 0.01));
+    const Rs = SolveEquation.SolveQuarticNumberical(R4, R3, R2, R1, R0, big(tol1 * 0.01));
     console.log(`四次方程根 Rs: ${Rs[0]}, ${Rs[1]}, ${Rs[2]}, ${Rs[3]}`);
     for (let i = 0; i < Rs.length; i++) {
       if (ret.length >= n) {
         break;
       }
-      let y: MATHJS.BigNumber = null;
+      let y: BigNumber = null;
       let R = Rs[i];
       if (MATHJS.typeOf(R) === "Complex") {
-        if (MATHJS.abs((R as MATHJS.Complex).im) > tol0) {
-          continue;
-        } else {
-          y = MATHJS.bignumber((R as MATHJS.Complex).re);
-        }
+        // if (MATHJS.abs((R as MATHJS.Complex).im) > tol0) {
+        //   continue;
+        // } else {
+        y = big((R as MATHJS.Complex).re);
+        // }
       } else {
-        y = R as MATHJS.BigNumber;
+        y = R as BigNumber;
       }
       if (y === null) {
         continue;
@@ -559,8 +561,8 @@ class Curve2Inter {
       // const B1 = b1 * y + d1;
       // const C1 = c1 * y * y + e1 * y + f1;      
       const A1 = a_1;
-      const B1 = MATHJS.add(MATHJS.multiply(b_1, y), d_1) as MATHJS.BigNumber;
-      const C1 = MATHJS.add(MATHJS.multiply(c_1, y, y), MATHJS.multiply(e_1, y), f_1) as MATHJS.BigNumber;
+      const B1 = add(mul(b_1, y), d_1) as BigNumber;
+      const C1 = add(mul(c_1, y, y), mul(e_1, y), f_1) as BigNumber;
       console.log(`二次方程 A1*x² + B1*x + C1 = 0 => A1:${A1.toNumber()}, B1:${B1.toNumber()}, C1:${C1.toNumber()}`);
       const Xs1 = SolveEquation.SolveQuadraticEquation(A1, B1, C1);
       console.log(`二次方程根 Xs1: ${Xs1[0]}, ${Xs1[1]}`);
@@ -568,16 +570,16 @@ class Curve2Inter {
       let intersX1 = new Array<Vector2>();
       let intersX2 = new Array<Vector2>();
       for (let j = 0; j < Xs1.length; j++) {
-        let x: MATHJS.BigNumber = null;
+        let x: BigNumber = null;
         let X = Xs1[j];
         if (MATHJS.typeOf(X) === "Complex") {
           if (MATHJS.abs((X as MATHJS.Complex).im) > tol0) {
             continue;
           } else {
-            x = MATHJS.bignumber((X as MATHJS.Complex).re);
+            x = big((X as MATHJS.Complex).re);
           }
         } else {
-          x = X as MATHJS.BigNumber;
+          x = X as BigNumber;
         }
         if (x === null) {
           continue;
@@ -590,22 +592,22 @@ class Curve2Inter {
       // const B2 = b2 * y + d2;
       // const C2 = c2 * y * y + e2 * y + f2;
       const A2 = a_2;
-      const B2 = MATHJS.add(MATHJS.multiply(b_2, y), d_2) as MATHJS.BigNumber;
-      const C2 = MATHJS.add(MATHJS.multiply(c_2, y, y), MATHJS.multiply(e_2, y), f_2) as MATHJS.BigNumber;
+      const B2 = add(mul(b_2, y), d_2) as BigNumber;
+      const C2 = add(mul(c_2, y, y), mul(e_2, y), f_2) as BigNumber;
       console.log(`二次方程 A2*x² + B2*x + C2 = 0 => A2:${A2.toNumber()}, B2:${B1.toNumber()}, C2:${C2.toNumber()}`);
       const Xs2 = SolveEquation.SolveQuadraticEquation(A2, B2, C2);
       console.log(`二次方程根 Xs2: ${Xs2[0]}, ${Xs2[1]}`);
       for (let j = 0; j < Xs2.length; j++) {
-        let x: MATHJS.BigNumber = null;
+        let x: BigNumber = null;
         let X = Xs2[j];
         if (MATHJS.typeOf(X) === "Complex") {
           if (MATHJS.abs((X as MATHJS.Complex).im) > tol0) {
             continue;
           } else {
-            x = MATHJS.bignumber((X as MATHJS.Complex).re);
+            x = big((X as MATHJS.Complex).re);
           }
         } else {
-          x = X as MATHJS.BigNumber;
+          x = X as BigNumber;
         }
         if (x === null) {
           continue;
@@ -669,8 +671,8 @@ class Curve2Inter {
    * @param {number} [n] - The max number of intersection points.
    */
   static ConicXConicMatrixPencil(
-    c0: { A: MATHJS.BigNumber, B: MATHJS.BigNumber, C: MATHJS.BigNumber, D: MATHJS.BigNumber, E: MATHJS.BigNumber, F: MATHJS.BigNumber },
-    c1: { A: MATHJS.BigNumber, B: MATHJS.BigNumber, C: MATHJS.BigNumber, D: MATHJS.BigNumber, E: MATHJS.BigNumber, F: MATHJS.BigNumber },
+    c0: { A: BigNumber, B: BigNumber, C: BigNumber, D: BigNumber, E: BigNumber, F: BigNumber },
+    c1: { A: BigNumber, B: BigNumber, C: BigNumber, D: BigNumber, E: BigNumber, F: BigNumber },
     c0a: Curve2Algo,
     c1a: Curve2Algo,
     tol0: number,
@@ -746,52 +748,52 @@ class Curve2Inter {
     // C_0 = a_1 c_1 f_1 
     //     + (b_1 d_1 e_1)/4 
     //     - (a_1 e_1^2 + c_1 d_1^2 + f_1 b_1^2)/4
-    const C_0 = MATHJS.add(
-      MATHJS.multiply(a_1, c_1, f_1),
-      MATHJS.multiply(b_1, d_1, e_1, 0.25),
-      MATHJS.multiply(MATHJS.add(MATHJS.multiply(a_1, e_1, e_1), MATHJS.multiply(c_1, d_1, d_1), MATHJS.multiply(f_1, b_1, b_1)), -0.25),
-    ) as MATHJS.BigNumber;
+    const C_0 = add(
+      mul(a_1, c_1, f_1),
+      mul(b_1, d_1, e_1, 0.25),
+      mul(add(mul(a_1, e_1, e_1), mul(c_1, d_1, d_1), mul(f_1, b_1, b_1)), -0.25),
+    ) as BigNumber;
     // C_3 = a_2 c_2 f_2 
     //    + (b_2 d_2 e_2)/4 
     //    - (a_2 e_2^2 + c_2 d_2^2 + f_2 b_2^2)/4
-    const C_3 = MATHJS.add(
-      MATHJS.multiply(a_2, c_2, f_2),
-      MATHJS.multiply(b_2, d_2, e_2, 0.25),
-      MATHJS.multiply(MATHJS.add(MATHJS.multiply(a_2, e_2, e_2), MATHJS.multiply(c_2, d_2, d_2), MATHJS.multiply(f_2, b_2, b_2)), -0.25),
-    ) as MATHJS.BigNumber;
+    const C_3 = add(
+      mul(a_2, c_2, f_2),
+      mul(b_2, d_2, e_2, 0.25),
+      mul(add(mul(a_2, e_2, e_2), mul(c_2, d_2, d_2), mul(f_2, b_2, b_2)), -0.25),
+    ) as BigNumber;
     // C_1 =   (c_1 f_1 - e_1^2/4) a_2 
     //       + (a_1 f_1 - d_1^2/4) c_2 
     //       + (a_1 c_1 - b_1^2/4) f_2 
     //       + ((b_1 f_1 - (d_1 e_1)/2) b_2 0.5
     //       + ((b_1 e_1)/2 - c_1 d_1) d_2 0.5
     //       + ((a_1 e_1 - (b_1 d_1)/2) e_2 0.5        
-    const C_1 = MATHJS.add(
-      MATHJS.multiply(MATHJS.add(MATHJS.multiply(c_1, f_1), MATHJS.multiply(e_1, e_1, -0.25)), a_2),
-      MATHJS.multiply(MATHJS.add(MATHJS.multiply(a_1, f_1), MATHJS.multiply(d_1, d_1, -0.25)), c_2),
-      MATHJS.multiply(MATHJS.add(MATHJS.multiply(a_1, c_1), MATHJS.multiply(b_1, b_1, -0.25)), f_2),
-      MATHJS.multiply(MATHJS.add(MATHJS.multiply(b_1, f_1), MATHJS.multiply(d_1, e_1, -0.5)), b_2, 0.5),
-      MATHJS.multiply(MATHJS.add(MATHJS.multiply(b_1, e_1, 0.5), MATHJS.multiply(c_1, d_1, -1)), d_2, 0.5),
-      MATHJS.multiply(MATHJS.add(MATHJS.multiply(a_1, e_1), MATHJS.multiply(b_1, d_1, -0.5)), e_2, 0.5),
-    ) as MATHJS.BigNumber;
+    const C_1 = add(
+      mul(add(mul(c_1, f_1), mul(e_1, e_1, -0.25)), a_2),
+      mul(add(mul(a_1, f_1), mul(d_1, d_1, -0.25)), c_2),
+      mul(add(mul(a_1, c_1), mul(b_1, b_1, -0.25)), f_2),
+      mul(add(mul(b_1, f_1), mul(d_1, e_1, -0.5)), b_2, 0.5),
+      mul(add(mul(b_1, e_1, 0.5), mul(c_1, d_1, -1)), d_2, 0.5),
+      mul(add(mul(a_1, e_1), mul(b_1, d_1, -0.5)), e_2, 0.5),
+    ) as BigNumber;
     // C_2 =   (c_2 f_2 - e_2^2/4) a_1 
     //       + (a_2 f_2 - d_2^2/4) c_1 
     //       + (a_2 c_2 - b_2^2/4) f_1 
     //       + ((b_2 f_2 - (d_2 e_2)/2) b_1 0.5
     //       + ((b_2 e_2)/2 - c_2 d_2) d_1 0.5
     //       + ((a_2 e_2 - (b_2 d_2)/2) e_1 0.5
-    const C_2 = MATHJS.add(
-      MATHJS.multiply(MATHJS.add(MATHJS.multiply(c_2, f_2), MATHJS.multiply(e_2, e_2, -0.25)), a_1),
-      MATHJS.multiply(MATHJS.add(MATHJS.multiply(a_2, f_2), MATHJS.multiply(d_2, d_2, -0.25)), c_1),
-      MATHJS.multiply(MATHJS.add(MATHJS.multiply(a_2, c_2), MATHJS.multiply(b_2, b_2, -0.25)), f_1),
-      MATHJS.multiply(MATHJS.add(MATHJS.multiply(b_2, f_2), MATHJS.multiply(d_2, e_2, -0.5)), b_1, 0.5),
-      MATHJS.multiply(MATHJS.add(MATHJS.multiply(b_2, e_2, 0.5), MATHJS.multiply(c_2, d_2, -1)), d_1, 0.5),
-      MATHJS.multiply(MATHJS.add(MATHJS.multiply(a_2, e_2), MATHJS.multiply(b_2, d_2, -0.5)), e_1, 0.5),
-    ) as MATHJS.BigNumber;
+    const C_2 = add(
+      mul(add(mul(c_2, f_2), mul(e_2, e_2, -0.25)), a_1),
+      mul(add(mul(a_2, f_2), mul(d_2, d_2, -0.25)), c_1),
+      mul(add(mul(a_2, c_2), mul(b_2, b_2, -0.25)), f_1),
+      mul(add(mul(b_2, f_2), mul(d_2, e_2, -0.5)), b_1, 0.5),
+      mul(add(mul(b_2, e_2, 0.5), mul(c_2, d_2, -1)), d_1, 0.5),
+      mul(add(mul(a_2, e_2), mul(b_2, d_2, -0.5)), e_1, 0.5),
+    ) as BigNumber;
 
-    // const C3 = MATHJS.bignumber(1);
-    // const C2 = MATHJS.divide(C_2, C_3) as MATHJS.BigNumber;
-    // const C1 = MATHJS.divide(C_1, C_3) as MATHJS.BigNumber;
-    // const C0 = MATHJS.divide(C_0, C_3) as MATHJS.BigNumber;
+    // const C3 = bignumber(1);
+    // const C2 = div(C_2, C_3) as BigNumber;
+    // const C1 = div(C_1, C_3) as BigNumber;
+    // const C0 = div(C_0, C_3) as BigNumber;
 
     console.log(`曲线c0参数：a_1:${a_1.toNumber()}, b_1:${b_1.toNumber()}, c_1:${c_1.toNumber()}, d_1:${d_1.toNumber()}, e_1:${e_1.toNumber()}, f_1:${f_1.toNumber()}`);
     console.log(`曲线c1参数：a_2:${a_2.toNumber()}, b_2:${b_2.toNumber()}, c_2:${c_2.toNumber()}, d_2:${d_2.toNumber()}, e_2:${e_2.toNumber()}, f_2:${f_2.toNumber()}`);
@@ -811,19 +813,19 @@ class Curve2Inter {
       if (i > 0 && λ == λs[i - 1]) {
         continue;
       }
-      let B = new Array<Array<MATHJS.BigNumber>>(3);
-      let row0 = new Array<MATHJS.BigNumber>(3);
-      let row1 = new Array<MATHJS.BigNumber>(3);
-      let row2 = new Array<MATHJS.BigNumber>(3);
-      row0[0] = MATHJS.add(A_1[0][0], MATHJS.multiply(λ, A_2[0][0])) as MATHJS.BigNumber;
-      row0[1] = MATHJS.add(A_1[0][1], MATHJS.multiply(λ, A_2[0][1])) as MATHJS.BigNumber;
-      row0[2] = MATHJS.add(A_1[0][2], MATHJS.multiply(λ, A_2[0][2])) as MATHJS.BigNumber;
-      row1[0] = MATHJS.add(A_1[1][0], MATHJS.multiply(λ, A_2[1][0])) as MATHJS.BigNumber;
-      row1[1] = MATHJS.add(A_1[1][1], MATHJS.multiply(λ, A_2[1][1])) as MATHJS.BigNumber;
-      row1[2] = MATHJS.add(A_1[1][2], MATHJS.multiply(λ, A_2[1][2])) as MATHJS.BigNumber;
-      row2[0] = MATHJS.add(A_1[2][0], MATHJS.multiply(λ, A_2[2][0])) as MATHJS.BigNumber;
-      row2[1] = MATHJS.add(A_1[2][1], MATHJS.multiply(λ, A_2[2][1])) as MATHJS.BigNumber;
-      row2[2] = MATHJS.add(A_1[2][2], MATHJS.multiply(λ, A_2[2][2])) as MATHJS.BigNumber;
+      let B = new Array<Array<BigNumber>>(3);
+      let row0 = new Array<BigNumber>(3);
+      let row1 = new Array<BigNumber>(3);
+      let row2 = new Array<BigNumber>(3);
+      row0[0] = add(A_1[0][0], mul(λ, A_2[0][0])) as BigNumber;
+      row0[1] = add(A_1[0][1], mul(λ, A_2[0][1])) as BigNumber;
+      row0[2] = add(A_1[0][2], mul(λ, A_2[0][2])) as BigNumber;
+      row1[0] = add(A_1[1][0], mul(λ, A_2[1][0])) as BigNumber;
+      row1[1] = add(A_1[1][1], mul(λ, A_2[1][1])) as BigNumber;
+      row1[2] = add(A_1[1][2], mul(λ, A_2[1][2])) as BigNumber;
+      row2[0] = add(A_1[2][0], mul(λ, A_2[2][0])) as BigNumber;
+      row2[1] = add(A_1[2][1], mul(λ, A_2[2][1])) as BigNumber;
+      row2[2] = add(A_1[2][2], mul(λ, A_2[2][2])) as BigNumber;
 
       B[0] = row0;
       B[1] = row1;
@@ -838,15 +840,15 @@ class Curve2Inter {
         const eigenvectors = MATHJS.eigs(B, { precision: 1e-25, eigenvectors: true }).eigenvectors;
         // 按特征值的绝对值降序排列
         eigenvectors.sort((a, b): number => {
-          let va = MATHJS.abs(a.value) as MATHJS.BigNumber;
-          let vb = MATHJS.abs(b.value) as MATHJS.BigNumber;
+          let va = MATHJS.abs(a.value) as BigNumber;
+          let vb = MATHJS.abs(b.value) as BigNumber;
           return MATHJS.compare(vb, va) as number;
         });
 
 
-        let λ0 = eigenvectors[0].value as MATHJS.BigNumber;
-        let λ1 = eigenvectors[1].value as MATHJS.BigNumber;
-        let λ2 = eigenvectors[2].value as MATHJS.BigNumber;
+        let λ0 = eigenvectors[0].value as BigNumber;
+        let λ1 = eigenvectors[1].value as BigNumber;
+        let λ2 = eigenvectors[2].value as BigNumber;
 
         let rank = 0;
         rank += MATHJS.abs(λ0).toNumber() > tol0 ? 1 : 0;
@@ -863,11 +865,11 @@ class Curve2Inter {
         // }, 0);
 
         // // 如果零特征值对应的向量给出实交点
-        // const nullVec = eigenvectors[zeroIdx].vector as Array<MATHJS.BigNumber>;
+        // const nullVec = eigenvectors[zeroIdx].vector as Array<BigNumber>;
         // const W = nullVec[2];
         // if (MATHJS.abs(W).toNumber() > 1e-10) {
-        //   const x = MATHJS.divide(nullVec[0], W) as MATHJS.BigNumber;
-        //   const y = MATHJS.divide(nullVec[1], W) as MATHJS.BigNumber;
+        //   const x = div(nullVec[0], W) as BigNumber;
+        //   const y = div(nullVec[1], W) as BigNumber;
         //   console.log(`零空间交点: (${x}, ${y})`);
 
         //   let inters = new Array<InterOfCurve2>();
@@ -877,9 +879,9 @@ class Curve2Inter {
         //   if (ret.length >= n) break;
         // }
 
-        let u = eigenvectors[0].vector as Array<MATHJS.BigNumber>;
-        let v = eigenvectors[1].vector as Array<MATHJS.BigNumber>;
-        let w = eigenvectors[1].vector as Array<MATHJS.BigNumber>;
+        let u = eigenvectors[0].vector as Array<BigNumber>;
+        let v = eigenvectors[1].vector as Array<BigNumber>;
+        let w = eigenvectors[1].vector as Array<BigNumber>;
         console.log(`特征值向量 v0: ${u}`);
         console.log(`特征值向量 v1: ${v}`);
         console.log(`特征值向量 v2: ${w}`);
@@ -889,17 +891,17 @@ class Curve2Inter {
           continue
         }
         // λ0 * λ1 < 0 两个实数特征值
-        if (!MATHJS.largerEq(MATHJS.multiply(λ0, λ1), 0)) {
-          let λ0_sqrt = MATHJS.sqrt(MATHJS.abs(λ0)) as MATHJS.BigNumber;
-          let λ1_sqrt = MATHJS.sqrt(MATHJS.abs(λ1)) as MATHJS.BigNumber;
+        if (!largerEq(mul(λ0, λ1), 0)) {
+          let λ0_sqrt = MATHJS.sqrt(MATHJS.abs(λ0)) as BigNumber;
+          let λ1_sqrt = MATHJS.sqrt(MATHJS.abs(λ1)) as BigNumber;
 
-          let p = MATHJS.multiply(u, λ0_sqrt) as MATHJS.BigNumber[];
-          let q = MATHJS.multiply(v, λ1_sqrt) as MATHJS.BigNumber[];
+          let p = mul(u, λ0_sqrt) as BigNumber[];
+          let q = mul(v, λ1_sqrt) as BigNumber[];
           if (!MATHJS.largerEq(λ1, 0)) {
-            q = MATHJS.unaryMinus(q);
+            q = un(q);
           }
-          let l0 = MATHJS.add(p, q) as MATHJS.BigNumber[];
-          let l1 = MATHJS.subtract(p, q) as MATHJS.BigNumber[];
+          let l0 = add(p, q) as BigNumber[];
+          let l1 = sub(p, q) as BigNumber[];
 
           // 5. 每条直线与原二次曲线之一求交（解二次方程），得到候选交点。
           console.log(`l0: ${l0[0].toNumber()} ${l0[1].toNumber()} ${l0[2].toNumber()}`);
@@ -951,7 +953,7 @@ class Curve2Inter {
    * 在c0的参数空间内迭代。
    * 寻找一个c0的参数u0，使得c0.p(u0)在c1上，即满足c1的一般方程。
    * 误差小于tol时停止。
-   * p0s为c0上的初始猜测点。
+   * p0为c0上的初始猜测点。
    * 
    * @param {Curve2Algo} [c0] - The frist curve.
    * @param {Curve2Algo} [c1] - The second curve.
@@ -1054,20 +1056,142 @@ class Curve2Inter {
     Curve2Inter.totaltimes += times;
   }
 
+  /**
+   * 计算某点在曲线c上的偏微分
+   * c是f(x,y)= Ax^2 + Bxy +Cy^2 + Dx + Ey + F= 0 的一般形式的系数。
+   * @param {A,B,C,D,E,F} [c] - The curve.
+   * @param {Vector2} [p] - The point. 
+   */
+  static PartialDifferential(c: { A: BigNumber, B: BigNumber, C: BigNumber, D: BigNumber, E: BigNumber, F: BigNumber }, p: Vector2): Vector2 {
+    // F'x = 2Ax + By + D
+    // F'y = Bx + 2Cy + E
+    let dx = add(mul(c.A, p.x, 2), mul(c.B, p.y), c.D) as BigNumber;
+    let dy = add(mul(c.B, p.x), mul(c.C, p.y, 2), c.E) as BigNumber;
+    return new Vector2(dx.toNumber(), dy.toNumber());
+  }
+  /**
+   * 用牛顿下降法在c0上寻找与c1的交点。
+   * 在c0的曲线上迭代。
+   * 寻找一个c0上的一点p，使得p在c1上，满足c1的一般方程。
+   * 误差小于tol时停止。
+   * p0为c0上的初始猜测点。
+   * 
+   * @param {Curve2Algo} [c0a] - The frist curve.
+   * @param {Curve2Algo} [c1a] - The second curve.
+   * @param {number} [tol0] - The tolerance of geometric.
+   * @param {number} [tol1] - The tolerance of algebraic.
+   */
+  static Newton(
+    c0: { A: BigNumber, B: BigNumber, C: BigNumber, D: BigNumber, E: BigNumber, F: BigNumber },
+    c1: { A: BigNumber, B: BigNumber, C: BigNumber, D: BigNumber, E: BigNumber, F: BigNumber },
+    c0a: Curve2Algo,
+    c1a: Curve2Algo,
+    p0: InterOfCurve2,
+    tol0: number,
+    tol1: number): void {
+    let ret = p0;
+    let g = c1a.g(p0.p);
+    let s = Math.log(Math.abs(g));
+    let du = 0.75 * (s > 1 ? s : 1);
+    let du_ = 0;
+    let times = 0;
+
+    // 符号相反二分法递归细分
+    let bin = (a: ValueOfBinary, b: ValueOfBinary) => {
+      let maxg = Math.max(Math.abs(a.g), Math.abs(b.g));
+      while (true) {
+        times++;
+        let u = (a.u + b.u) * 0.5;
+        let p = c0a.p(u);
+        let g = c1a.g(p);
+        // 一般方程返回值是0，则恰好是交点。
+        if (Math.abs(g) < tol1 /*|| Math.abs(a.u - b.u) < tol1 && a.p.distanceTo(b.p) < tol0*/) {
+          ret.p = p;
+          ret.u0 = u;
+          ret.u1 = c1a.u(p);
+          break;
+        } else {
+          //中间的参数带来了扩张的g值，说明没有跨过根，直接返回。
+          if (Math.abs(g) / maxg > 10) {
+            break;
+          }
+          else if (a.g * g < 0) {
+            b = { p, u, g };
+          }
+          else if (b.g * g < 0) {
+            a = { p, u, g };
+          }
+        }
+      }
+    }
+
+    while (true) {
+      times++;
+      ret.u0 += du;
+      let u = ret.u0;
+      let dp = c0a.p(u);
+      let dg = c1a.g(dp);
+      // 异号时，说明跨过了根，减小步长并反向
+      if (g * dg < 0) {
+        let a = { p: ret.p, u: ret.u0 - du, g: g };
+        let b = { p: dp, u, g: dg };
+        if (a.u < b.u) {
+          bin(a, b);
+        } else {
+          bin(b, a);
+        }
+        break;
+      }
+      // 扩张时，反向
+      else if (Math.abs(dg) > Math.abs(g)) {
+        du = -du * 0.75;
+      }
+      // 收缩时
+      // else if (Math.abs(dg) < Math.abs(g)) {
+      //     // let s = Math.log(Math.abs(dg));
+      //     // if (s > 1) {
+      //     //     du = du * s;
+      //     // }
+      // }
+      // 满足要求,找到了在c1上的点
+      if (Math.abs(dg) < tol1) {
+        ret.p = dp;
+        ret.u1 = c1a.u(dp);
+        break;
+      }
+      // 迭代结果不变，认为已经收敛，或者du已经很小。
+      else if (Math.abs(g - dg) < tol1 && du_ == du || Math.abs(du) < 1e-15) {
+        ret.p = dp;
+        ret.u1 = c1a.u(dp);
+        break;
+      }
+      else {
+        g = dg;
+        du_ = du;
+      }
+    }
+    if (times > 100) {
+      console.warn("times :" + times);
+    } else {
+      console.log("times :" + times);
+    }
+    Curve2Inter.totaltimes += times;
+  }
+
   // 构建二次型矩阵
-  static QuadraticMatrix(c: { A: MATHJS.BigNumber, B: MATHJS.BigNumber, C: MATHJS.BigNumber, D: MATHJS.BigNumber, E: MATHJS.BigNumber, F: MATHJS.BigNumber }): Array<Array<MATHJS.BigNumber>> {
-    let A = new Array<Array<MATHJS.BigNumber>>(3);
-    let row0 = new Array<MATHJS.BigNumber>(3);
-    let row1 = new Array<MATHJS.BigNumber>(3);
-    let row2 = new Array<MATHJS.BigNumber>(3);
+  static QuadraticMatrix(c: { A: BigNumber, B: BigNumber, C: BigNumber, D: BigNumber, E: BigNumber, F: BigNumber }): Array<Array<BigNumber>> {
+    let A = new Array<Array<BigNumber>>(3);
+    let row0 = new Array<BigNumber>(3);
+    let row1 = new Array<BigNumber>(3);
+    let row2 = new Array<BigNumber>(3);
     row0[0] = c.A;
-    row0[1] = MATHJS.multiply(c.B, 0.5) as MATHJS.BigNumber;
-    row0[2] = MATHJS.multiply(c.D, 0.5) as MATHJS.BigNumber;
-    row1[0] = MATHJS.multiply(c.B, 0.5) as MATHJS.BigNumber;
+    row0[1] = mul(c.B, 0.5) as BigNumber;
+    row0[2] = mul(c.D, 0.5) as BigNumber;
+    row1[0] = mul(c.B, 0.5) as BigNumber;
     row1[1] = c.C;
-    row1[2] = MATHJS.multiply(c.E, 0.5) as MATHJS.BigNumber;
-    row2[0] = MATHJS.multiply(c.D, 0.5) as MATHJS.BigNumber;
-    row2[1] = MATHJS.multiply(c.E, 0.5) as MATHJS.BigNumber;
+    row1[2] = mul(c.E, 0.5) as BigNumber;
+    row2[0] = mul(c.D, 0.5) as BigNumber;
+    row2[1] = mul(c.E, 0.5) as BigNumber;
     row2[2] = c.F;
     A[0] = row0;
     A[1] = row1;

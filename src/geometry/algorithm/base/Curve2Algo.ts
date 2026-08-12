@@ -81,6 +81,18 @@ class Curve2Algo {
   }
 
   /**
+   * the DG(derivative of general) function return the derivative value of the general equation for the curve.
+   * f(x,y) = 0 return f'(x,y) = f'x * dx + f'y * dx
+   * 
+   * @param {Vector2} [point] - the point baout curve. 
+   * @retun {number}
+   */
+  dg(point: Vector2): number {
+    debugger;
+    return null;
+  }
+
+  /**
    * the t(tangent) function return 1-order derivative normalize vector at u parameter.
    *
    * @param {number} [u ∈ [0,a]] - the u parameter of curve.
