@@ -23,14 +23,16 @@ class ComTransform extends ComBatch {
 
     let str = this._text;
     let paras = str.split(' ');
+    let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);
     if (paras.length == 5) {
       // 创建一个直线段
       this.beginPoint = new Vector2(new Number(paras[1]).valueOf(), new Number(paras[2]).valueOf());
       this.endPoint = new Vector2(new Number(paras[3]).valueOf(), new Number(paras[4]).valueOf());
+      if (context.select.selectedObjects.length > 0) {
+        this.olds.push(...context.select.selectedObjects);
+      }
     } else {
       this.bind(window);
-      let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);
-
       if (context.select.selectedObjects.length == 0) {
         let act_pick_data = new ActPickObject();
         await act_pick_data.execute(context);

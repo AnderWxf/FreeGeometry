@@ -1207,7 +1207,167 @@ B 的秩？
 3. **SVD 比特征分解更稳定**，推荐使用
 4. **验证交点**：代入两条曲线检查是否为零
 
-# 七、二次曲面交线的精确表示
+
+
+
+---
+
+# 七、牛顿法求解方程组（比如求两条曲线的交点）
+## 1. 牛顿法要解决什么问题？
+
+我们要找一组 \((x, y)\)，使得：
+\[
+\begin{cases}
+f(x, y) = 0 \\
+g(x, y) = 0
+\end{cases}
+\]
+
+也就是两条曲线的交点。
+
+假如我们有一个猜测点 \(P_0 = (x_0, y_0)\)，但它在两条曲线上都有偏差：
+\[
+f(P_0) = v_f \neq 0,\quad g(P_0) = v_g \neq 0
+\]
+
+牛顿法的思路就是：**根据当前点的偏差，找一个方向和步长，让偏差变小**，然后反复迭代。
+
+---
+
+## 2. 牛顿法的核心想法
+
+### 第 1 步：用偏微分来“预测”变化
+
+在 \(P_0\) 附近，偏差 \(f\) 和 \(g\) 的变化可以用**全微分**来近似：
+\[
+\begin{cases}
+f(P_0 + \Delta) \approx f(P_0) + f_x \Delta x + f_y \Delta y \\
+g(P_0 + \Delta) \approx g(P_0) + g_x \Delta x + g_y \Delta y
+\end{cases}
+\]
+
+其中：
+- \(f_x, f_y, g_x, g_y\) 是四个偏导数
+- \(\Delta = (\Delta x, \Delta y)\) 是我们要找的更新步长
+
+### 第 2 步：我们希望“一步到位”
+
+我们希望移动到新点 \(P_1 = P_0 + \Delta\) 时，偏差变成 0：
+\[
+\begin{cases}
+f(P_0) + f_x \Delta x + f_y \Delta y = 0 \\
+g(P_0) + g_x \Delta x + g_y \Delta y = 0
+\end{cases}
+\]
+
+这其实就是求解一个**二元一次线性方程组**，解出 \(\Delta x\) 和 \(\Delta y\)：
+
+\[
+\boxed{
+\begin{bmatrix}
+f_x & f_y \\
+g_x & g_y
+\end{bmatrix}
+\begin{bmatrix}
+\Delta x \\
+\Delta y
+\end{bmatrix}
+=
+-
+\begin{bmatrix}
+f(P_0) \\
+g(P_0)
+\end{bmatrix}
+}
+\]
+
+进一步变换：
+
+\[
+\boxed{
+\begin{bmatrix}
+f_x & f_y \\
+g_x & g_y
+\end{bmatrix}^{-}
+\begin{bmatrix}
+f_x & f_y \\
+g_x & g_y
+\end{bmatrix}
+\begin{bmatrix}
+\Delta x \\
+\Delta y
+\end{bmatrix}
+=
+\begin{bmatrix}
+f_x & f_y \\
+g_x & g_y
+\end{bmatrix}^{-}
+-
+\begin{bmatrix}
+f(P_0) \\
+g(P_0)
+\end{bmatrix}
+}
+\]
+
+
+\[
+\boxed{
+\begin{bmatrix}
+\Delta x \\
+\Delta y
+\end{bmatrix}
+=
+\begin{bmatrix}
+f_x & f_y \\
+g_x & g_y
+\end{bmatrix}^{-}
+\begin{bmatrix}
+-f(P_0) \\
+-g(P_0)
+\end{bmatrix}
+}
+\]
+
+### 第 3 步：更新点
+
+\[
+P_1 = P_0 + \Delta
+\]
+
+### 第 4 步：重复
+
+如果 \(P_1\) 还不够接近，就再从 \(P_1\) 出发，用同样的方法继续算，直到偏差足够小。
+
+---
+
+## 3. 可视化理解
+
+把 \(f(x,y)\) 想象成一个**曲面**，\(f = 0\) 是它和水平面的交线。  
+我们站在 \(P_0\) 点，看到自己不在交线上，偏差是 \(v_f\)。  
+偏导数告诉我们：如果往哪个方向走，偏差会变大还是变小，变多快。  
+牛顿法就是把这些信息组合起来，**算出“一步走到交线”需要迈多大步子**。
+
+---
+
+## 4. 总结公式
+
+牛顿法的迭代公式是：
+\[
+\boxed{
+P_{k+1} = P_k - J^{-1}(P_k) \cdot \mathbf{F}(P_k)
+}
+\]
+
+其中：
+- \(\mathbf{F}(P) = \begin{bmatrix} f(P) \\ g(P) \end{bmatrix}\) 是**偏差向量**
+- \(J(P) = \begin{bmatrix} f_x & f_y \\ g_x & g_y \end{bmatrix}\) 是**雅可比矩阵**，里面全是偏导数
+- \(J^{-1}\) 是雅可比矩阵的逆
+
+它的含义就是：**用局部的线性变化规律，来推测达到目标所需的步长。**
+
+
+# 八、二次曲面交线的精确表示
 ## 核心思想概述
 二次曲面本身可以由一个精确的参数⽅程或隐函数⽅程表示，但是两个二次曲面的交线却没有一个明确的参数方程或隐函数方程描述。
 理论上我们可以使用两个二次曲面方程联立的方程组作为曲面交线的精确表达，但是这正以方程组的形式描述的曲线在进行曲线造型
