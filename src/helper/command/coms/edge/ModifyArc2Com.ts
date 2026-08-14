@@ -34,15 +34,22 @@ class ModifyArc2Com extends ComModify {
     let centerPoint: Vector2;
     let beginPoint: Vector2;
     let endPoint: Vector2;
-    if (paras.length == 7) {
-      // 创建一个线段
-      centerPoint = new Vector2(new Number(paras[1]).valueOf(), new Number(paras[2]).valueOf());
-      beginPoint = new Vector2(new Number(paras[3]).valueOf(), new Number(paras[4]).valueOf());
-      endPoint = new Vector2(new Number(paras[5]).valueOf(), new Number(paras[6]).valueOf());
+    // 指定了对象
+    if (paras.length >= 1) {
+      let objs = Global.scene.getObjectsByUUIDs(paras);
+      if (objs.length > 0 && objs[0].userData.type == this.type) {
+        this.old = objs[0];
+      }
     } else {
-      this.bind(window);
-      let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);
+      this.getSelected();
+    }
 
+
+
+    this.bind(window);
+    let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);
+
+    if (!this.old) {
       let act_pick_data = new ActPickObject();
       await act_pick_data.execute(context);
       if (this._isCancel || act_pick_data.isCancel) { this.cancel(); return; }
@@ -53,8 +60,15 @@ class ModifyArc2Com extends ComModify {
         if (this._isCancel || act_pick_data.isCancel) { this.cancel(); return; }
       }
       this.old = act_pick_data.result;
-      CopyUserData(this.old.userData as UserData, userData);
+    }
 
+    CopyUserData(this.old.userData as UserData, userData);
+
+    if (paras.length >= 7) {
+      centerPoint = new Vector2(new Number(paras[2]).valueOf(), new Number(paras[3]).valueOf());
+      beginPoint = new Vector2(new Number(paras[4]).valueOf(), new Number(paras[5]).valueOf());
+      endPoint = new Vector2(new Number(paras[6]).valueOf(), new Number(paras[7]).valueOf());
+    } else { 
       let act_pick_assist = new ActPickAssist();
       await act_pick_assist.execute(context);
       this.assistIndex = this.getIndex(act_pick_assist.result);
@@ -68,13 +82,15 @@ class ModifyArc2Com extends ComModify {
       await act_pick_new_pos.execute(context);
       if (this._isCancel || act_pick_new_pos.isCancel) { this.cancel(); return; }
 
-
       centerPoint = userData.assistPoints[0].p as Vector2;
       beginPoint = userData.assistPoints[1].p as Vector2;
       endPoint = userData.assistPoints[2].p as Vector2;
 
       userData.assistPoints[this.assistIndex].p.set(act_pick_new_pos.result.x, act_pick_new_pos.result.y);
     }
+
+
+
     // 创建一个曲线段
     let edge = Brep2Builder.BuildCircleArcEdge2FromCenterBeginEndPoin(centerPoint, beginPoint, endPoint);
     edge.u.y = this.isForward ? edge.u.y : edge.u.y - PI2;
@@ -83,7 +99,7 @@ class ModifyArc2Com extends ComModify {
     geo.userData = userData;
     this.results = geo;
 
-    this._text = paras[0] + ' ' + centerPoint.x + ' ' + centerPoint.y + ' ' + beginPoint.x + ' ' + beginPoint.y + ' ' + endPoint.x + ' ' + endPoint.y;
+    this._text = paras[0] + userData.original.uuid + ' ' + centerPoint.x + ' ' + centerPoint.y + ' ' + beginPoint.x + ' ' + beginPoint.y + ' ' + endPoint.x + ' ' + endPoint.y;
     this.done();
   }
   onMouseMoveExec(event: MouseEvent) {

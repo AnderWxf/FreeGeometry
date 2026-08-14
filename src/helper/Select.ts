@@ -5,6 +5,8 @@ import type { UserData } from './UserData';
 import * as MATHJS from '../mathjs';
 import { Edge2 } from '../geometry/data/brep/Brep2';
 import { Edge2Algo } from '../geometry/algorithm/brep/Brep2Algo';
+import { Point2Data } from '../geometry/data/base/Point2Data';
+import { Point3Data } from '../geometry/data/base/Point3Data';
 
 /**
  * Select controller.
@@ -117,7 +119,7 @@ class Select {
           continue;
         }
         let userData = obj.userData as UserData;
-        if (userData.color || userData.color === 0) {
+        if (userData.color || userData.color !== 0) {
           (obj as any).material?.color?.setHex(userData.color);
         }
         this.selectedObjects.splice(i, 1);
@@ -163,11 +165,11 @@ class Select {
         else if (userData.original instanceof Vector3) {
           this.pickedPoint.set(userData.original.x, userData.original.y, userData.original.z);
         }
-        else if (userData.original.p instanceof Vector2) {
-          this.pickedPoint.set(userData.original.p.x, userData.original.p.y, 0);
+        else if (userData.original instanceof Point2Data) {
+          this.pickedPoint.set(userData.original.pos.x, userData.original.pos.y, 0);
         }
-        else if (userData.original.p instanceof Vector3) {
-          this.pickedPoint.set(userData.original.p.x, userData.original.p.y, userData.original.p.z);
+        else if (userData.original instanceof Point3Data) {
+          this.pickedPoint.set(userData.original.pos.x, userData.original.pos.y, userData.original.pos.z);
         }
         if (userData.isAssist) {
           //拾取的是一个存在的点对象
@@ -271,7 +273,7 @@ class Select {
     for (let i = 0; i < this.overObjects.length; i++) {
       let obj = this.overObjects[i] as THREE.Object3D;
       let userData = obj.userData as UserData;
-      if (userData.color || userData.color === 0) {
+      if (userData.color || userData.color !== 0) {
         (obj as any).material?.color?.setHex(userData.color);
       }
     }

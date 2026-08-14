@@ -13,6 +13,8 @@ import { Hyperbola3Data } from "./curve3/Hyperbola3Data";
 import { Nurbs3Data } from "./curve3/Nurbs3Data";
 import { Parabola3Data } from "./curve3/Parabola3Data";
 import { UvCurveData } from "./curve3/UvCurveData";
+import { Point2Data } from "./Point2Data";
+import { Point3Data } from "./Point3Data";
 import { ConicalSurfaceData } from "./surface/ConicalSurfaceData";
 import { CylinderSurfaceData } from "./surface/CylinderSurfaceData";
 import { EllipsoidSurfaceData } from "./surface/EllipsoidSurfaceData";
@@ -32,6 +34,9 @@ export function unserialize(data: any): any[] {
     case GeomType.MATH_MATRIX2: return [Matrix2.Unserialize(data)];
     case GeomType.MATH_MATRIX3: return [Matrix3.Unserialize(data)];
     case GeomType.MATH_MATRIX4: return [Matrix4.Unserialize(data)];
+
+    case GeomType.DATA_TYPE_POINT2: return [Point2Data.Unserialize(data)];
+    case GeomType.DATA_TYPE_POINT3: return [Point3Data.Unserialize(data)];
 
     case GeomType.DATA_TYPE_CURVE2_ARC2: return [Arc2Data.Unserialize(data)];
     case GeomType.DATA_TYPE_CURVE2_ARC2: return [Arc2Data.Unserialize(data)];

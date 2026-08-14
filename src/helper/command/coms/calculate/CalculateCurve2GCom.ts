@@ -11,7 +11,7 @@ import { Vector2 } from "../../../../math/Math";
 
 
 /**
- * Calculate curv2 g command class.
+ * Calculate curv2 g command class. 
  * 
  */
 class CalculateCurve2GCom extends Command {

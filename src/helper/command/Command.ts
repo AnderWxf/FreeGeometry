@@ -5,7 +5,24 @@ import * as THREE from "three";
 
 /**
  * Command base class.
+ * 命令格式：
+ * 创建命令：命令类型 p0.x p0.y p1.x p1.y ... UUID0 UUID1 ...
+ * 修改命令：命令类型 UUID 控制点索引 p.x p.y
+ * 变换命令：命令类型 p0.x p0.y p1.x p1.y UUID0 UUID1 ...
+ * 布尔运算：命令类型 UUID0 UUID1 ...
+ * 度量命令：命令类型 UUID0 UUID1 ...
+ * 计算命令：命令类型 UUID0 UUID1 ...
+ * 场景命令：命令类型 ...
+ * 其他命令：命令类型 ...
  * 
+ * 命令可以撤销重做。
+ * 
+ * 命令类型后面的额参数都是可选的，命令类型后面可以没有参数，也可以有多个参数。
+ * 当命令类型后面有参数时，参数之间用空格分隔，参数的类型可以是数字、字符串、布尔值。
+ * 当命令类型后面没有参数时需要人工在空间选中对象或者控制点，完成命令的执行。
+ * 当命令执行完成后，应该在_text中记录命令的执行结果，方便脚本保存。
+ *  
+ * 命令的序列集合组成脚本，脚本可以保存为文本文件，文本文件可以加载为脚本执行。
  */
 class Command {
   static geometry = new THREE.SphereGeometry(0.1);
@@ -76,6 +93,7 @@ class Command {
     this.unbind(window);
     this._isDone = true;
     this._executer.recored(this);
+    console.log('Command done: ' + this._text);
   }
 }
 export { Command };

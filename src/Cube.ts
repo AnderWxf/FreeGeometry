@@ -60,7 +60,7 @@ export class Cube {
     // 将渲染器的 DOM 元素添加到页面中
     gpu.appendChild(renderer.domElement);
 
-    cam.CamToolBarOnChange('前');
+    cam.CamViewChange('前');
 
     const select = new Select(scene);
     Global.select = select;

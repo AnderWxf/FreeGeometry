@@ -14,6 +14,7 @@ import { ActPickAssist } from "../../acts/ActPickAssist";
 import { ActPickObject } from "../../acts/ActPickObject";
 import { CloneUserData, CopyUserData, CreateGeomUserData, type UserData } from "../../../UserData";
 import { PI2 } from "../../../../math/MathUtils";
+import { Point2Data } from "../../../../geometry/data/base/Point2Data";
 
 
 /**
@@ -24,7 +25,7 @@ class ModifyPoint2Com extends ComModify {
   point: Vector2;
   constructor(executer: CommandExecuter, text: string) {
     super(executer, text);
-    this.type = GeomType.MATH_VECTOR2;
+    this.type = GeomType.DATA_TYPE_POINT2;
   }
   async exec(): Promise<void> {
     let str = this._text;
@@ -35,6 +36,7 @@ class ModifyPoint2Com extends ComModify {
     if (paras.length == 3) {
       // 创建一个线段
       centerPoint = new Vector2(new Number(paras[1]).valueOf(), new Number(paras[2]).valueOf());
+      this.getSelected();
     } else {
       this.bind(window);
       let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);
@@ -58,7 +60,7 @@ class ModifyPoint2Com extends ComModify {
     }
     // 创建一个点
     userData.color = THREE.Color.NAMES.greenyellow;
-    userData.original = this.point;
+    userData.original = new Point2Data(this.point.clone());
     let geo = this.createAssistPoint({ p: this.point, c: userData.color }, false);
     geo.userData = userData;
     this.results = geo;

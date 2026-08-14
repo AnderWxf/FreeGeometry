@@ -2,7 +2,10 @@ import { GeomType } from "../../../../core/Constents";
 import { Global } from "../../../../core/Global";
 import { Brep2Inter, type InterOfFace2 } from "../../../../geometry/algorithm/relation/intersection/Brep2Inter";
 import type { InterOfCurve2 } from "../../../../geometry/algorithm/relation/intersection/Curve2Inter";
+import { Point2Data } from "../../../../geometry/data/base/Point2Data";
 import type { Edge2 } from "../../../../geometry/data/brep/Brep2";
+import { DataBase } from "../../../../geometry/data/DataBase";
+import type { UserData } from "../../../UserData";
 import { ActionContext3D } from "../../Active";
 import { ActPickObjects } from "../../acts/ActPickObjects";
 import { Command } from "../../Command";
@@ -29,20 +32,24 @@ class EdgeIntersectionCom extends Command {
 
   async exec(): Promise<void> {
     let str = this._text;
-
-
-
+    let paras = str.split(' ');
     this.bind(window);
-    let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);
-    let selects: Array<THREE.Object3D> = null;
-    if (context.select.selectedObjects.length) {
-      selects = context.select.selectedObjects;
+    let selects: Array<THREE.Object3D> = [];
+    if (paras.length > 2) {
+      selects = Global.scene.getObjectsByUUIDs(paras);
     } else {
-      let act_pick_objs = new ActPickObjects();
-      await act_pick_objs.execute(context);
-      if (this._isCancel || act_pick_objs.isCancel) { this.cancel(); return; }
-      selects = act_pick_objs.results;
+      let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);
+
+      if (context.select.selectedObjects.length) {
+        selects = context.select.selectedObjects;
+      } else {
+        let act_pick_objs = new ActPickObjects();
+        await act_pick_objs.execute(context);
+        if (this._isCancel || act_pick_objs.isCancel) { this.cancel(); return; }
+        selects = act_pick_objs.results;
+      }
     }
+
     // 只能选择二维曲线类型
     for (let i = 0; i < selects.length; i++) {
       let geo = selects[i];
@@ -78,9 +85,11 @@ class EdgeIntersectionCom extends Command {
       }
       for (let i = 0; i < this.results.length; i++) {
         for (let j = 0; j < this.results[i].is.length; j++) {
-          let point = this.createAssistPoint({ p: this.results[i].is[j].p, c: THREE.Color.NAMES.blue }, false)
-          point.userData.type = GeomType.MATH_VECTOR2;
-          this.assists.push(point);
+          let point = this.results[i].is[j].p;
+          let geo = this.createAssistPoint({ p: point, c: THREE.Color.NAMES.blue }, false)
+          geo.userData.type = GeomType.DATA_TYPE_POINT2;
+          geo.userData.original = new Point2Data(point.clone());
+          this.assists.push(geo);
         }
       }
       for (let i = 0; i < this.assists.length; i++) {

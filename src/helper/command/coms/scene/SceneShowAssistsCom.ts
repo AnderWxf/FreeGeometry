@@ -5,6 +5,17 @@ import * as THREE from "three";
 
 class SceneShowAssistsCom extends Command {
   async exec() {
+    let str = this._text;
+    let paras = str.split(' ');
+    if (paras.length == 2) {
+      if (paras[1] == 'true') {
+        Global.isShowAssists = true;
+      } else if (paras[1] == 'false') {
+        Global.isShowAssists = false;
+      }
+    } else {
+      this._text = this._text + ' ' + Global.isShowAssists;
+    }
     let scene = Global.scene;
     let os = scene.allObjects;
     for (let i = 0; i < os.length; i++) {

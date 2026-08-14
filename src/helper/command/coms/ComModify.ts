@@ -22,6 +22,8 @@ class ComModify extends Command {
     super(executer, text);
     this.assists = [];
   }
+
+
   onMouseMoveExec(event: MouseEvent) {
   };
 
@@ -36,6 +38,19 @@ class ComModify extends Command {
       element.visible = Global.isShowAssists;
     });
 
+  }
+
+  protected getSelected() { 
+    // 寻找已经选好的目标
+    if (Global.select.selectedObjects.length > 0) {
+      for (let i = 0; i < Global.select.selectedObjects.length; i++) {
+        let select = Global.select.selectedObjects[i];
+        if (select.userData && select.userData.type === this.type) {
+          this.old = select;
+          break;
+        }
+      }
+    }
   }
 
   protected getIndex(pick: THREE.Object3D): number {

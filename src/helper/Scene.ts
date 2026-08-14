@@ -3,6 +3,7 @@ import type { UserData } from './UserData';
 import { Edge2 } from '../geometry/data/brep/Brep2';
 import { BrepMeshBuilder } from './BrepMeshBuilder';
 import * as MATHJS from '../mathjs';
+import { DataBase } from '../geometry/data/DataBase';
 
 class Scene {
   private _objects: Map<number, THREE.Object3D>;
@@ -76,6 +77,21 @@ class Scene {
       result.push(value);
       if (value.children.length) {
         result.push(...value.children);
+      }
+    }
+    return result;
+  }
+
+  getObjectsByUUIDs(paras: string[]): THREE.Object3D[] {
+    const result: THREE.Object3D[] = [];
+    // 从场景中选择需要的目标
+    for (const value of this._objects.values()) {
+      let userData = value.userData as UserData;
+      if (userData.original instanceof DataBase) {
+        let uuid = userData.original.uuid;
+        if (paras.includes(uuid)) {
+          result.push(value);
+        }
       }
     }
     return result;

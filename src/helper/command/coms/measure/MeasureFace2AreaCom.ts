@@ -9,10 +9,10 @@ import { Face2Algo } from "../../../../geometry/algorithm/brep/Brep2Algo";
 
 
 /**
- * Calculate face area command class.
+ * Measure face area command class.
  * 
  */
-class CalculateFace2AreaCom extends Command {
+class MeasureFace2AreaCom extends Command {
   public results: number = 0;
   faces: Face2[];
   constructor(executer: CommandExecuter, text: string) {
@@ -59,4 +59,4 @@ class CalculateFace2AreaCom extends Command {
 
   }
 }
-export { CalculateFace2AreaCom };
+export { MeasureFace2AreaCom };

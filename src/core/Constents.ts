@@ -68,6 +68,10 @@ enum GeomType {
   DRAW_SOLID_SWEP = 74,    // 扫掠体
   DRAW_SOLID_LOFT = 75,     // 放样体
 
+
+  // 点数据类型
+  DATA_TYPE_POINT2 = -1 + 255,
+  DATA_TYPE_POINT3 = -2 + 255,
   // 二维曲线数据类型
   DATA_TYPE_CURVE2_ARC2 = 0 + 255,
   DATA_TYPE_CURVE2_HYPERBOLA2 = 1 + 255,
@@ -113,7 +117,8 @@ enum GeomType {
   DATA_TYPE_BREP3_BODY3 = 58 + 255,
 }
 
-// 命令类型
+// 命令类型 
+// CREATE_POINT2 = 'P2' 可以使用CREATE_POINT2，也可以使用P2,命令类型不区分大小写
 enum CommandType {
   /********基本创建命令**********/
   // 点类型
@@ -162,11 +167,11 @@ enum CommandType {
   CREATE_TORUS = 'TORU',              // 圆环
   CREATE_ELLIPTICAL_CYLINDER = 'ECYL',// 椭圆柱
   CREATE_ELLIPTICAL_CONE = 'ECON',    // 椭圆锥
-  CREATE_ELLIPTICAL_TORUS = 'ETOR',    // 椭圆环
+  CREATE_ELLIPTICAL_TORUS = 'ETOR',   // 椭圆环
   CREATE_STRETCH_BODY = 'STRE',       // 拉伸体
   CREATE_ROTATE_BODY = 'ROTA',        // 旋转体
   CREATE_SWEEP_BODY = 'SWEP',         // 扫掠体
-  CREATE_LOFT_BODY = 'LOFT',           // 放样体
+  CREATE_LOFT_BODY = 'LOFT',          // 放样体
 
   /*******基本修改命令 = 'M' + 基本创建命令 *********/
   // 点类型
@@ -221,12 +226,12 @@ enum CommandType {
   MODIFY_SWEEP_BODY = 'MSWEP',         // 扫掠体
   MODIFY_LOFT_BODY = 'MLOFT',          // 放样体
 
-  //计算
-  CALCULATE_LENGTH_2 = 'CL2',          // 计算长度
-  CALCULATE_AREA_2 = 'CA2',            // 计算面积
-  CALCULATE_LENGTH_3 = 'CL3',          // 计算长度
-  CALCULATE_AREA_3 = 'CA3',            // 计算面积
-  CALCULATE_VOLUME_3 = 'CV3',          // 计算体积
+  //度量
+  MEASURE_LENGTH_2 = 'MEL2',          // 计算长度
+  MEASURE_AREA_2 = 'MEA2',            // 计算面积
+  MEASURE_LENGTH_3 = 'MEL3',          // 计算长度
+  MEASURE_AREA_3 = 'MEA3',            // 计算面积
+  MEASURE_VOLUME_3 = 'MEV3',          // 计算体积
 
   //计算
   CALCULATE_CURVE2_U = 'CCU',           // 计算曲线U函数
@@ -263,15 +268,18 @@ enum CommandType {
   SCENE_CLEAR_POINT = 'CLEAR_POINT',    // 清空点
   SCENE_SHOW_ASSISTS = 'SHOW_ASSISTS',  // 显示/隐藏辅助对象
 
+  // 空间变换
+  TRANSFORM_MOVE = 'M',                 // 移动
+  TRANSFORM_ROTATE = 'R',               // 旋转
+  TRANSFORM_SCALE = 'S',                // 缩放
+  TRANSFORM_OFFSET = 'O',               // 偏移，产生新对象
+  TRANSFORM_MIRROR = 'I',               // 镜像，产生新对象 
+
   // 其他
+  OTHER_SELECT = 'SEL',                 // 选择
   OTHER_DELETE = 'D',                   // 删除
   OTHER_UNDO = 'UD',                    // 撤销
   OTHER_REDO = 'RD',                    // 重做
-  OTHER_MOVE = 'M',                     // 移动
-  OTHER_ROTATE = 'R',                   // 旋转
-  OTHER_SCALE = 'S',                    // 缩放
-  OTHER_OFFSET = 'O',                   // 偏移，产生新对象
-  OTHER_MIRROR = 'I',                   // 镜像，产生新对象   
   OTHER_GROUP_OR_UNGROUP = 'G',         // 组合/取消组合
 }
 

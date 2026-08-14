@@ -39,6 +39,7 @@ class ModifyNurbs2FitCom extends ComModify {
         let point = new Vector2(new Number(paras[i]).valueOf(), new Number(paras[i + 1]).valueOf());
         points.push(point);
       }
+      this.getSelected();
     } else {
       this.bind(window);
       let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);

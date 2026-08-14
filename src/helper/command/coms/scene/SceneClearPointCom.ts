@@ -16,7 +16,10 @@ class SceneClearPointCom extends Command {
     for (let i = scene.objects.length - 1; i >= 0; i--) {
       const o = scene.objects[i] as THREE.Object3D;
       let userData = o.userData as UserData;
-      if (userData.type === GeomType.MATH_VECTOR2 || userData.type === GeomType.MATH_VECTOR3) {
+      if (userData.type === GeomType.MATH_VECTOR2
+        || userData.type === GeomType.MATH_VECTOR3
+        || userData.type === GeomType.DATA_TYPE_POINT2
+        || userData.type === GeomType.DATA_TYPE_POINT3) {
         this.olds.push(o);
         scene.remove(o);
       }

@@ -13,10 +13,10 @@ import { CreateGeomUserData } from "../../../UserData";
 
 
 /**
- * Calculate face area command class. TODO
+ * Measure face area command class. TODO
  * 
  */
-class CalculateFace3AreaCom extends ComCreate {
+class MeasureFace3AreaCom extends ComCreate {
   edges: Edge2[];
   constructor(executer: CommandExecuter, text: string) {
     super(executer, text);
@@ -122,4 +122,4 @@ class CalculateFace3AreaCom extends ComCreate {
   //     }
   // }
 }
-export { CalculateFace3AreaCom };
+export { MeasureFace3AreaCom };

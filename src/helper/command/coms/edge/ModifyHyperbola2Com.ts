@@ -47,6 +47,7 @@ class ModifyHyperbola2Com extends ComModify {
       u0Point = new Vector2(new Number(paras[7]).valueOf(), new Number(paras[8]).valueOf());
       u1Point = new Vector2(new Number(paras[9]).valueOf(), new Number(paras[10]).valueOf());
       this.isRight = new Boolean(paras[11]).valueOf();
+      this.getSelected();
     } else {
       this.bind(window);
       let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);

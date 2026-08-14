@@ -13,10 +13,10 @@ import { CreateGeomUserData } from "../../../UserData";
 
 
 /**
- * Calculate loop length command class. TODO
+ * Measure body volume command class. TODO
  * 
  */
-class CalculateLoop3LengthCom extends ComCreate {
+class MeasureBody3VolumeCom extends ComCreate {
   edges: Edge2[];
   constructor(executer: CommandExecuter, text: string) {
     super(executer, text);
@@ -54,7 +54,6 @@ class CalculateLoop3LengthCom extends ComCreate {
           face.border.coedges.push(coedge);
           face.curves.push(edge.curve);
         }
-
         userData.color = THREE.Color.NAMES.blue;
         let geo = BrepMeshBuilder.BuildFace2Mesh(face, userData.color);
         userData.original = face;
@@ -122,4 +121,4 @@ class CalculateLoop3LengthCom extends ComCreate {
   //     }
   // }
 }
-export { CalculateLoop3LengthCom };
+export { MeasureBody3VolumeCom };

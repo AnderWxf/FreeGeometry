@@ -36,6 +36,16 @@ class ModifyLine2Com extends ComModify {
       // 创建一个直线段
       beginPoint = new Vector2(new Number(paras[1]).valueOf(), new Number(paras[2]).valueOf());
       endPoint = new Vector2(new Number(paras[3]).valueOf(), new Number(paras[4]).valueOf());
+      // 寻找已经选好的目标
+      if (Global.select.selectedObjects.length > 0) {
+        for (let i = 0; i < Global.select.selectedObjects.length; i++) {
+          let select = Global.select.selectedObjects[i];
+          if (select.userData && select.userData.type === this.type) {
+            this.old = select;
+            break;
+          }
+        }
+      }
     } else {
       this.bind(window);
       let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);

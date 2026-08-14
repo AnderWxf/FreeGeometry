@@ -11,6 +11,8 @@ import { Brep2Builder } from "../../../geometry/algorithm/builder/Brep2Builder";
 import type { Transform2 } from "../../../geometry/data/base/Transform2";
 import { GeomType } from "../../../core/Constents";
 import { CloneUserData, CopyUserData, type UserData } from "../../UserData";
+import { Point2Data } from "../../../geometry/data/base/Point2Data";
+import type { Point3Data } from "../../../geometry/data/base/Point3Data";
 
 /**
  * Transform command class.
@@ -23,16 +25,17 @@ class ComTransform extends ComBatch {
 
     let str = this._text;
     let paras = str.split(' ');
-    let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);
+
     if (paras.length == 5) {
       // 创建一个直线段
       this.beginPoint = new Vector2(new Number(paras[1]).valueOf(), new Number(paras[2]).valueOf());
       this.endPoint = new Vector2(new Number(paras[3]).valueOf(), new Number(paras[4]).valueOf());
-      if (context.select.selectedObjects.length > 0) {
-        this.olds.push(...context.select.selectedObjects);
+      if (Global.select.selectedObjects.length > 0) {
+        this.olds.push(...Global.select.selectedObjects);
       }
     } else {
       this.bind(window);
+      let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);
       if (context.select.selectedObjects.length == 0) {
         let act_pick_data = new ActPickObject();
         await act_pick_data.execute(context);
@@ -69,8 +72,17 @@ class ComTransform extends ComBatch {
       if (old.userData.type == GeomType.MATH_VECTOR2) {
         let point = (old.userData.original as Vector2).clone();
         point.applyMatrix3(trans);
-        userData.original = point;
+        userData.original = new Point2Data(point);
         let geo = this.createAssistPoint({ p: point, c: userData.color }, false);
+        geo.userData = userData;
+        this.results.push(geo);
+      }
+      // 点
+      else if (old.userData.type == GeomType.DATA_TYPE_POINT2) {
+        let point = (old.userData.original as Point2Data).clone();
+        point.pos.applyMatrix3(trans);
+        userData.original = point;
+        let geo = this.createAssistPoint({ p: point.pos, c: userData.color }, false);
         geo.userData = userData;
         this.results.push(geo);
       }
@@ -187,7 +199,7 @@ class ComTransform extends ComBatch {
         let old = this.olds[i];
         let userData = CloneUserData(old.userData as UserData);
         // 点
-        if (old.userData.type < GeomType.MATH_VECTOR2) {
+        if (old.userData.type == GeomType.MATH_VECTOR2) {
           // 单例
           if (old.userData.original instanceof Vector2) {
             let point = (old.userData.original as Vector2).clone();

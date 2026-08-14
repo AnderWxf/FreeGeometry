@@ -41,6 +41,16 @@ class ModifyNurbs2CtrlCom extends ComModify {
         let point = new Vector2(new Number(paras[i]).valueOf(), new Number(paras[i + 1]).valueOf());
         points.push(point);
       }
+      // 寻找已经选好的目标
+      if (Global.select.selectedObjects.length > 0) {
+        for (let i = 0; i < Global.select.selectedObjects.length; i++) {
+          let select = Global.select.selectedObjects[i];
+          if (select.userData && select.userData.type === this.type) {
+            this.old = select;
+            break;
+          }
+        }
+      }
     } else {
       this.bind(window);
       let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);

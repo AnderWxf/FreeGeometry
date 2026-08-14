@@ -6,6 +6,7 @@ import { BrepMeshBuilder } from "./BrepMeshBuilder";
 import { CreateAssistPoint, type UserData } from "./UserData";
 import * as THREE from "three";
 import { GeomType } from "../core/Constents";
+import { Point2Data } from "../geometry/data/base/Point2Data";
 
 type DocNode = {
   userData: UserData,
@@ -30,6 +31,12 @@ function ImportJson(json: string): THREE.Object3D[] {
       let original = originals[0];
       if (original instanceof Vector2) {
         let geo = CreateAssistPoint({ p: original, c: userData.color });
+        userData.original = new Point2Data(original);
+        geo.userData = userData;
+        results.push(geo);
+      }
+      if (original instanceof Point2Data) {
+        let geo = CreateAssistPoint({ p: original.pos, c: userData.color });
         userData.original = original;
         geo.userData = userData;
         results.push(geo);

@@ -8,6 +8,7 @@ import { describe, expect, test } from 'vitest';
 import { Vector2, Vector3 } from '../math/Math';
 import { vec2 } from 'three/src/nodes/TSL';
 import { Edge2 } from '../geometry/data/brep/Brep2';
+import { Point2Data } from '../geometry/data/base/Point2Data';
 
 function IsCloseTo(received: any, expected: any, tolerance: number = 1e-12): boolean {
   return isEqualWith(received, expected, (objVal, othVal) => {
@@ -141,6 +142,9 @@ function ExecuteDescribeInsertPoint2(typeName: string, typeDir: string, process:
               if (input[i].userData.original instanceof Vector2) {
                 expected.push(input[i]);
               }
+              if (input[i].userData.original instanceof Point2Data) {
+                expected.push(input[i]);
+              }
               if (input[i].userData.original instanceof Edge2) {
                 if (edge1 === null) {
                   edge1 = input[i].userData.original;
@@ -153,6 +157,7 @@ function ExecuteDescribeInsertPoint2(typeName: string, typeDir: string, process:
               }
             }
 
+            let tol = 1e-4;
             const result = process(edge1, edge2) as [any];
             // 交点距离判定，
             for (let j = expected.length - 1; j >= 0; j--) {
@@ -161,7 +166,28 @@ function ExecuteDescribeInsertPoint2(typeName: string, typeDir: string, process:
                 let ret = result[k].userData as UserData;
                 if (exp.original instanceof Vector2
                   && ret.original instanceof Vector2
-                  && exp.original.distanceTo(ret.original) < 1e-4
+                  && exp.original.distanceTo(ret.original) < tol
+                ) {
+                  expected.splice(j, 1);
+                  break;
+                }
+                else if (exp.original instanceof Point2Data
+                  && ret.original instanceof Vector2
+                  && exp.original.pos.distanceTo(ret.original) < tol
+                ) {
+                  expected.splice(j, 1);
+                  break;
+                }
+                else if (exp.original instanceof Point2Data
+                  && ret.original instanceof Point2Data
+                  && exp.original.pos.distanceTo(ret.original.pos) < tol
+                ) {
+                  expected.splice(j, 1);
+                  break;
+                }
+                else if (exp.original instanceof Vector2
+                  && ret.original instanceof Point2Data
+                  && exp.original.distanceTo(ret.original.pos) < tol
                 ) {
                   expected.splice(j, 1);
                   break;

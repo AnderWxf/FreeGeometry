@@ -28,7 +28,7 @@ grid_yz.visible = false;
 grid_yz.renderOrder = -Infinity;
 (grid_yz.material as THREE.LineBasicMaterial).vertexColors = true;
 
-let CamToolBarOnChange = (value: string) => {
+let CamViewChange = (value: string) => {
   if (value == '透') {
     perspective.bind(window);
     orthographic.unbind(window);
@@ -100,14 +100,14 @@ let CamToolBarOnChange = (value: string) => {
   }
 
 };
-const CamToolBar: React.FC = () => (
-  <Space wrap>
 
+const ComOptionBar: React.FC = () => (
+  <Space wrap>
     <Select
       defaultValue="前"
-      style={{ width: 50, position: 'fixed', top: 10, right: 10, zIndex: 1000, backgroundColor: 'transparent' }}
+      style={{ width: 75, position: 'fixed', top: 10, right: 10, zIndex: 1000, backgroundColor: 'transparent' }}
       onSelect={(value: string) => {
-        CamToolBarOnChange(value);
+        CamViewChange(value);
       }}
       options={[
         { value: '前', label: '前' },
@@ -119,13 +119,6 @@ const CamToolBar: React.FC = () => (
         { value: '透', label: '透' },
       ]}
     />
-
-  </Space>
-);
-
-const ComOptionBar: React.FC = () => (
-  <Space wrap>
-
     <Checkbox
       style={{ width: 60, position: 'fixed', top: 10, right: 70, zIndex: 1000, backgroundColor: 'transparent' }}
       onChange={(e) => {
@@ -149,6 +142,14 @@ const ComOptionBar: React.FC = () => (
         Global.comExector.execute(CommandType.SCENE_SHOW_ASSISTS);
       }}
     >辅点</Checkbox>
+    <Checkbox
+      style={{ width: 80, position: 'fixed', top: 10, right: 260, zIndex: 1000 }}
+      defaultChecked={false}
+      onChange={(e) => {
+        Global.isShowAssists = e.target.checked;
+        Global.comExector.execute(CommandType.SCENE_SHOW_ASSISTS);
+      }}
+    >录制</Checkbox>    
     <div id='states' style={{ width: 300, position: 'fixed', fontSize: 14, top: 10, right: 350, color: '#00AA00', zIndex: 1000 }}> 光标位置 </div>
     {/* <Checkbox
       style={{ width: 100, position: 'fixed', top: 10, right: 300, zIndex: 1000 }}
@@ -165,7 +166,7 @@ let pos = 0;
 let CommandBarOnEnter = (value: string) => {
   if (value.trim() == '') { return; }
   Global.gpu.focus();
-  Global.comExector.execute(value.toUpperCase());
+  Global.comExector.execute(value);
 };
 
 const CommandBar: React.FC = () => {
@@ -436,11 +437,11 @@ const MenuItems = [
       { key: CommandType.OTHER_DELETE, label: '删除' + ' ' + CommandType.OTHER_DELETE + ' Delete' },
       { key: CommandType.OTHER_UNDO, label: '撤销' + ' ' + CommandType.OTHER_UNDO + ' Ctrl + Z' },
       { key: CommandType.OTHER_REDO, label: '重做' + ' ' + CommandType.OTHER_REDO + ' Ctrl + Y' },
-      { key: CommandType.OTHER_MOVE, label: '移动' + ' ' + CommandType.OTHER_MOVE },
-      { key: CommandType.OTHER_ROTATE, label: '旋转' + ' ' + CommandType.OTHER_ROTATE },
-      { key: CommandType.OTHER_SCALE, label: '缩放' + ' ' + CommandType.OTHER_SCALE },
-      { key: CommandType.OTHER_OFFSET, label: '偏移' + ' ' + CommandType.OTHER_OFFSET },
-      { key: CommandType.OTHER_MIRROR, label: '镜像' + ' ' + CommandType.OTHER_MIRROR },
+      { key: CommandType.TRANSFORM_MOVE, label: '移动' + ' ' + CommandType.TRANSFORM_MOVE },
+      { key: CommandType.TRANSFORM_ROTATE, label: '旋转' + ' ' + CommandType.TRANSFORM_ROTATE },
+      { key: CommandType.TRANSFORM_SCALE, label: '缩放' + ' ' + CommandType.TRANSFORM_SCALE },
+      { key: CommandType.TRANSFORM_OFFSET, label: '偏移' + ' ' + CommandType.TRANSFORM_OFFSET },
+      { key: CommandType.TRANSFORM_MIRROR, label: '镜像' + ' ' + CommandType.TRANSFORM_MIRROR },
       { key: CommandType.OTHER_GROUP_OR_UNGROUP, label: '组合/取消组合' + ' ' + CommandType.OTHER_GROUP_OR_UNGROUP },
     ]
   },
@@ -488,17 +489,17 @@ const MenuItems = [
     label: '度量',
     children: [
       // 度量计算
-      { key: CommandType.CALCULATE_LENGTH_2, label: '计算长度' + ' ' + CommandType.CALCULATE_LENGTH_2 },
-      { key: CommandType.CALCULATE_AREA_2, label: '计算面积' + ' ' + CommandType.CALCULATE_AREA_2 },
-      { key: CommandType.CALCULATE_LENGTH_3, label: '计算长度' + ' ' + CommandType.CALCULATE_LENGTH_3 },
-      { key: CommandType.CALCULATE_AREA_3, label: '计算面积' + ' ' + CommandType.CALCULATE_AREA_3 },
-      { key: CommandType.CALCULATE_VOLUME_3, label: '计算体积' + ' ' + CommandType.CALCULATE_VOLUME_3 },
+      { key: CommandType.MEASURE_LENGTH_2, label: '计算长度' + ' ' + CommandType.MEASURE_LENGTH_2 },
+      { key: CommandType.MEASURE_AREA_2, label: '计算面积' + ' ' + CommandType.MEASURE_AREA_2 },
+      { key: CommandType.MEASURE_LENGTH_3, label: '计算长度' + ' ' + CommandType.MEASURE_LENGTH_3 },
+      { key: CommandType.MEASURE_AREA_3, label: '计算面积' + ' ' + CommandType.MEASURE_AREA_3 },
+      { key: CommandType.MEASURE_VOLUME_3, label: '计算体积' + ' ' + CommandType.MEASURE_VOLUME_3 },
     ]
   },
 ];
 const MenuBarOnChange = (info: any): void => {
   Global.gpu.focus();
-  let command = info.key.toUpperCase();
+  let command = info.key;
   Global.comExector.execute(command);
 };
 const MenuBar: React.FC = () => (
@@ -538,7 +539,7 @@ const MenuBar: React.FC = () => (
     </ConfigProvider>
   </Space>
 );
-export default { perspective, orthographic, grid_xz, grid_xy, grid_yz, CamToolBarOnChange };
+export default { perspective, orthographic, grid_xz, grid_xy, grid_yz, CamViewChange };
 
 const root = ReactDOM.createRoot(document.getElementById('ui'));
 root.render(
@@ -552,7 +553,6 @@ root.render(
         },
       }}
     >
-      <CamToolBar />
       <ComOptionBar />
       <MenuBar />
       <CommandBar />

@@ -7,6 +7,7 @@ import { Vector2 } from "../../../../math/Math";
 import type { CommandExecuter } from "../../CommandExecuter";
 import { GeomType } from "../../../../core/Constents";
 import { CreateGeomUserData } from "../../../UserData";
+import { Point2Data } from "../../../../geometry/data/base/Point2Data";
 
 
 /**
@@ -17,7 +18,7 @@ class CreatePoint2Com extends ComCreate {
   point: Vector2;
   constructor(executer: CommandExecuter, text: string) {
     super(executer, text);
-    this.type = GeomType.MATH_VECTOR2;
+    this.type = GeomType.DATA_TYPE_POINT2;
   }
   async exec(): Promise<void> {
     let str = this._text;
@@ -38,7 +39,7 @@ class CreatePoint2Com extends ComCreate {
     }
     // 创建一个点
     userData.color = THREE.Color.NAMES.greenyellow;
-    userData.original = this.point;
+    userData.original = new Point2Data(this.point.clone());
     let geo = this.createAssistPoint({ p: this.point, c: userData.color }, false);
     geo.userData = userData;
     this.results = geo;

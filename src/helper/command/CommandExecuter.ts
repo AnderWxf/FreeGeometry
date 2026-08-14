@@ -42,11 +42,11 @@ import { ComDelete } from "./coms/ComDelete";
 import type { UserData } from "../UserData";
 import { EdgeIntersectionCom } from "./coms/operation/EdgeIntersectionCom";
 import { EdgeCuttingCom } from "./coms/operation/EdgeCuttingCom";
-import { CalculateLoop2LengthCom } from "./coms/calculate/CalculateLoop2LengthCom";
-import { CalculateBody3VolumeCom } from "./coms/calculate/CalculateBody3VolumeCom";
-import { CalculateFace3AreaCom } from "./coms/calculate/CalculateFace3AreaCom";
-import { CalculateFace2AreaCom } from "./coms/calculate/CalculateFace2AreaCom";
-import { CalculateLoop3LengthCom } from "./coms/calculate/CalculateLoop3LengthCom";
+import { MeasureLoop2LengthCom } from "./coms/measure/MeasureLoop2LengthCom";
+import { MeasureBody3VolumeCom } from "./coms/measure/MeasureBody3VolumeCom";
+import { MeasureFace3AreaCom } from "./coms/measure/MeasureFace3AreaCom";
+import { MeasureFace2AreaCom } from "./coms/measure/MeasureFace2AreaCom";
+import { MeasureLoop3LengthCom } from "./coms/measure/MeasureLoop3LengthCom";
 import { Bool2IntersectionCom } from "./coms/bool/Bool2IntersectionCom";
 import { Bool2UnionCom } from "./coms/bool/Bool2UnionCom";
 import { Bool2DifferenceCom } from "./coms/bool/Bool2DifferenceCom";
@@ -76,6 +76,7 @@ import { SceneShowAssistsCom } from "./coms/scene/SceneShowAssistsCom";
 import { ModifyPoint2Com } from "./coms/point/ModifyPoint2Com";
 import { SceneSaveasCom } from "./coms/scene/SceneSaveasCom";
 import { SceneClearPointCom } from "./coms/scene/SceneClearPointCom";
+import { ComSelect } from "./coms/ComSelect";
 
 /**
  * Command executer base class.
@@ -85,9 +86,11 @@ class CommandExecuter {
   private _commands = new Map<string, Function>();
   private _history: Stack<Command>;
   private _redos: Stack<Command>;
-  private KeyShiftDown: Boolean = false;
-  private KeyCtrlDown: Boolean = false;
+  private KeyShiftDown: boolean = false;
+  private KeyCtrlDown: boolean = false;
   private _curr: Command;
+  private _isRecord: boolean = false;
+  private _records: string[] = [];
   constructor() {
     this._history = new Stack<Command>();
     this._redos = new Stack<Command>();
@@ -145,11 +148,11 @@ class CommandExecuter {
     this._commands.set(CommandType.CALCULATE_POINT_EDGE2_AUTO, CalculatePointEdge2AutoCom);
     this._commands.set(CommandType.CALCULATE_POINT_FACE2_AUTO, CalculatePointFace2AutoCom);
 
-    this._commands.set(CommandType.CALCULATE_LENGTH_2, CalculateLoop2LengthCom);
-    this._commands.set(CommandType.CALCULATE_LENGTH_3, CalculateLoop3LengthCom);
-    this._commands.set(CommandType.CALCULATE_AREA_2, CalculateFace2AreaCom);
-    this._commands.set(CommandType.CALCULATE_AREA_3, CalculateFace3AreaCom);
-    this._commands.set(CommandType.CALCULATE_VOLUME_3, CalculateBody3VolumeCom);
+    this._commands.set(CommandType.MEASURE_LENGTH_2, MeasureLoop2LengthCom);
+    this._commands.set(CommandType.MEASURE_LENGTH_3, MeasureLoop3LengthCom);
+    this._commands.set(CommandType.MEASURE_AREA_2, MeasureFace2AreaCom);
+    this._commands.set(CommandType.MEASURE_AREA_3, MeasureFace3AreaCom);
+    this._commands.set(CommandType.MEASURE_VOLUME_3, MeasureBody3VolumeCom);
 
     this._commands.set(CommandType.CALCULATE_EDGE_INTERSECTION, EdgeIntersectionCom);
     this._commands.set(CommandType.CALCULATE_EDGE_CUTTING, EdgeCuttingCom);
@@ -170,13 +173,30 @@ class CommandExecuter {
     this._commands.set(CommandType.SCENE_CLEAR_POINT, SceneClearPointCom);
     this._commands.set(CommandType.SCENE_SHOW_ASSISTS, SceneShowAssistsCom);
 
+    this._commands.set(CommandType.OTHER_SELECT, ComSelect);
     this._commands.set(CommandType.OTHER_DELETE, ComDelete);
-    this._commands.set(CommandType.OTHER_MOVE, ComMove);
-    this._commands.set(CommandType.OTHER_ROTATE, ComRotate);
-    this._commands.set(CommandType.OTHER_SCALE, ComScale);
-    this._commands.set(CommandType.OTHER_MIRROR, ComMirror);
-    this._commands.set(CommandType.OTHER_OFFSET, ComOffset);
+
+    this._commands.set(CommandType.TRANSFORM_MOVE, ComMove);
+    this._commands.set(CommandType.TRANSFORM_ROTATE, ComRotate);
+    this._commands.set(CommandType.TRANSFORM_SCALE, ComScale);
+    this._commands.set(CommandType.TRANSFORM_MIRROR, ComMirror);
+    this._commands.set(CommandType.TRANSFORM_OFFSET, ComOffset);
+
     // this._commands.set(CommandType.OTHER_GROUP_OR_UNGROUP, ComGroup);
+  }
+
+  get isRecord(): boolean {
+    return this._isRecord;
+  }
+
+  set isRecord(isRecord: boolean) {
+    this._isRecord = isRecord;
+    if (!isRecord) {
+      this._records = [];
+    }
+  }
+  get records(): string[] {
+    return this._records;
   }
 
   RegisterCommand(type: string, com: Function) {
@@ -207,6 +227,7 @@ class CommandExecuter {
   isExecuting(): boolean {
     return this._curr != null && !this._curr.isDone && !this._curr.isCancel;
   }
+  
   onEidtor() {
     let seleced = Global.select.selectedObjects[0];
     let userData = seleced.userData as UserData;
@@ -215,8 +236,9 @@ class CommandExecuter {
       return;
     }
     let typeName = GeomType[type] as string;
-    if (type == GeomType.MATH_VECTOR2) {
-      typeName = CommandType.CREATE_POINT2;
+    if (type == GeomType.MATH_VECTOR2
+      || type == GeomType.DATA_TYPE_POINT2) {
+      typeName = CommandType.MODIFY_POINT2;
     } else {
       typeName = typeName.split('_')[2];//DRAW_CURVE2_L = 0, // 两点直线段
     }
@@ -238,6 +260,7 @@ class CommandExecuter {
       }
     }
   }
+
   /*
   ********快捷键********
   * 'Esc'                命令取消
@@ -289,16 +312,16 @@ class CommandExecuter {
           this.execute(CommandType.SCENE_IMPORT);
           return;
         } else {
-          com = new ComMirror(this, CommandType.OTHER_MIRROR);
+          com = new ComMirror(this, CommandType.TRANSFORM_MIRROR);
         }
         break;
       // M：移动
       case 'KeyM':
-        com = new ComMove(this, CommandType.OTHER_MOVE);
+        com = new ComMove(this, CommandType.TRANSFORM_MOVE);
         break;
       // R：旋转
       case 'KeyR':
-        com = new ComRotate(this, CommandType.OTHER_ROTATE);
+        com = new ComRotate(this, CommandType.TRANSFORM_ROTATE);
         break;
       // O：偏移
       case 'KeyO':
@@ -308,7 +331,7 @@ class CommandExecuter {
           this.execute(CommandType.SCENE_LOAD);
           return;
         } else {
-          com = new ComOffset(this, CommandType.OTHER_OFFSET);
+          com = new ComOffset(this, CommandType.TRANSFORM_OFFSET);
         }
         break;
       // S：拉伸
@@ -327,7 +350,7 @@ class CommandExecuter {
           return;
         }
         else {
-          com = new ComScale(this, CommandType.OTHER_SCALE);
+          com = new ComScale(this, CommandType.TRANSFORM_SCALE);
         }
         break;
       // Ctrl+Z Undo
@@ -388,6 +411,12 @@ class CommandExecuter {
     }
   }
 
+  aotuExecute(comstrs: string[]) {
+    for (let i = 0; i < comstrs.length; i++) {
+      this.execute(comstrs[i]);
+    }
+  }
+
   execute(comstr: string) {
     let s = comstr.split(' ');
     if (s.length) {
@@ -402,6 +431,12 @@ class CommandExecuter {
           break;
         default:
           let c = this._commands.get(command) as Function;
+          if (!c) {
+            if (Object.prototype.hasOwnProperty.call(CommandType, command)) {
+              command = CommandType[command as keyof typeof CommandType];
+              c = this._commands.get(command) as Function;
+            }
+          }
           if (c) {
             let com: Command = new (<any>c)(this, comstr);
             if (this._curr && !this._curr.isDone) {

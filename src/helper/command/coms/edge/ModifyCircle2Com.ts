@@ -35,6 +35,7 @@ class ModifyCircle2Com extends ComModify {
       // 创建一个直线段
       centerPoint = new Vector2(new Number(paras[1]).valueOf(), new Number(paras[2]).valueOf());
       beginPoint = new Vector2(new Number(paras[3]).valueOf(), new Number(paras[4]).valueOf());
+      this.getSelected();
     } else {
       this.bind(window);
       let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);
