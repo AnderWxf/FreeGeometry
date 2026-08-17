@@ -14,12 +14,12 @@ import { CreateGeomUserData, type UserData } from "../../../UserData";
 
 /**
  * Create command class.
- * 
+ * 格式：命令类型 center.x center.y focus.x focus.y begin.x begin.y uuid
  */
 class CreateParabola2Com extends ComCreate {
-  centerPoint: Vector2;
-  focusPoint: Vector2;
-  beginPoint: Vector2;
+  center: Vector2;
+  focus: Vector2;
+  begin: Vector2;
   constructor(executer: CommandExecuter, text: string) {
     super(executer, text);
     this.type = GeomType.DRAW_CURVE2_PA;
@@ -28,12 +28,11 @@ class CreateParabola2Com extends ComCreate {
     let str = this._text;
     let paras = str.split(' ');
     let userData = CreateGeomUserData(this.type);
-
-    if (paras.length == 7) {
+    if (paras.length >= 7) {
       // 创建一个线段
-      this.centerPoint = new Vector2(new Number(paras[1]).valueOf(), new Number(paras[2]).valueOf());
-      this.focusPoint = new Vector2(new Number(paras[3]).valueOf(), new Number(paras[4]).valueOf());
-      this.beginPoint = new Vector2(new Number(paras[5]).valueOf(), new Number(paras[6]).valueOf());
+      this.center = new Vector2(new Number(paras[1]).valueOf(), new Number(paras[2]).valueOf());
+      this.focus = new Vector2(new Number(paras[3]).valueOf(), new Number(paras[4]).valueOf());
+      this.begin = new Vector2(new Number(paras[5]).valueOf(), new Number(paras[6]).valueOf());
     } else {
       this.bind(window);
       let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);
@@ -41,66 +40,71 @@ class CreateParabola2Com extends ComCreate {
       let act_pick_center = new ActPickPoint2();
       await act_pick_center.execute(context);
       if (this._isCancel || act_pick_center.isCancel) { this.cancel(); return; }
-      this.centerPoint = new Vector2(act_pick_center.result.x, act_pick_center.result.y);
-      userData.assistPoints.push({ p: this.centerPoint, c: THREE.Color.NAMES.greenyellow });
+      this.center = new Vector2(act_pick_center.result.x, act_pick_center.result.y);
+      userData.assistPoints.push({ p: this.center, c: THREE.Color.NAMES.greenyellow });
       this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
       Global.scene.add(this.assists[this.assists.length - 1]);
 
       let act_pick_begin = new ActPickPoint2();
       await act_pick_begin.execute(context);
       if (this._isCancel || act_pick_begin.isCancel) { this.cancel(); return; }
-      this.focusPoint = new Vector2(act_pick_begin.result.x, act_pick_begin.result.y);
-      userData.assistPoints.push({ p: this.focusPoint, c: THREE.Color.NAMES.limegreen });
+      this.focus = new Vector2(act_pick_begin.result.x, act_pick_begin.result.y);
+      userData.assistPoints.push({ p: this.focus, c: THREE.Color.NAMES.limegreen });
       this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
       Global.scene.add(this.assists[this.assists.length - 1]);
 
       let act_pick_end = new ActPickPoint2();
       await act_pick_end.execute(context);
       if (this._isCancel || act_pick_end.isCancel) { this.cancel(); return; }
-      this.beginPoint = new Vector2(act_pick_end.result.x, act_pick_end.result.y);
+      this.begin = new Vector2(act_pick_end.result.x, act_pick_end.result.y);
     }
     // 创建一个曲线段
-    let edge = Brep2Builder.BuildParabolaEdge2FromCenterABPoint(this.centerPoint, this.focusPoint, this.beginPoint);
+    let edge = Brep2Builder.BuildParabolaEdge2FromCenterABPoint(this.center, this.focus, this.begin);
+    if (paras.length >= 8) { edge.uuid = paras[7]; }
     let alg = CurveBuilder.Algorithm2ByData(edge.curve);
-    this.beginPoint = alg.p(edge.u.x);
+    this.begin = alg.p(edge.u.x);
     let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, userData.color);
     userData.original = edge;
     geo.userData = userData;
     this.results = geo;
 
-    userData.assistPoints.push({ p: this.beginPoint, c: THREE.Color.NAMES.greenyellow });
+    userData.assistPoints.push({ p: this.begin, c: THREE.Color.NAMES.greenyellow });
     this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
     Global.scene.add(this.assists[this.assists.length - 1]);
 
-    this._text = paras[0] + ' ' + this.centerPoint.x + ' ' + this.centerPoint.y + ' ' + this.focusPoint.x + ' ' + this.focusPoint.y + ' ' + this.beginPoint.x + ' ' + this.beginPoint.y;
+    this._text = paras[0]
+      + ' ' + this.center.x + ' ' + this.center.y
+      + ' ' + this.focus.x + ' ' + this.focus.y
+      + ' ' + this.begin.x + ' ' + this.begin.y
+      + ' ' + edge.uuid;
 
     this.done();
   }
   onMouseMoveExec(event: MouseEvent) {
     if (this._isCancel) { this.cancel(); return; }
-    if (this.centerPoint && !this.focusPoint) {
+    if (this.center && !this.focus) {
       if (this.tempResult) {
         Global.scene.remove(this.tempResult);
       }
       let beginPoint: Vector2 = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
-      let f = beginPoint.distanceTo(this.centerPoint);
+      let f = beginPoint.distanceTo(this.center);
       if (f == 0) return;
       let u0 = 2 * f;
       let u1 = -u0;
       // 创建一个临时曲线段
-      let edge = Brep2Builder.BuildParabolaEdge2FromCenterAPoint(this.centerPoint, beginPoint, u0, u1);
+      let edge = Brep2Builder.BuildParabolaEdge2FromCenterAPoint(this.center, beginPoint, u0, u1);
       let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0);
       t.name = "temp";
       this.tempResult = t;
       Global.scene.add(this.tempResult);
     }
-    if (this.centerPoint && this.focusPoint && !this.beginPoint) {
+    if (this.center && this.focus && !this.begin) {
       if (this.tempResult) {
         Global.scene.remove(this.tempResult);
       }
       let endPoint: Vector2 = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
       // 创建一个临时曲线段
-      let edge = Brep2Builder.BuildParabolaEdge2FromCenterABPoint(this.centerPoint, this.focusPoint, endPoint);
+      let edge = Brep2Builder.BuildParabolaEdge2FromCenterABPoint(this.center, this.focus, endPoint);
       let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0);
       t.name = "temp";
       this.tempResult = t;

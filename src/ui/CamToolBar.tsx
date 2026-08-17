@@ -105,7 +105,7 @@ const ComOptionBar: React.FC = () => (
   <Space wrap>
     <Select
       defaultValue="前"
-      style={{ width: 75, position: 'fixed', top: 10, right: 10, zIndex: 1000, backgroundColor: 'transparent' }}
+      style={{ width: 60, position: 'fixed', top: 5, right: 5, zIndex: 1000, backgroundColor: 'transparent' }}
       onSelect={(value: string) => {
         CamViewChange(value);
       }}
@@ -143,13 +143,12 @@ const ComOptionBar: React.FC = () => (
       }}
     >辅点</Checkbox>
     <Checkbox
-      style={{ width: 80, position: 'fixed', top: 10, right: 260, zIndex: 1000 }}
+      style={{ width: 80, position: 'fixed', top: 10, right: 280, zIndex: 1000 }}
       defaultChecked={false}
       onChange={(e) => {
-        Global.isShowAssists = e.target.checked;
-        Global.comExector.execute(CommandType.SCENE_SHOW_ASSISTS);
+        Global.comExector.isRecord = e.target.checked;
       }}
-    >录制</Checkbox>    
+    >录制</Checkbox>
     <div id='states' style={{ width: 300, position: 'fixed', fontSize: 14, top: 10, right: 350, color: '#00AA00', zIndex: 1000 }}> 光标位置 </div>
     {/* <Checkbox
       style={{ width: 100, position: 'fixed', top: 10, right: 300, zIndex: 1000 }}
@@ -252,6 +251,8 @@ const MenuItems = [
       { key: CommandType.SCENE_IMPORT, label: '导入' + ' ' + CommandType.SCENE_IMPORT + ' Ctrl + I' },
       { key: CommandType.SCENE_CLEAR, label: '清空' + ' ' + CommandType.SCENE_CLEAR },
       { key: CommandType.SCENE_CLEAR_POINT, label: '清空点' + ' ' + CommandType.SCENE_CLEAR_POINT },
+      { key: CommandType.SCENE_STRICP_SAVE, label: '保存脚本' + ' ' + CommandType.SCENE_STRICP_SAVE },
+      { key: CommandType.SCENE_STRICP_EXEC, label: '执行脚本' + ' ' + CommandType.SCENE_STRICP_EXEC },
     ],
   },
   {

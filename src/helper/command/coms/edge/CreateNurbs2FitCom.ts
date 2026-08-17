@@ -14,7 +14,7 @@ import { CreateGeomUserData, type UserData } from "../../../UserData";
 
 /**
  * Create command class.
- * 
+ * 命令类型 n p[0].x p[0].y p[1].x p[1].y p[2].x p[2].y ... uuid
  */
 class CreateNurbs2FitCom extends ComCreate {
   points: Vector2[];
@@ -27,10 +27,11 @@ class CreateNurbs2FitCom extends ComCreate {
     let str = this._text;
     let paras = str.split(' ');
     let userData = CreateGeomUserData(this.type);
-    if (paras.length > 5) {
-      // 创建一个多段线
-      for (let i = 1; i < paras.length; i++) {
-        let point = new Vector2(new Number(paras[i]).valueOf(), new Number(paras[i + 1]).valueOf());
+    if (paras.length >= 6) {
+      // 获取n个点
+      let n = new Number(paras[1]).valueOf();
+      for (let i = 1; i < (n + 1) * 2; i++) {
+        let point = new Vector2(new Number(paras[i]).valueOf(), new Number(paras[i++]).valueOf());
         this.points.push(point);
       }
     } else {
@@ -48,20 +49,25 @@ class CreateNurbs2FitCom extends ComCreate {
         this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
         Global.scene.add(this.assists[this.assists.length - 1]);
       }
-      this._text = paras[0];
-      for (let i = 1; i < this.points.length; i++) {
-        let point = this.points[i];
-        this._text += ' ' + point.x + ' ' + point.y;
-      }
+
     }
 
     // 创建一个曲线段
     if (this.points.length > 2) {
       let edge = Brep2Builder.BuildEdge2FromFittingPoints(this.points, this.points.length == 3 ? 2 : 3);
+      if (paras.length >= 6 && paras.length % 2 == 1) {
+        edge.uuid = paras[paras.length - 1];
+      }
       let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, userData.color);
       userData.original = edge;
       geo.userData = userData;
       this.results = geo;
+      this._text = paras[0] + ' ' + this.points.length;
+      for (let i = 1; i < this.points.length; i++) {
+        let point = this.points[i];
+        this._text += ' ' + point.x + ' ' + point.y;
+      }
+      this._text += ' ' + edge.uuid;
       this.done();
     } else {
       this.cancel();

@@ -52,10 +52,10 @@ class BrepMeshBuilder {
     }
     else if (original instanceof Array) {
       if (original[0] instanceof Edge2) {
-        BrepMeshBuilder.BuildEdge2sMesh(original, userData.color, null, 0, mesh as THREE.Line);
+        BrepMeshBuilder.BuildEdge2sMesh(original as Edge2[], userData.color, null, 0, mesh as THREE.Line);
       }
       else if (original[0] instanceof Face2) {
-        BrepMeshBuilder.BuildFace2sMesh(original, userData.color, null, true, mesh as THREE.Mesh);
+        BrepMeshBuilder.BuildFace2sMesh(original as Face2[], userData.color, null, true, mesh as THREE.Mesh);
       }
     }
   }

@@ -1,7 +1,7 @@
 import * as THREE from "three";
-import { Global } from "../../../core/Global";
-import type { CommandExecuter } from "../CommandExecuter";
-import { Command } from "../Command";
+import { Global } from "../../../../core/Global";
+import type { CommandExecuter } from "../../CommandExecuter";
+import { Command } from "../../Command";
 
 
 /**

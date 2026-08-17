@@ -14,7 +14,7 @@ import { CreateGeomUserData, type UserData } from "../../../UserData";
 
 /**
  * Create command class.
- * 
+ * 命令类型 n p[0].x p[0].y p[1].x p[1].y p[2].x p[2].y ... uuid0 uuid1 uuid2
  */
 class CreatePolyline2Com extends ComCreate {
   points: Vector2[];
@@ -28,10 +28,11 @@ class CreatePolyline2Com extends ComCreate {
     let paras = str.split(' ');
     let userData = CreateGeomUserData(this.type);
 
-    if (paras.length > 5) {
-      // 创建一个多段线
-      for (let i = 1; i < paras.length; i++) {
-        let point = new Vector2(new Number(paras[i]).valueOf(), new Number(paras[i + 1]).valueOf());
+    if (paras.length >= 6) {
+      // 获取n个点
+      let n = new Number(paras[1]).valueOf();
+      for (let i = 1; i < (n + 1) * 2; i++) {
+        let point = new Vector2(new Number(paras[i]).valueOf(), new Number(paras[i++]).valueOf());
         this.points.push(point);
       }
     } else {
@@ -49,11 +50,6 @@ class CreatePolyline2Com extends ComCreate {
         this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
         Global.scene.add(this.assists[this.assists.length - 1]);
       }
-      this._text = paras[0];
-      for (let i = 1; i < this.points.length; i++) {
-        let point = this.points[i];
-        this._text += ' ' + point.x + ' ' + point.y;
-      }
     }
     // 创建一个多段线
     let edges: Edge2[] = [];
@@ -64,9 +60,26 @@ class CreatePolyline2Com extends ComCreate {
       edges.push(edge);
     }
     let geo = BrepMeshBuilder.BuildEdge2sMesh(edges, THREE.Color.NAMES.red);
+    if (paras.length >= 6) {
+      let n = new Number(paras[1]).valueOf();
+      for (let i = 0; i < n - 1; i++) {
+        let uuid = paras[2 + n * 2 + i];
+        edges[i].uuid = uuid;
+      }
+    }
     userData.original = edges;
     geo.userData = userData;
     this.results = geo;
+    let n = this.points.length
+    this._text = paras[0] + ' ' + n;
+    for (let i = 1; i < this.points.length; i++) {
+      let point = this.points[i];
+      this._text += ' ' + point.x + ' ' + point.y;
+    }
+    for (let i = 0; i < edges.length; i++) {
+      this._text += ' ' + edges[i].uuid
+    }
+
     this.done();
   }
   onMouseMoveExec(event: MouseEvent) {

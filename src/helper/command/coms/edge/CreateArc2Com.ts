@@ -16,12 +16,12 @@ import { e } from "../../../../mathjs/lib/cjs/entry/pureFunctionsAny.generated";
 
 /**
  * Create command class.
- * 
+ * 格式：命令类型 center.x center.y begin.x begin.y end.x end.y isForward uuid
  */
 class CreateArc2Com extends ComCreate {
-  centerPoint: Vector2;
-  beginPoint: Vector2;
-  endPoint: Vector2;
+  center: Vector2;
+  begin: Vector2;
+  end: Vector2;
   private isForward: boolean = true;
   constructor(executer: CommandExecuter, text: string) {
     super(executer, text);
@@ -31,11 +31,11 @@ class CreateArc2Com extends ComCreate {
     let str = this._text;
     let paras = str.split(' ');
     let userData = CreateGeomUserData(this.type);
-    if (paras.length == 7) {
+    if (paras.length >= 8) {
       // 创建一个线段
-      this.centerPoint = new Vector2(new Number(paras[1]).valueOf(), new Number(paras[2]).valueOf());
-      this.beginPoint = new Vector2(new Number(paras[3]).valueOf(), new Number(paras[4]).valueOf());
-      this.endPoint = new Vector2(new Number(paras[5]).valueOf(), new Number(paras[6]).valueOf());
+      this.center = new Vector2(new Number(paras[1]).valueOf(), new Number(paras[2]).valueOf());
+      this.begin = new Vector2(new Number(paras[3]).valueOf(), new Number(paras[4]).valueOf());
+      this.end = new Vector2(new Number(paras[5]).valueOf(), new Number(paras[6]).valueOf());
       this.isForward = new Boolean(paras[7]).valueOf();
     } else {
       this.bind(window);
@@ -44,41 +44,44 @@ class CreateArc2Com extends ComCreate {
       let act_pick_center = new ActPickPoint2();
       await act_pick_center.execute(context);
       if (this._isCancel || act_pick_center.isCancel) { this.cancel(); return; }
-      this.centerPoint = new Vector2(act_pick_center.result.x, act_pick_center.result.y);
-      userData.assistPoints.push({ p: this.centerPoint, c: THREE.Color.NAMES.greenyellow });
+      this.center = new Vector2(act_pick_center.result.x, act_pick_center.result.y);
+      userData.assistPoints.push({ p: this.center, c: THREE.Color.NAMES.greenyellow });
       this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
       Global.scene.add(this.assists[this.assists.length - 1]);
 
       let act_pick_begin = new ActPickPoint2();
       await act_pick_begin.execute(context);
       if (this._isCancel || act_pick_begin.isCancel) { this.cancel(); return; }
-      this.beginPoint = new Vector2(act_pick_begin.result.x, act_pick_begin.result.y);
-      userData.assistPoints.push({ p: this.beginPoint, c: THREE.Color.NAMES.limegreen });
+      this.begin = new Vector2(act_pick_begin.result.x, act_pick_begin.result.y);
+      userData.assistPoints.push({ p: this.begin, c: THREE.Color.NAMES.limegreen });
       this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
       Global.scene.add(this.assists[this.assists.length - 1]);
 
       let act_pick_end = new ActPickPoint2();
       await act_pick_end.execute(context);
       if (this._isCancel || act_pick_end.isCancel) { this.cancel(); return; }
-      this.endPoint = new Vector2(act_pick_end.result.x, act_pick_end.result.y);
+      this.end = new Vector2(act_pick_end.result.x, act_pick_end.result.y);
 
     }
     // 创建一个曲线段
-    let edge = Brep2Builder.BuildCircleArcEdge2FromCenterBeginEndPoin(this.centerPoint, this.beginPoint, this.endPoint);
+    let edge = Brep2Builder.BuildCircleArcEdge2FromCenterBeginEndPoin(this.center, this.begin, this.end);
+    if (paras.length >= 9) { edge.uuid = paras[8]; }
     edge.u.y = this.isForward ? edge.u.y : edge.u.y - PI2;
     let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, userData.color);
     userData.original = edge;
     geo.userData = userData;
     this.results = geo;
-    this._text = paras[0] + ' ' + this.centerPoint.x + ' ' + this.centerPoint.y
-      + ' ' + this.beginPoint.x + ' ' + this.beginPoint.y
-      + ' ' + this.endPoint.x + ' ' + this.endPoint.y
-      + ' ' + this.isForward;
+    this._text = paras[0]
+      + ' ' + this.center.x + ' ' + this.center.y
+      + ' ' + this.begin.x + ' ' + this.begin.y
+      + ' ' + this.end.x + ' ' + this.end.y
+      + ' ' + this.isForward
+      + ' ' + edge.uuid;
 
     let alg = CurveBuilder.Algorithm2ByData(edge.curve);
     let endPoint = alg.p(edge.u.y);
-    this.endPoint.set(endPoint.x, endPoint.y);
-    userData.assistPoints.push({ p: this.endPoint, c: THREE.Color.NAMES.darkblue });
+    this.end.set(endPoint.x, endPoint.y);
+    userData.assistPoints.push({ p: this.end, c: THREE.Color.NAMES.darkblue });
     this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
     Global.scene.add(this.assists[this.assists.length - 1]);
 
@@ -86,26 +89,26 @@ class CreateArc2Com extends ComCreate {
   }
   onMouseMoveExec(event: MouseEvent) {
     if (this._isCancel) { this.cancel(); return; }
-    if (this.centerPoint && !this.beginPoint) {
+    if (this.center && !this.begin) {
       if (this.tempResult) {
         Global.scene.remove(this.tempResult);
       }
       let beginPoint: Vector2 = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
       // 创建一个临时曲线段
-      let edge = Brep2Builder.BuildCircleEdge2FromCenterRadius(this.centerPoint, beginPoint.distanceTo(this.centerPoint));
+      let edge = Brep2Builder.BuildCircleEdge2FromCenterRadius(this.center, beginPoint.distanceTo(this.center));
 
       let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0);
       t.name = "temp";
       this.tempResult = t;
       Global.scene.add(this.tempResult);
     }
-    if (this.centerPoint && this.beginPoint && !this.endPoint) {
+    if (this.center && this.begin && !this.end) {
       if (this.tempResult) {
         Global.scene.remove(this.tempResult);
       }
       let endPoint: Vector2 = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
       // 创建一个临时曲线段
-      let edge = Brep2Builder.BuildCircleArcEdge2FromCenterBeginEndPoin(this.centerPoint, this.beginPoint, endPoint);
+      let edge = Brep2Builder.BuildCircleArcEdge2FromCenterBeginEndPoin(this.center, this.begin, endPoint);
       edge.u.y = this.isForward ? edge.u.y : edge.u.y - PI2;
       let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0);
       t.name = "temp";

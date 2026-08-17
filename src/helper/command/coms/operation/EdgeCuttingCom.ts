@@ -61,7 +61,7 @@ class EdgeCuttingCom extends Command {
               let u: UserData = CloneUserData(userData);
               u.assistPoints = null;
               u.original = e.clone();
-              this.des.push({ e: u.original, u: u });
+              this.des.push({ e: u.original as Edge2, u: u });
             });
 
             this.olds.push(geo);
@@ -75,7 +75,7 @@ class EdgeCuttingCom extends Command {
             let u: UserData = CloneUserData(userData);
             u.assistPoints = null;
             u.original = original.clone();
-            this.des.push({ e: u.original, u: u });
+            this.des.push({ e: u.original as Edge2, u: u });
             this.olds.push(geo);
           }
         }

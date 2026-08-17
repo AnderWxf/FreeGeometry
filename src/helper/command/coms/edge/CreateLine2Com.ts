@@ -13,11 +13,11 @@ import { CreateGeomUserData, type UserData } from "../../../UserData";
 
 /**
  * Create command class.
- * 
+ * 格式：命令类型 begin.x begin.y end.x end.y uuid
  */
 class CreateLine2Com extends ComCreate {
-  beginPoint: Vector2;
-  endPoint: Vector2;
+  begin: Vector2;
+  end: Vector2;
   constructor(executer: CommandExecuter, text: string) {
     super(executer, text);
     this.type = GeomType.DRAW_CURVE2_L;
@@ -26,11 +26,10 @@ class CreateLine2Com extends ComCreate {
     let str = this._text;
     let paras = str.split(' ');
     let userData = CreateGeomUserData(this.type);
-
-    if (paras.length == 5) {
+    if (paras.length >= 5) {
       // 创建一个直线段
-      this.beginPoint = new Vector2(new Number(paras[1]).valueOf(), new Number(paras[2]).valueOf());
-      this.endPoint = new Vector2(new Number(paras[3]).valueOf(), new Number(paras[4]).valueOf());
+      this.begin = new Vector2(new Number(paras[1]).valueOf(), new Number(paras[2]).valueOf());
+      this.end = new Vector2(new Number(paras[3]).valueOf(), new Number(paras[4]).valueOf());
     } else {
       this.bind(window);
       let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);
@@ -38,38 +37,42 @@ class CreateLine2Com extends ComCreate {
       let act_pick_begin = new ActPickPoint2();
       await act_pick_begin.execute(context);
       if (this._isCancel || act_pick_begin.isCancel) { this.cancel(); return; }
-      this.beginPoint = new Vector2(act_pick_begin.result.x, act_pick_begin.result.y);
-      userData.assistPoints.push({ p: this.beginPoint, c: THREE.Color.NAMES.greenyellow });
+      this.begin = new Vector2(act_pick_begin.result.x, act_pick_begin.result.y);
+      userData.assistPoints.push({ p: this.begin, c: THREE.Color.NAMES.greenyellow });
       this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
       Global.scene.add(this.assists[this.assists.length - 1]);
 
       let act_pick_end = new ActPickPoint2();
       await act_pick_end.execute(context);
       if (this._isCancel || act_pick_end.isCancel) { this.cancel(); return; }
-      this.endPoint = new Vector2(act_pick_end.result.x, act_pick_end.result.y);
-      userData.assistPoints.push({ p: this.endPoint, c: THREE.Color.NAMES.limegreen });
+      this.end = new Vector2(act_pick_end.result.x, act_pick_end.result.y);
+      userData.assistPoints.push({ p: this.end, c: THREE.Color.NAMES.limegreen });
       this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
       Global.scene.add(this.assists[this.assists.length - 1]);
-
-      this._text = paras[0] + ' ' + this.beginPoint.x + ' ' + this.beginPoint.y + ' ' + this.endPoint.x + ' ' + this.endPoint.y;
     }
     // 创建一个直线段
-    let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(this.beginPoint, this.endPoint);
+    let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(this.begin, this.end);
+    if (paras.length >= 6) { edge.uuid = paras[5]; }
     let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, userData.color);
     userData.original = edge;
     geo.userData = userData;
     this.results = geo;
+    this._text = paras[0]
+      + ' ' + this.begin.x + ' ' + this.begin.y
+      + ' ' + this.end.x + ' ' + this.end.y
+      + ' ' + edge.uuid;
+
     this.done();
   }
   onMouseMoveExec(event: MouseEvent) {
     if (this._isCancel) { this.cancel(); return; }
-    if (this.beginPoint && !this.endPoint) {
+    if (this.begin && !this.end) {
       if (this.tempResult) {
         Global.scene.remove(this.tempResult);
       }
       let endPoint: Vector2 = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
       // 创建一个临时直线段
-      let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(this.beginPoint, endPoint);
+      let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(this.begin, endPoint);
       let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0);
       t.name = "temp";
       this.tempResult = t;

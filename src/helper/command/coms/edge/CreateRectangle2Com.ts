@@ -14,11 +14,11 @@ import { CreateGeomUserData, type UserData } from "../../../UserData";
 
 /**
  * Create command class.
- * 
+ * 命令类型 begin.x begin.y end.x end.y uuid0 uuid1 uuid2 uuid3
  */
 class CreateRectangle2Com extends ComCreate {
-  beginPoint: Vector2;
-  endPoint: Vector2;
+  begin: Vector2;
+  end: Vector2;
   constructor(executer: CommandExecuter, text: string) {
     super(executer, text);
     this.type = GeomType.DRAW_CURVE2_RC;
@@ -27,10 +27,10 @@ class CreateRectangle2Com extends ComCreate {
     let str = this._text;
     let paras = str.split(' ');
     let userData = CreateGeomUserData(this.type);
-    if (paras.length == 5) {
+    if (paras.length >= 5) {
       // 创建一个多段线
-      this.beginPoint = new Vector2(new Number(paras[1]).valueOf(), new Number(paras[2]).valueOf());
-      this.endPoint = new Vector2(new Number(paras[3]).valueOf(), new Number(paras[4]).valueOf());
+      this.begin = new Vector2(new Number(paras[1]).valueOf(), new Number(paras[2]).valueOf());
+      this.end = new Vector2(new Number(paras[3]).valueOf(), new Number(paras[4]).valueOf());
     } else {
       this.bind(window);
       let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);
@@ -38,28 +38,26 @@ class CreateRectangle2Com extends ComCreate {
       let act_pick_begin = new ActPickPoint2();
       await act_pick_begin.execute(context);
       if (this._isCancel || act_pick_begin.isCancel) { this.cancel(); return; }
-      this.beginPoint = new Vector2(act_pick_begin.result.x, act_pick_begin.result.y);
-      userData.assistPoints.push({ p: this.beginPoint, c: THREE.Color.NAMES.greenyellow });
+      this.begin = new Vector2(act_pick_begin.result.x, act_pick_begin.result.y);
+      userData.assistPoints.push({ p: this.begin, c: THREE.Color.NAMES.greenyellow });
       this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
       Global.scene.add(this.assists[this.assists.length - 1]);
 
       let act_pick_end = new ActPickPoint2();
       await act_pick_end.execute(context);
       if (this._isCancel || act_pick_end.isCancel) { this.cancel(); return; }
-      this.endPoint = new Vector2(act_pick_end.result.x, act_pick_end.result.y);
-      userData.assistPoints.push({ p: this.endPoint, c: THREE.Color.NAMES.darkblue });
+      this.end = new Vector2(act_pick_end.result.x, act_pick_end.result.y);
+      userData.assistPoints.push({ p: this.end, c: THREE.Color.NAMES.darkblue });
       this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
       Global.scene.add(this.assists[this.assists.length - 1]);
-
-      this._text = paras[0] + ' ' + this.beginPoint.x + ' ' + this.beginPoint.y + ' ' + this.endPoint.x + ' ' + this.endPoint.y;
     }
     // 创建一个多段线
     let points: Vector2[] = [];
     let edges: Edge2[] = [];
-    let p0 = this.beginPoint.clone();
-    let p1 = this.beginPoint.clone().add(new Vector2(this.endPoint.x - this.beginPoint.x, 0));
-    let p2 = this.endPoint.clone();
-    let p3 = this.endPoint.clone().add(new Vector2(this.beginPoint.x - this.endPoint.x, 0));
+    let p0 = this.begin.clone();
+    let p1 = this.begin.clone().add(new Vector2(this.end.x - this.begin.x, 0));
+    let p2 = this.end.clone();
+    let p3 = this.end.clone().add(new Vector2(this.begin.x - this.end.x, 0));
     points.push(p0);
     points.push(p1);
     points.push(p2);
@@ -75,14 +73,27 @@ class CreateRectangle2Com extends ComCreate {
     edges.push(edge);
 
     let geo = BrepMeshBuilder.BuildEdge2sMesh(edges, THREE.Color.NAMES.red);
+    if (paras.length >= 6) {
+      for (let i = 0; i < edges.length; i++) {
+        let uuid = paras[6 + i];
+        edges[i].uuid = uuid;
+      }
+    }
     userData.original = edges;
     geo.userData = userData;
     this.results = geo;
+    this._text = paras[0]
+      + ' ' + this.begin.x + ' ' + this.begin.y
+      + ' ' + this.end.x + ' ' + this.end.y
+      + ' ' + edges[0].uuid
+      + ' ' + edges[1].uuid
+      + ' ' + edges[2].uuid
+      + ' ' + edges[3].uuid;
     this.done();
   }
   onMouseMoveExec(event: MouseEvent) {
     if (this._isCancel) { this.cancel(); return; }
-    if (this.beginPoint && !this.endPoint) {
+    if (this.begin && !this.end) {
       if (this.tempResult) {
         Global.scene.remove(this.tempResult);
       }
@@ -92,10 +103,10 @@ class CreateRectangle2Com extends ComCreate {
 
       let points: Vector2[] = [];
       let edges: Edge2[] = [];
-      let p0 = this.beginPoint.clone();
-      let p1 = this.beginPoint.clone().add(new Vector2(endPoint.x - this.beginPoint.x, 0));
+      let p0 = this.begin.clone();
+      let p1 = this.begin.clone().add(new Vector2(endPoint.x - this.begin.x, 0));
       let p2 = endPoint.clone();
-      let p3 = endPoint.clone().add(new Vector2(this.beginPoint.x - endPoint.x, 0));
+      let p3 = endPoint.clone().add(new Vector2(this.begin.x - endPoint.x, 0));
       points.push(p0);
       points.push(p1);
       points.push(p2);

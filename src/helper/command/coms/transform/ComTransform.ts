@@ -1,18 +1,18 @@
-import { Global } from "../../../core/Global";
-import { Edge2, Face2 } from "../../../geometry/data/brep/Brep2";
-import { Matrix3, Vector2, type Matrix4 } from "../../../math/Math";
-import { BrepMeshBuilder } from "../../BrepMeshBuilder";
-import { ActionContext3D } from "../Active";
-import { ActPickObject } from "../acts/ActPickObject";
-import { ActPickPoint2 } from "../acts/ActPickPoint2";
+import { Global } from "../../../../core/Global";
+import { Edge2, Face2 } from "../../../../geometry/data/brep/Brep2";
+import { Matrix3, Vector2, type Matrix4 } from "../../../../math/Math";
+import { BrepMeshBuilder } from "../../../BrepMeshBuilder";
+import { ActionContext3D } from "../../Active";
+import { ActPickObject } from "../../acts/ActPickObject";
+import { ActPickPoint2 } from "../../acts/ActPickPoint2";
 import * as THREE from "three";
-import { ComBatch } from "./ComBatch";
-import { Brep2Builder } from "../../../geometry/algorithm/builder/Brep2Builder";
-import type { Transform2 } from "../../../geometry/data/base/Transform2";
-import { GeomType } from "../../../core/Constents";
-import { CloneUserData, CopyUserData, type UserData } from "../../UserData";
-import { Point2Data } from "../../../geometry/data/base/Point2Data";
-import type { Point3Data } from "../../../geometry/data/base/Point3Data";
+import { ComBatch } from "../ComBatch";
+import { Brep2Builder } from "../../../../geometry/algorithm/builder/Brep2Builder";
+import type { Transform2 } from "../../../../geometry/data/base/Transform2";
+import { GeomType } from "../../../../core/Constents";
+import { CloneUserData, CopyUserData, type UserData } from "../../../UserData";
+import { Point2Data } from "../../../../geometry/data/base/Point2Data";
+import type { Point3Data } from "../../../../geometry/data/base/Point3Data";
 
 /**
  * Transform command class.

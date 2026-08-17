@@ -267,6 +267,8 @@ enum CommandType {
   SCENE_CLEAR = 'CLEAR',                // 清空
   SCENE_CLEAR_POINT = 'CLEAR_POINT',    // 清空点
   SCENE_SHOW_ASSISTS = 'SHOW_ASSISTS',  // 显示/隐藏辅助对象
+  SCENE_STRICP_SAVE = 'STRICP_SAVE',    // 脚本保存
+  SCENE_STRICP_EXEC = 'STRICP_EXEC',    // 脚本执行
 
   // 空间变换
   TRANSFORM_MOVE = 'M',                 // 移动

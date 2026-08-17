@@ -11,11 +11,11 @@ import { ModifyCircle2Com } from "./coms/edge/ModifyCircle2Com";
 import { ModifyCircle2ThreePointCom } from "./coms/edge/ModifyCircle2ThreePointCom";
 import { ModifyArc2Com } from "./coms/edge/ModifyArc2Com";
 import { ModifyArc2ThreePointCom } from "./coms/edge/ModifyArc2ThreePointCom";
-import { ComMove } from "./coms/ComMove";
-import { ComRotate } from "./coms/ComRotate";
-import { ComOffset } from "./coms/ComOffset";
-import { ComScale } from "./coms/ComScale";
-import { ComMirror } from "./coms/ComMirror";
+import { ComMove } from "./coms/transform/ComMove";
+import { ComRotate } from "./coms/transform/ComRotate";
+import { ComOffset } from "./coms/transform/ComOffset";
+import { ComScale } from "./coms/transform/ComScale";
+import { ComMirror } from "./coms/transform/ComMirror";
 import { CreateEllipse2Com } from "./coms/edge/CreateEllipse2Com";
 import { CreateEllipseArc2Com } from "./coms/edge/CreateEllipseArc2Com";
 import { ModifyEllipse2Com } from "./coms/edge/ModifyEllipse2Com";
@@ -38,7 +38,7 @@ import { CreateNurbs2CtrlCom } from "./coms/edge/CreateNurbs2CtrlCom";
 import { ModifyNurbs2FitCom } from "./coms/edge/ModifyNurbs2FitCom";
 import { ModifyNurbs2CtrlCom } from "./coms/edge/ModifyNurbs2CtrlCom";
 import { CreateSectionCom } from "./coms/face/CreateSectionCom";
-import { ComDelete } from "./coms/ComDelete";
+import { ComDelete } from "./coms/other/ComDelete";
 import type { UserData } from "../UserData";
 import { EdgeIntersectionCom } from "./coms/operation/EdgeIntersectionCom";
 import { EdgeCuttingCom } from "./coms/operation/EdgeCuttingCom";
@@ -76,7 +76,11 @@ import { SceneShowAssistsCom } from "./coms/scene/SceneShowAssistsCom";
 import { ModifyPoint2Com } from "./coms/point/ModifyPoint2Com";
 import { SceneSaveasCom } from "./coms/scene/SceneSaveasCom";
 import { SceneClearPointCom } from "./coms/scene/SceneClearPointCom";
-import { ComSelect } from "./coms/ComSelect";
+import { ComSelect } from "./coms/other/ComSelect";
+import { ComUnDo } from "./coms/other/ComUnDo";
+import { ComReDo } from "./coms/other/ComReDo";
+import { SceneStricpSaveCom } from "./coms/scene/SceneStricpSaveCom";
+import { SceneStricpExecCom } from "./coms/scene/SceneStricpExecCom";
 
 /**
  * Command executer base class.
@@ -89,8 +93,8 @@ class CommandExecuter {
   private KeyShiftDown: boolean = false;
   private KeyCtrlDown: boolean = false;
   private _curr: Command;
-  private _isRecord: boolean = false;
-  private _records: string[] = [];
+  private _isRecord: boolean = false; //录制标记
+  private _records: string[] = [];// 录制的脚本
   constructor() {
     this._history = new Stack<Command>();
     this._redos = new Stack<Command>();
@@ -172,9 +176,17 @@ class CommandExecuter {
     this._commands.set(CommandType.SCENE_CLEAR, SceneClearCom);
     this._commands.set(CommandType.SCENE_CLEAR_POINT, SceneClearPointCom);
     this._commands.set(CommandType.SCENE_SHOW_ASSISTS, SceneShowAssistsCom);
+    this._commands.set(CommandType.SCENE_STRICP_SAVE, SceneStricpSaveCom);
+    this._commands.set(CommandType.SCENE_STRICP_EXEC, SceneStricpExecCom);
+
+
+
 
     this._commands.set(CommandType.OTHER_SELECT, ComSelect);
     this._commands.set(CommandType.OTHER_DELETE, ComDelete);
+    this._commands.set(CommandType.OTHER_UNDO, ComUnDo);
+    this._commands.set(CommandType.OTHER_REDO, ComReDo);
+
 
     this._commands.set(CommandType.TRANSFORM_MOVE, ComMove);
     this._commands.set(CommandType.TRANSFORM_ROTATE, ComRotate);
@@ -227,7 +239,7 @@ class CommandExecuter {
   isExecuting(): boolean {
     return this._curr != null && !this._curr.isDone && !this._curr.isCancel;
   }
-  
+
   onEidtor() {
     let seleced = Global.select.selectedObjects[0];
     let userData = seleced.userData as UserData;
@@ -283,7 +295,6 @@ class CommandExecuter {
   */
   onKeyDown = (event: KeyboardEvent) => {
     event.stopPropagation();
-    let com: Command;
     switch (event.code) {
       case "Enter":
       case "NumpadEnter":
@@ -295,7 +306,7 @@ class CommandExecuter {
         }
         break;
       case "Delete":
-        com = new ComDelete(this, CommandType.OTHER_DELETE);
+        this.execute(CommandType.OTHER_DELETE);
         break;
       // E：选中后编辑
       case 'KeyE':
@@ -312,16 +323,16 @@ class CommandExecuter {
           this.execute(CommandType.SCENE_IMPORT);
           return;
         } else {
-          com = new ComMirror(this, CommandType.TRANSFORM_MIRROR);
+          this.execute(CommandType.TRANSFORM_MIRROR);
         }
         break;
       // M：移动
       case 'KeyM':
-        com = new ComMove(this, CommandType.TRANSFORM_MOVE);
+        this.execute(CommandType.TRANSFORM_MOVE);
         break;
       // R：旋转
       case 'KeyR':
-        com = new ComRotate(this, CommandType.TRANSFORM_ROTATE);
+        this.execute(CommandType.TRANSFORM_ROTATE);
         break;
       // O：偏移
       case 'KeyO':
@@ -331,7 +342,7 @@ class CommandExecuter {
           this.execute(CommandType.SCENE_LOAD);
           return;
         } else {
-          com = new ComOffset(this, CommandType.TRANSFORM_OFFSET);
+          this.execute(CommandType.TRANSFORM_OFFSET);
         }
         break;
       // S：拉伸
@@ -350,21 +361,19 @@ class CommandExecuter {
           return;
         }
         else {
-          com = new ComScale(this, CommandType.TRANSFORM_SCALE);
+          this.execute(CommandType.TRANSFORM_SCALE);
         }
         break;
       // Ctrl+Z Undo
       case "KeyZ":
         if (this.KeyCtrlDown) {
-          this.undo();
-          return;
+          this.execute(CommandType.OTHER_UNDO);
         };
         break;
       // Ctrl+Y Redo
       case "KeyY":
         if (this.KeyCtrlDown) {
-          this.redo();
-          return;
+          this.execute(CommandType.OTHER_REDO);
         };
         break;
       // Ctrl+X Clear
@@ -384,18 +393,6 @@ class CommandExecuter {
         this.KeyShiftDown = true;
         break;
     }
-    if (com) {
-      if (this._curr && !this._curr.isDone) {
-        this._curr.cancel();
-      }
-      this._curr = com;
-      try {
-        this._curr.exec();
-      } catch (e: any) {
-        console.error(e);
-        this._curr.cancel();
-      }
-    }
   }
 
   onKeyUp = (event: KeyboardEvent) => {
@@ -411,49 +408,43 @@ class CommandExecuter {
     }
   }
 
-  aotuExecute(comstrs: string[]) {
+  aotuExecute(comstrs: string[]): Command[] {
+    let result: Command[] = [];
     for (let i = 0; i < comstrs.length; i++) {
-      this.execute(comstrs[i]);
+      result.push(this.execute(comstrs[i]));
     }
+    return result;
   }
 
-  execute(comstr: string) {
+  execute(comstr: string): Command {
     let s = comstr.split(' ');
-    if (s.length) {
-      let command = s[0];
-      command = command.toUpperCase();
-      switch (command) {
-        case CommandType.OTHER_UNDO:
-          this.undo();
-          break;
-        case CommandType.OTHER_REDO:
-          this.redo();
-          break;
-        default:
-          let c = this._commands.get(command) as Function;
-          if (!c) {
-            if (Object.prototype.hasOwnProperty.call(CommandType, command)) {
-              command = CommandType[command as keyof typeof CommandType];
-              c = this._commands.get(command) as Function;
-            }
-          }
-          if (c) {
-            let com: Command = new (<any>c)(this, comstr);
-            if (this._curr && !this._curr.isDone) {
-              this._curr.cancel();
-            }
-            this._curr = com;
-            try {
-              this._curr.exec();
-            } catch (e: any) {
-              console.error(e);
-              this._curr.cancel();
-            }
-          } else {
-            console.warn('命令不存在：' + command);
-          }
+
+    let command = s[0];
+    command = command.toUpperCase();
+
+    let c = this._commands.get(command) as Function;
+    if (!c) {
+      if (Object.prototype.hasOwnProperty.call(CommandType, command)) {
+        command = CommandType[command as keyof typeof CommandType];
+        c = this._commands.get(command) as Function;
       }
     }
+    if (c) {
+      let com: Command = new (<any>c)(this, comstr);
+      if (this._curr && !this._curr.isDone) {
+        this._curr.cancel();
+      }
+      this._curr = com;
+      try {
+        this._curr.exec();
+      } catch (e: any) {
+        console.error(e);
+        this._curr.cancel();
+      }
+    } else {
+      console.warn('命令不存在：' + command);
+    }
+    return this._curr;
   }
 
   bind(window: Window) {
@@ -467,6 +458,9 @@ class CommandExecuter {
 
   recored(com: Command) {
     this._history.push(com);
+    if (this._isRecord) {
+      this._records.push(com.text + '\n');
+    }
   }
 
   undo() {

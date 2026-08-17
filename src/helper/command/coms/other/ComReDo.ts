@@ -1,0 +1,41 @@
+import { Global } from "../../../../core/Global";
+import { Command } from "../../Command";
+import type { CommandExecuter } from "../../CommandExecuter";
+
+/**
+ * Redo processing command class.
+ * 
+ */
+class ComReDo extends Command {
+  constructor(executer: CommandExecuter, text: string) {
+    super(executer, text);
+  }
+
+  async exec(): Promise<void> {
+    let str = this._text;
+    let paras = str.split(' ');
+    Global.comExector.redo();
+    this.done();
+  }
+
+  override cancel() {
+    super.cancel();
+    this.unbind(window);
+  }
+
+  override done() {
+    super.done();
+  }
+
+  override undo() {
+    if (this._isDone) {
+      Global.comExector.undo();
+    }
+  }
+  override redo() {
+    if (this._isDone) {
+      Global.comExector.redo();
+    }
+  }
+}
+export { ComReDo };

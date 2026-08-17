@@ -1,8 +1,8 @@
-import { Global } from "../../../core/Global";
-import { DataBase } from "../../../geometry/data/DataBase";
-import type { UserData } from "../../UserData";
-import { Command } from "../Command";
-import type { CommandExecuter } from "../CommandExecuter";
+import { Global } from "../../../../core/Global";
+import { DataBase } from "../../../../geometry/data/DataBase";
+import type { UserData } from "../../../UserData";
+import { Command } from "../../Command";
+import type { CommandExecuter } from "../../CommandExecuter";
 import * as THREE from "three";
 
 /**
