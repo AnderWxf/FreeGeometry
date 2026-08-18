@@ -37,6 +37,15 @@ class CreateArc2Com extends ComCreate {
       this.begin = new Vector2(new Number(paras[3]).valueOf(), new Number(paras[4]).valueOf());
       this.end = new Vector2(new Number(paras[5]).valueOf(), new Number(paras[6]).valueOf());
       this.isForward = new Boolean(paras[7]).valueOf();
+
+      userData.assistPoints.push({ p: this.center, c: THREE.Color.NAMES.greenyellow });
+      this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
+      Global.scene.add(this.assists[this.assists.length - 1]);
+
+      userData.assistPoints.push({ p: this.begin, c: THREE.Color.NAMES.limegreen });
+      this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
+      Global.scene.add(this.assists[this.assists.length - 1]);
+
     } else {
       this.bind(window);
       let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);

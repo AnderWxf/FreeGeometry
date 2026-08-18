@@ -14,7 +14,7 @@ import { CreateGeomUserData, type UserData } from "../../../UserData";
 
 /**
  * Create command class.
- * 命令类型 n p[0].x p[0].y p[1].x p[1].y p[2].x p[2].y ... uuid0 uuid1 uuid2
+ * 命令类型 n p[0].x p[0].y p[1].x p[1].y p[2].x p[2].y ... uuid0 uuid1 uuid2...
  */
 class CreatePolyline2Com extends ComCreate {
   points: Vector2[];
@@ -34,6 +34,9 @@ class CreatePolyline2Com extends ComCreate {
       for (let i = 1; i < (n + 1) * 2; i++) {
         let point = new Vector2(new Number(paras[i]).valueOf(), new Number(paras[i++]).valueOf());
         this.points.push(point);
+        userData.assistPoints.push({ p: point, c: THREE.Color.NAMES.greenyellow });
+        this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
+        Global.scene.add(this.assists[this.assists.length - 1]);        
       }
     } else {
       this.bind(window);
@@ -60,7 +63,7 @@ class CreatePolyline2Com extends ComCreate {
       edges.push(edge);
     }
     let geo = BrepMeshBuilder.BuildEdge2sMesh(edges, THREE.Color.NAMES.red);
-    if (paras.length >= 6) {
+    if (paras.length > 6) {
       let n = new Number(paras[1]).valueOf();
       for (let i = 0; i < n - 1; i++) {
         let uuid = paras[2 + n * 2 + i];

@@ -18,12 +18,12 @@ import { CreateFaceCom } from "./CreateFaceCom";
 
 /**
  * Create command class.
- * 
+ * 格式：命令类型 center.x center.y major.x major.y minor.x minor.y uuid0 uuid1
  */
 class CreateEllipseAreaCom extends CreateFaceCom {
-  centerPoint: Vector2;
-  majorPoint: Vector2;
-  minorPoint: Vector2;
+  center: Vector2;
+  major: Vector2;
+  minor: Vector2;
   constructor(executer: CommandExecuter, text: string) {
     super(executer, text);
     this.type = GeomType.DRAW_SURFACE_EL;
@@ -32,11 +32,20 @@ class CreateEllipseAreaCom extends CreateFaceCom {
     let str = this._text;
     let paras = str.split(' ');
     let userData = CreateGeomUserData(this.type);
-    if (paras.length == 7) {
+    if (paras.length >= 7) {
       // 创建一个线段
-      this.centerPoint = new Vector2(new Number(paras[1]).valueOf(), new Number(paras[2]).valueOf());
-      this.majorPoint = new Vector2(new Number(paras[3]).valueOf(), new Number(paras[4]).valueOf());
-      this.minorPoint = new Vector2(new Number(paras[5]).valueOf(), new Number(paras[6]).valueOf());
+      this.center = new Vector2(new Number(paras[1]).valueOf(), new Number(paras[2]).valueOf());
+      this.major = new Vector2(new Number(paras[3]).valueOf(), new Number(paras[4]).valueOf());
+      this.minor = new Vector2(new Number(paras[5]).valueOf(), new Number(paras[6]).valueOf());
+
+      userData.assistPoints.push({ p: this.center, c: THREE.Color.NAMES.greenyellow });
+      this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
+      Global.scene.add(this.assists[this.assists.length - 1]);
+
+      userData.assistPoints.push({ p: this.major, c: THREE.Color.NAMES.limegreen });
+      this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
+      Global.scene.add(this.assists[this.assists.length - 1]);
+
     } else {
       this.bind(window);
       let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);
@@ -44,68 +53,75 @@ class CreateEllipseAreaCom extends CreateFaceCom {
       let act_pick_center = new ActPickPoint2();
       await act_pick_center.execute(context);
       if (this._isCancel || act_pick_center.isCancel) { this.cancel(); return; }
-      this.centerPoint = new Vector2(act_pick_center.result.x, act_pick_center.result.y);
-      userData.assistPoints.push({ p: this.centerPoint, c: THREE.Color.NAMES.greenyellow });
+      this.center = new Vector2(act_pick_center.result.x, act_pick_center.result.y);
+      userData.assistPoints.push({ p: this.center, c: THREE.Color.NAMES.greenyellow });
       this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
       Global.scene.add(this.assists[this.assists.length - 1]);
 
       let act_pick_major = new ActPickPoint2();
       await act_pick_major.execute(context);
       if (this._isCancel || act_pick_major.isCancel) { this.cancel(); return; }
-      this.majorPoint = new Vector2(act_pick_major.result.x, act_pick_major.result.y);
-      userData.assistPoints.push({ p: this.majorPoint, c: THREE.Color.NAMES.limegreen });
+      this.major = new Vector2(act_pick_major.result.x, act_pick_major.result.y);
+      userData.assistPoints.push({ p: this.major, c: THREE.Color.NAMES.limegreen });
       this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
       Global.scene.add(this.assists[this.assists.length - 1]);
 
       let act_pick_minor = new ActPickPoint2();
       await act_pick_minor.execute(context);
       if (this._isCancel || act_pick_minor.isCancel) { this.cancel(); return; }
-      this.minorPoint = new Vector2(act_pick_minor.result.x, act_pick_minor.result.y);
-
+      this.minor = new Vector2(act_pick_minor.result.x, act_pick_minor.result.y);
     }
 
     // 创建一个曲线段
-    let edge = Brep2Builder.BuildEllipseEdge2FromCenterBeginEndPoint(this.centerPoint, this.majorPoint, this.minorPoint);
-
+    let edge = Brep2Builder.BuildEllipseEdge2FromCenterBeginEndPoint(this.center, this.major, this.minor);
+    if (paras.length >= 8) { edge.uuid = paras[7]; }
     let alg = CurveBuilder.Algorithm2ByData(edge.curve);
     let minorPoint = alg.p(PI_2);
-    this.minorPoint.set(minorPoint.x, minorPoint.y);
-    this._text = paras[0] + ' ' + this.centerPoint.x + ' ' + this.centerPoint.y + ' ' + this.majorPoint.x + ' ' + this.majorPoint.y + ' ' + this.minorPoint.x + ' ' + this.minorPoint.y;
+    this.minor.set(minorPoint.x, minorPoint.y);
 
-    userData.assistPoints.push({ p: this.minorPoint, c: THREE.Color.NAMES.darkblue });
+    userData.assistPoints.push({ p: this.minor, c: THREE.Color.NAMES.darkblue });
     this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
     Global.scene.add(this.assists[this.assists.length - 1]);
 
     // 创建一个面
     let face = Brep2Builder.BuildFaceByEdges([edge]);
+    if (paras.length >= 9) { face.uuid = paras[8]; }
     userData.color = THREE.Color.NAMES.blue;
     let geo = BrepMeshBuilder.BuildFace2Mesh(face, userData.color);
     userData.original = face;
     geo.userData = userData;
     this.results = geo;
+
+    this._text = paras[0]
+      + ' ' + this.center.x + ' ' + this.center.y
+      + ' ' + this.major.x + ' ' + this.major.y
+      + ' ' + this.minor.x + ' ' + this.minor.y
+      + ' ' + edge.uuid
+      + ' ' + face.uuid;
+
     this.done();
   }
   onMouseMoveExec(event: MouseEvent) {
     if (this._isCancel) { this.cancel(); return; }
-    if (this.centerPoint && !this.majorPoint) {
+    if (this.center && !this.major) {
       if (this.tempResult) {
         Global.scene.remove(this.tempResult);
       }
       let majorPoint: Vector2 = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
       // 创建一个临时曲线段
-      let edge = Brep2Builder.BuildCircleEdge2FromCenterRadius(this.centerPoint, majorPoint.distanceTo(this.centerPoint));
+      let edge = Brep2Builder.BuildCircleEdge2FromCenterRadius(this.center, majorPoint.distanceTo(this.center));
       let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0);
       t.name = "temp";
       this.tempResult = t;
       Global.scene.add(this.tempResult);
     }
-    if (this.centerPoint && this.majorPoint && !this.minorPoint) {
+    if (this.center && this.major && !this.minor) {
       if (this.tempResult) {
         Global.scene.remove(this.tempResult);
       }
       let minorPoint: Vector2 = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
       // 创建一个临时曲线段
-      let edge = Brep2Builder.BuildEllipseEdge2FromCenterBeginEndPoint(this.centerPoint, this.majorPoint, minorPoint);
+      let edge = Brep2Builder.BuildEllipseEdge2FromCenterBeginEndPoint(this.center, this.major, minorPoint);
       let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0);
       t.name = "temp";
       this.tempResult = t;

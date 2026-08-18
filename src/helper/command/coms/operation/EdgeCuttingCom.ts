@@ -14,7 +14,7 @@ import * as THREE from "three";
 
 /**
  * Edge cutting command class.
- * 
+ * 命令类型 n0 n1 uuide0 uuide1 ... uuide_0 uuide_1...
  */
 class EdgeCuttingCom extends Command {
   public src: Array<Edge2>;
@@ -35,18 +35,27 @@ class EdgeCuttingCom extends Command {
   async exec(): Promise<void> {
     let str = this._text;
     let paras = str.split(' ');
-
     this.bind(window);
-    let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);
-    let selects: Array<THREE.Object3D> = null;
-    if (context.select.selectedObjects.length) {
-      selects = context.select.selectedObjects;
+    let selects: Array<THREE.Object3D> = [];
+    let n0 = 0;
+    let n1 = 0;
+    if (paras.length > 3) {
+      n0 = new Number(paras[1]).valueOf();
+      n1 = new Number(paras[2]).valueOf();
+      selects = Global.scene.getObjectsByUUIDs(paras.slice(3, 3 + n0));
     } else {
-      let act_pick_objs = new ActPickObjects();
-      await act_pick_objs.execute(context);
-      if (this._isCancel || act_pick_objs.isCancel) { this.cancel(); return; }
-      selects = act_pick_objs.results;
+      let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);
+
+      if (context.select.selectedObjects.length) {
+        selects = context.select.selectedObjects;
+      } else {
+        let act_pick_objs = new ActPickObjects();
+        await act_pick_objs.execute(context);
+        if (this._isCancel || act_pick_objs.isCancel) { this.cancel(); return; }
+        selects = act_pick_objs.results;
+      }
     }
+
     // 只能选择二维曲线类型
     for (let i = 0; i < selects.length; i++) {
       let geo = selects[i];
@@ -128,6 +137,9 @@ class EdgeCuttingCom extends Command {
       }
       for (let i = 0; i < edges.length; i++) {
         let algo = new Edge2Algo(edges[i].e);
+        if (n1 > 0) {
+          edges[i].e.uuid = paras[3 + n0 + i];
+        }
         let geo = BrepMeshBuilder.BuildEdge2Mesh(edges[i].e, THREE.Color.NAMES.red);
         let begin = algo.getBeginPoint();
         let end = algo.getEndPoint();
@@ -140,6 +152,17 @@ class EdgeCuttingCom extends Command {
         });
         this.results.push(geo);
       }
+
+      n0 = this.src.length + this.des.length;
+      n1 = edges.length;
+      this._text = paras[0] + ' ' + n0 + ' ' + n1;
+      for (let i = 0; i < this.src.length; i++) {
+        this._text += ' ' + this.src[i].uuid;
+      }
+      for (let i = 0; i < this.des.length; i++) {
+        this._text += ' ' + this.des[i].e.uuid;
+      }
+
       this.done();
     } else {
       this.cancel();

@@ -15,7 +15,7 @@ import { CloneUserData, CopyUserData, CreateGeomUserData, type UserData } from "
 
 /**
  * Modify command class.
- * 
+ * 格式：命令类型 UUID 控制点索引 p.x p.y
  */
 class ModifyLine2Com extends ComModify {
 
@@ -30,26 +30,18 @@ class ModifyLine2Com extends ComModify {
     let paras = str.split(' ');
     let userData = CreateGeomUserData(this.type);
 
-    let beginPoint: Vector2;
-    let endPoint: Vector2;
-    if (paras.length == 5) {
-      // 创建一个直线段
-      beginPoint = new Vector2(new Number(paras[1]).valueOf(), new Number(paras[2]).valueOf());
-      endPoint = new Vector2(new Number(paras[3]).valueOf(), new Number(paras[4]).valueOf());
-      // 寻找已经选好的目标
-      if (Global.select.selectedObjects.length > 0) {
-        for (let i = 0; i < Global.select.selectedObjects.length; i++) {
-          let select = Global.select.selectedObjects[i];
-          if (select.userData && select.userData.type === this.type) {
-            this.old = select;
-            break;
-          }
-        }
+    // 指定了对象
+    if (paras.length >= 2) {
+      let objs = Global.scene.getObjectsByUUIDs([paras[1]]);
+      if (objs.length > 0 && objs[0].userData.type == this.type) {
+        this.old = objs[0];
       }
     } else {
-      this.bind(window);
-      let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);
-
+      this.getSelected();
+    }
+    this.bind(window);
+    let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);
+    if (!this.old) {
       let act_pick_data = new ActPickObject();
       await act_pick_data.execute(context);
       if (this._isCancel || act_pick_data.isCancel) { this.cancel(); return; }
@@ -60,8 +52,14 @@ class ModifyLine2Com extends ComModify {
         if (this._isCancel || act_pick_data.isCancel) { this.cancel(); return; }
       }
       this.old = act_pick_data.result;
-      CopyUserData(this.old.userData as UserData, userData);
-
+    }
+    CopyUserData(this.old.userData as UserData, userData);
+    if (paras.length >= 5) {
+      this.assistIndex = new Number(paras[2]).valueOf();
+      let px = new Number(paras[3]).valueOf();
+      let py = new Number(paras[4]).valueOf();
+      userData.assistPoints[this.assistIndex].p.set(px, py);
+    } else {
       let act_pick_assist = new ActPickAssist();
       await act_pick_assist.execute(context);
       this.assistIndex = this.getIndex(act_pick_assist.result);
@@ -74,20 +72,24 @@ class ModifyLine2Com extends ComModify {
       let act_pick_new_pos = new ActPickPoint2();
       await act_pick_new_pos.execute(context);
       if (this._isCancel || act_pick_new_pos.isCancel) { this.cancel(); return; }
-
-      beginPoint = userData.assistPoints[0].p as Vector2;
-      endPoint = userData.assistPoints[1].p as Vector2;
-
       userData.assistPoints[this.assistIndex].p.set(act_pick_new_pos.result.x, act_pick_new_pos.result.y);
-
-      this._text = paras[0] + ' ' + beginPoint.x + ' ' + beginPoint.y + ' ' + endPoint.x + ' ' + endPoint.y;
     }
+    let beginPoint = userData.assistPoints[0].p as Vector2;
+    let endPoint = userData.assistPoints[1].p as Vector2;
+
     // 创建一个直线段
     let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(beginPoint, endPoint);
+    edge.uuid = this.old.userData.original.uuid;
     let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, userData.color);
     userData.original = edge;
     geo.userData = userData;
     this.results = geo;
+
+    this._text = paras[0]
+      + ' ' + edge.uuid
+      + ' ' + this.assistIndex
+      + ' ' + userData.assistPoints[this.assistIndex].p.x + ' ' + userData.assistPoints[this.assistIndex].p.y;
+
     this.done();
   }
   onMouseMoveExec(event: MouseEvent) {

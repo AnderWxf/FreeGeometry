@@ -93,6 +93,13 @@ class Scene {
           result.push(value);
         }
       }
+      else if (userData.original instanceof Array
+        && userData.original[0] instanceof DataBase) {
+        let uuid = userData.original[0].uuid;
+        if (paras.includes(uuid)) {
+          result.push(value);
+        }
+      }
     }
     return result;
   }

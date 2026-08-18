@@ -33,6 +33,15 @@ class CreateCircle2ThreePointCom extends ComCreate {
       this.begin = new Vector2(new Number(paras[1]).valueOf(), new Number(paras[2]).valueOf());
       this.middle = new Vector2(new Number(paras[3]).valueOf(), new Number(paras[4]).valueOf());
       this.end = new Vector2(new Number(paras[5]).valueOf(), new Number(paras[6]).valueOf());
+
+      userData.assistPoints.push({ p: this.begin, c: THREE.Color.NAMES.limegreen });
+      this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
+      Global.scene.add(this.assists[this.assists.length - 1]);
+
+      userData.assistPoints.push({ p: this.middle, c: THREE.Color.NAMES.darkblue });
+      this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
+      Global.scene.add(this.assists[this.assists.length - 1]);      
+      
     } else {
       this.bind(window);
       let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);
@@ -57,11 +66,11 @@ class CreateCircle2ThreePointCom extends ComCreate {
       await act_pick_end.execute(context);
       if (this._isCancel || act_pick_end.isCancel) { this.cancel(); return; }
       this.end = new Vector2(act_pick_end.result.x, act_pick_end.result.y);
-      userData.assistPoints.push({ p: this.end, c: THREE.Color.NAMES.darkblue });
-      this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
-      Global.scene.add(this.assists[this.assists.length - 1]);
-
     }
+    userData.assistPoints.push({ p: this.end, c: THREE.Color.NAMES.darkblue });
+    this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
+    Global.scene.add(this.assists[this.assists.length - 1]);
+    
     // 创建一个曲线段
     let edge = Brep2Builder.BuildCircleFromBeginMiddleEndPoint(this.begin, this.middle, this.end);
     if (edge == null) {

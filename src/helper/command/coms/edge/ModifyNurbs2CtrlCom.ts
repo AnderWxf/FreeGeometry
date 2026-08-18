@@ -22,7 +22,7 @@ import { CloneUserData, CopyUserData, CreateGeomUserData, type UserData } from "
 
 /**
  * Modify command class.
- * 
+ * 格式：命令类型 UUID 控制点索引 p.x p.y
  */
 class ModifyNurbs2CtrlCom extends ComModify {
   constructor(executer: CommandExecuter, text: string) {
@@ -34,27 +34,18 @@ class ModifyNurbs2CtrlCom extends ComModify {
     let paras = str.split(' ');
     let userData = CreateGeomUserData(this.type);
 
-    let points: Vector2[] = [];
-    if (paras.length > 5) {
-      // 创建一个多段线
-      for (let i = 1; i < paras.length; i++) {
-        let point = new Vector2(new Number(paras[i]).valueOf(), new Number(paras[i + 1]).valueOf());
-        points.push(point);
-      }
-      // 寻找已经选好的目标
-      if (Global.select.selectedObjects.length > 0) {
-        for (let i = 0; i < Global.select.selectedObjects.length; i++) {
-          let select = Global.select.selectedObjects[i];
-          if (select.userData && select.userData.type === this.type) {
-            this.old = select;
-            break;
-          }
-        }
+    // 指定了对象
+    if (paras.length >= 2) {
+      let objs = Global.scene.getObjectsByUUIDs([paras[1]]);
+      if (objs.length > 0 && objs[0].userData.type == this.type) {
+        this.old = objs[0];
       }
     } else {
-      this.bind(window);
-      let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);
-
+      this.getSelected();
+    }
+    this.bind(window);
+    let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);
+    if (!this.old) {
       let act_pick_data = new ActPickObject();
       await act_pick_data.execute(context);
       if (this._isCancel || act_pick_data.isCancel) { this.cancel(); return; }
@@ -65,8 +56,14 @@ class ModifyNurbs2CtrlCom extends ComModify {
         if (this._isCancel || act_pick_data.isCancel) { this.cancel(); return; }
       }
       this.old = act_pick_data.result;
-      CopyUserData(this.old.userData as UserData, userData);
-
+    }
+    CopyUserData(this.old.userData as UserData, userData);
+    if (paras.length >= 5) {
+      this.assistIndex = new Number(paras[2]).valueOf();
+      let px = new Number(paras[3]).valueOf();
+      let py = new Number(paras[4]).valueOf();
+      userData.assistPoints[this.assistIndex].p.set(px, py);
+    } else {
       let act_pick_assist = new ActPickAssist();
       await act_pick_assist.execute(context);
       this.assistIndex = this.getIndex(act_pick_assist.result);
@@ -79,19 +76,12 @@ class ModifyNurbs2CtrlCom extends ComModify {
       let act_pick_new_pos = new ActPickPoint2();
       await act_pick_new_pos.execute(context);
       if (this._isCancel || act_pick_new_pos.isCancel) { this.cancel(); return; }
-
-      for (let i = 0; i < this.old.children.length; i++) {
-        let point = new Vector2(this.old.children[i].position.x, this.old.children[i].position.y);
-        points.push(point);
-      }
       userData.assistPoints[this.assistIndex].p.set(act_pick_new_pos.result.x, act_pick_new_pos.result.y);
-      points[this.assistIndex] = act_pick_new_pos.result;
     }
-
-    this._text = paras[0];
-    for (let i = 1; i < points.length; i++) {
-      let point = points[i];
-      this._text += ' ' + point.x + ' ' + point.y;
+    let points: Vector2[] = [];
+    for (let i = 0; i < userData.assistPoints.length; i++) {
+      let point = userData.assistPoints[i].p;
+      points.push(point);
     }
 
     // 创建一个曲线段
@@ -115,10 +105,17 @@ class ModifyNurbs2CtrlCom extends ComModify {
 
       let nurbsData = new Nurbs2Data(new Transform2(), controls, knots, degree);
       let edge = Brep2Builder.BuildEdge2FromCurve2(nurbsData, 0, 1);
+      edge.uuid = this.old.userData.original.uuid;
       let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, userData.color);
       userData.original = edge;
       geo.userData = userData;
       this.results = geo;
+
+      this._text = paras[0]
+        + ' ' + edge.uuid
+        + ' ' + this.assistIndex
+        + ' ' + userData.assistPoints[this.assistIndex].p.x + ' ' + userData.assistPoints[this.assistIndex].p.y;
+
       this.done();
     } else {
       this.cancel();

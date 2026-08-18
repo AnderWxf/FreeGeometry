@@ -149,7 +149,7 @@ const ComOptionBar: React.FC = () => (
         Global.comExector.isRecord = e.target.checked;
       }}
     >录制</Checkbox>
-    <div id='states' style={{ width: 300, position: 'fixed', fontSize: 14, top: 10, right: 350, color: '#00AA00', zIndex: 1000 }}> 光标位置 </div>
+    <div id='states' style={{ width: 300, position: 'fixed', fontSize: 14, top: 10, right: 360, color: '#00AA00', zIndex: 1000 }}> 光标位置 </div>
     {/* <Checkbox
       style={{ width: 100, position: 'fixed', top: 10, right: 300, zIndex: 1000 }}
       onChange={(e) => {

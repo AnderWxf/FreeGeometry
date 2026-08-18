@@ -35,6 +35,10 @@ class CreateNurbs2CtrlCom extends ComCreate {
       for (let i = 1; i < (n + 1) * 2; i++) {
         let point = new Vector2(new Number(paras[i]).valueOf(), new Number(paras[i++]).valueOf());
         this.points.push(point);
+
+        userData.assistPoints.push({ p: point, c: THREE.Color.NAMES.greenyellow });
+        this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
+        Global.scene.add(this.assists[this.assists.length - 1]);
       }
     } else {
       this.bind(window);

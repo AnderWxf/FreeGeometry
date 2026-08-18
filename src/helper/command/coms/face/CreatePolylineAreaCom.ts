@@ -15,7 +15,7 @@ import { CreateFaceCom } from "./CreateFaceCom";
 
 /**
  * Create command class.
- * 
+ * 命令类型 n p[0].x p[0].y p[1].x p[1].y p[2].x p[2].y... uuid
  */
 class CreatePolylineAreaCom extends CreateFaceCom {
   points: Vector2[];
@@ -29,11 +29,15 @@ class CreatePolylineAreaCom extends CreateFaceCom {
     let paras = str.split(' ');
     let userData = CreateGeomUserData(this.type);
 
-    if (paras.length > 5) {
-      // 创建一个多段线
-      for (let i = 1; i < paras.length; i++) {
-        let point = new Vector2(new Number(paras[i]).valueOf(), new Number(paras[i + 1]).valueOf());
+    if (paras.length >= 8) {
+      // 获取n个点
+      let n = new Number(paras[1]).valueOf();
+      for (let i = 1; i < (n + 1) * 2; i++) {
+        let point = new Vector2(new Number(paras[i]).valueOf(), new Number(paras[i++]).valueOf());
         this.points.push(point);
+        userData.assistPoints.push({ p: point, c: THREE.Color.NAMES.greenyellow });
+        this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
+        Global.scene.add(this.assists[this.assists.length - 1]);
       }
     } else {
       this.bind(window);
@@ -54,11 +58,6 @@ class CreatePolylineAreaCom extends CreateFaceCom {
         this.cancel();
         return;
       }
-      this._text = paras[0];
-      for (let i = 1; i < this.points.length; i++) {
-        let point = this.points[i];
-        this._text += ' ' + point.x + ' ' + point.y;
-      }
     }
     // 创建一个闭合多段线
     let edges: Edge2[] = [];
@@ -72,14 +71,28 @@ class CreatePolylineAreaCom extends CreateFaceCom {
     let endPoint = this.points[0];
     let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(beginPoint, endPoint);
     edges.push(edge);
-
     // 创建一个面
     let face = Brep2Builder.BuildFaceByEdges(edges);
+    if (paras.length > edges.length * 2 + 2) {
+      face.uuid = paras[edges.length * 2 + 2];
+    }
+
     userData.color = THREE.Color.NAMES.blue;
     let geo = BrepMeshBuilder.BuildFace2Mesh(face, userData.color);
     userData.original = face;
     geo.userData = userData;
     this.results = geo;
+    let n = this.points.length
+    this._text = paras[0] + ' ' + n;
+    for (let i = 1; i < this.points.length; i++) {
+      let point = this.points[i];
+      this._text += ' ' + point.x + ' ' + point.y;
+    }
+    for (let i = 0; i < edges.length; i++) {
+      this._text += ' ' + edges[i].uuid
+    }
+    this._text += ' ' + face.uuid;
+
     this.done();
   }
   onMouseMoveExec(event: MouseEvent) {

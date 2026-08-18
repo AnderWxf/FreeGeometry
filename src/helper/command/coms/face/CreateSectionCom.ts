@@ -9,13 +9,13 @@ import type { CommandExecuter } from "../../CommandExecuter";
 import { GeomType } from "../../../../core/Constents";
 import { Coedge2, Edge2, Face2, Vertice2 } from "../../../../geometry/data/brep/Brep2";
 import { ActPickObjects } from "../../acts/ActPickObjects";
-import { CreateGeomUserData } from "../../../UserData";
+import { CreateGeomUserData, type UserData } from "../../../UserData";
 import { CreateFaceCom } from "./CreateFaceCom";
 
 
 /**
  * Create command class.
- * 
+ * 命令类型 n0 n1 uuide0 uuide1 uuide2 uuide3... uuidf0 uuidf1...
  */
 class CreateSectionCom extends CreateFaceCom {
 
@@ -28,48 +28,47 @@ class CreateSectionCom extends CreateFaceCom {
     let paras = str.split(' ');
     let userData = CreateGeomUserData(this.type);
     let edges: Edge2[] = [];
-    if (paras.length > 5) {
-      // 创建一个面
-      let points: Vector2[] = [];
-      for (let i = 1; i < paras.length; i++) {
-        let point = new Vector2(new Number(paras[i]).valueOf(), new Number(paras[i + 1]).valueOf());
-        points.push(point);
-      }
-
-      this._text = paras[0];
-
-      // 创建一个面
-      if (points.length > 3) {
-        let face = new Face2();
-        for (let i = 0; i < points.length; i++) {
-          face.vertices.push(new Vertice2());
+    let n0 = 0;
+    let n1 = 0;
+    if (paras.length >= 3) {
+      n0 = new Number(paras[1]).valueOf();
+      n1 = new Number(paras[2]).valueOf();
+    }
+    // 指定了对象
+    if (n0 > 0) {
+      let objs = Global.scene.getObjectsByUUIDs(paras.slice(3, 3 + n0));
+      if (objs.length > 0) {
+        for (let i = 0; i < objs.length; i++) {
+          let userData = objs[i].userData as UserData;
+          if (userData.original instanceof Edge2) {
+            edges.push(userData.original);
+          }
+          if (userData.original instanceof Array
+            && userData.original[0] instanceof Edge2
+          ) {
+            edges.push(...(userData.original as Edge2[]));
+          }
         }
-        for (let i = 0; i < points.length; i++) {
-          let b = points[i];
-          let e = points[(i + 1) % points.length];
-          let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(b, e);
-          edge.v0 = face.vertices[i];
-          edge.v1 = face.vertices[(i + 1) % points.length];
-          edges.push(edge);
-          let coedge = new Coedge2();
-          coedge.e = edge;
-          face.border.coedges.push(coedge);
-          face.curves.push(edge.curve);
-        }
-
-        userData.color = THREE.Color.NAMES.blue;
-        let geo = BrepMeshBuilder.BuildFace2Mesh(face, userData.color);
-        userData.original = face;
-        geo.userData = userData;
-        this.results = geo;
-        this.done();
-      } else {
-        this.cancel();
       }
-    } else {
-      this.bind(window);
-      let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);
+    }
+    // 寻找已经选好的目标
+    else if (Global.select.selectedObjects.length > 0) {
+      for (let i = 0; i < Global.select.selectedObjects.length; i++) {
+        let select = Global.select.selectedObjects[i];
+        let userData = select.userData as UserData;
+        if (userData.original instanceof Edge2) {
+          edges.push(userData.original);
+        }
+        if (userData.original instanceof Array
+          && userData.original[0] instanceof Edge2) {
+          edges.push(...(userData.original as Edge2[]));
+        }
+      }
+    }
 
+    this.bind(window);
+    let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);
+    if (edges.length == 0) {
       let act_pick_objs = new ActPickObjects();
       await act_pick_objs.execute(context);
       if (this._isCancel || act_pick_objs.isCancel) { this.cancel(); return; }
@@ -86,30 +85,36 @@ class CreateSectionCom extends CreateFaceCom {
           }
         }
       }
-
-      if (edges.length) {
-        for (let i = 0; i < edges.length; i++) {
-          edges[i] = edges[i].clone();
-        }
-        userData.color = THREE.Color.NAMES.blue;
-        if (act_pick_objs.results.length == 1) {
-          let face = Brep2Builder.BuildFaceByEdges(edges);
-          let geo = BrepMeshBuilder.BuildFace2Mesh(face, userData.color);
-          userData.original = face;
-          geo.userData = userData;
-          this.results = geo;
-        }
-        if (act_pick_objs.results.length > 1) {
-          let faces = Brep2Builder.BuildFacesByEdges(edges, 1e-4, 1e-10);
-          let geo = BrepMeshBuilder.BuildFace2sMesh(faces, userData.color);
-          userData.original = faces;
-          geo.userData = userData;
-          this.results = geo;
-        }
-        this.done();
-      } else {
-        this.cancel();
+    }
+    if (edges.length) {
+      for (let i = 0; i < edges.length; i++) {
+        edges[i] = edges[i].clone();
       }
+      n0 = edges.length;
+      userData.color = THREE.Color.NAMES.blue;
+      let faces = Brep2Builder.BuildFacesByEdges(edges, 1e-4, 1e-10);
+      if (n1 > 0) {
+        for (let i = 0; i < n1; i++) {
+          faces[i].uuid = paras[3 + n0 + i];
+        }
+      }
+      n1 = faces.length;
+      let geo = BrepMeshBuilder.BuildFace2sMesh(faces, userData.color);
+      userData.original = faces;
+      geo.userData = userData;
+      this.results = geo;
+
+      this._text = paras[0] + ' ' + n0 + ' ' + n1;
+      for (let i = 0; i < edges.length; i++) {
+        this._text += ' ' + edges[i].uuid;
+      }
+      for (let i = 0; i < faces.length; i++) {
+        this._text += ' ' + faces[i].uuid
+      }
+
+      this.done();
+    } else {
+      this.cancel();
     }
   }
 

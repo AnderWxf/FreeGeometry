@@ -20,7 +20,7 @@ import { CloneUserData, CopyUserData, CreateGeomUserData, type UserData } from "
 
 /**
  * Modify command class.
- * 
+ * 格式：命令类型 UUID 控制点索引 p.x p.y
  */
 class ModifyNurbs2FitCom extends ComModify {
   constructor(executer: CommandExecuter, text: string) {
@@ -32,18 +32,18 @@ class ModifyNurbs2FitCom extends ComModify {
     let paras = str.split(' ');
     let userData = CreateGeomUserData(this.type);
 
-    let points: Vector2[] = [];
-    if (paras.length > 5) {
-      // 创建一个多段线
-      for (let i = 1; i < paras.length; i++) {
-        let point = new Vector2(new Number(paras[i]).valueOf(), new Number(paras[i + 1]).valueOf());
-        points.push(point);
+    // 指定了对象
+    if (paras.length >= 2) {
+      let objs = Global.scene.getObjectsByUUIDs([paras[1]]);
+      if (objs.length > 0 && objs[0].userData.type == this.type) {
+        this.old = objs[0];
       }
-      this.getSelected();
     } else {
-      this.bind(window);
-      let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);
-
+      this.getSelected();
+    }
+    this.bind(window);
+    let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);
+    if (!this.old) {
       let act_pick_data = new ActPickObject();
       await act_pick_data.execute(context);
       if (this._isCancel || act_pick_data.isCancel) { this.cancel(); return; }
@@ -54,8 +54,15 @@ class ModifyNurbs2FitCom extends ComModify {
         if (this._isCancel || act_pick_data.isCancel) { this.cancel(); return; }
       }
       this.old = act_pick_data.result;
-      CopyUserData(this.old.userData as UserData, userData);
+    }
+    CopyUserData(this.old.userData as UserData, userData);
 
+    if (paras.length >= 5) {
+      this.assistIndex = new Number(paras[2]).valueOf();
+      let px = new Number(paras[3]).valueOf();
+      let py = new Number(paras[4]).valueOf();
+      userData.assistPoints[this.assistIndex].p.set(px, py);
+    } else {
       let act_pick_assist = new ActPickAssist();
       await act_pick_assist.execute(context);
       this.assistIndex = this.getIndex(act_pick_assist.result);
@@ -68,27 +75,28 @@ class ModifyNurbs2FitCom extends ComModify {
       let act_pick_new_pos = new ActPickPoint2();
       await act_pick_new_pos.execute(context);
       if (this._isCancel || act_pick_new_pos.isCancel) { this.cancel(); return; }
-
       userData.assistPoints[this.assistIndex].p.set(act_pick_new_pos.result.x, act_pick_new_pos.result.y);
-
-      for (let i = 0; i < userData.assistPoints.length; i++) {
-        points.push(userData.assistPoints[i].p as Vector2);
-      }
     }
-
-    this._text = paras[0];
-    for (let i = 1; i < points.length; i++) {
-      let point = points[i];
-      this._text += ' ' + point.x + ' ' + point.y;
+    let points: Vector2[] = [];
+    for (let i = 0; i < userData.assistPoints.length; i++) {
+      let point = userData.assistPoints[i].p;
+      points.push(point);
     }
 
     // 创建一个曲线段
     if (points.length > 2) {
       let edge = Brep2Builder.BuildEdge2FromFittingPoints(points, points.length == 3 ? 2 : 3);
+      edge.uuid = this.old.userData.original.uuid;
       let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, userData.color);
       userData.original = edge;
       geo.userData = userData;
       this.results = geo;
+
+      this._text = paras[0]
+        + ' ' + edge.uuid
+        + ' ' + this.assistIndex
+        + ' ' + userData.assistPoints[this.assistIndex].p.x + ' ' + userData.assistPoints[this.assistIndex].p.y;
+
       this.done();
     } else {
       this.cancel();

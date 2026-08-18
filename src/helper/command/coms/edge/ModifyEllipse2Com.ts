@@ -21,7 +21,7 @@ import { CurveBuilder } from "../../../../geometry/algorithm/builder/CurveBuilde
 
 /**
  * Modify command class.
- * 
+ * 格式：命令类型 UUID 控制点索引 p.x p.y
  */
 class ModifyEllipse2Com extends ComModify {
   constructor(executer: CommandExecuter, text: string) {
@@ -33,19 +33,18 @@ class ModifyEllipse2Com extends ComModify {
     let paras = str.split(' ');
     let userData = CreateGeomUserData(this.type);
 
-    let centerPoint: Vector2;
-    let majorPoint: Vector2;
-    let minorPoint: Vector2;
-    if (paras.length == 7) {
-      // 创建一个线段
-      centerPoint = new Vector2(new Number(paras[1]).valueOf(), new Number(paras[2]).valueOf());
-      majorPoint = new Vector2(new Number(paras[3]).valueOf(), new Number(paras[4]).valueOf());
-      minorPoint = new Vector2(new Number(paras[5]).valueOf(), new Number(paras[6]).valueOf());
-      this.getSelected();
+    // 指定了对象
+    if (paras.length >= 2) {
+      let objs = Global.scene.getObjectsByUUIDs([paras[1]]);
+      if (objs.length > 0 && objs[0].userData.type == this.type) {
+        this.old = objs[0];
+      }
     } else {
-      this.bind(window);
-      let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);
-
+      this.getSelected();
+    }
+    this.bind(window);
+    let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);
+    if (!this.old) {
       let act_pick_data = new ActPickObject();
       await act_pick_data.execute(context);
       if (this._isCancel || act_pick_data.isCancel) { this.cancel(); return; }
@@ -70,15 +69,15 @@ class ModifyEllipse2Com extends ComModify {
       let act_pick_new_pos = new ActPickPoint2();
       await act_pick_new_pos.execute(context);
       if (this._isCancel || act_pick_new_pos.isCancel) { this.cancel(); return; }
-
-      centerPoint = userData.assistPoints[0].p as Vector2;
-      majorPoint = userData.assistPoints[1].p as Vector2;
-      minorPoint = userData.assistPoints[2].p as Vector2;
-
       userData.assistPoints[this.assistIndex].p.set(act_pick_new_pos.result.x, act_pick_new_pos.result.y);
     }
+    let centerPoint = userData.assistPoints[0].p as Vector2;
+    let majorPoint = userData.assistPoints[1].p as Vector2;
+    let minorPoint = userData.assistPoints[2].p as Vector2;
+
     // 创建一个曲线段
     let edge = Brep2Builder.BuildEllipseEdge2FromCenterBeginEndPoint(centerPoint, majorPoint, minorPoint);
+    edge.uuid = this.old.userData.original.uuid;
     let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, userData.color);
     userData.original = edge;
     geo.userData = userData;
@@ -87,7 +86,10 @@ class ModifyEllipse2Com extends ComModify {
     let minorP = alg.p(PI_2);
     minorPoint.set(minorP.x, minorP.y);
 
-    this._text = paras[0] + ' ' + centerPoint.x + ' ' + centerPoint.y + ' ' + majorPoint.x + ' ' + majorPoint.y + ' ' + minorPoint.x + ' ' + minorPoint.y;
+    this._text = paras[0]
+      + ' ' + edge.uuid
+      + ' ' + this.assistIndex
+      + ' ' + userData.assistPoints[this.assistIndex].p.x + ' ' + userData.assistPoints[this.assistIndex].p.y;
 
     this.done();
   }

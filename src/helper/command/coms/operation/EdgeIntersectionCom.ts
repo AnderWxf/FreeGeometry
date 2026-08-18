@@ -14,7 +14,7 @@ import * as THREE from "three";
 
 /**
  * Edge intersection computing command class.
- * 
+ * 命令类型 n0 n1 uuide0 uuide1 ... uuidp0 uuidp1 ...
  */
 class EdgeIntersectionCom extends Command {
   public src: Array<Edge2>;
@@ -35,8 +35,12 @@ class EdgeIntersectionCom extends Command {
     let paras = str.split(' ');
     this.bind(window);
     let selects: Array<THREE.Object3D> = [];
-    if (paras.length > 2) {
-      selects = Global.scene.getObjectsByUUIDs(paras);
+    let n0 = 0;
+    let n1 = 0;
+    if (paras.length > 3) {
+      n0 = new Number(paras[1]).valueOf();
+      n1 = new Number(paras[2]).valueOf();
+      selects = Global.scene.getObjectsByUUIDs(paras.slice(3, 3 + n0));
     } else {
       let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);
 
@@ -73,7 +77,6 @@ class EdgeIntersectionCom extends Command {
       }
     }
 
-
     if (this.src.length > 0 && this.des.length > 0) {
       for (let i = 0; i < this.src.length; i++) {
         let src = this.src[i];
@@ -89,12 +92,27 @@ class EdgeIntersectionCom extends Command {
           let geo = this.createAssistPoint({ p: point, c: THREE.Color.NAMES.blue }, false)
           geo.userData.type = GeomType.DATA_TYPE_POINT2;
           geo.userData.original = new Point2Data(point.clone());
+          if (n1 > 0) { 
+            geo.userData.original.uuid = paras[3 + n0 + this.assists.length];
+          }
           this.assists.push(geo);
         }
       }
       for (let i = 0; i < this.assists.length; i++) {
         this.assists[i].visible = true;
       }
+
+      n0 = this.src.length + this.des.length;
+      n1 = this.assists.length;
+      this._text = paras[0] + ' ' + n0 + ' ' + n1;
+
+      for (let i = 0; i < this.src.length; i++) {
+        this._text += ' ' + this.src[i].uuid;
+      }
+      for (let i = 0; i < this.des.length; i++) {
+        this._text += ' ' + this.des[i].uuid;
+      }
+
       this.done();
     } else {
       this.cancel();

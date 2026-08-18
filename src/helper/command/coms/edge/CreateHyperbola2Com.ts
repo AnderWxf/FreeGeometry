@@ -41,6 +41,15 @@ class CreateHyperbola2Com extends ComCreate {
       this.u0p = new Vector2(new Number(paras[7]).valueOf(), new Number(paras[8]).valueOf());
       this.u1p = new Vector2(new Number(paras[9]).valueOf(), new Number(paras[10]).valueOf());
       this.isRight = new Boolean(paras[11]).valueOf();
+
+      userData.assistPoints.push({ p: this.center, c: THREE.Color.NAMES.greenyellow });
+      this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
+      Global.scene.add(this.assists[this.assists.length - 1]);
+
+      userData.assistPoints.push({ p: this.major, c: THREE.Color.NAMES.limegreen });
+      this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
+      Global.scene.add(this.assists[this.assists.length - 1]);      
+      
     } else {
       this.bind(window);
       let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);

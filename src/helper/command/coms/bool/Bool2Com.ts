@@ -11,7 +11,7 @@ import { BoolCom } from "./BoolCom";
 
 /**
  * Bool command class.
- * 
+ * 命令类型 n0 n1 uuidf0 uuidf1 ... uuidf_0 uuidf_1 ...
  */
 class Bool2Com extends BoolCom {
   protected src: Face2[];
@@ -26,16 +26,27 @@ class Bool2Com extends BoolCom {
   async exec(): Promise<void> {
     let str = this._text;
     let paras = str.split(' ');
-
     this.bind(window);
-    let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);
-    let act_pick_objs = new ActPickObjects();
-    await act_pick_objs.execute(context);
-    if (this._isCancel || act_pick_objs.isCancel) { this.cancel(); return; }
+    let selects: Array<THREE.Object3D> = [];
+    // 指定了对象
+    if (paras.length >= 3) {
+      selects = Global.scene.getObjectsByUUIDs(paras.slice(1));
+    } else {
+      let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);
+      if (context.select.selectedObjects.length) {
+        selects = context.select.selectedObjects;
+      } else {
+        let act_pick_objs = new ActPickObjects();
+        await act_pick_objs.execute(context);
+        if (this._isCancel || act_pick_objs.isCancel) { this.cancel(); return; }
+        selects = act_pick_objs.results;
+      }
+    }
+
 
     // 只能选择二维平面类型
-    for (let i = 0; i < act_pick_objs.results.length; i++) {
-      let geo = act_pick_objs.results[i];
+    for (let i = 0; i < selects.length; i++) {
+      let geo = selects[i];
       let userData = geo.userData as UserData;
       if (userData.type >= GeomType.DRAW_SURFACE_CI && userData.type < GeomType.DRAW_SURFACE_PLA) {
         if (userData.original instanceof Face2) {
@@ -94,6 +105,15 @@ class Bool2Com extends BoolCom {
       userData.original = faces;
       geo.userData = userData;
       this.results.push(geo);
+
+
+      this._text = paras[0];
+      for (let i = 0; i < this.src.length; i++) {
+        this._text += ' ' + this.src[i].uuid;
+      }
+      for (let i = 0; i < this.des.length; i++) {
+        this._text += ' ' + this.des[i].uuid;
+      }      
 
       this.done();
     } else {

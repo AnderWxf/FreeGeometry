@@ -21,7 +21,7 @@ import { CloneUserData, CopyUserData, CreateGeomUserData, type UserData } from "
 
 /**
  * Modify command class.
- * 
+ * 格式：命令类型 UUID 控制点索引 p.x p.y isRight
  */
 class ModifyHyperbola2Com extends ComModify {
   private isRight: boolean = true;   // 默认右侧弧(按下左shift表示画左侧弧)
@@ -34,24 +34,19 @@ class ModifyHyperbola2Com extends ComModify {
     let paras = str.split(' ');
     let userData = CreateGeomUserData(this.type);
 
-    let centerPoint: Vector2;
-    let majorPoint: Vector2;
-    let minorPoint: Vector2;
-    let u0Point: Vector2;
-    let u1Point: Vector2;
-    if (paras.length == 12) {
-      // 创建一个线段
-      centerPoint = new Vector2(new Number(paras[1]).valueOf(), new Number(paras[2]).valueOf());
-      majorPoint = new Vector2(new Number(paras[3]).valueOf(), new Number(paras[4]).valueOf());
-      minorPoint = new Vector2(new Number(paras[5]).valueOf(), new Number(paras[6]).valueOf());
-      u0Point = new Vector2(new Number(paras[7]).valueOf(), new Number(paras[8]).valueOf());
-      u1Point = new Vector2(new Number(paras[9]).valueOf(), new Number(paras[10]).valueOf());
-      this.isRight = new Boolean(paras[11]).valueOf();
-      this.getSelected();
+    // 指定了对象
+    if (paras.length >= 2) {
+      let objs = Global.scene.getObjectsByUUIDs([paras[1]]);
+      if (objs.length > 0 && objs[0].userData.type == this.type) {
+        this.old = objs[0];
+      }
     } else {
-      this.bind(window);
-      let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);
+      this.getSelected();
+    }
 
+    this.bind(window);
+    let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);
+    if (!this.old) {
       let act_pick_data = new ActPickObject();
       await act_pick_data.execute(context);
       if (this._isCancel || act_pick_data.isCancel) { this.cancel(); return; }
@@ -62,8 +57,14 @@ class ModifyHyperbola2Com extends ComModify {
         if (this._isCancel || act_pick_data.isCancel) { this.cancel(); return; }
       }
       this.old = act_pick_data.result;
-      CopyUserData(this.old.userData as UserData, userData);
-
+    }
+    CopyUserData(this.old.userData as UserData, userData);
+    if (paras.length >= 5) {
+      this.assistIndex = new Number(paras[2]).valueOf();
+      let px = new Number(paras[3]).valueOf();
+      let py = new Number(paras[4]).valueOf();
+      userData.assistPoints[this.assistIndex].p.set(px, py);
+    } else {
       let act_pick_assist = new ActPickAssist();
       await act_pick_assist.execute(context);
       this.assistIndex = this.getIndex(act_pick_assist.result);
@@ -76,18 +77,22 @@ class ModifyHyperbola2Com extends ComModify {
       let act_pick_new_pos = new ActPickPoint2();
       await act_pick_new_pos.execute(context);
       if (this._isCancel || act_pick_new_pos.isCancel) { this.cancel(); return; }
-
-      centerPoint = userData.assistPoints[0].p as Vector2;
-      majorPoint = userData.assistPoints[1].p as Vector2;
-      minorPoint = userData.assistPoints[2].p as Vector2;
-      u0Point = userData.assistPoints[3].p as Vector2;
-      u1Point = userData.assistPoints[4].p as Vector2;
-
       userData.assistPoints[this.assistIndex].p.set(act_pick_new_pos.result.x, act_pick_new_pos.result.y);
     }
+
+    if (paras.length >= 6) {
+      this.isRight = new Boolean(paras[5]).valueOf();
+    }
+
+    let centerPoint = userData.assistPoints[0].p as Vector2;
+    let majorPoint = userData.assistPoints[1].p as Vector2;
+    let minorPoint = userData.assistPoints[2].p as Vector2;
+    let u0Point = userData.assistPoints[3].p as Vector2;
+    let u1Point = userData.assistPoints[4].p as Vector2;
+
     // 创建一个曲线段
     let edge = Brep2Builder.BuildHyperbolaEdge2FromCenterABPoint(centerPoint, majorPoint, minorPoint);
-
+    edge.uuid = this.old.userData.original.uuid;
     let alg = CurveBuilder.Algorithm2ByData(edge.curve);
 
     let u0 = alg.u(u0Point);
@@ -98,20 +103,19 @@ class ModifyHyperbola2Com extends ComModify {
     let u1p = alg.p(u1);
     u1Point.set(u1p.x, u1p.y);
 
-    this._text = paras[0] + ' ' + centerPoint.x + ' ' + centerPoint.y
-      + ' ' + majorPoint.x + ' ' + majorPoint.y
-      + ' ' + minorPoint.x + ' ' + minorPoint.y
-      + ' ' + u0Point.x + ' ' + u0Point.y
-      + ' ' + u1Point.x + ' ' + u1Point.y
-      + ' ' + this.isRight
-      ;
-
     edge.u.set(u0, u1);
 
     let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, userData.color);
     userData.original = edge;
     geo.userData = userData;
     this.results = geo;
+
+    this._text = paras[0]
+      + ' ' + edge.uuid
+      + ' ' + this.assistIndex
+      + ' ' + userData.assistPoints[this.assistIndex].p.x + ' ' + userData.assistPoints[this.assistIndex].p.y
+      + ' ' + this.isRight;
+
     this.done();
   }
   onMouseMoveExec(event: MouseEvent) {
