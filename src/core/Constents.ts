@@ -245,18 +245,12 @@ enum CommandType {
   CALCULATE_EDGE_CUTTING = 'OEC',       // 边切分(多选对象组中的第一个分割后面所有对象)
 
   //布尔运算
-  BOOL_2_INTERSECTION_MULTIPLE = 'BIM', // 2D布尔交(多对多)
-  BOOL_2_UNION_MULTIPLE = 'BUM',        // 2D布尔并(多对多)
-  BOOL_2_DIFFERENCE_MULTIPLE = 'BDM',   // 2D布尔差(多对多)
-  BOOL_2_INTERSECTION = 'BI',           // 2D布尔交(单对单)
-  BOOL_2_UNION = 'BU',                  // 2D布尔并(单对单)
-  BOOL_2_DIFFERENCE = 'BD',             // 2D布尔差(单对单)
-  BOOL_3_INTERSECTION_MULTIPLE = 'B3IM',// 3D布尔交(多对多)
-  BOOL_3_UNION_MULTIPLE = 'B3UM',       // 3D布尔并(多对多)
-  BOOL_3_DIFFERENCE_MULTIPLE = 'B3DM',  // 3D布尔差(多对多)
-  BOOL_3_INTERSECTION = 'B3I',          // 3D布尔交(单对单)
-  BOOL_3_UNION = 'B3U',                 // 3D布尔并(单对单)
-  BOOL_3_DIFFERENCE = 'B3D',            // 3D布尔差(单对单)
+  BOOL_2_INTERSECTION = 'BI',           // 2D布尔交
+  BOOL_2_UNION = 'BU',                  // 2D布尔并
+  BOOL_2_DIFFERENCE = 'BD',             // 2D布尔差
+  BOOL_3_INTERSECTION = 'B3I',          // 3D布尔交
+  BOOL_3_UNION = 'B3U',                 // 3D布尔并
+  BOOL_3_DIFFERENCE = 'B3D',            // 3D布尔差
 
   // 场景
   SCENE_SAVE = 'SAVE',                  // 保存

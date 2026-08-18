@@ -28,9 +28,13 @@ class Bool2Com extends BoolCom {
     let paras = str.split(' ');
     this.bind(window);
     let selects: Array<THREE.Object3D> = [];
+    let n0 = 0;
+    let n1 = 0;
     // 指定了对象
     if (paras.length >= 3) {
-      selects = Global.scene.getObjectsByUUIDs(paras.slice(1));
+      n0 = new Number(paras[1]).valueOf();
+      n1 = new Number(paras[2]).valueOf();
+      selects = Global.scene.getObjectsByUUIDs(paras.slice(3 + n0));
     } else {
       let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);
       if (context.select.selectedObjects.length) {
@@ -42,7 +46,6 @@ class Bool2Com extends BoolCom {
         selects = act_pick_objs.results;
       }
     }
-
 
     // 只能选择二维平面类型
     for (let i = 0; i < selects.length; i++) {
@@ -99,6 +102,11 @@ class Bool2Com extends BoolCom {
         return;
       }
       let faces: Face2[] = this.execute();
+      if (n1) {
+        for (let i = 0; i < faces.length; i++) {
+          faces[i].uuid = paras[3 + n0 + i];
+        }
+      }
       let userData = CreateGeomUserData(GeomType.DRAW_SURFACE_SEC);
       userData.color = THREE.Color.NAMES.blue;
       let geo = BrepMeshBuilder.BuildFace2sMesh(faces, userData.color);
@@ -106,14 +114,18 @@ class Bool2Com extends BoolCom {
       geo.userData = userData;
       this.results.push(geo);
 
-
-      this._text = paras[0];
+      n0 = this.src.length + this.des.length;
+      n1 = faces.length;
+      this._text = paras[0] + ' ' + n0 + ' ' + n1;
       for (let i = 0; i < this.src.length; i++) {
         this._text += ' ' + this.src[i].uuid;
       }
       for (let i = 0; i < this.des.length; i++) {
         this._text += ' ' + this.des[i].uuid;
-      }      
+      }
+      for (let i = 0; i < faces.length; i++) {
+        this._text += ' ' + faces[i].uuid;
+      }
 
       this.done();
     } else {

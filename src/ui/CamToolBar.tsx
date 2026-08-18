@@ -452,18 +452,12 @@ const MenuItems = [
     label: '布尔',
     children: [
       //布尔运算
-      { key: CommandType.BOOL_2_INTERSECTION, label: '2D布尔交(单)' + ' ' + CommandType.BOOL_2_INTERSECTION },
-      { key: CommandType.BOOL_2_UNION, label: '2D布尔并(单)' + ' ' + CommandType.BOOL_2_UNION },
-      { key: CommandType.BOOL_2_DIFFERENCE, label: '2D布尔差(单)' + ' ' + CommandType.BOOL_2_DIFFERENCE },
-      { key: CommandType.BOOL_2_INTERSECTION_MULTIPLE, label: '2D布尔交(多)' + ' ' + CommandType.BOOL_2_INTERSECTION_MULTIPLE },
-      { key: CommandType.BOOL_2_UNION_MULTIPLE, label: '2D布尔并(多)' + ' ' + CommandType.BOOL_2_UNION_MULTIPLE },
-      { key: CommandType.BOOL_2_DIFFERENCE_MULTIPLE, label: '2D布尔差(多)' + ' ' + CommandType.BOOL_2_DIFFERENCE_MULTIPLE },
-      { key: CommandType.BOOL_3_INTERSECTION, label: '3D布尔交(单)' + ' ' + CommandType.BOOL_3_INTERSECTION },
-      { key: CommandType.BOOL_3_UNION, label: '3D布尔并(单)' + ' ' + CommandType.BOOL_3_UNION },
-      { key: CommandType.BOOL_3_DIFFERENCE, label: '3D布尔差(单)' + ' ' + CommandType.BOOL_3_DIFFERENCE },
-      { key: CommandType.BOOL_3_INTERSECTION_MULTIPLE, label: '3D布尔交(多)' + ' ' + CommandType.BOOL_3_INTERSECTION_MULTIPLE },
-      { key: CommandType.BOOL_3_UNION_MULTIPLE, label: '3D布尔并(多)' + ' ' + CommandType.BOOL_3_UNION_MULTIPLE },
-      { key: CommandType.BOOL_3_DIFFERENCE_MULTIPLE, label: '3D布尔差(多)' + ' ' + CommandType.BOOL_3_DIFFERENCE_MULTIPLE },
+      { key: CommandType.BOOL_2_INTERSECTION, label: '2D布尔交' + ' ' + CommandType.BOOL_2_INTERSECTION },
+      { key: CommandType.BOOL_2_UNION, label: '2D布尔并' + ' ' + CommandType.BOOL_2_UNION },
+      { key: CommandType.BOOL_2_DIFFERENCE, label: '2D布尔差' + ' ' + CommandType.BOOL_2_DIFFERENCE },
+      { key: CommandType.BOOL_3_INTERSECTION, label: '3D布尔交' + ' ' + CommandType.BOOL_3_INTERSECTION },
+      { key: CommandType.BOOL_3_UNION, label: '3D布尔并' + ' ' + CommandType.BOOL_3_UNION },
+      { key: CommandType.BOOL_3_DIFFERENCE, label: '3D布尔差' + ' ' + CommandType.BOOL_3_DIFFERENCE },
     ]
   },
   {

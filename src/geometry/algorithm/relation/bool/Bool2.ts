@@ -6,7 +6,7 @@ import { Brep2Inter, type InterOfFace2 } from "../intersection/Brep2Inter";
 class Bool2 {
 
   /*
-  * 一对一布尔运算，差。
+  * 多对多布尔运算，差。
   * a,b都是单面片组,组内不相交，返回单面片组。
   */
   static Differences(a: Face2[], b: Face2[], tol0: number, tol1: number): Face2[] {
@@ -61,7 +61,7 @@ class Bool2 {
   }
 
   /*
-  * 一对一布尔运算，交。
+  * 多对多布尔运算，交。
   * a,b都是单面片组,组内不相交，返回单面片组。
   */
   static Intersections(a: Face2[], b: Face2[], tol0: number, tol1: number): Face2[] {
@@ -112,7 +112,7 @@ class Bool2 {
   }
 
   /*
-  * 一对一布尔运算，并。
+  * 多对多布尔运算，并。
   * a,b都是单面片组,组内不相交，返回单面片组。
   */
   static Unions(a: Face2[], b: Face2[], tol0: number, tol1: number): Face2[] {
