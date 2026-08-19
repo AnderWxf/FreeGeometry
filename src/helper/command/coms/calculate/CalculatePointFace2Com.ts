@@ -27,7 +27,7 @@ class CalculatePointFace2Com extends Command {
     let paras = str.split(' ');
     // 指定了对象
     if (paras.length >= 2) {
-      let selects = Global.scene.getObjectsByUUIDs(paras.slice(1));
+      let selects = Global.scene.getObjectsByUUIDs(paras.slice(1, 1));
       if (selects.length) {
         this.face = selects[0].userData.original as Face2;
       }

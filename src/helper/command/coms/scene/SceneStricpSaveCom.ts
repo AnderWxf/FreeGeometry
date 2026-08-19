@@ -12,10 +12,10 @@ class SceneStricpSaveCom extends Command {
     let paras = str.split(' ');
     let records = Global.comExector.records;
 
-    let filename = 'Stricp_' + new Date().toLocaleString() + '.txt';
+    let filename = 'Stricp_' + new Date().toLocaleString() + '.fg';
     filename = filename.replace(/[\/\\:*?"<>|]/g, '_'); // 替换非法字符
     if (Global.filename) {
-      filename = Global.filename.split('.')[0] + '.txt';
+      filename = Global.filename.split('.')[0] + '.fg';
     } else {
       Global.filename = filename;
     }
@@ -28,7 +28,7 @@ class SceneStricpSaveCom extends Command {
         suggestedName: filename,
         types: [{
           description: 'TXT Files',
-          accept: { 'application/text': ['.txt'] }
+          accept: { 'application/text': ['.fg'] }
         }]
       });
 

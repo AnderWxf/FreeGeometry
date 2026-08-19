@@ -30,8 +30,8 @@ class CreateNurbs2FitCom extends ComCreate {
     if (paras.length >= 6) {
       // 获取n个点
       let n = new Number(paras[1]).valueOf();
-      for (let i = 1; i < (n + 1) * 2; i++) {
-        let point = new Vector2(new Number(paras[i]).valueOf(), new Number(paras[i++]).valueOf());
+      for (let i = 2; i < (n + 1) * 2; i++) {
+        let point = new Vector2(new Number(paras[i]).valueOf(), new Number(paras[++i]).valueOf());
         this.points.push(point);
         userData.assistPoints.push({ p: point, c: THREE.Color.NAMES.greenyellow });
         this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
@@ -65,7 +65,7 @@ class CreateNurbs2FitCom extends ComCreate {
       geo.userData = userData;
       this.results = geo;
       this._text = paras[0] + ' ' + this.points.length;
-      for (let i = 1; i < this.points.length; i++) {
+      for (let i = 0; i < this.points.length; i++) {
         let point = this.points[i];
         this._text += ' ' + point.x + ' ' + point.y;
       }

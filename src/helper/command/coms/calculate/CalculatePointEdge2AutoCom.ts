@@ -29,7 +29,7 @@ class CalculatePointEdge2AutoCom extends Command {
     let paras = str.split(' ');
     // 指定了对象
     if (paras.length >= 2) {
-      let selects = Global.scene.getObjectsByUUIDs(paras.slice(1));
+      let selects = Global.scene.getObjectsByUUIDs(paras.slice(1, 1));
       if (selects.length) {
         this.edge = selects[0].userData.original as Edge2;
       }
@@ -76,7 +76,7 @@ class CalculatePointEdge2AutoCom extends Command {
 
     if (paras.length >= 4) {
       for (let i = 2; i < paras.length; i++) {
-        this.points.push(new Vector2(new Number(paras[i]).valueOf(), new Number(paras[i++]).valueOf()));
+        this.points.push(new Vector2(new Number(paras[i]).valueOf(), new Number(paras[++i]).valueOf()));
       }
     } else {
       // 遍历场景中的所有孤立点

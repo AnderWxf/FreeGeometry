@@ -283,9 +283,11 @@ class CommandExecuter {
   * 'Ctrl' + 'O', LOAD 
   * 'Ctrl' + 'I', IMPORT 
   * 'Ctrl' + 'X', CLEAR  
+  * 'Ctrl' + 'R', STRICP_SAVE
+  * 'Ctrl' + 'Shift' + 'R', STRICP_EXEC  
   */
   onKeyDown = (event: KeyboardEvent) => {
-    event.stopPropagation();
+    event.preventDefault();
     switch (event.code) {
       case "Enter":
       case "NumpadEnter":
@@ -323,6 +325,18 @@ class CommandExecuter {
         break;
       // R：旋转
       case 'KeyR':
+        if (this.KeyCtrlDown && !this.KeyShiftDown) {
+          this.KeyCtrlDown = false;
+          event.preventDefault();
+          this.execute(CommandType.SCENE_STRICP_SAVE);
+          return;
+        } else if (this.KeyCtrlDown && this.KeyShiftDown) {
+          this.KeyCtrlDown = false;
+          this.KeyShiftDown = false;
+          event.preventDefault();
+          this.execute(CommandType.SCENE_STRICP_EXEC);
+          return;
+        }
         this.execute(CommandType.TRANSFORM_ROTATE);
         break;
       // O：偏移

@@ -28,7 +28,7 @@ class CalculatePointFace2AutoCom extends Command {
     let paras = str.split(' ');
     // 指定了对象
     if (paras.length >= 2) {
-      let selects = Global.scene.getObjectsByUUIDs(paras.slice(1));
+      let selects = Global.scene.getObjectsByUUIDs(paras.slice(1, 1));
       if (selects.length) {
         this.face = selects[0].userData.original as Face2;
       }
@@ -71,7 +71,7 @@ class CalculatePointFace2AutoCom extends Command {
     this.algo = new Face2Algo(this.face);
     if (paras.length >= 4) {
       for (let i = 2; i < paras.length; i++) {
-        this.points.push(new Vector2(new Number(paras[i]).valueOf(), new Number(paras[i++]).valueOf()));
+        this.points.push(new Vector2(new Number(paras[i]).valueOf(), new Number(paras[++i]).valueOf()));
       }
     } else {
       // 遍历场景中的所有孤立点
@@ -133,7 +133,7 @@ class CalculatePointFace2AutoCom extends Command {
       let point = this.points[i];
       this._text += ' ' + point.x + ' ' + point.y;
     }
-    
+
     this.done();
   }
 }

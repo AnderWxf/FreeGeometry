@@ -47,10 +47,11 @@ class SceneLoadCom extends Command {
     event.target.removeEventListener('cancel', this.onCancel);
   }
   onLoaded(event: any): void {
+    const this_ = SceneLoadCom.this_;
     let str = this._text;
     let paras = str.split(' ');
 
-    SceneLoadCom.this_.onCancel(event);
+    this_.onCancel(event);
     const file = event.target.files[0];
     if (!file) {
       alert('请选择一个文件');
@@ -68,7 +69,6 @@ class SceneLoadCom extends Command {
     // 触发 React 组件更新（通过自定义事件）
     window.dispatchEvent(new CustomEvent('filenameChanged', { detail: Global.filename }));
     const reader = new FileReader();
-    const this_ = SceneLoadCom.this_;
     reader.onload = function (e: any) {
       try {
         // 保存原有数据，并清空场景

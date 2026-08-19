@@ -35,7 +35,7 @@ class ComSelect extends Command {
     }
 
     // 从场景中选择需要的目标
-    this.results = Global.scene.getObjectsByUUIDs(paras);
+    this.results = Global.scene.getObjectsByUUIDs(paras.slice(1));
     // 设置选择状态
     Global.select.selectedObjects.push(...this.results);
     for (let i = 0; i < this.results.length; i++) {

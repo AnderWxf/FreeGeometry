@@ -20,7 +20,7 @@ class ComDelete extends Command {
     let paras = str.split(' ');
     // 指定了对象
     if (paras.length >= 2) {
-      let objs = Global.scene.getObjectsByUUIDs(paras);
+      let objs = Global.scene.getObjectsByUUIDs(paras.slice(1));
       this.results.push(...objs);
     } else {
       let selectedObjects = Global.select.selectedObjects;

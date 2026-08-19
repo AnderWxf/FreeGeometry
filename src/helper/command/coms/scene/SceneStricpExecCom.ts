@@ -23,7 +23,7 @@ class SceneStricpExecCom extends Command {
         SceneStricpExecCom.input_ = document.createElement('input');
         SceneStricpExecCom.input_.type = 'file';
         SceneStricpExecCom.input_.hidden = true;
-        SceneStricpExecCom.input_.accept = '.txt,application/text';
+        SceneStricpExecCom.input_.accept = '.fg,application/text';
       }
       SceneStricpExecCom.input_.addEventListener('change', this.onLoaded);
       SceneStricpExecCom.input_.addEventListener('cancel', this.onCancel);
@@ -45,8 +45,11 @@ class SceneStricpExecCom extends Command {
     event.target.removeEventListener('cancel', this.onCancel);
   }
   onLoaded(event: any): void {
-    let str = this._text;
+    const this_ = SceneStricpExecCom.this_;
+    let str = this_._text;
     let paras = str.split(' ');
+
+    this_.onCancel(event);
     const file = event.target.files[0];
     if (!file) {
       alert('请选择一个文件');
@@ -54,8 +57,8 @@ class SceneStricpExecCom extends Command {
       return;
     }
     // 验证文件类型
-    if (!file.name.endsWith('.txt') && file.type !== 'application/txt') {
-      alert('请上传 txt 文件');
+    if (!file.name.endsWith('.fg') && file.type !== 'application/txt') {
+      alert('请上传 fg 文件');
       this.cancel();
       return;
     }
@@ -64,7 +67,7 @@ class SceneStricpExecCom extends Command {
     // 触发 React 组件更新（通过自定义事件）
     window.dispatchEvent(new CustomEvent('filenameChanged', { detail: Global.filename }));
     const reader = new FileReader();
-    const this_ = SceneStricpExecCom.this_;
+
     reader.onload = function (e: any) {
       try {
         // 加载txt中的数据

@@ -34,7 +34,7 @@ class Bool2Com extends BoolCom {
     if (paras.length >= 3) {
       n0 = new Number(paras[1]).valueOf();
       n1 = new Number(paras[2]).valueOf();
-      selects = Global.scene.getObjectsByUUIDs(paras.slice(3 + n0));
+      selects = Global.scene.getObjectsByUUIDs(paras.slice(3, 3 + n0));
     } else {
       let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);
       if (context.select.selectedObjects.length) {

@@ -1,4 +1,4 @@
-import { ImportJson, type DocNode } from "../../../Doc";
+import { ImportJson } from "../../../Doc";
 import { Command } from "../../Command";
 import * as THREE from "three";
 import { Global } from "../../../../core/Global";
@@ -17,6 +17,7 @@ class SceneImportCom extends Command {
   static this_: SceneImportCom;
   static input_: HTMLInputElement;
   async exec() {
+
     let str = this._text;
     let paras = str.split(' ');
 
@@ -46,11 +47,13 @@ class SceneImportCom extends Command {
     // 清理监听器，防止内存泄漏
     event.target.removeEventListener('change', this.onLoaded);
     event.target.removeEventListener('cancel', this.onCancel);
-  }  
+  }
   onLoaded(event: any): void {
-    let str = this._text;
+    const this_ = SceneImportCom.this_;
+    let str = this_._text;
     let paras = str.split(' ');
-    
+
+    this_.onCancel(event);
     const file = event.target.files[0];
     if (!file) {
       alert('请选择一个文件');
@@ -65,7 +68,7 @@ class SceneImportCom extends Command {
     }
     this._text = paras[0] + ' ' + file.name;
     const reader = new FileReader();
-    const this_ = SceneImportCom.this_;
+
     reader.onload = function (e: any) {
       try {
         // 加载json中的数据

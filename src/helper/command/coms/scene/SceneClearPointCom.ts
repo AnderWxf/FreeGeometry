@@ -4,8 +4,6 @@ import * as THREE from "three";
 import type { CommandExecuter } from "../../CommandExecuter";
 import type { UserData } from "../../../UserData";
 import { GeomType } from "../../../../core/Constents";
-import { Point2Data } from "../../../../geometry/data/base/Point2Data";
-import { Point3Data } from "../../../../geometry/data/base/Point3Data";
 
 /**
  * Clear command class.
