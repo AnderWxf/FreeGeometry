@@ -136,7 +136,7 @@ class CurveBuilder {
     radius.x = major.length();
     major.normalize();
     let rotation = Math.atan2(major.y, major.x);
-    major.multiplyScalar(minor.dot(major)).add(c);
+    major.multiplyScalar(minor.dot(major));
     radius.y = minor.distanceTo(major);
     let tr = new Transform2(c, rotation);
     return new Arc2Data(tr, radius);
