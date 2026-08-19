@@ -78,6 +78,7 @@ import { ComUnDo } from "./coms/other/ComUnDo";
 import { ComReDo } from "./coms/other/ComReDo";
 import { SceneStricpSaveCom } from "./coms/scene/SceneStricpSaveCom";
 import { SceneStricpExecCom } from "./coms/scene/SceneStricpExecCom";
+import { ComReverse } from "./coms/ComReverse";
 
 /**
  * Command executer base class.
@@ -172,14 +173,11 @@ class CommandExecuter {
     this._commands.set(CommandType.SCENE_STRICP_SAVE, SceneStricpSaveCom);
     this._commands.set(CommandType.SCENE_STRICP_EXEC, SceneStricpExecCom);
 
-
-
-
+    this._commands.set(CommandType.OTHER_REVERSE, ComReverse);
     this._commands.set(CommandType.OTHER_SELECT, ComSelect);
     this._commands.set(CommandType.OTHER_DELETE, ComDelete);
     this._commands.set(CommandType.OTHER_UNDO, ComUnDo);
     this._commands.set(CommandType.OTHER_REDO, ComReDo);
-
 
     this._commands.set(CommandType.TRANSFORM_MOVE, ComMove);
     this._commands.set(CommandType.TRANSFORM_ROTATE, ComRotate);

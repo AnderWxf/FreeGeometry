@@ -12,7 +12,7 @@ class NurbsSurfaceData extends SurfaceData {
    *
    * @type {number}
    */
-  private type = GeomType.DATA_TYPE_SURFACE_NURBSSURFACE;
+  private type = GeomType[GeomType.DATA_TYPE_SURFACE_NURBSSURFACE];
   /**
    * The contrls points ( m x n )of this nurbs surface.
    *

@@ -4,7 +4,7 @@ import type { CommandExecuter } from "../../CommandExecuter";
 
 /**
  * Redo processing command class.
- * 
+ * 格式：命令类型
  */
 class ComReDo extends Command {
   constructor(executer: CommandExecuter, text: string) {

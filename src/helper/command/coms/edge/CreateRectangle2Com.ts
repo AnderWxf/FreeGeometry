@@ -14,7 +14,7 @@ import { CreateGeomUserData, type UserData } from "../../../UserData";
 
 /**
  * Create command class.
- * 命令类型 begin.x begin.y end.x end.y uuid0 uuid1 uuid2 uuid3
+ * 格式：命令类型 begin.x begin.y end.x end.y uuid0 uuid1 uuid2 uuid3
  */
 class CreateRectangle2Com extends ComCreate {
   begin: Vector2;
@@ -85,7 +85,7 @@ class CreateRectangle2Com extends ComCreate {
     userData.original = edges;
     geo.userData = userData;
     this.results = geo;
-    
+
     this._text = paras[0]
       + ' ' + this.begin.x + ' ' + this.begin.y
       + ' ' + this.end.x + ' ' + this.end.y
@@ -93,7 +93,7 @@ class CreateRectangle2Com extends ComCreate {
       + ' ' + edges[1].uuid
       + ' ' + edges[2].uuid
       + ' ' + edges[3].uuid;
-    
+
     this.done();
   }
   onMouseMoveExec(event: MouseEvent) {

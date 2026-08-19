@@ -5,7 +5,7 @@ import { ComTransform } from "./ComTransform";
 
 /**
  * Scale command class.
- * 
+ * 格式：命令类型 begin.x begin.y end.x end.y uuid0 uuid1...
  */
 class ComScale extends ComTransform {
   constructor(executer: CommandExecuter, text: string) {

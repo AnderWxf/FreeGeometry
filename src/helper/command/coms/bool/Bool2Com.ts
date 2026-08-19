@@ -11,7 +11,7 @@ import { BoolCom } from "./BoolCom";
 
 /**
  * Bool command class.
- * 命令类型 n0 n1 uuidf0 uuidf1 ... uuidf_0 uuidf_1 ...
+ * 格式：命令类型 n0 n1 uuidf0 uuidf1 ... uuidf_0 uuidf_1 ...
  */
 class Bool2Com extends BoolCom {
   protected src: Face2[];

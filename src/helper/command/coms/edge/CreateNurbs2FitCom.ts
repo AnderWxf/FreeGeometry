@@ -14,7 +14,7 @@ import { CreateGeomUserData, type UserData } from "../../../UserData";
 
 /**
  * Create command class.
- * 命令类型 n p[0].x p[0].y p[1].x p[1].y p[2].x p[2].y ... uuid
+ * 格式：命令类型 n p[0].x p[0].y p[1].x p[1].y p[2].x p[2].y ... uuid
  */
 class CreateNurbs2FitCom extends ComCreate {
   points: Vector2[];

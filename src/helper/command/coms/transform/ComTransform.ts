@@ -12,26 +12,31 @@ import type { Transform2 } from "../../../../geometry/data/base/Transform2";
 import { GeomType } from "../../../../core/Constents";
 import { CloneUserData, CopyUserData, type UserData } from "../../../UserData";
 import { Point2Data } from "../../../../geometry/data/base/Point2Data";
-import type { Point3Data } from "../../../../geometry/data/base/Point3Data";
+import { DataBase } from "../../../../geometry/data/DataBase";
 
 /**
  * Transform command class.
- * 
+ * 格式：命令类型 begin.x begin.y end.x end.y uuid0 uuid1...
  */
 class ComTransform extends ComBatch {
-  beginPoint: Vector2;
-  endPoint: Vector2;
+  begin: Vector2;
+  end: Vector2;
   override async exec(): Promise<void> {
 
     let str = this._text;
     let paras = str.split(' ');
 
-    if (paras.length == 5) {
+    if (paras.length >= 5) {
       // 创建一个直线段
-      this.beginPoint = new Vector2(new Number(paras[1]).valueOf(), new Number(paras[2]).valueOf());
-      this.endPoint = new Vector2(new Number(paras[3]).valueOf(), new Number(paras[4]).valueOf());
-      if (Global.select.selectedObjects.length > 0) {
-        this.olds.push(...Global.select.selectedObjects);
+      this.begin = new Vector2(new Number(paras[1]).valueOf(), new Number(paras[2]).valueOf());
+      this.end = new Vector2(new Number(paras[3]).valueOf(), new Number(paras[4]).valueOf());
+      if (paras.length >= 6) {
+        let objs = Global.scene.getObjectsByUUIDs(paras.slice(5));
+        this.olds.push(...objs);
+      } else {
+        if (Global.select.selectedObjects.length > 0) {
+          this.olds.push(...Global.select.selectedObjects);
+        }
       }
     } else {
       this.bind(window);
@@ -51,19 +56,14 @@ class ComTransform extends ComBatch {
       let act_pick_begin = new ActPickPoint2();
       await act_pick_begin.execute(context);
       if (this._isCancel || act_pick_begin.isCancel) { this.cancel(); return; }
-
-      this.beginPoint = new Vector2(act_pick_begin.result.x, act_pick_begin.result.y);
-
+      this.begin = new Vector2(act_pick_begin.result.x, act_pick_begin.result.y);
 
       let act_pick_end = new ActPickPoint2();
       await act_pick_end.execute(context);
       if (this._isCancel || act_pick_end.isCancel) { this.cancel(); return; }
-      this.endPoint = new Vector2(act_pick_end.result.x, act_pick_end.result.y);
-
-
-      this._text = paras[0] + ' ' + this.beginPoint.x + ' ' + this.beginPoint.y + ' ' + this.endPoint.x + ' ' + this.endPoint.y;
+      this.end = new Vector2(act_pick_end.result.x, act_pick_end.result.y);
     }
-    let trans = this.makeTransfrom(this.beginPoint, this.endPoint);
+    let trans = this.makeTransfrom(this.begin, this.end);
     // 创建n个线段
     for (let i = 0; i < this.olds.length; i++) {
       let old = this.olds[i];
@@ -172,6 +172,22 @@ class ComTransform extends ComBatch {
         }
       }
     }
+
+    this._text = paras[0]
+      + ' ' + this.begin.x + ' ' + this.begin.y
+      + ' ' + this.end.x + ' ' + this.end.y;
+    for (let i = 0; i < this.olds.length; i++) {
+      let userData = CloneUserData(this.olds[i].userData as UserData);
+      if (userData.original instanceof DataBase) {
+        this._text += ' ' + userData.original.uuid;
+      }
+      if (userData.original instanceof Array) {
+        for (let j = 0; j < userData.original.length; j++) {
+          this._text += ' ' + userData.original[i].uuid;
+        }
+      }
+    }
+
     this.done();
   }
   // 计算变换矩阵
@@ -188,13 +204,13 @@ class ComTransform extends ComBatch {
   }
   override onMouseMoveExec(event: MouseEvent) {
     if (this._isCancel) { this.cancel(); return; }
-    if (this.beginPoint && !this.endPoint) {
+    if (this.begin && !this.end) {
       if (this.tempResults) {
         Global.scene.remove(...this.tempResults);
         this.tempResults = [];
       }
       let endPoint: Vector2 = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
-      let trans = this.makeTransfrom(this.beginPoint, endPoint);
+      let trans = this.makeTransfrom(this.begin, endPoint);
       for (let i = 0; i < this.olds.length; i++) {
         let old = this.olds[i];
         let userData = CloneUserData(old.userData as UserData);
@@ -302,7 +318,7 @@ class ComTransform extends ComBatch {
       }
 
       // 创建一个临时直线段
-      let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(this.beginPoint, endPoint);
+      let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(this.begin, endPoint);
       let t = BrepMeshBuilder.BuildEdge2Mesh(edge, THREE.Color.NAMES.gray, undefined, 0,);
       t.name = "temp";
       this.tempResults.push(t);

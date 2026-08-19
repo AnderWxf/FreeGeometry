@@ -52,7 +52,7 @@ class CalculateCurve2GCom extends Command {
     if (this._isCancel || act_pick_point.isCancel) { this.cancel(); return; }
     let point = new Vector2(act_pick_point.result.x, act_pick_point.result.y);
     this.results = this.algo.gf(point)
-    console.log('u: ', this.results);
+    console.log('g: ', this.results);
     this.done();
   }
 

@@ -7,7 +7,7 @@ import * as THREE from "three";
 
 /**
  * Undo processing command class.
- * 
+ * 格式：命令类型
  */
 class ComUnDo extends Command {
   constructor(executer: CommandExecuter, text: string) {

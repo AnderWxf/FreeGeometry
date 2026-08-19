@@ -16,7 +16,7 @@ import { CreateGeomUserData, type UserData } from "../../../UserData";
 
 /**
  * Create command class.
- * 命令类型 n p[0].x p[0].y p[1].x p[1].y p[2].x p[2].y ... uuid
+ * 格式：命令类型 n p[0].x p[0].y p[1].x p[1].y p[2].x p[2].y ... uuid
  */
 class CreateNurbs2CtrlCom extends ComCreate {
   points: Vector2[];
@@ -90,7 +90,7 @@ class CreateNurbs2CtrlCom extends ComCreate {
         this._text += ' ' + point.x + ' ' + point.y;
       }
       this._text += ' ' + edge.uuid;
-      
+
       this.done();
     } else {
       this.cancel();

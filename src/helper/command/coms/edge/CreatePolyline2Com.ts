@@ -14,7 +14,7 @@ import { CreateGeomUserData, type UserData } from "../../../UserData";
 
 /**
  * Create command class.
- * 命令类型 n p[0].x p[0].y p[1].x p[1].y p[2].x p[2].y ... uuid0 uuid1 uuid2...
+ * 格式：命令类型 n p[0].x p[0].y p[1].x p[1].y p[2].x p[2].y ... uuid0 uuid1 uuid2...
  */
 class CreatePolyline2Com extends ComCreate {
   points: Vector2[];
@@ -36,7 +36,7 @@ class CreatePolyline2Com extends ComCreate {
         this.points.push(point);
         userData.assistPoints.push({ p: point, c: THREE.Color.NAMES.greenyellow });
         this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
-        Global.scene.add(this.assists[this.assists.length - 1]);        
+        Global.scene.add(this.assists[this.assists.length - 1]);
       }
     } else {
       this.bind(window);

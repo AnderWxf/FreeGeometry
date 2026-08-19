@@ -15,7 +15,7 @@ import { CreateFaceCom } from "./CreateFaceCom";
 
 /**
  * Create command class.
- * 命令类型 n0 n1 uuide0 uuide1 uuide2 uuide3... uuidf0 uuidf1...
+ * 格式：命令类型 n0 n1 uuide0 uuide1 uuide2 uuide3... uuidf0 uuidf1...
  */
 class CreateSectionCom extends CreateFaceCom {
 

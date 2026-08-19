@@ -7,7 +7,7 @@ import * as THREE from "three";
 
 /**
  * Select processing command class.
- * 
+ * 格式：命令类型 uuid0 uuid1 ...
  */
 class ComSelect extends Command {
   public olds: THREE.Object3D[];
@@ -47,8 +47,6 @@ class ComSelect extends Command {
     }
     this.done();
   }
-  onMouseMoveExec(event: MouseEvent) {
-  };
 
   override cancel() {
     super.cancel();
@@ -62,14 +60,7 @@ class ComSelect extends Command {
     super.done();
     this.unbind(window);
   }
-  override bind(window: Window) {
-    super.bind(window);
-    window.addEventListener("mousemove", this.onMouseMove);
-  }
-  override unbind(window: Window) {
-    super.unbind(window);
-    window.removeEventListener("mousemove", this.onMouseMove);
-  }
+
   override undo() {
     if (this._isDone) {
       // 选择的取消选择

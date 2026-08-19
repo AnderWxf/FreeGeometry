@@ -12,7 +12,7 @@ class Arc2Data extends Curve2Data {
    *
    * @type {number}
    */
-  private type = GeomType.DATA_TYPE_CURVE2_ARC2;
+  private type = GeomType[GeomType.DATA_TYPE_CURVE2_ARC2];
 
   /**
    * The radius value of this Arc2Data.

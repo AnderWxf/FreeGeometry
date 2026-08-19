@@ -15,7 +15,7 @@ import { CreateFaceCom } from "./CreateFaceCom";
 
 /**
  * Create command class.
- * 命令类型 begin.x begin.y end.x end.y uuide0 uuide1 uuide2 uuide3 uuidf
+ * 格式：命令类型 begin.x begin.y end.x end.y uuide0 uuide1 uuide2 uuide3 uuidf
  */
 class CreateRectangleAreaCom extends CreateFaceCom {
   begin: Vector2;

@@ -4,7 +4,7 @@ import { ComTransform } from "./ComTransform";
 
 /**
  * Move command class.
- * 
+ * 格式：命令类型 begin.x begin.y end.x end.y uuid0 uuid1...
  */
 class ComMove extends ComTransform {
 

@@ -12,7 +12,7 @@ class Arc3Data extends Curve3Data {
    *
    * @type {number}
    */
-  private type = GeomType.DATA_TYPE_CURVE3_ARC3;
+  private type = GeomType[GeomType.DATA_TYPE_CURVE3_ARC3];
   /**
    * The radius value of this Arc3Data.
    *

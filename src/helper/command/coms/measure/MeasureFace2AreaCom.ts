@@ -11,7 +11,7 @@ import type { UserData } from "../../../UserData";
 
 /**
  * Measure face area command class.
- * 命令类型 uuid0 uuid1 uuid2...
+ * 格式：命令类型 uuid0 uuid1 uuid2...
  */
 class MeasureFace2AreaCom extends Command {
   public results: number = 0;

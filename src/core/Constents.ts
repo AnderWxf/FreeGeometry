@@ -68,7 +68,9 @@ enum GeomType {
   DRAW_SOLID_SWEP = 74,    // 扫掠体
   DRAW_SOLID_LOFT = 75,     // 放样体
 
-
+  // 变换类型
+  DATA_TYPE_TRANSFORM2 = -3 + 255,
+  DATA_TYPE_TRANSFORM3 = -4 + 255,
   // 点数据类型
   DATA_TYPE_POINT2 = -1 + 255,
   DATA_TYPE_POINT3 = -2 + 255,
@@ -269,9 +271,10 @@ enum CommandType {
   TRANSFORM_ROTATE = 'R',               // 旋转
   TRANSFORM_SCALE = 'S',                // 缩放
   TRANSFORM_OFFSET = 'O',               // 偏移，产生新对象
-  TRANSFORM_MIRROR = 'I',               // 镜像，产生新对象 
+  TRANSFORM_MIRROR = 'I',               // 镜像，产生新对象
 
   // 其他
+  OTHER_REVERSE = 'REV',                // 翻转
   OTHER_SELECT = 'SEL',                 // 选择
   OTHER_DELETE = 'D',                   // 删除
   OTHER_UNDO = 'UD',                    // 撤销

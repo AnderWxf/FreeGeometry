@@ -14,7 +14,7 @@ import * as THREE from "three";
 
 /**
  * Edge cutting command class.
- * 命令类型 n0 n1 uuide0 uuide1 ... uuide_0 uuide_1...
+ * 格式：命令类型 n0 n1 uuide0 uuide1 ... uuide_0 uuide_1...
  */
 class EdgeCuttingCom extends Command {
   public src: Array<Edge2>;

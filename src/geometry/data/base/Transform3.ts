@@ -1,3 +1,4 @@
+import { GeomType } from "../../../core/Constents";
 import { Euler, Matrix4, Vector3 } from "../../../math/Math";
 
 /**
@@ -5,6 +6,13 @@ import { Euler, Matrix4, Vector3 } from "../../../math/Math";
  *
  */
 class Transform3 {
+  /**
+   * The type of data for unserialize.
+   *
+   * @type {number}
+   */
+  private type = GeomType[GeomType.DATA_TYPE_TRANSFORM3];
+
   /**
    * The position value of this Transform3.
    *

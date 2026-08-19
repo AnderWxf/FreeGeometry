@@ -435,6 +435,7 @@ const MenuItems = [
     label: '操作',
     children: [
       //其他
+      { key: CommandType.OTHER_REVERSE, label: '翻转' + ' ' + CommandType.OTHER_REVERSE },
       { key: CommandType.OTHER_DELETE, label: '删除' + ' ' + CommandType.OTHER_DELETE + ' Delete' },
       { key: CommandType.OTHER_UNDO, label: '撤销' + ' ' + CommandType.OTHER_UNDO + ' Ctrl + Z' },
       { key: CommandType.OTHER_REDO, label: '重做' + ' ' + CommandType.OTHER_REDO + ' Ctrl + Y' },

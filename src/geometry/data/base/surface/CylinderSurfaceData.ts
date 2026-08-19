@@ -13,7 +13,7 @@ class CylinderSurfaceData extends SurfaceData {
    *
    * @type {number}
    */
-  private type = GeomType.DATA_TYPE_SURFACE_CYLINDERSURFACE;  
+  private type = GeomType[GeomType.DATA_TYPE_SURFACE_CYLINDERSURFACE];
   /**
    * The radius of this Cylinder surface.
    *

@@ -22,7 +22,7 @@ import { ModifyFaceCom } from "./ModifyFaceCom";
 
 /**
  * Modify command class.
- * 命令类型 UUID 控制点索引 p.x p.y
+ * 格式：命令类型 UUID 控制点索引 p.x p.y
  */
 class ModifyEllipseAreaCom extends ModifyFaceCom {
   constructor(executer: CommandExecuter, text: string) {

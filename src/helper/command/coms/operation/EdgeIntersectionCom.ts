@@ -14,7 +14,7 @@ import * as THREE from "three";
 
 /**
  * Edge intersection computing command class.
- * 命令类型 n0 n1 uuide0 uuide1 ... uuidp0 uuidp1 ...
+ * 格式：命令类型 n0 n1 uuide0 uuide1 ... uuidp0 uuidp1 ...
  */
 class EdgeIntersectionCom extends Command {
   public src: Array<Edge2>;
@@ -92,7 +92,7 @@ class EdgeIntersectionCom extends Command {
           let geo = this.createAssistPoint({ p: point, c: THREE.Color.NAMES.blue }, false)
           geo.userData.type = GeomType.DATA_TYPE_POINT2;
           geo.userData.original = new Point2Data(point.clone());
-          if (n1 > 0) { 
+          if (n1 > 0) {
             geo.userData.original.uuid = paras[3 + n0 + this.assists.length];
           }
           this.assists.push(geo);
