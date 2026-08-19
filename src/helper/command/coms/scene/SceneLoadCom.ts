@@ -48,7 +48,7 @@ class SceneLoadCom extends Command {
   }
   onLoaded(event: any): void {
     const this_ = SceneLoadCom.this_;
-    let str = this._text;
+    let str = this_._text;
     let paras = str.split(' ');
 
     this_.onCancel(event);
