@@ -88,9 +88,6 @@ class CreatePolylineAreaCom extends CreateFaceCom {
       let point = this.points[i];
       this._text += ' ' + point.x + ' ' + point.y;
     }
-    for (let i = 0; i < edges.length; i++) {
-      this._text += ' ' + edges[i].uuid
-    }
     this._text += ' ' + face.uuid;
 
     this.done();

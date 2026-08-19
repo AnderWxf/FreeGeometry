@@ -12,7 +12,7 @@ import { Vector2 } from "../../../../math/Math";
 
 /**
  * Calculate curv2 g command class. 
- * 
+ * 格式：命令类型 uuid
  */
 class CalculateCurve2GCom extends Command {
   public results: number = 0;
@@ -22,7 +22,26 @@ class CalculateCurve2GCom extends Command {
     super(executer, text);
   }
   async exec(): Promise<void> {
-
+    let str = this._text;
+    let paras = str.split(' ');
+    // 指定了对象
+    if (paras.length >= 2) {
+      let selects = Global.scene.getObjectsByUUIDs(paras.slice(1));
+      if (selects.length) {
+        this.edge = selects[0].userData.original as Edge2;
+      }
+    } else {
+      // 寻找已经选好的目标
+      if (Global.select.selectedObjects.length > 0) {
+        for (let i = 0; i < Global.select.selectedObjects.length; i++) {
+          let select = Global.select.selectedObjects[i];
+          if (select.userData.original instanceof Edge2) {
+            this.edge = select.userData.original;
+            break;
+          }
+        }
+      }
+    }
     this.bind(window);
     let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);
 

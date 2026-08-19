@@ -11,7 +11,6 @@ import { GeomType } from "../../../../core/Constents";
 import { CreateGeomUserData, type UserData } from "../../../UserData";
 import { CurveBuilder } from "../../../../geometry/algorithm/builder/CurveBuilder";
 import { PI2 } from "../../../../math/MathUtils";
-import { e } from "../../../../mathjs/lib/cjs/entry/pureFunctionsAny.generated";
 
 
 /**

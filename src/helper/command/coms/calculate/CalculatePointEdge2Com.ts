@@ -12,17 +12,37 @@ import { Vector2 } from "../../../../math/Math";
 
 /**
  * Calculate point edge2 relation command class.
- * 
+ * 格式：命令类型 uuide point.x point.y
  */
 class CalculatePointEdge2Com extends Command {
   public results: string;
   edge: Edge2;
   algo: Edge2Algo;
+  point: Vector2;
   constructor(executer: CommandExecuter, text: string) {
     super(executer, text);
   }
   async exec(): Promise<void> {
-
+    let str = this._text;
+    let paras = str.split(' ');
+    // 指定了对象
+    if (paras.length >= 2) {
+      let selects = Global.scene.getObjectsByUUIDs(paras.slice(1));
+      if (selects.length) {
+        this.edge = selects[0].userData.original as Edge2;
+      }
+    } else {
+      // 寻找已经选好的目标
+      if (Global.select.selectedObjects.length > 0) {
+        for (let i = 0; i < Global.select.selectedObjects.length; i++) {
+          let select = Global.select.selectedObjects[i];
+          if (select.userData.original instanceof Edge2) {
+            this.edge = select.userData.original;
+            break;
+          }
+        }
+      }
+    }
     this.bind(window);
     let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);
 
@@ -51,15 +71,20 @@ class CalculatePointEdge2Com extends Command {
       }
     }
     this.algo = new Edge2Algo(this.edge);
-    let act_pick_point = new ActPickPoint2();
-    await act_pick_point.execute(context);
-    if (this._isCancel || act_pick_point.isCancel) { this.cancel(); return; }
-    let point = new Vector2(act_pick_point.result.x, act_pick_point.result.y);
 
-    let isAtSpace = this.algo.isSpacePoint(point, 1e-4, 1e-10);
-    let isAtInner = this.algo.isPointAtInner(point, 1e-4, 1e-10);
-    let isAtBoder = this.algo.isPointAtBoder(point, 1e-4, 1e-10);
-    let isAtOn = this.algo.isPointOn(point, 1e-4, 1e-10);
+    if (paras.length >= 4) {
+      this.point = new Vector2(new Number(paras[2]).valueOf(), new Number(paras[3]).valueOf());
+    } else {
+      let act_pick_point = new ActPickPoint2();
+      await act_pick_point.execute(context);
+      if (this._isCancel || act_pick_point.isCancel) { this.cancel(); return; }
+      this.point = new Vector2(act_pick_point.result.x, act_pick_point.result.y);
+    }
+
+    let isAtSpace = this.algo.isSpacePoint(this.point, 1e-4, 1e-10);
+    let isAtInner = this.algo.isPointAtInner(this.point, 1e-4, 1e-10);
+    let isAtBoder = this.algo.isPointAtBoder(this.point, 1e-4, 1e-10);
+    let isAtOn = this.algo.isPointOn(this.point, 1e-4, 1e-10);
 
     this.results = '';
     this.results += ' ' + (isAtSpace ? 'as' : '!as');
@@ -67,7 +92,12 @@ class CalculatePointEdge2Com extends Command {
     this.results += ' ' + (isAtBoder ? 'ab' : '!ab');
     this.results += ' ' + (isAtOn ? 'ao' : '!ao');
 
-    console.log('p: ', this.results);
+    console.log(' p: ', this.results);
+
+    this._text = paras[0]
+      + ' ' + this.edge.uuid
+      + ' ' + this.point.x + ' ' + this.point.y;
+
     this.done();
   }
 

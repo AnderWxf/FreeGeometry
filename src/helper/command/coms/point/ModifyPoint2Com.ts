@@ -19,7 +19,7 @@ import { Point2Data } from "../../../../geometry/data/base/Point2Data";
 
 /**
  * Modify command class.
- * 
+ * 格式：命令类型 uuid point.x point.y 
  */
 class ModifyPoint2Com extends ComModify {
   point: Vector2;
@@ -32,15 +32,18 @@ class ModifyPoint2Com extends ComModify {
     let paras = str.split(' ');
     let userData = CreateGeomUserData(this.type);
 
-    let centerPoint: Vector2;
-    if (paras.length == 3) {
-      // 创建一个线段
-      centerPoint = new Vector2(new Number(paras[1]).valueOf(), new Number(paras[2]).valueOf());
-      this.getSelected();
+    if (paras.length >= 2) {
+      let objs = Global.scene.getObjectsByUUIDs([paras[1]]);
+      if (objs.length > 0 && objs[0].userData.type == this.type) {
+        this.old = objs[0];
+      }
     } else {
-      this.bind(window);
-      let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);
+      this.getSelected();
+    }
 
+    this.bind(window);
+    let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);
+    if (!this.old) {
       let act_pick_data = new ActPickObject();
       await act_pick_data.execute(context);
       if (this._isCancel || act_pick_data.isCancel) { this.cancel(); return; }
@@ -51,19 +54,30 @@ class ModifyPoint2Com extends ComModify {
         if (this._isCancel || act_pick_data.isCancel) { this.cancel(); return; }
       }
       this.old = act_pick_data.result;
-      CopyUserData(this.old.userData as UserData, userData);
+    }
+    CopyUserData(this.old.userData as UserData, userData);
 
+    if (paras.length >= 4) {
+      this.point = new Vector2(new Number(paras[2]).valueOf(), new Number(paras[3]).valueOf());
+    } else {
       let act_pick_point = new ActPickPoint2();
       await act_pick_point.execute(context);
       if (this._isCancel || act_pick_point.isCancel) { this.cancel(); return; }
       this.point = new Vector2(act_pick_point.result.x, act_pick_point.result.y);
     }
+
     // 创建一个点
+    let p = new Point2Data(this.point.clone());
     userData.color = THREE.Color.NAMES.greenyellow;
-    userData.original = new Point2Data(this.point.clone());
+    userData.original = p;
     let geo = this.createAssistPoint({ p: this.point, c: userData.color }, false);
     geo.userData = userData;
     this.results = geo;
+
+    this._text = paras[0]
+      + ' ' + p.uuid
+      + ' ' + p.pos.x + ' ' + p.pos.y;
+
     this.done();
   }
   onMouseMoveExec(event: MouseEvent) {

@@ -117,11 +117,8 @@ class Bool2Com extends BoolCom {
       n0 = this.src.length + this.des.length;
       n1 = faces.length;
       this._text = paras[0] + ' ' + n0 + ' ' + n1;
-      for (let i = 0; i < this.src.length; i++) {
-        this._text += ' ' + this.src[i].uuid;
-      }
-      for (let i = 0; i < this.des.length; i++) {
-        this._text += ' ' + this.des[i].uuid;
+      for (let i = 0; i < this.olds.length; i++) {
+        this._text += ' ' + this.olds[i].uuid;
       }
       for (let i = 0; i < faces.length; i++) {
         this._text += ' ' + faces[i].uuid;

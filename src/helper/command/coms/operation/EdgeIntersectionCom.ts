@@ -1,11 +1,8 @@
 import { GeomType } from "../../../../core/Constents";
 import { Global } from "../../../../core/Global";
 import { Brep2Inter, type InterOfFace2 } from "../../../../geometry/algorithm/relation/intersection/Brep2Inter";
-import type { InterOfCurve2 } from "../../../../geometry/algorithm/relation/intersection/Curve2Inter";
 import { Point2Data } from "../../../../geometry/data/base/Point2Data";
 import type { Edge2 } from "../../../../geometry/data/brep/Brep2";
-import { DataBase } from "../../../../geometry/data/DataBase";
-import type { UserData } from "../../../UserData";
 import { ActionContext3D } from "../../Active";
 import { ActPickObjects } from "../../acts/ActPickObjects";
 import { Command } from "../../Command";

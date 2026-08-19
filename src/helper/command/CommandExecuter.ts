@@ -91,7 +91,7 @@ class CommandExecuter {
   private KeyShiftDown: boolean = false;
   private KeyCtrlDown: boolean = false;
   private _curr: Command;
-  private _isRecord: boolean = false; //录制标记
+  private _isRecord: boolean = true; //录制标记
   private _records: string[] = [];// 录制的脚本
   constructor() {
     this._history = new Stack<Command>();

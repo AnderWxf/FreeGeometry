@@ -2,10 +2,9 @@ import { ActionContext3D } from "../../Active";
 import { Global } from "../../../../core/Global";
 import type { CommandExecuter } from "../../CommandExecuter";
 import { GeomType } from "../../../../core/Constents";
-import { Edge2, Face2 } from "../../../../geometry/data/brep/Brep2";
-import { ActPickObjects } from "../../acts/ActPickObjects";
+import { Edge2 } from "../../../../geometry/data/brep/Brep2";
 import { Command } from "../../Command";
-import { Edge2Algo, Face2Algo } from "../../../../geometry/algorithm/brep/Brep2Algo";
+import { Edge2Algo } from "../../../../geometry/algorithm/brep/Brep2Algo";
 import { ActPickObject } from "../../acts/ActPickObject";
 import { ActPickPoint2 } from "../../acts/ActPickPoint2";
 import { Vector2 } from "../../../../math/Math";
@@ -13,7 +12,7 @@ import { Vector2 } from "../../../../math/Math";
 
 /**
  * Calculate curv2 u command class.
- * 
+ * 格式：命令类型 uuid
  */
 class CalculateCurve2UCom extends Command {
   public results: number = 0;
@@ -23,7 +22,26 @@ class CalculateCurve2UCom extends Command {
     super(executer, text);
   }
   async exec(): Promise<void> {
-
+    let str = this._text;
+    let paras = str.split(' ');
+    // 指定了对象
+    if (paras.length >= 2) {
+      let selects = Global.scene.getObjectsByUUIDs(paras.slice(1));
+      if (selects.length) {
+        this.edge = selects[0].userData.original as Edge2;
+      }
+    } else {
+      // 寻找已经选好的目标
+      if (Global.select.selectedObjects.length > 0) {
+        for (let i = 0; i < Global.select.selectedObjects.length; i++) {
+          let select = Global.select.selectedObjects[i];
+          if (select.userData.original instanceof Edge2) {
+            this.edge = select.userData.original;
+            break;
+          }
+        }
+      }
+    }
     this.bind(window);
     let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);
 

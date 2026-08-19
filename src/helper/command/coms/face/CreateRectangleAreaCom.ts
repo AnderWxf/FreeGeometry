@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import { ComCreate } from "../ComCreate";
 import { ActionContext3D } from "../../Active";
 import { Global } from "../../../../core/Global";
 import { ActPickPoint2 } from "../../acts/ActPickPoint2";
@@ -8,14 +7,14 @@ import { Vector2 } from "../../../../math/Math";
 import { BrepMeshBuilder } from "../../../BrepMeshBuilder";
 import type { CommandExecuter } from "../../CommandExecuter";
 import { GeomType } from "../../../../core/Constents";
-import { Coedge2, Face2, Vertice2, type Edge2 } from "../../../../geometry/data/brep/Brep2";
+import { type Edge2 } from "../../../../geometry/data/brep/Brep2";
 import { CreateGeomUserData, type UserData } from "../../../UserData";
 import { CreateFaceCom } from "./CreateFaceCom";
 
 
 /**
  * Create command class.
- * 格式：命令类型 begin.x begin.y end.x end.y uuide0 uuide1 uuide2 uuide3 uuidf
+ * 格式：命令类型 begin.x begin.y end.x end.y uuid
  */
 class CreateRectangleAreaCom extends CreateFaceCom {
   begin: Vector2;
@@ -75,15 +74,10 @@ class CreateRectangleAreaCom extends CreateFaceCom {
     }
     let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(points[points.length - 1], points[0]);
     edges.push(edge);
-    if (paras.length >= 6) {
-      for (let i = 0; i < edges.length; i++) {
-        let uuid = paras[6 + i];
-        edges[i].uuid = uuid;
-      }
-    }
+
     // 创建一个面
     let face = Brep2Builder.BuildFaceByEdges(edges);
-    if (paras.length >= 9) { face.uuid = paras[8]; }
+    if (paras.length >= 6) { face.uuid = paras[5]; }
     userData.color = THREE.Color.NAMES.blue;
     let geo = BrepMeshBuilder.BuildFace2Mesh(face, userData.color);
     userData.original = face;
@@ -93,10 +87,6 @@ class CreateRectangleAreaCom extends CreateFaceCom {
     this._text = paras[0]
       + ' ' + this.begin.x + ' ' + this.begin.y
       + ' ' + this.end.x + ' ' + this.end.y
-      + ' ' + edges[0].uuid
-      + ' ' + edges[1].uuid
-      + ' ' + edges[2].uuid
-      + ' ' + edges[3].uuid
       + ' ' + face.uuid;
 
     this.done();

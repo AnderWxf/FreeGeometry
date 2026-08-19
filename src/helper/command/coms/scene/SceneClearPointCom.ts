@@ -4,7 +4,13 @@ import * as THREE from "three";
 import type { CommandExecuter } from "../../CommandExecuter";
 import type { UserData } from "../../../UserData";
 import { GeomType } from "../../../../core/Constents";
+import { Point2Data } from "../../../../geometry/data/base/Point2Data";
+import { Point3Data } from "../../../../geometry/data/base/Point3Data";
 
+/**
+ * Clear command class.
+ * 格式：命令类型
+ */
 class SceneClearPointCom extends Command {
   public olds: THREE.Object3D[];
   constructor(executer: CommandExecuter, text: string) {
@@ -12,6 +18,10 @@ class SceneClearPointCom extends Command {
     this.olds = [];
   }
   async exec() {
+    let str = this._text;
+    let paras = str.split(' ');
+    this._text = paras[0];
+
     let scene = Global.scene;
     for (let i = scene.objects.length - 1; i >= 0; i--) {
       const o = scene.objects[i] as THREE.Object3D;

@@ -12,7 +12,7 @@ import { Point2Data } from "../../../../geometry/data/base/Point2Data";
 
 /**
  * Create command class.
- * 
+ * 格式：命令类型 point.x point.y uuid
  */
 class CreatePoint2Com extends ComCreate {
   point: Vector2;
@@ -24,7 +24,7 @@ class CreatePoint2Com extends ComCreate {
     let str = this._text;
     let paras = str.split(' ');
     let userData = CreateGeomUserData(this.type);
-    if (paras.length == 3) {
+    if (paras.length >= 3) {
       // 创建一个点
       this.point = new Vector2(new Number(paras[1]).valueOf(), new Number(paras[2]).valueOf());
     } else {
@@ -38,11 +38,18 @@ class CreatePoint2Com extends ComCreate {
 
     }
     // 创建一个点
+    let p = new Point2Data(this.point);
+    if (paras.length >= 4) { p.uuid = paras[3]; }
     userData.color = THREE.Color.NAMES.greenyellow;
-    userData.original = new Point2Data(this.point.clone());
-    let geo = this.createAssistPoint({ p: this.point, c: userData.color }, false);
+    userData.original = p;
+    let geo = this.createAssistPoint({ p: p.pos, c: userData.color }, false);
     geo.userData = userData;
     this.results = geo;
+
+    this._text = paras[0]
+      + ' ' + p.pos.x + ' ' + p.pos.y
+      + ' ' + p.uuid;
+
     this.done();
   }
 

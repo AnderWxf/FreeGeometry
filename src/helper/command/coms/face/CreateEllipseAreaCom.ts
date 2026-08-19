@@ -1,6 +1,4 @@
 import * as THREE from "three";
-import { Command } from "../../Command";
-import { ComCreate } from "../ComCreate";
 import { ActionContext3D } from "../../Active";
 import { Global } from "../../../../core/Global";
 import { ActPickPoint2 } from "../../acts/ActPickPoint2";
@@ -11,14 +9,13 @@ import type { CommandExecuter } from "../../CommandExecuter";
 import { GeomType } from "../../../../core/Constents";
 import { CurveBuilder } from "../../../../geometry/algorithm/builder/CurveBuilder";
 import { PI_2 } from "../../../../math/MathUtils";
-import { CreateGeomUserData, type UserData } from "../../../UserData";
-import { Coedge2, Edge2, Face2, Vertice2 } from "../../../../geometry/data/brep/Brep2";
+import { CreateGeomUserData} from "../../../UserData";
 import { CreateFaceCom } from "./CreateFaceCom";
 
 
 /**
  * Create command class.
- * 格式：命令类型 center.x center.y major.x major.y minor.x minor.y uuid0 uuid1
+ * 格式：命令类型 center.x center.y major.x major.y minor.x minor.y uuid
  */
 class CreateEllipseAreaCom extends CreateFaceCom {
   center: Vector2;
@@ -74,7 +71,6 @@ class CreateEllipseAreaCom extends CreateFaceCom {
 
     // 创建一个曲线段
     let edge = Brep2Builder.BuildEllipseEdge2FromCenterBeginEndPoint(this.center, this.major, this.minor);
-    if (paras.length >= 8) { edge.uuid = paras[7]; }
     let alg = CurveBuilder.Algorithm2ByData(edge.curve);
     let minorPoint = alg.p(PI_2);
     this.minor.set(minorPoint.x, minorPoint.y);
@@ -85,7 +81,7 @@ class CreateEllipseAreaCom extends CreateFaceCom {
 
     // 创建一个面
     let face = Brep2Builder.BuildFaceByEdges([edge]);
-    if (paras.length >= 9) { face.uuid = paras[8]; }
+    if (paras.length >= 8) { face.uuid = paras[7]; }
     userData.color = THREE.Color.NAMES.blue;
     let geo = BrepMeshBuilder.BuildFace2Mesh(face, userData.color);
     userData.original = face;
@@ -96,7 +92,6 @@ class CreateEllipseAreaCom extends CreateFaceCom {
       + ' ' + this.center.x + ' ' + this.center.y
       + ' ' + this.major.x + ' ' + this.major.y
       + ' ' + this.minor.x + ' ' + this.minor.y
-      + ' ' + edge.uuid
       + ' ' + face.uuid;
 
     this.done();

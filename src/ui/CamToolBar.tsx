@@ -121,6 +121,7 @@ const ComOptionBar: React.FC = () => (
     />
     <Checkbox
       style={{ width: 60, position: 'fixed', top: 10, right: 70, zIndex: 1000, backgroundColor: 'transparent' }}
+      defaultChecked={Global.select.isSnap}
       onChange={(e) => {
         Global.select.isSnap = e.target.checked;
       }}
@@ -130,13 +131,14 @@ const ComOptionBar: React.FC = () => (
     >捕捉</Checkbox>
     <Checkbox
       style={{ width: 60, position: 'fixed', top: 10, right: 140, zIndex: 1000, backgroundColor: 'transparent' }}
+      defaultChecked={Global.select.isEditor}
       onChange={(e) => {
         Global.select.isEditor = e.target.checked;
       }}
     >编辑</Checkbox>
     <Checkbox
       style={{ width: 80, position: 'fixed', top: 10, right: 200, zIndex: 1000 }}
-      defaultChecked={true}
+      defaultChecked={Global.isShowAssists}
       onChange={(e) => {
         Global.isShowAssists = e.target.checked;
         Global.comExector.execute(CommandType.SCENE_SHOW_ASSISTS);
@@ -144,7 +146,7 @@ const ComOptionBar: React.FC = () => (
     >辅点</Checkbox>
     <Checkbox
       style={{ width: 80, position: 'fixed', top: 10, right: 280, zIndex: 1000 }}
-      defaultChecked={false}
+      defaultChecked={Global.comExector.isRecord}
       onChange={(e) => {
         Global.comExector.isRecord = e.target.checked;
       }}

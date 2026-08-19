@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import { Command } from "../../Command";
 import { ComCreate } from "../ComCreate";
 import { ActionContext3D } from "../../Active";
 import { Global } from "../../../../core/Global";

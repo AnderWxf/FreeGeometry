@@ -6,11 +6,8 @@ import { Brep2Builder } from "../../../../geometry/algorithm/builder/Brep2Builde
 import { Vector2 } from "../../../../math/Math";
 import { BrepMeshBuilder } from "../../../BrepMeshBuilder";
 import type { CommandExecuter } from "../../CommandExecuter";
-import { ComModify } from "../ComModify";
 import { ActPickObject } from "../../acts/ActPickObject";
-import { Edge2 } from "../../../../geometry/data/brep/Brep2";
 import { ActPickAssist } from "../../acts/ActPickAssist";
-import { Arc2Data } from "../../../../geometry/data/base/curve2/Arc2Data";
 import { GeomType } from "../../../../core/Constents";
 import { CloneUserData, CopyUserData, CreateGeomUserData, type UserData } from "../../../UserData";
 import { ModifyFaceCom } from "./ModifyFaceCom";

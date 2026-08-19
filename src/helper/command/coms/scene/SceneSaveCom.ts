@@ -1,13 +1,19 @@
-import { useState } from "react";
 import { Global } from "../../../../core/Global";
 import { type DocNode } from "../../../Doc";
 import type { UserData } from "../../../UserData";
 import { Command } from "../../Command";
 import * as THREE from "three";
 
+/**
+ * Save command class.
+ * 格式：命令类型 filename
+ */
 class SceneSaveCom extends Command {
   static link: HTMLAnchorElement = null;
   async exec() {
+    let str = this._text;
+    let paras = str.split(' ');
+
     let scene = Global.scene;
     let os = scene.objects;
     let data: DocNode[] = [];
@@ -23,10 +29,11 @@ class SceneSaveCom extends Command {
     let filename = 'Scene_' + new Date().toLocaleString() + '.json';
     filename = filename.replace(/[\/\\:*?"<>|]/g, '_'); // 替换非法字符
     if (Global.filename) {
-      filename = Global.filename;
+      filename = Global.filename.split('.')[0] + '.json';
     } else {
       Global.filename = filename;
     }
+    this._text = paras[0] + ' ' + filename;
     // 触发 React 组件更新（通过自定义事件）
     window.dispatchEvent(new CustomEvent('filenameChanged', { detail: Global.filename }));
     // 检测是否支持 File System Access API

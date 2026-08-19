@@ -4,6 +4,10 @@ import * as THREE from "three";
 import { Global } from "../../../../core/Global";
 import type { CommandExecuter } from "../../CommandExecuter";
 
+/**
+ * Import command class.
+ * 格式：命令类型 filename
+ */
 class SceneImportCom extends Command {
   public results: THREE.Object3D[];
   constructor(executer: CommandExecuter, text: string) {
@@ -13,6 +17,9 @@ class SceneImportCom extends Command {
   static this_: SceneImportCom;
   static input_: HTMLInputElement;
   async exec() {
+    let str = this._text;
+    let paras = str.split(' ');
+
     SceneImportCom.this_ = this;
     try {
       if (!SceneImportCom.input_) {
@@ -41,6 +48,9 @@ class SceneImportCom extends Command {
     event.target.removeEventListener('cancel', this.onCancel);
   }  
   onLoaded(event: any): void {
+    let str = this._text;
+    let paras = str.split(' ');
+    
     const file = event.target.files[0];
     if (!file) {
       alert('请选择一个文件');
@@ -53,6 +63,7 @@ class SceneImportCom extends Command {
       this.cancel();
       return;
     }
+    this._text = paras[0] + ' ' + file.name;
     const reader = new FileReader();
     const this_ = SceneImportCom.this_;
     reader.onload = function (e: any) {

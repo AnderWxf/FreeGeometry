@@ -1,9 +1,11 @@
-import { ImportJson, type DocNode } from "../../../Doc";
 import { Command } from "../../Command";
-import * as THREE from "three";
 import { Global } from "../../../../core/Global";
 import type { CommandExecuter } from "../../CommandExecuter";
 
+/**
+ * Stricp Execute command class.
+ * 格式：命令类型 filename
+ */
 class SceneStricpExecCom extends Command {
   public results: string[];
   private _comms: Command[];
@@ -43,6 +45,8 @@ class SceneStricpExecCom extends Command {
     event.target.removeEventListener('cancel', this.onCancel);
   }
   onLoaded(event: any): void {
+    let str = this._text;
+    let paras = str.split(' ');
     const file = event.target.files[0];
     if (!file) {
       alert('请选择一个文件');
@@ -55,6 +59,10 @@ class SceneStricpExecCom extends Command {
       this.cancel();
       return;
     }
+    Global.filename = file.name;
+    this._text = paras[0] + ' ' + file.name;
+    // 触发 React 组件更新（通过自定义事件）
+    window.dispatchEvent(new CustomEvent('filenameChanged', { detail: Global.filename }));
     const reader = new FileReader();
     const this_ = SceneStricpExecCom.this_;
     reader.onload = function (e: any) {
@@ -69,6 +77,7 @@ class SceneStricpExecCom extends Command {
           }
         }
         this_._comms = Global.comExector.aotuExecute(this_.results);
+
         this_.done();
       } catch (error) {
         console.log('文件格式错误：不是有效的 JSON');

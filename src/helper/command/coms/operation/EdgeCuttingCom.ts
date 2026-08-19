@@ -1,7 +1,7 @@
 import { GeomType } from "../../../../core/Constents";
 import { Global } from "../../../../core/Global";
-import { Brep2Algo, Edge2Algo } from "../../../../geometry/algorithm/brep/Brep2Algo";
-import { Brep2Inter, type InterOfFace2 } from "../../../../geometry/algorithm/relation/intersection/Brep2Inter";
+import { Edge2Algo } from "../../../../geometry/algorithm/brep/Brep2Algo";
+import { Brep2Inter } from "../../../../geometry/algorithm/relation/intersection/Brep2Inter";
 import type { InterOfCurve2 } from "../../../../geometry/algorithm/relation/intersection/Curve2Inter";
 import type { Edge2 } from "../../../../geometry/data/brep/Brep2";
 import { BrepMeshBuilder } from "../../../BrepMeshBuilder";

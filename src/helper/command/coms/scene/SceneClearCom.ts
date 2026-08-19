@@ -2,8 +2,10 @@ import { Global } from "../../../../core/Global";
 import { Command } from "../../Command";
 import * as THREE from "three";
 import type { CommandExecuter } from "../../CommandExecuter";
-import { useState } from "react";
-
+/**
+ * Clear command class.
+ * 格式：命令类型 
+ */
 class SceneClearCom extends Command {
   public olds: THREE.Object3D[];
   constructor(executer: CommandExecuter, text: string) {

@@ -22,7 +22,6 @@ class ComTransform extends ComBatch {
   begin: Vector2;
   end: Vector2;
   override async exec(): Promise<void> {
-
     let str = this._text;
     let paras = str.split(' ');
 
@@ -68,7 +67,7 @@ class ComTransform extends ComBatch {
     for (let i = 0; i < this.olds.length; i++) {
       let old = this.olds[i];
       let userData = CloneUserData(old.userData as UserData);
-      // 点
+      // 点向量
       if (old.userData.type == GeomType.MATH_VECTOR2) {
         let point = (old.userData.original as Vector2).clone();
         point.applyMatrix3(trans);
@@ -77,9 +76,10 @@ class ComTransform extends ComBatch {
         geo.userData = userData;
         this.results.push(geo);
       }
-      // 点
+      // 几何点
       else if (old.userData.type == GeomType.DATA_TYPE_POINT2) {
         let point = (old.userData.original as Point2Data).clone();
+        point.uuid = old.userData.original.uuid;
         point.pos.applyMatrix3(trans);
         userData.original = point;
         let geo = this.createAssistPoint({ p: point.pos, c: userData.color }, false);
@@ -95,6 +95,7 @@ class ComTransform extends ComBatch {
           for (let i = 0; i < array.length; i++) {
             if (array[i] instanceof Edge2) {
               let edge = (array[i] as Edge2).clone();
+              edge.uuid = (array[i] as Edge2).uuid;
               this.appTransfrom(edge.curve.trans, trans);
               edges.push(edge);
             }
@@ -112,7 +113,8 @@ class ComTransform extends ComBatch {
         }
         // 单例
         if (old.userData.original instanceof Edge2) {
-          let edge = (old.userData.original as Edge2).clone();
+          let edge = old.userData.original.clone();
+          edge.uuid = old.userData.original.uuid;
           this.appTransfrom(edge.curve.trans, trans);
           userData.original = edge;
           let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, userData.color);
@@ -135,6 +137,7 @@ class ComTransform extends ComBatch {
           for (let i = 0; i < array.length; i++) {
             if (array[i] instanceof Face2) {
               let face = (array[i] as Face2).clone();
+              face.uuid = array[i].uuid;
               face.curves.forEach((curve) => {
                 this.appTransfrom(curve.trans, trans);
               });
@@ -155,6 +158,7 @@ class ComTransform extends ComBatch {
         // 单例
         if (old.userData.original instanceof Face2) {
           let face = (old.userData.original as Face2).clone() as Face2;
+          face.uuid = old.userData.original.uuid;
           for (let i = 0; i < face.curves.length; i++) {
             this.appTransfrom(face.curves[i].trans, trans);
           }

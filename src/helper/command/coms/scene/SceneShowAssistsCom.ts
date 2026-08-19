@@ -3,6 +3,10 @@ import type { UserData } from "../../../UserData";
 import { Command } from "../../Command";
 import * as THREE from "three";
 
+/**
+ * ShowAssists command class.
+ * 格式：命令类型 true/false
+ */
 class SceneShowAssistsCom extends Command {
   async exec() {
     let str = this._text;
@@ -13,8 +17,6 @@ class SceneShowAssistsCom extends Command {
       } else if (paras[1] == 'false') {
         Global.isShowAssists = false;
       }
-    } else {
-      this._text = this._text + ' ' + Global.isShowAssists;
     }
     let scene = Global.scene;
     let os = scene.allObjects;
@@ -25,6 +27,9 @@ class SceneShowAssistsCom extends Command {
         o.visible = Global.isShowAssists;
       }
     }
+
+    this._text = this._text + ' ' + Global.isShowAssists;
+
     this.done();
   }
 }

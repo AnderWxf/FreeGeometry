@@ -1,15 +1,25 @@
 import { Global } from "../../../../core/Global";
 import { Command } from "../../Command";
 
+/**
+ * Stricp save command class.
+ * 格式：命令类型 filename
+ */
 class SceneStricpSaveCom extends Command {
   static link: HTMLAnchorElement = null;
   async exec() {
+    let str = this._text;
+    let paras = str.split(' ');
     let records = Global.comExector.records;
-    // 1. 将数据对象转为格式化的 JSON 字符串
 
     let filename = 'Stricp_' + new Date().toLocaleString() + '.txt';
     filename = filename.replace(/[\/\\:*?"<>|]/g, '_'); // 替换非法字符
-    Global.filename = filename;
+    if (Global.filename) {
+      filename = Global.filename.split('.')[0] + '.txt';
+    } else {
+      Global.filename = filename;
+    }
+    this._text = paras[0] + ' ' + filename;
     // 触发 React 组件更新（通过自定义事件）
     window.dispatchEvent(new CustomEvent('filenameChanged', { detail: Global.filename }));
     // 检测是否支持 File System Access API

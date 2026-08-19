@@ -1,6 +1,4 @@
 import * as THREE from "three";
-import { Command } from "../../Command";
-import { ComCreate } from "../ComCreate";
 import { ActionContext3D } from "../../Active";
 import { Global } from "../../../../core/Global";
 import { ActPickPoint2 } from "../../acts/ActPickPoint2";
@@ -10,13 +8,12 @@ import { BrepMeshBuilder } from "../../../BrepMeshBuilder";
 import type { CommandExecuter } from "../../CommandExecuter";
 import { GeomType } from "../../../../core/Constents";
 import { CreateGeomUserData, type UserData } from "../../../UserData";
-import { Coedge2, Face2, Vertice2 } from "../../../../geometry/data/brep/Brep2";
 import { CreateFaceCom } from "./CreateFaceCom";
 
 
 /**
  * Create command class.
- * 格式：命令类型 center.x center.y begin.x begin.y uuid0 uuid1
+ * 格式：命令类型 center.x center.y begin.x begin.y uuid
  */
 class CreateCircleAreaCom extends CreateFaceCom {
   center: Vector2;
@@ -53,7 +50,6 @@ class CreateCircleAreaCom extends CreateFaceCom {
       await act_pick_end.execute(context);
       if (this._isCancel || act_pick_end.isCancel) { this.cancel(); return; }
       this.begin = new Vector2(act_pick_end.result.x, act_pick_end.result.y);
-
     }
 
     userData.assistPoints.push({ p: this.begin, c: THREE.Color.NAMES.limegreen });
@@ -62,10 +58,9 @@ class CreateCircleAreaCom extends CreateFaceCom {
 
     // 创建一个曲线段
     let edge = Brep2Builder.BuildCircleEdge2FromCenterRadius(this.center, this.begin.distanceTo(this.center));
-    if (paras.length >= 6) { edge.uuid = paras[5]; }
     // 创建一个面
     let face = Brep2Builder.BuildFaceByEdges([edge]);
-    if (paras.length >= 7) { face.uuid = paras[6]; }
+    if (paras.length >= 6) { face.uuid = paras[5]; }
     userData.color = THREE.Color.NAMES.blue;
     let geo = BrepMeshBuilder.BuildFace2Mesh(face, userData.color);
     userData.original = face;
@@ -75,7 +70,6 @@ class CreateCircleAreaCom extends CreateFaceCom {
     this._text = paras[0]
       + ' ' + this.center.x + ' ' + this.center.y
       + ' ' + this.begin.x + ' ' + this.begin.y
-      + ' ' + edge.uuid
       + ' ' + face.uuid;
 
     this.done();

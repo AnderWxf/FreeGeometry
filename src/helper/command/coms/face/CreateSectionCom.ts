@@ -1,13 +1,11 @@
 import * as THREE from "three";
-import { ComCreate } from "../ComCreate";
 import { ActionContext3D } from "../../Active";
 import { Global } from "../../../../core/Global";
 import { Brep2Builder } from "../../../../geometry/algorithm/builder/Brep2Builder";
-import { Vector2 } from "../../../../math/Math";
 import { BrepMeshBuilder } from "../../../BrepMeshBuilder";
 import type { CommandExecuter } from "../../CommandExecuter";
 import { GeomType } from "../../../../core/Constents";
-import { Coedge2, Edge2, Face2, Vertice2 } from "../../../../geometry/data/brep/Brep2";
+import { Edge2 } from "../../../../geometry/data/brep/Brep2";
 import { ActPickObjects } from "../../acts/ActPickObjects";
 import { CreateGeomUserData, type UserData } from "../../../UserData";
 import { CreateFaceCom } from "./CreateFaceCom";
