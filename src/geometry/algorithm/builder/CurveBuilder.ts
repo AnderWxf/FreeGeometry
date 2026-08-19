@@ -131,12 +131,13 @@ class CurveBuilder {
    */
   static BuildEllipse2FromCenterBeginEndPoint(c: Vector2, b: Vector2, e: Vector2): Arc2Data {
     let major = b.clone().sub(c);
+    let minor = e.clone().sub(c);
     let radius = new Vector2();
     radius.x = major.length();
     major.normalize();
     let rotation = Math.atan2(major.y, major.x);
-    major.multiplyScalar(e.clone().dot(major));
-    radius.y = e.distanceTo(major);
+    major.multiplyScalar(minor.dot(major)).add(c);
+    radius.y = minor.distanceTo(major);
     let tr = new Transform2(c, rotation);
     return new Arc2Data(tr, radius);
   }
