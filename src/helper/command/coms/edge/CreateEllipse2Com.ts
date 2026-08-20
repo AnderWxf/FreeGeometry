@@ -73,23 +73,24 @@ class CreateEllipse2Com extends ComCreate {
     // 创建一个曲线段
     let edge = Brep2Builder.BuildEllipseEdge2FromCenterBeginEndPoint(this.center, this.major, this.minor);
     if (paras.length >= 8) { edge.uuid = paras[7]; }
+    let alg = CurveBuilder.Algorithm2ByData(edge.curve);
+    let minorPoint = alg.p(PI_2);
+    this.minor.set(minorPoint.x, minorPoint.y);
+
     let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, userData.color);
     userData.original = edge;
     geo.userData = userData;
     this.results = geo;
 
-    let alg = CurveBuilder.Algorithm2ByData(edge.curve);
-    let minorPoint = alg.p(PI_2);
-    this.minor.set(minorPoint.x, minorPoint.y);
+    userData.assistPoints.push({ p: this.minor, c: THREE.Color.NAMES.darkblue });
+    this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
+    Global.scene.add(this.assists[this.assists.length - 1]);
+
     this._text = paras[0]
       + ' ' + this.center.x + ' ' + this.center.y
       + ' ' + this.major.x + ' ' + this.major.y
       + ' ' + this.minor.x + ' ' + this.minor.y
       + ' ' + edge.uuid;
-
-    userData.assistPoints.push({ p: this.minor, c: THREE.Color.NAMES.darkblue });
-    this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
-    Global.scene.add(this.assists[this.assists.length - 1]);
 
     this.done();
   }

@@ -64,10 +64,12 @@ class CreateCircle2Com extends ComCreate {
     userData.original = edge;
     geo.userData = userData;
     this.results = geo;
+
     this._text = paras[0]
       + ' ' + this.center.x + ' ' + this.center.y
       + ' ' + this.begin.x + ' ' + this.begin.y
       + ' ' + edge.uuid;
+    
     this.done();
   }
   onMouseMoveExec(event: MouseEvent) {

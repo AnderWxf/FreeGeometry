@@ -77,7 +77,10 @@ class CreateArc2ThreePointCom extends ComCreate {
     userData.original = edge;
     geo.userData = userData;
     this.results = geo;
+    
     userData.assistPoints.push({ p: edge.curve.trans.pos, c: THREE.Color.NAMES.greenyellow });
+    this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
+    Global.scene.add(this.assists[this.assists.length - 1]);
 
     this._text = paras[0]
       + ' ' + this.begin.x + ' ' + this.begin.y

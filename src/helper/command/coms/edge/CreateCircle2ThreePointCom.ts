@@ -40,8 +40,8 @@ class CreateCircle2ThreePointCom extends ComCreate {
 
       userData.assistPoints.push({ p: this.middle, c: THREE.Color.NAMES.darkblue });
       this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
-      Global.scene.add(this.assists[this.assists.length - 1]);      
-      
+      Global.scene.add(this.assists[this.assists.length - 1]);
+
     } else {
       this.bind(window);
       let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);
@@ -70,7 +70,7 @@ class CreateCircle2ThreePointCom extends ComCreate {
     userData.assistPoints.push({ p: this.end, c: THREE.Color.NAMES.darkblue });
     this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
     Global.scene.add(this.assists[this.assists.length - 1]);
-    
+
     // 创建一个曲线段
     let edge = Brep2Builder.BuildCircleFromBeginMiddleEndPoint(this.begin, this.middle, this.end);
     if (edge == null) {
@@ -84,11 +84,14 @@ class CreateCircle2ThreePointCom extends ComCreate {
     this.results = geo;
     userData.assistPoints.push({ p: edge.curve.trans.pos, c: THREE.Color.NAMES.greenyellow });
     this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
+    Global.scene.add(this.assists[this.assists.length - 1]);
+
     this._text = paras[0]
       + ' ' + this.begin.x + ' ' + this.begin.y
       + ' ' + this.middle.x + ' ' + this.middle.y
       + ' ' + this.end.x + ' ' + this.end.y
       + ' ' + edge.uuid;
+
     this.done();
   }
   onMouseMoveExec(event: MouseEvent) {
