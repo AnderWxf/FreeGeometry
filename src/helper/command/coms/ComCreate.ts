@@ -30,7 +30,7 @@ class ComCreate extends Command {
       if (Global.scene.children.includes(element)) {
         Global.scene.remove(element);
       }
-      element.visible = Global.isShowAssists;
+      // element.visible = Global.isShowAssists;
     });
   }
   override done() {
@@ -45,7 +45,7 @@ class ComCreate extends Command {
         Global.scene.remove(element);
       }
       this.results.children.push(element);
-      element.visible = Global.isShowAssists;
+      // element.visible = Global.isShowAssists;
     });
   }
   override undo() {

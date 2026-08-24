@@ -35,12 +35,12 @@ class ComModify extends Command {
     }
     this.assists.forEach(element => {
       this.results.children.push(element);
-      element.visible = Global.isShowAssists;
+      // element.visible = Global.isShowAssists;
     });
 
   }
 
-  protected getSelected() { 
+  protected getSelected() {
     // 寻找已经选好的目标
     if (Global.select.selectedObjects.length > 0) {
       for (let i = 0; i < Global.select.selectedObjects.length; i++) {
@@ -77,7 +77,7 @@ class ComModify extends Command {
       let assist = this.createAssistPoint({ p: ap.p.clone(), c: ap.c });
       this.assists.push(assist);
       this.results.children.push(assist);
-      assist.visible = Global.isShowAssists;
+      // assist.visible = Global.isShowAssists;
     });
     if (Global.select.isEditor) {
       Global.select.pushSelectObject(this.results);

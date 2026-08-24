@@ -93,11 +93,7 @@ function CreateAssistPoint2(a: AssisPoint2, isAssist: boolean = true): THREE.Mes
   mesh.userData.color = a.c;
   mesh.userData.original = new Point2Data(a.p);
   mesh.userData.detail = 1;
-  if (isAssist) {
-    mesh.visible = Global.isShowAssists;
-  } else {
-    mesh.visible = true;
-  }
+  mesh.visible = false;
   return mesh;
 }
 

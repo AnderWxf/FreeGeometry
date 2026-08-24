@@ -241,7 +241,7 @@ class CommandExecuter {
     let typeName = GeomType[type] as string;
     if (type == GeomType.MATH_VECTOR2
       || type == GeomType.DATA_TYPE_POINT2) {
-      typeName = CommandType.MODIFY_POINT2;
+      typeName = CommandType.CREATE_POINT2;
     } else {
       typeName = typeName.split('_')[2];//DRAW_CURVE2_L = 0, // 两点直线段
     }

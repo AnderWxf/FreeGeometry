@@ -66,6 +66,7 @@ class ModifyPoint2Com extends ComModify {
     userData.original = p;
     let geo = this.createAssistPoint({ p: this.point, c: userData.color }, false);
     geo.userData = userData;
+    geo.visible = true;
     this.results = geo;
 
     this._text = paras[0]

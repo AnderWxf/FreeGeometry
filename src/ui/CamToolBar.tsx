@@ -279,11 +279,11 @@ const MenuItems = [
         label: '曲线',
         children: [
           // 二维曲线类型
-          { key: CommandType.CREATE_LINE, label: '两点直线段' + ' ' + CommandType.CREATE_LINE },
-          { key: CommandType.CREATE_ARC, label: '圆弧' + ' ' + CommandType.CREATE_ARC },
-          { key: CommandType.CREATE_ARC_THREE_POINT, label: '三点圆弧' + ' ' + CommandType.CREATE_ARC_THREE_POINT },
+          { key: CommandType.CREATE_LINE, label: '直线' + ' ' + CommandType.CREATE_LINE },
           { key: CommandType.CREATE_CIRCLE, label: '圆' + ' ' + CommandType.CREATE_CIRCLE },
+          { key: CommandType.CREATE_ARC, label: '圆弧' + ' ' + CommandType.CREATE_ARC },
           { key: CommandType.CREATE_CIRCLE_THREE_POINT, label: '三点圆' + ' ' + CommandType.CREATE_CIRCLE_THREE_POINT },
+          { key: CommandType.CREATE_ARC_THREE_POINT, label: '三点圆弧' + ' ' + CommandType.CREATE_ARC_THREE_POINT },
           { key: CommandType.CREATE_ELLIPSE, label: '椭圆' + ' ' + CommandType.CREATE_ELLIPSE },
           { key: CommandType.CREATE_ELLIPSE_ARC, label: '椭圆弧' + ' ' + CommandType.CREATE_ELLIPSE_ARC },
           { key: CommandType.CREATE_HYPERBOLA, label: '双曲线' + ' ' + CommandType.CREATE_HYPERBOLA },

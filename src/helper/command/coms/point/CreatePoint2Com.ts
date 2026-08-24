@@ -44,6 +44,7 @@ class CreatePoint2Com extends ComCreate {
     userData.original = p;
     let geo = this.createAssistPoint({ p: p.pos, c: userData.color }, false);
     geo.userData = userData;
+    geo.visible = true;
     this.results = geo;
 
     this._text = paras[0]

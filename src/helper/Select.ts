@@ -78,6 +78,11 @@ class Select {
       if (userData.color || userData.color === 0) {
         (obj as any).material?.color?.setHex(userData.color);
       }
+      obj.children.forEach(child => {
+        if (child.userData.isAssist) {
+          child.visible = false;
+        }
+      });
     }
     for (let i = 0; i < this.overObjects.length; i++) {
       let obj = this.overObjects[i] as THREE.Object3D;
@@ -85,6 +90,11 @@ class Select {
       if (userData.color || userData.color === 0) {
         (obj as any).material?.color?.setHex(userData.color);
       }
+      obj.children.forEach(child => {
+        if (child.userData.isAssist) {
+          child.visible = false;
+        }
+      });
     }
     this.selectedAssist = null;
     this.selectedObjects = [];
@@ -123,6 +133,11 @@ class Select {
           (obj as any).material?.color?.setHex(userData.color);
         }
         this.selectedObjects.splice(i, 1);
+        obj.children.forEach(child => {
+          if (child.userData.isAssist) {
+            child.visible = false;
+          }
+        });
       }
     }
     const raycaster = this._raycasterForOver;
@@ -226,6 +241,11 @@ class Select {
           this.selectedObjects.push(obj);
           break;
         }
+        obj.children.forEach(child => {
+          if (child.userData.isAssist) {
+            child.visible = Global.isShowAssists;
+          }
+        });
       }
 
     }
@@ -276,6 +296,11 @@ class Select {
       if (userData.color || userData.color !== 0) {
         (obj as any).material?.color?.setHex(userData.color);
       }
+      obj.children.forEach(child => {
+        if (child.userData.isAssist) {
+          child.visible = false;
+        }
+      });
     }
     this.overObjects = [];
     // 创建射线投射器
@@ -361,6 +386,11 @@ class Select {
             (obj as any).material?.color?.setHex(THREE.Color.NAMES.cornflowerblue);
             this.overObjects.push(obj);
           }
+          obj.children.forEach(child => {
+            if (child.userData.isAssist) {
+              child.visible = Global.isShowAssists;
+            }
+          });
         }
       }
     }

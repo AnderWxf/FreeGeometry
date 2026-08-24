@@ -74,6 +74,7 @@ class ComTransform extends ComBatch {
         userData.original = new Point2Data(point);
         let geo = this.createAssistPoint({ p: point, c: userData.color }, false);
         geo.userData = userData;
+        geo.visible = true;
         this.results.push(geo);
       }
       // 几何点
@@ -84,6 +85,7 @@ class ComTransform extends ComBatch {
         userData.original = point;
         let geo = this.createAssistPoint({ p: point.pos, c: userData.color }, false);
         geo.userData = userData;
+        geo.visible = true;
         this.results.push(geo);
       }
       // 线

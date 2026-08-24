@@ -11,16 +11,16 @@ export class Global {
   static website: string = "";
   static description: string = "A geometry library for 3D modeling.";
 
-  static select: Select;
-  static scene: Scene;
+  static select: Select;        // 全局选择和高亮工具
+  static scene: Scene;          // 全局选场景对象
   static renderer: WEBGPU.WebGPURenderer;
   static camera: THREE.Camera;
   static gpu: HTMLElement;
   static canvas: HTMLCanvasElement;
 
-  static isShowAssists: boolean = true;
-  static comExector: CommandExecuter;
+  static isShowAssists: boolean = true;// 在选中或者鼠标悬浮的时候显示辅助物体
+  static comExector: CommandExecuter;// 全局命令执行器
 
-  static filename: string = '';
+  static filename: string = '';// 当前保存、导入、加载、执行的文件名
 }
 
