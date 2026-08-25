@@ -83,7 +83,7 @@ class SceneStricpExecCom extends Command {
 
         this_.done();
       } catch (error) {
-        console.log('文件格式错误：不是有效的 JSON');
+        console.log('文件格式错误：不是有效的脚本文件');
         console.error('解析失败:', error);
         this_.cancel();
       }
