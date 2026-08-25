@@ -23,7 +23,7 @@ class SceneStricpExecCom extends Command {
         SceneStricpExecCom.input_ = document.createElement('input');
         SceneStricpExecCom.input_.type = 'file';
         SceneStricpExecCom.input_.hidden = true;
-        SceneStricpExecCom.input_.accept = '.fg,application/text';
+        SceneStricpExecCom.input_.accept = '.fg.txt,application/text';
       }
       SceneStricpExecCom.input_.addEventListener('change', this.onLoaded);
       SceneStricpExecCom.input_.addEventListener('cancel', this.onCancel);
@@ -57,7 +57,7 @@ class SceneStricpExecCom extends Command {
       return;
     }
     // 验证文件类型
-    if (!file.name.endsWith('.fg') && file.type !== 'application/txt') {
+    if (!file.name.endsWith('.fg.txt') && file.type !== 'application/txt') {
       alert('请上传 fg 文件');
       this.cancel();
       return;
