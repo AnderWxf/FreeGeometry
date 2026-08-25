@@ -2,6 +2,7 @@ import type { BigNumber } from '../../../mathjs';
 import { multiply as mul, add, unaryMinus as un, bignumber as big, subtract as sub, equal, largerEq, divide as div, abs } from '../../../mathjs';
 import * as MATHJS from '../../../mathjs';
 import { PI2, PI4, PI_4 } from '../../../math/MathUtils';
+import nerdamer from 'nerdamer-prime';
 
 class SolveEquation {
 
@@ -890,6 +891,105 @@ class SolveEquation {
       console.log(`Root[${i}]：${roots[i]}`);
     }
     return roots;
+  }
+
+  /**
+   * 使用math.js计算nerdamer.js的结果表达式
+   * @param {string} expr - nerdamer.js的结果表达式
+   * @returns {Object} 解的表达式计算结果
+   */
+  static Expression2BigNumber(expr: string): BigNumber | MATHJS.Complex {
+    // 预处理
+    let processed = expr;
+    // 处理隐式乘法: 2sqrt(3) → 2*sqrt(3)
+    processed = processed.replace(/(\d+)(sqrt|sin|cos|tan|log|exp)/g, '$1*$2');
+    // 处理 )数字 → )*数字
+    processed = processed.replace(/\)(\d)/g, ')*$1');
+    // 处理 数字( → 数字*(
+    processed = processed.replace(/(\d)\(/g, '$1*(');
+    // 处理 )sqrt → )*sqrt
+    processed = processed.replace(/\)(sqrt|sin|cos|tan|log|exp)/g, ')*$1');
+    // 处理 `i`（虚数单位）
+    // mathjs 使用 `i`，所以保留
+    try {
+      let ret = MATHJS.evaluate(processed);
+      if (MATHJS.typeOf(ret) === "Complex") {
+        return ret as MATHJS.Complex;
+      } else if (MATHJS.typeOf(ret) === 'BigNumber') {
+        return ret as BigNumber;
+      } else {
+        return big(ret);
+      }
+    } catch (error) {
+      console.error('原始表达式:', expr);
+      console.error('处理后表达式:', processed);
+      throw error;
+    }
+  }
+
+  /**
+   * 使用nerdamer.js求解一元四次方程 速度慢
+   * 比SolveQuarticNumberical慢一二十倍。
+   * @param {number} a - 四次项系数
+   * @param {number} b - 三次项系数
+   * @param {number} c - 二次项系数
+   * @param {number} d - 一次项系数
+   * @param {number} e - 常数项
+   * @returns {Object} 解的结果
+   */
+  static SolveQuarticNerdamer(a_: number | BigNumber, b_: number | BigNumber, c_: number | BigNumber, d_: number | BigNumber, e_: number | BigNumber, tol1: BigNumber = big(1e-12)): Array<MATHJS.Complex | BigNumber> {
+    let a = big(a_);
+    let b = big(b_);
+    let c = big(c_);
+    let d = big(d_);
+    let e = big(e_);
+
+    let expr = a + '*x^4 + ' + b + '*x^3 + ' + c + '*x^2 + ' + d + '*x + ' + e + ' = 0';
+    console.log(`方程表达式：${expr}`);
+    let begin = new Date();
+    let ret = nerdamer.solve(expr, 'x');
+    let end = new Date();
+    console.log(`方程的根表达式：  ${ret}`);
+    console.log(`Nerdamer.solve Time ：  ${end.getTime() - begin.getTime()}`);
+    let result = new Array<MATHJS.Complex | BigNumber>();
+    let begin0 = new Date();
+    ret.each((r) => {
+      result.push(SolveEquation.Expression2BigNumber(r.toString()));
+    });
+    let end0 = new Date();
+    console.log(`Expression2BigNumber Time ：  ${end0.getTime() - begin0.getTime()}`);
+    return result;
+  }
+
+  /**
+   * 使用nerdamer.js求解一元高次式方程（五次以上） 速度慢
+   * 系数数组对顶次数由低到高
+   * @param {number} cs_ - 系数数组
+   * @returns {Object} 解的结果
+   */
+  static SolvePolynomialNerdamer(cs_: [number | BigNumber]): Array<MATHJS.Complex | BigNumber> {
+    let cs = new Array<BigNumber>();
+    for (let i = 0; i < cs_.length; i++) {
+      cs.push(big(cs_[i]));
+    }
+    let expr = ' = 0';
+    for (let i = 0; i < cs.length; i++) {
+      expr = cs[i] + '*x^' + i + ' + ' + expr;
+    }
+    console.log(`方程表达式：${expr}`);
+    let begin = new Date();
+    let ret = nerdamer.solve(expr, 'x');
+    let end = new Date();
+    console.log(`方程的根表达式：  ${ret}`);
+    console.log(`Nerdamer.solve Time ：  ${end.getTime() - begin.getTime()}`);
+    let result = new Array<MATHJS.Complex | BigNumber>();
+    let begin0 = new Date();
+    ret.each((r) => {
+      result.push(SolveEquation.Expression2BigNumber(r.toString()));
+    });
+    let end0 = new Date();
+    console.log(`Expression2BigNumber Time ：  ${end0.getTime() - begin0.getTime()}`);
+    return result;
   }
 
   /**

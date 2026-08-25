@@ -536,8 +536,15 @@ class Curve2Inter {
 
     // 解四次方程
     console.log(`四次方程 R4 y^4 + R3 y^3 + R2 y^2 + R1 y + R0 => R4:${R4.toNumber()}, R3:${R3.toNumber()}, R2:${R2.toNumber()}, R1:${R1.toNumber()}, R0:${R0.toNumber()}`);
+    let begin = new Date();
     const Rs = SolveEquation.SolveQuarticNumberical(R4, R3, R2, R1, R0, big(tol1 * 0.01));
     console.log(`四次方程根 Rs: ${Rs[0]}, ${Rs[1]}, ${Rs[2]}, ${Rs[3]}`);
+    let end0 = new Date();
+    console.log(`Time Rs: ${end0.getTime() - begin.getTime()}`);
+    // const Rs1 = SolveEquation.SolveQuarticNerdamer(R4, R3, R2, R1, R0);
+    // let end1 = new Date();
+    // console.log(`四次方程根 Rs1: ${Rs1[0]}, ${Rs1[1]}, ${Rs1[2]}, ${Rs1[3]}`);
+    // console.log(`Time Rs1: ${end1.getTime() - end0.getTime()}`);
     for (let i = 0; i < Rs.length; i++) {
       if (ret.length >= n) {
         break;
