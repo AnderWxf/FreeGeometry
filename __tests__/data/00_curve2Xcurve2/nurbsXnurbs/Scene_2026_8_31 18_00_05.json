@@ -1,0 +1,324 @@
+[
+  {
+    "userData": {
+      "type": 10,
+      "typename": "DRAW_CURVE2_NF",
+      "canPick": true,
+      "isAssist": false,
+      "assistPoints": [
+        {
+          "p": {
+            "type": -1,
+            "typename": "MATH_VECTOR2",
+            "x": -16.614583333333336,
+            "y": 10.390625
+          },
+          "c": 11403055
+        },
+        {
+          "p": {
+            "type": -1,
+            "typename": "MATH_VECTOR2",
+            "x": 12.500000000000004,
+            "y": 11.223958333333334
+          },
+          "c": 11403055
+        },
+        {
+          "p": {
+            "type": -1,
+            "typename": "MATH_VECTOR2",
+            "x": -3.9583333333333366,
+            "y": -10.078125
+          },
+          "c": 11403055
+        },
+        {
+          "p": {
+            "type": -1,
+            "typename": "MATH_VECTOR2",
+            "x": -27.343750000000007,
+            "y": 0.3385416666666673
+          },
+          "c": 11403055
+        },
+        {
+          "p": {
+            "type": -1,
+            "typename": "MATH_VECTOR2",
+            "x": -25.72916666666668,
+            "y": -20.755208333333336
+          },
+          "c": 11403055
+        }
+      ],
+      "color": 16711680,
+      "original": {
+        "uuid": "271e1025-9aaa-4833-8af1-6439e1961594",
+        "type": 296,
+        "typename": "DATA_TYPE_BREP2_EDGE2",
+        "v0i": -1,
+        "v1i": -1,
+        "curvei": -1,
+        "u": {
+          "type": -1,
+          "typename": "MATH_VECTOR2",
+          "x": 0,
+          "y": 1
+        },
+        "curve": {
+          "uuid": "3e8bac52-99dc-412a-a3f4-54fe8d77fc6d",
+          "trans": {
+            "type": 252,
+            "typename": "DATA_TYPE_TRANSFORM2",
+            "pos": {
+              "type": -1,
+              "typename": "MATH_VECTOR2",
+              "x": 0,
+              "y": 0
+            },
+            "rot": 0,
+            "scale": {
+              "type": -1,
+              "typename": "MATH_VECTOR2",
+              "x": 1,
+              "y": 1
+            }
+          },
+          "type": 258,
+          "typename": "DATA_TYPE_CURVE2_NURBS2",
+          "controls": [
+            {
+              "type": -2,
+              "typename": "MATH_VECTOR4",
+              "x": -16.614583333333336,
+              "y": 10.390625,
+              "z": 1
+            },
+            {
+              "type": -2,
+              "typename": "MATH_VECTOR4",
+              "x": 25.335026764002613,
+              "y": 41.354652711077506,
+              "z": 1
+            },
+            {
+              "type": -2,
+              "typename": "MATH_VECTOR4",
+              "x": 5.724866878073582,
+              "y": -50.15209895357876,
+              "z": 1
+            },
+            {
+              "type": -2,
+              "typename": "MATH_VECTOR4",
+              "x": -40.01305659069326,
+              "y": 21.020324837470977,
+              "z": 1
+            },
+            {
+              "type": -2,
+              "typename": "MATH_VECTOR4",
+              "x": -25.72916666666668,
+              "y": -20.755208333333336,
+              "z": 1
+            }
+          ],
+          "knots": [
+            0,
+            0,
+            0,
+            0,
+            0.5409073437069447,
+            1,
+            1,
+            1,
+            1
+          ],
+          "degree": 3
+        }
+      }
+    }
+  },
+  {
+    "userData": {
+      "type": 11,
+      "canPick": true,
+      "isAssist": false,
+      "assistPoints": [
+        {
+          "p": {
+            "type": -1,
+            "typename": "MATH_VECTOR2",
+            "x": -16.60718749422652,
+            "y": 10.396083617007426
+          },
+          "c": 11403055
+        },
+        {
+          "p": {
+            "type": -1,
+            "typename": "MATH_VECTOR2",
+            "x": -0.4092708275598489,
+            "y": -0.228916382992578
+          },
+          "c": 11403055
+        },
+        {
+          "p": {
+            "type": -1,
+            "typename": "MATH_VECTOR2",
+            "x": -16.555104160893183,
+            "y": -9.60391638299258
+          },
+          "c": 11403055
+        },
+        {
+          "p": {
+            "type": -1,
+            "typename": "MATH_VECTOR2",
+            "x": -1.7113541608931806,
+            "y": -27.41641638299258
+          },
+          "c": 11403055
+        },
+        {
+          "p": {
+            "type": -1,
+            "typename": "MATH_VECTOR2",
+            "x": 33.86156250577349,
+            "y": -23.82266638299258
+          },
+          "c": 11403055
+        }
+      ],
+      "color": 16711680,
+      "original": {
+        "uuid": "027d54a8-7792-4d9d-b4ce-e00277a8c74d",
+        "type": 296,
+        "typename": "DATA_TYPE_BREP2_EDGE2",
+        "v0i": -1,
+        "v1i": -1,
+        "curvei": -1,
+        "curve": {
+          "uuid": "1aca9c44-f76c-4151-bb21-c4390bceb1bc",
+          "trans": {
+            "type": 252,
+            "typename": "DATA_TYPE_TRANSFORM2",
+            "pos": {
+              "type": -1,
+              "typename": "MATH_VECTOR2",
+              "x": 2.4032291724401524,
+              "y": -9.83829138299258
+            },
+            "rot": 0,
+            "scale": {
+              "type": -1,
+              "typename": "MATH_VECTOR2",
+              "x": 1,
+              "y": 1
+            }
+          },
+          "type": 258,
+          "typename": "DATA_TYPE_CURVE2_NURBS2",
+          "controls": [
+            {
+              "type": -2,
+              "typename": "MATH_VECTOR4",
+              "x": -19.01041666666667,
+              "y": 20.234375000000004,
+              "z": 1
+            },
+            {
+              "type": -2,
+              "typename": "MATH_VECTOR4",
+              "x": -2.8125000000000013,
+              "y": 9.609375000000002,
+              "z": 1
+            },
+            {
+              "type": -2,
+              "typename": "MATH_VECTOR4",
+              "x": -18.958333333333336,
+              "y": 0.23437499999999975,
+              "z": 1
+            },
+            {
+              "type": -2,
+              "typename": "MATH_VECTOR4",
+              "x": -4.114583333333333,
+              "y": -17.578125000000004,
+              "z": 1
+            },
+            {
+              "type": -2,
+              "typename": "MATH_VECTOR4",
+              "x": 31.45833333333334,
+              "y": -13.984375000000004,
+              "z": 1
+            }
+          ],
+          "knots": [
+            0,
+            0,
+            0,
+            0,
+            0.5,
+            1,
+            1,
+            1,
+            1
+          ],
+          "degree": 3
+        },
+        "u": {
+          "type": -1,
+          "typename": "MATH_VECTOR2",
+          "x": 0,
+          "y": 1
+        }
+      },
+      "typename": "DRAW_CURVE2_NC"
+    }
+  },
+  {
+    "userData": {
+      "canPick": true,
+      "isAssist": false,
+      "color": 255,
+      "original": {
+        "uuid": "8487c947-0ea5-4983-9480-bcd783e8fde5",
+        "type": 254,
+        "typename": "DATA_TYPE_POINT2",
+        "pos": {
+          "type": -1,
+          "typename": "MATH_VECTOR2",
+          "x": -16.60718749573325,
+          "y": 10.396083615895447
+        }
+      },
+      "type": 254,
+      "typename": "DATA_TYPE_POINT2"
+    }
+  },
+  {
+    "userData": {
+      "canPick": true,
+      "isAssist": false,
+      "color": 255,
+      "original": {
+        "uuid": "429ae293-727e-41f2-8f06-031ed067cf94",
+        "type": 254,
+        "typename": "DATA_TYPE_POINT2",
+        "pos": {
+          "type": -1,
+          "typename": "MATH_VECTOR2",
+          "x": -8.467909473100823,
+          "y": -9.560686346928355
+        }
+      },
+      "type": 254,
+      "typename": "DATA_TYPE_POINT2"
+    }
+  }
+]

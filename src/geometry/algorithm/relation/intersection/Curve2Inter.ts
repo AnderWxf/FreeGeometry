@@ -1247,13 +1247,13 @@ class Curve2Inter {
       // if (Brep2Inter.FaceXFace(polygon0, polygon1, tol0, tol1).length == 0) {
       //   return [];
       // }
-      if (c0.controls.length <= c1.controls.length) {
-        let segment = c0.controls.length * 2;
-        return Curve2Inter.CurveXCurve(c0, c1, segment, tol0, tol1, n);
-      } else {
-        let segment = c1.controls.length * 2;
-        return Curve2Inter.SwapU(Curve2Inter.CurveXCurve(c1, c0, segment, tol0, tol1, n));
-      }
+      // if (c0.controls.length <= c1.controls.length) {
+      let segment = c0.controls.length * c1.controls.length;
+      return Curve2Inter.CurveXCurve(c0, c1, segment, tol0, tol1, n);
+      // } else {
+      //   let segment = c1.controls.length * 2;
+      //   return Curve2Inter.SwapU(Curve2Inter.CurveXCurve(c1, c0, segment, tol0, tol1, n));
+      // }
     } else {
       // 使用verb求交，算法结果不稳定，精度只能稳定在1e-7左右。
       let ret = new Array<InterOfCurve2>();

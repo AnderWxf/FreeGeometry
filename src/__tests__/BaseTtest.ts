@@ -159,42 +159,46 @@ function ExecuteDescribeInsertPoint2(typeName: string, typeDir: string, process:
 
             let tol = 1e-4;
             const result = process(edge1, edge2) as [any];
-            // 交点距离判定，
-            for (let j = result.length - 1; j >= 0; j--) {
-              let exp = result[j].userData as UserData;
-              for (let k = expected.length - 1; k >= 0; k--) {
-                let ret = expected[k].userData as UserData;
-                if (exp.original instanceof Vector2
-                  && ret.original instanceof Vector2
-                  && exp.original.distanceTo(ret.original) < tol
-                ) {
-                  result.splice(j, 1);
-                  break;
-                }
-                else if (exp.original instanceof Point2Data
-                  && ret.original instanceof Vector2
-                  && exp.original.pos.distanceTo(ret.original) < tol
-                ) {
-                  result.splice(j, 1);
-                  break;
-                }
-                else if (exp.original instanceof Point2Data
-                  && ret.original instanceof Point2Data
-                  && exp.original.pos.distanceTo(ret.original.pos) < tol
-                ) {
-                  result.splice(j, 1);
-                  break;
-                }
-                else if (exp.original instanceof Vector2
-                  && ret.original instanceof Point2Data
-                  && exp.original.distanceTo(ret.original.pos) < tol
-                ) {
-                  result.splice(j, 1);
-                  break;
+            if (result.length > 0) {
+              // 交点距离判定，
+              for (let j = result.length - 1; j >= 0; j--) {
+                let exp = result[j].userData as UserData;
+                for (let k = expected.length - 1; k >= 0; k--) {
+                  let ret = expected[k].userData as UserData;
+                  if (exp.original instanceof Vector2
+                    && ret.original instanceof Vector2
+                    && exp.original.distanceTo(ret.original) < tol
+                  ) {
+                    result.splice(j, 1);
+                    break;
+                  }
+                  else if (exp.original instanceof Point2Data
+                    && ret.original instanceof Vector2
+                    && exp.original.pos.distanceTo(ret.original) < tol
+                  ) {
+                    result.splice(j, 1);
+                    break;
+                  }
+                  else if (exp.original instanceof Point2Data
+                    && ret.original instanceof Point2Data
+                    && exp.original.pos.distanceTo(ret.original.pos) < tol
+                  ) {
+                    result.splice(j, 1);
+                    break;
+                  }
+                  else if (exp.original instanceof Vector2
+                    && ret.original instanceof Point2Data
+                    && exp.original.distanceTo(ret.original.pos) < tol
+                  ) {
+                    result.splice(j, 1);
+                    break;
+                  }
                 }
               }
+              expect(IsCloseTo([], result, 1e-8)).toBe(true);
+            } else {
+              expect(IsCloseTo([], expected, 1e-8)).toBe(true);
             }
-            expect(IsCloseTo([], result, 1e-8)).toBe(true);
           });
         }
       });
