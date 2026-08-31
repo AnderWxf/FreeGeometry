@@ -1,0 +1,181 @@
+[
+  {
+    "userData": {
+      "type": 7,
+      "canPick": true,
+      "isAssist": false,
+      "assistPoints": [
+        {
+          "p": {
+            "type": "MATH_VECTOR2",
+            "x": 0,
+            "y": 0
+          },
+          "c": 11403055
+        },
+        {
+          "p": {
+            "type": "MATH_VECTOR2",
+            "x": 1.5,
+            "y": 0
+          },
+          "c": 3329330
+        },
+        {
+          "p": {
+            "type": "MATH_VECTOR2",
+            "x": 2.5,
+            "y": 1.5
+          },
+          "c": 32768
+        },
+        {
+          "p": {
+            "type": "MATH_VECTOR2",
+            "x": 4.981214711292817,
+            "y": -4.749999999999999
+          },
+          "c": 49151
+        },
+        {
+          "p": {
+            "type": "MATH_VECTOR2",
+            "x": 4.981214711292817,
+            "y": 4.749999999999999
+          },
+          "c": 139
+        }
+      ],
+      "color": 16711680,
+      "original": {
+        "uuid": "838e2a9f-7423-45bf-9307-a4d2f8a6ee5a",
+        "type": "DATA_TYPE_BREP2_EDGE2",
+        "v0i": -1,
+        "v1i": -1,
+        "curvei": -1,
+        "u": {
+          "type": "MATH_VECTOR2",
+          "x": -1.2649174553900444,
+          "y": 1.2649174553900444
+        },
+        "curve": {
+          "uuid": "4cc531e5-b404-4501-ad6d-81bd4c00b933",
+          "trans": {
+            "type": "DATA_TYPE_TRANSFORM2",
+            "pos": {
+              "type": "MATH_VECTOR2",
+              "x": 0,
+              "y": 0
+            },
+            "rot": 0,
+            "scale": {
+              "type": "MATH_VECTOR2",
+              "x": 1,
+              "y": 1
+            }
+          },
+          "type": "DATA_TYPE_CURVE2_HYPERBOLA2",
+          "radius": {
+            "type": "MATH_VECTOR2",
+            "x": 1.5,
+            "y": 1.5
+          }
+        }
+      },
+      "detail": 2
+    }
+  },
+  {
+    "userData": {
+      "type": 0,
+      "canPick": true,
+      "isAssist": false,
+      "assistPoints": [
+        {
+          "p": {
+            "type": "MATH_VECTOR2",
+            "x": 1.5001074977682078,
+            "y": -0.017958420320110642
+          },
+          "c": 11403055
+        },
+        {
+          "p": {
+            "type": "MATH_VECTOR2",
+            "x": 1.5,
+            "y": 2.2
+          },
+          "c": 3329330
+        }
+      ],
+      "color": 16711680,
+      "original": {
+        "uuid": "815b4086-642f-495a-aae0-8a564703c159",
+        "type": "DATA_TYPE_BREP2_EDGE2",
+        "v0i": -1,
+        "v1i": -1,
+        "curvei": -1,
+        "u": {
+          "type": "MATH_VECTOR2",
+          "x": 0,
+          "y": 2.217958422925158
+        },
+        "curve": {
+          "uuid": "78523747-a9fe-4400-9e24-41058f20a963",
+          "trans": {
+            "type": "DATA_TYPE_TRANSFORM2",
+            "pos": {
+              "type": "MATH_VECTOR2",
+              "x": 1.5001074977682078,
+              "y": -0.017958420320110642
+            },
+            "rot": 1.5708447937846917,
+            "scale": {
+              "type": "MATH_VECTOR2",
+              "x": 1,
+              "y": 1
+            }
+          },
+          "type": "DATA_TYPE_CURVE2_LINE2"
+        }
+      },
+      "detail": 2
+    }
+  },
+  {
+    "userData": {
+      "canPick": true,
+      "isAssist": false,
+      "color": 255,
+      "original": {
+        "uuid": "746c798d-a0f2-400a-ad0a-76fa4847b435",
+        "type": "DATA_TYPE_POINT2",
+        "pos": {
+          "type": "MATH_VECTOR2",
+          "x": 1.5001057640347062,
+          "y": 0.01781300901446816
+        }
+      },
+      "detail": 1,
+      "type": 254
+    }
+  },
+  {
+    "userData": {
+      "canPick": true,
+      "isAssist": false,
+      "color": 255,
+      "original": {
+        "uuid": "a8d19fa9-2844-4514-bbe3-b610416498c6",
+        "type": "DATA_TYPE_POINT2",
+        "pos": {
+          "type": "MATH_VECTOR2",
+          "x": 1.500107497768208,
+          "y": -0.017958420320124773
+        }
+      },
+      "detail": 1,
+      "type": 254
+    }
+  }
+]

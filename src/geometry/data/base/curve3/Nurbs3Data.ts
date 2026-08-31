@@ -12,7 +12,8 @@ class Nurbs3Data extends Curve3Data {
    *
    * @type {number}
    */
-  private type = GeomType[GeomType.DATA_TYPE_CURVE3_NURBS3];
+  private readonly type = GeomType.DATA_TYPE_CURVE3_NURBS3;
+  private readonly typename = GeomType[GeomType.DATA_TYPE_CURVE3_NURBS3];
   /**
    * The contrls points of this Nurbs3Data.
    * use Vector4 to include weight info (w is weight)

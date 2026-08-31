@@ -13,7 +13,8 @@ class EllipsoidSurfaceData extends SurfaceData {
    *
    * @type {number}
    */
-  private type = GeomType[GeomType.DATA_TYPE_SURFACE_ELLIPSOIDSURFACE];
+  private readonly type = GeomType.DATA_TYPE_SURFACE_ELLIPSOIDSURFACE;
+  private readonly typename = GeomType[GeomType.DATA_TYPE_SURFACE_ELLIPSOIDSURFACE];
   /**
    * The radius size of this Ellipsoid surface.
    *

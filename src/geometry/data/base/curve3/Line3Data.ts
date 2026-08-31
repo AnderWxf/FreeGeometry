@@ -11,7 +11,8 @@ class Line3Data extends Curve3Data {
    *
    * @type {number}
    */
-  private type = GeomType[GeomType.DATA_TYPE_CURVE3_LINE3];
+  private readonly type = GeomType.DATA_TYPE_CURVE3_LINE3;
+  private readonly typename = GeomType[GeomType.DATA_TYPE_CURVE3_LINE3];
   /**
    * Constructs a new 3D Transfrom.
    *

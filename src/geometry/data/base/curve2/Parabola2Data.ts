@@ -11,7 +11,8 @@ class Parabola2Data extends Curve2Data {
    *
    * @type {number}
    */
-  private type = GeomType[GeomType.DATA_TYPE_CURVE2_PARABOLA2];
+  private readonly type = GeomType.DATA_TYPE_CURVE2_PARABOLA2;
+  private readonly typename = GeomType[GeomType.DATA_TYPE_CURVE2_PARABOLA2];
   /**
    * The focus distance of this Parabola curve.
    *

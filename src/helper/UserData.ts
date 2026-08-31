@@ -1,4 +1,4 @@
-import type { GeomType } from "../core/Constents";
+import { GeomType } from "../core/Constents";
 import type { Vector2, Vector3 } from "../math/Math";
 import * as THREE from "three";
 import { Command } from "./command/Command";
@@ -19,6 +19,7 @@ type AssisPoint3 = {
 
 type UserData = {
   type: GeomType;   // 几何类型
+  typename: string; // 几何类型名称
   canPick: boolean; // 是否可拾取
   color: number;    // 颜色
   detail: number;   // 造型的精细等级（此值序列化是应该忽略）
@@ -30,6 +31,7 @@ type UserData = {
 function CreateGeomUserData(type: GeomType): UserData {
   return {
     type: type,
+    typename: GeomType[type],
     canPick: true,
     isAssist: false,
     assistPoints: [],
@@ -93,7 +95,7 @@ function CreateAssistPoint2(a: AssisPoint2, isAssist: boolean = true): THREE.Mes
   mesh.userData.color = a.c;
   mesh.userData.original = new Point2Data(a.p);
   mesh.userData.detail = 1;
-  mesh.visible = false;
+  mesh.visible = !isAssist;
   return mesh;
 }
 

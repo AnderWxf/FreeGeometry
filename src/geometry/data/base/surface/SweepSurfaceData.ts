@@ -15,7 +15,8 @@ class SweepSurfaceData extends SurfaceData {
    *
    * @type {number}
    */
-  private type = GeomType[GeomType.DATA_TYPE_SURFACE_SWEEPSURFACE];
+  private readonly type = GeomType.DATA_TYPE_SURFACE_SWEEPSURFACE;
+  private readonly typename = GeomType[GeomType.DATA_TYPE_SURFACE_SWEEPSURFACE];
   /**
    * The section curve of this Sweep surface.
    *

@@ -49,7 +49,8 @@ class Vector2 {
    *
    * @type {number}
    */
-  private type = GeomType[GeomType.MATH_VECTOR2];
+  private readonly type = GeomType.MATH_VECTOR2;
+  private readonly typename = GeomType[GeomType.MATH_VECTOR2];
   /**
    * The x value of this vector.
    *
@@ -960,7 +961,8 @@ class Vector3 {
  *
  * @type {number}
  */
-  private type = GeomType[GeomType.MATH_VECTOR3];
+  private readonly type = GeomType.MATH_VECTOR3;
+  private readonly typename = GeomType[GeomType.MATH_VECTOR3];
   public x: number;
   public y: number;
   public z: number;
@@ -2202,7 +2204,8 @@ class Vector4 {
    *
    * @type {number}
    */
-  private type = GeomType[GeomType.MATH_VECTOR4];
+  private readonly type = GeomType.MATH_VECTOR4;
+  private readonly typename = GeomType[GeomType.MATH_VECTOR4];
   /**
    * The x value of this vector.
    *
@@ -3295,7 +3298,8 @@ class Euler {
    *
    * @type {number}
    */
-  private type = GeomType[GeomType.MATH_EULER];
+  private readonly type = GeomType.MATH_EULER;
+  private readonly typename = GeomType[GeomType.MATH_EULER];
   /**
    * The default Euler angle order.
    *
@@ -3751,7 +3755,8 @@ class Quaternion {
    *
    * @type {number}
    */
-  private type = GeomType[GeomType.MATH_QUATERNION];
+  private readonly type = GeomType.MATH_QUATERNION;
+  private readonly typename = GeomType[GeomType.MATH_QUATERNION];
   public _x: number;
   public _y: number;
   public _z: number;
@@ -4715,11 +4720,12 @@ class Quaternion {
  */
 class Matrix2 {
   /**
- * The type of data for unserialize.
- *
- * @type {number}
- */
-  private type = GeomType[GeomType.MATH_MATRIX2];
+   * The type of data for unserialize.
+   *
+   * @type {number}
+   */
+  private readonly type = GeomType.MATH_MATRIX2;
+  private readonly typename = GeomType[GeomType.MATH_MATRIX2];
   public elements = [
     1, 0,
     0, 1,
@@ -4932,11 +4938,12 @@ class Matrix2 {
  */
 class Matrix3 {
   /**
- * The type of data for unserialize.
- *
- * @type {number}
- */
-  private type = GeomType[GeomType.MATH_MATRIX3];
+   * The type of data for unserialize.
+   *
+   * @type {number}
+   */
+  private readonly type = GeomType.MATH_MATRIX3;
+  private readonly typename = GeomType[GeomType.MATH_MATRIX3];
   public elements = [
     1, 0, 0,
     0, 1, 0,
@@ -5670,11 +5677,12 @@ class Matrix3 {
  */
 class Matrix4 {
   /**
- * The type of data for unserialize.
- *
- * @type {number}
- */
-  private type = GeomType[GeomType.MATH_MATRIX4];
+   * The type of data for unserialize.
+   *
+   * @type {number}
+   */
+  private readonly type = GeomType.MATH_MATRIX4;
+  private readonly typename = GeomType[GeomType.MATH_MATRIX4];
   public elements = [
     1, 0, 0, 0,
     0, 1, 0, 0,

@@ -12,7 +12,8 @@ class Hyperbola2Data extends Curve2Data {
    *
    * @type {number}
    */
-  private type = GeomType[GeomType.DATA_TYPE_CURVE2_HYPERBOLA2];
+  private readonly type = GeomType.DATA_TYPE_CURVE2_HYPERBOLA2;
+  private readonly typename = GeomType[GeomType.DATA_TYPE_CURVE2_HYPERBOLA2];
   /**
    * The radius value of this Hyperbola2Data.
    *

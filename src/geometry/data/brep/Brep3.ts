@@ -25,7 +25,8 @@ class Vertice3 extends DataBase {
    *
    * @type {number}
    */
-  private type = GeomType[GeomType.DATA_TYPE_BREP3_VERTICE3];
+  private readonly type = GeomType.DATA_TYPE_BREP3_VERTICE3;
+  private readonly typename = GeomType[GeomType.DATA_TYPE_BREP3_VERTICE3];
   /**
    * point of Vertice.
    *
@@ -72,7 +73,8 @@ class Edge3 extends DataBase {
    *
    * @type {number}
    */
-  private type = GeomType[GeomType.DATA_TYPE_BREP3_EDGE3];
+  private readonly type = GeomType.DATA_TYPE_BREP3_EDGE3;
+  private readonly typename = GeomType[GeomType.DATA_TYPE_BREP3_EDGE3];
   /**
    * v0: begin vertice of Edge.
    *
@@ -225,7 +227,8 @@ class Coedge3 extends DataBase {
    *
    * @type {number}
    */
-  private type = GeomType[GeomType.DATA_TYPE_BREP3_COEDGE3];
+  private readonly type = GeomType.DATA_TYPE_BREP3_COEDGE3;
+  private readonly typename = GeomType[GeomType.DATA_TYPE_BREP3_COEDGE3];
   /**
    * Edge of Coedge.
    *
@@ -322,7 +325,8 @@ class Loop3 extends DataBase {
    *
    * @type {number}
    */
-  private type = GeomType[GeomType.DATA_TYPE_BREP3_LOOP3];
+  private readonly type = GeomType.DATA_TYPE_BREP3_LOOP3;
+  private readonly typename = GeomType[GeomType.DATA_TYPE_BREP3_LOOP3];
   /**
    * Coedges of Loop.
    */
@@ -373,7 +377,8 @@ class Face3 extends DataBase {
    *
    * @type {number}
    */
-  private type = GeomType[GeomType.DATA_TYPE_BREP3_FACE3];
+  private readonly type = GeomType.DATA_TYPE_BREP3_FACE3;
+  private readonly typename = GeomType[GeomType.DATA_TYPE_BREP3_FACE3];
   /**
    *  vertices of Face.
    */
@@ -477,7 +482,8 @@ class Digraph3 extends DataBase {
    *
    * @type {number}
    */
-  private type = GeomType[GeomType.DATA_TYPE_BREP3_DIGRAPH3];
+  private readonly type = GeomType.DATA_TYPE_BREP3_DIGRAPH3;
+  private readonly typename = GeomType[GeomType.DATA_TYPE_BREP3_DIGRAPH3];
   /**
    *  vertices of Face.
    */
@@ -530,7 +536,8 @@ class Shell3 extends DataBase {
    *
    * @type {number}
    */
-  private type = GeomType[GeomType.DATA_TYPE_BREP3_SHELL3];
+  private readonly type = GeomType.DATA_TYPE_BREP3_SHELL3;
+  private readonly typename = GeomType[GeomType.DATA_TYPE_BREP3_SHELL3];
   /**
    * faces of Shell.
    */
@@ -569,7 +576,8 @@ class Lump3 extends DataBase {
    *
    * @type {number}
    */
-  private type = GeomType[GeomType.DATA_TYPE_BREP3_LUMP3];
+  private readonly type = GeomType.DATA_TYPE_BREP3_LUMP3;
+  private readonly typename = GeomType[GeomType.DATA_TYPE_BREP3_LUMP3];
   /**
    * shells of Lump.
    */
@@ -610,7 +618,8 @@ class Body3 extends DataBase {
    *
    * @type {number}
    */
-  private type = GeomType[GeomType.DATA_TYPE_BREP3_BODY3];
+  private readonly type = GeomType.DATA_TYPE_BREP3_BODY3;
+  private readonly typename = GeomType[GeomType.DATA_TYPE_BREP3_BODY3];
   /**
    *  vertices of Body.
    */

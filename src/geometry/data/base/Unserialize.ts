@@ -142,7 +142,7 @@ export function unserialize(data: any): any[] {
     case GeomType[GeomType.DATA_TYPE_BREP3_LOOP3]: return [Loop3.Unserialize(data)];
     case GeomType[GeomType.DATA_TYPE_BREP3_FACE3]: return [Face3.Unserialize(data)];
 
-    // case GeomType[GeomType.DATA_TYPE_BREP3_DIGRAPH3]: return [dig.Unserialize(data)];
+    // case GeomType.DATA_TYPE_BREP3_DIGRAPH3]: return [dig.Unserialize(data)];
     case GeomType[GeomType.DATA_TYPE_BREP3_SHELL3]: return [Shell3.Unserialize(data)];
     case GeomType[GeomType.DATA_TYPE_BREP3_LUMP3]: return [Lump3.Unserialize(data)];
     case GeomType[GeomType.DATA_TYPE_BREP3_BODY3]: return [Body3.Unserialize(data)];

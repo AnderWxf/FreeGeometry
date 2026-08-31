@@ -14,7 +14,8 @@ class UvCurveData extends Curve3Data {
    *
    * @type {number}
    */
-  private type = GeomType[GeomType.DATA_TYPE_CURVE3_UVCURVE];
+  private readonly type = GeomType.DATA_TYPE_CURVE3_UVCURVE;
+  private readonly typename = GeomType[GeomType.DATA_TYPE_CURVE3_UVCURVE];
   /**
    * The 2d curve of this UvCurveData.
    * 2D curve in uv space of s1.

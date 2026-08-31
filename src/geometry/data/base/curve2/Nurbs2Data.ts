@@ -12,7 +12,8 @@ class Nurbs2Data extends Curve2Data {
    *
    * @type {number}
    */
-  private type = GeomType[GeomType.DATA_TYPE_CURVE2_NURBS2];
+  private readonly type = GeomType.DATA_TYPE_CURVE2_NURBS2;
+  private readonly typename = GeomType[GeomType.DATA_TYPE_CURVE2_NURBS2];
   /**
    * The contrls points of this Nurbs2Data.
    * use Vector3 to include weight info (z is weight)

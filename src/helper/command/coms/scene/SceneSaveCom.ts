@@ -1,3 +1,4 @@
+import { GeomType } from "../../../../core/Constents";
 import { Global } from "../../../../core/Global";
 import { type DocNode } from "../../../Doc";
 import type { UserData } from "../../../UserData";
@@ -20,7 +21,9 @@ class SceneSaveCom extends Command {
     for (let i = 0; i < os.length; i++) {
       const o = os[i] as THREE.Object3D;
       let userData = o.userData as UserData;
-      userData.detail = undefined
+      userData.detail = undefined;
+      // 使用string 保存type，便于直接阅读。
+      (userData as any).typename = GeomType[userData.type];
       data.push({ userData: userData });
     }
     // 1. 将数据对象转为格式化的 JSON 字符串

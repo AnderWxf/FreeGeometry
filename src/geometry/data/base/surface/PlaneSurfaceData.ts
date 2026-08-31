@@ -12,7 +12,8 @@ class PlaneSurfaceData extends SurfaceData {
    *
    * @type {number}
    */
-  private type = GeomType[GeomType.DATA_TYPE_SURFACE_PLANESURFACE];
+  private readonly type = GeomType.DATA_TYPE_SURFACE_PLANESURFACE;
+  private readonly typename = GeomType[GeomType.DATA_TYPE_SURFACE_PLANESURFACE];
   /**
    * Constructs a plane surface.
    *

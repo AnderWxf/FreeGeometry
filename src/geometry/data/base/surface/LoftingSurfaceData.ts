@@ -16,7 +16,8 @@ class LoftingSurfaceData extends SurfaceData {
    *
    * @type {number}
    */
-  private type = GeomType[GeomType.DATA_TYPE_SURFACE_LOFTINGSURFACE];
+  private readonly type = GeomType.DATA_TYPE_SURFACE_LOFTINGSURFACE;
+  private readonly typename = GeomType[GeomType.DATA_TYPE_SURFACE_LOFTINGSURFACE];
   /**
    * The section curve and t parameter of this Lofting surface.
    *

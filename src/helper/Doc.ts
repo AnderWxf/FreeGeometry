@@ -12,6 +12,18 @@ type DocNode = {
   userData: UserData,
 }
 
+function getEnumValue<T extends Record<string, string | number>>(
+  enumObj: T,
+  key: string
+): T[keyof T] | undefined {
+  // 检查 key 是否为枚举对象自身的属性
+  if (Object.prototype.hasOwnProperty.call(enumObj, key)) {
+    return enumObj[key as keyof T];
+  }
+  // 如果键名不存在，返回 undefined
+  return undefined;
+}
+
 function ImportJson(json: string): THREE.Object3D[] {
   let results: THREE.Object3D[] = [];
   const jsonData = JSON.parse(json);
@@ -30,13 +42,13 @@ function ImportJson(json: string): THREE.Object3D[] {
     if (originals.length == 1) {
       let original = originals[0];
       if (original instanceof Vector2) {
-        let geo = CreateAssistPoint({ p: original, c: userData.color });
+        let geo = CreateAssistPoint({ p: original, c: userData.color }, false);
         userData.original = new Point2Data(original);
         geo.userData = userData;
         results.push(geo);
       }
       if (original instanceof Point2Data) {
-        let geo = CreateAssistPoint({ p: original.pos, c: userData.color });
+        let geo = CreateAssistPoint({ p: original.pos, c: userData.color }, false);
         userData.original = original;
         geo.userData = userData;
         results.push(geo);

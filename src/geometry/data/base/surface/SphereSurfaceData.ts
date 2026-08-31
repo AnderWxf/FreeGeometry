@@ -12,7 +12,8 @@ class SphereSurfaceData extends SurfaceData {
    *
    * @type {number}
    */
-  private type = GeomType[GeomType.DATA_TYPE_SURFACE_SPHERESURFACE];
+  private readonly type = GeomType.DATA_TYPE_SURFACE_SPHERESURFACE;
+  private readonly typename = GeomType[GeomType.DATA_TYPE_SURFACE_SPHERESURFACE];
   /**
    * The radius value of this Sphere surface.
    *

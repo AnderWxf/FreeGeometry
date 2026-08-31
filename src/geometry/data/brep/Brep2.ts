@@ -22,7 +22,8 @@ class Vertice2 extends DataBase {
    *
    * @type {number}
    */
-  private type = GeomType[GeomType.DATA_TYPE_BREP2_VERTICE2];
+  private readonly type = GeomType.DATA_TYPE_BREP2_VERTICE2;
+  private readonly typename = GeomType[GeomType.DATA_TYPE_BREP2_VERTICE2];
   /**
    * point of Vertice.
    *
@@ -69,7 +70,8 @@ class Edge2 extends DataBase {
    *
    * @type {number}
    */
-  private type = GeomType[GeomType.DATA_TYPE_BREP2_EDGE2];
+  private readonly type = GeomType.DATA_TYPE_BREP2_EDGE2;
+  private readonly typename = GeomType[GeomType.DATA_TYPE_BREP2_EDGE2];
   /**
    * v0 of Edge. being.
    *
@@ -267,7 +269,8 @@ class Coedge2 extends DataBase {
    *
    * @type {number}
    */
-  private type = GeomType[GeomType.DATA_TYPE_BREP2_COEDGE2];
+  private readonly type = GeomType.DATA_TYPE_BREP2_COEDGE2;
+  private readonly typename = GeomType[GeomType.DATA_TYPE_BREP2_COEDGE2];
   /**
    * Edge of Coedge.
    *
@@ -363,7 +366,8 @@ class Loop2 extends DataBase {
    *
    * @type {number}
    */
-  private type = GeomType[GeomType.DATA_TYPE_BREP2_LOOP2];
+  private readonly type = GeomType.DATA_TYPE_BREP2_LOOP2;
+  private readonly typename = GeomType[GeomType.DATA_TYPE_BREP2_LOOP2];
   /**
    * Coedges of Loop.
    */
@@ -417,7 +421,8 @@ class Face2 extends DataBase {
    *
    * @type {number}
    */
-  private type = GeomType[GeomType.DATA_TYPE_BREP2_FACE2];
+  private readonly type = GeomType.DATA_TYPE_BREP2_FACE2;
+  private readonly typename = GeomType[GeomType.DATA_TYPE_BREP2_FACE2];
   /**
    *  vertices of Face.
    */
@@ -569,7 +574,8 @@ class Digraph2 extends DataBase {
    *
    * @type {number}
    */
-  private type = GeomType[GeomType.DATA_TYPE_BREP2_DIGRAPH2];
+  private readonly type = GeomType.DATA_TYPE_BREP2_DIGRAPH2;
+  private readonly typename = GeomType[GeomType.DATA_TYPE_BREP2_DIGRAPH2];
   /**
    *  vertices of Face.
    */

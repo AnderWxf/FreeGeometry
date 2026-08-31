@@ -17,19 +17,19 @@ enum GeomType {
 
   //绘制类型的最后一段必须和绘制命令的枚举值保持一致。
   // 二维曲线绘制类型
-  DRAW_CURVE2_L = 0,       // 两点直线段
-  DRAW_CURVE2_A = 1,       // 圆弧
-  DRAW_CURVE2_A3 = 2,      // 三点圆弧
-  DRAW_CURVE2_C = 3,       // 圆
-  DRAW_CURVE2_C3 = 4,      // 三点圆
-  DRAW_CURVE2_E = 5,       // 椭圆
-  DRAW_CURVE2_EA = 6,      // 椭圆弧
-  DRAW_CURVE2_HY = 7,      // 双曲线
-  DRAW_CURVE2_PA = 8,      // 抛物线
-  DRAW_CURVE2_PO = 9,      // 多段线
-  DRAW_CURVE2_NF = 10,     // Nurbs fitting
-  DRAW_CURVE2_NC = 11,     // Nurbs control
-  DRAW_CURVE2_RC = 12,     // REC：矩形
+  DRAW_CURVE2_L = 0,        // 两点直线段
+  DRAW_CURVE2_A = 1,        // 圆弧
+  DRAW_CURVE2_A3 = 2,       // 三点圆弧
+  DRAW_CURVE2_C = 3,        // 圆
+  DRAW_CURVE2_C3 = 4,       // 三点圆
+  DRAW_CURVE2_E = 5,        // 椭圆
+  DRAW_CURVE2_EA = 6,       // 椭圆弧
+  DRAW_CURVE2_HY = 7,       // 双曲线
+  DRAW_CURVE2_PA = 8,       // 抛物线
+  DRAW_CURVE2_PO = 9,       // 多段线
+  DRAW_CURVE2_NF = 10,      // Nurbs fitting
+  DRAW_CURVE2_NC = 11,      // Nurbs control
+  DRAW_CURVE2_RC = 12,      // REC：矩形
 
   // 三维曲线绘制类型
 
@@ -41,31 +41,31 @@ enum GeomType {
   DRAW_SURFACE_SEC = 34,    // 剖面
 
   // 三维曲面绘制类型
-  DRAW_SURFACE_PLA = 41,     // 空间平面
-  DRAW_SURFACE_SHP = 42,     // 球面
-  DRAW_SURFACE_ELL = 43,     // 椭球面
-  DRAW_SURFACE_CYL = 44,     // 圆柱面
-  DRAW_SURFACE_CON = 45,     // 圆锥面
-  DRAW_SURFACE_NUR = 46,     // Nurbs面
-  DRAW_SURFACE_STR = 47,     // 拉伸面
-  DRAW_SURFACE_ROT = 48,     // 旋转面
-  DRAW_SURFACE_SWE = 49,     // 扫掠面
-  DRAW_SURFACE_LOF = 50,     // 放样曲面
+  DRAW_SURFACE_PLA = 41,    // 空间平面
+  DRAW_SURFACE_SHP = 42,    // 球面
+  DRAW_SURFACE_ELL = 43,    // 椭球面
+  DRAW_SURFACE_CYL = 44,    // 圆柱面
+  DRAW_SURFACE_CON = 45,    // 圆锥面
+  DRAW_SURFACE_NUR = 46,    // Nurbs面
+  DRAW_SURFACE_STR = 47,    // 拉伸面
+  DRAW_SURFACE_ROT = 48,    // 旋转面
+  DRAW_SURFACE_SWE = 49,    // 扫掠面
+  DRAW_SURFACE_LOF = 50,    // 放样曲面
 
   // 三维实体绘制类型
-  DRAW_SOLID_HEXA = 60,    // 六面体
-  DRAW_SOLID_TETR = 61,    // 四面体
-  DRAW_SOLID_PRIS = 62,    // 棱柱体
-  DRAW_SOLID_PYRA = 63,    // 金字塔体
-  DRAW_SOLID_CYLI = 65,    // 圆柱体
-  DRAW_SOLID_CONE = 66,    // 圆锥体
-  DRAW_SOLID_TORU = 67,    // 圆环
-  DRAW_SOLID_ECYL = 69,    // 椭圆柱
-  DRAW_SOLID_ECON = 70,    // 椭圆锥
-  DRAW_SOLID_ETOR = 71,    // 椭圆环
-  DRAW_SOLID_STRE = 72,    // 拉伸体
-  DRAW_SOLID_ROTA = 73,    // 旋转体
-  DRAW_SOLID_SWEP = 74,    // 扫掠体
+  DRAW_SOLID_HEXA = 60,     // 六面体
+  DRAW_SOLID_TETR = 61,     // 四面体
+  DRAW_SOLID_PRIS = 62,     // 棱柱体
+  DRAW_SOLID_PYRA = 63,     // 金字塔体
+  DRAW_SOLID_CYLI = 65,     // 圆柱体
+  DRAW_SOLID_CONE = 66,     // 圆锥体
+  DRAW_SOLID_TORU = 67,     // 圆环
+  DRAW_SOLID_ECYL = 69,     // 椭圆柱
+  DRAW_SOLID_ECON = 70,     // 椭圆锥
+  DRAW_SOLID_ETOR = 71,     // 椭圆环
+  DRAW_SOLID_STRE = 72,     // 拉伸体
+  DRAW_SOLID_ROTA = 73,     // 旋转体
+  DRAW_SOLID_SWEP = 74,     // 扫掠体
   DRAW_SOLID_LOFT = 75,     // 放样体
 
   // 变换类型

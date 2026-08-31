@@ -11,7 +11,8 @@ class Point3Data extends DataBase {
    *
    * @type {number}
    */
-  private type = GeomType[GeomType.DATA_TYPE_POINT3];
+  private readonly type = GeomType.DATA_TYPE_POINT3;
+  private readonly typename = GeomType[GeomType.DATA_TYPE_POINT3];
 
   /**
    * The positon of this Point3Data.

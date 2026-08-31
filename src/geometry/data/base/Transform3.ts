@@ -11,8 +11,8 @@ class Transform3 {
    *
    * @type {number}
    */
-  private type = GeomType[GeomType.DATA_TYPE_TRANSFORM3];
-
+  private readonly type = GeomType.DATA_TYPE_TRANSFORM3;
+  private readonly typename = GeomType[GeomType.DATA_TYPE_TRANSFORM3];
   /**
    * The position value of this Transform3.
    *

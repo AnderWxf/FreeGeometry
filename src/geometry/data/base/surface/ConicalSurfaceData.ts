@@ -13,7 +13,8 @@ class ConicalSurfaceData extends SurfaceData {
    *
    * @type {number}
    */
-  private type = GeomType[GeomType.DATA_TYPE_SURFACE_CONICALSURFACE];
+  private readonly type = GeomType.DATA_TYPE_SURFACE_CONICALSURFACE;
+  private readonly typename = GeomType[GeomType.DATA_TYPE_SURFACE_CONICALSURFACE];
   /**
    * The radius at height value 1 of this conical surface.
    *
