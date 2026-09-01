@@ -9,6 +9,7 @@ import type { CommandExecuter } from "../../CommandExecuter";
 class ComReDo extends Command {
   constructor(executer: CommandExecuter, text: string) {
     super(executer, text);
+    this._isNeedHistory = false;
   }
 
   async exec(): Promise<void> {

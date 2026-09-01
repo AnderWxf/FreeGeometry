@@ -15,17 +15,25 @@ class SceneLoadCom extends Command {
     super(executer, text);
     this.olds = [];
     this.results = [];
+    this._isNeedRecord = false;
   }
   static this_: SceneLoadCom;
   static input_: HTMLInputElement;
   async exec() {
+    let str = this._text;
+    let paras = str.split(' ');
     SceneLoadCom.this_ = this;
     try {
       if (!SceneLoadCom.input_) {
         SceneLoadCom.input_ = document.createElement('input');
         SceneLoadCom.input_.type = 'file';
         SceneLoadCom.input_.hidden = true;
-        SceneLoadCom.input_.accept = '.json,application/json';
+        if (paras.length > 1) {
+          SceneLoadCom.input_.accept = paras[1] + ',application/json';
+        } else {
+          SceneLoadCom.input_.accept = '.json,application/json';
+        }
+
       }
       SceneLoadCom.input_.addEventListener('change', this.onLoaded);
       SceneLoadCom.input_.addEventListener('cancel', this.onCancel);
@@ -58,14 +66,24 @@ class SceneLoadCom extends Command {
       this.cancel();
       return;
     }
-    // 验证文件类型
-    if (!file.name.endsWith('.json') && file.type !== 'application/json') {
-      alert('请上传 JSON 文件');
-      this.cancel();
-      return;
+    if (paras.length > 1) {
+      // 验证文件类型
+      if (!file.name.endsWith(paras[1]) && file.type !== 'application/json') {
+        alert('请上传指定的 JSON 文件');
+        this.cancel();
+        return;
+      }
+    } else {
+      // 验证文件类型
+      if (!file.name.endsWith('.json') && file.type !== 'application/json') {
+        alert('请上传 JSON 文件');
+        this.cancel();
+        return;
+      }
     }
+
     Global.filename = file.name;
-    this._text = paras[0] + ' ' + file.name;
+    this_._text = paras[0] + ' ' + file.name;
     // 触发 React 组件更新（通过自定义事件）
     window.dispatchEvent(new CustomEvent('filenameChanged', { detail: Global.filename }));
     const reader = new FileReader();

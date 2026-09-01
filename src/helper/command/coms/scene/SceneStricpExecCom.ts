@@ -13,17 +13,25 @@ class SceneStricpExecCom extends Command {
     super(executer, text);
     this.results = [];
     this._comms = [];
+    this._isNeedRecord = false;
   }
   static this_: SceneStricpExecCom;
   static input_: HTMLInputElement;
   async exec() {
+    let str = this._text;
+    let paras = str.split(' ');
+
     SceneStricpExecCom.this_ = this;
     try {
       if (!SceneStricpExecCom.input_) {
         SceneStricpExecCom.input_ = document.createElement('input');
         SceneStricpExecCom.input_.type = 'file';
         SceneStricpExecCom.input_.hidden = true;
-        SceneStricpExecCom.input_.accept = '.fg.txt,application/text';
+        if (paras.length > 1) {
+          SceneStricpExecCom.input_.accept = paras[1] + ',application/json';
+        } else {
+          SceneStricpExecCom.input_.accept = '.fg.txt,application/text';
+        }
       }
       SceneStricpExecCom.input_.addEventListener('change', this.onLoaded);
       SceneStricpExecCom.input_.addEventListener('cancel', this.onCancel);
@@ -56,14 +64,24 @@ class SceneStricpExecCom extends Command {
       this.cancel();
       return;
     }
-    // 验证文件类型
-    if (!file.name.endsWith('.fg.txt') && file.type !== 'application/txt') {
-      alert('请上传 fg 文件');
-      this.cancel();
-      return;
+    if (paras.length > 1) {
+      // 验证文件类型
+      if (!file.name.endsWith(paras[1]) && file.type !== 'application/json') {
+        alert('请上传指定的 .fg.txt 文件');
+        this.cancel();
+        return;
+      }
+    } else {
+      // 验证文件类型
+      if (!file.name.endsWith('.fg.txt') && file.type !== 'application/txt') {
+        alert('请上传 .fg.txt 文件');
+        this.cancel();
+        return;
+      }
     }
+
     Global.filename = file.name;
-    this._text = paras[0] + ' ' + file.name;
+    this_._text = paras[0] + ' ' + file.name;
     // 触发 React 组件更新（通过自定义事件）
     window.dispatchEvent(new CustomEvent('filenameChanged', { detail: Global.filename }));
     const reader = new FileReader();

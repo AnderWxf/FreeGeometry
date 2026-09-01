@@ -462,8 +462,10 @@ class CommandExecuter {
   }
 
   recored(com: Command) {
-    this._history.push(com);
-    if (this._isRecord) {
+    if (com.isNeedHistory) {
+      this._history.push(com);
+    }
+    if (this._isRecord && com.isNeedRecord) {
       this._records.push(com.text + '\n');
     }
   }

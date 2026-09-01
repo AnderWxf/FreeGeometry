@@ -4,6 +4,7 @@ import { type DocNode } from "../../../Doc";
 import type { UserData } from "../../../UserData";
 import { Command } from "../../Command";
 import * as THREE from "three";
+import type { CommandExecuter } from "../../CommandExecuter";
 
 /**
  * Saveas command class.
@@ -11,6 +12,10 @@ import * as THREE from "three";
  */
 class SceneSaveasCom extends Command {
   static link: HTMLAnchorElement = null;
+  constructor(executer: CommandExecuter, text: string) {
+    super(executer, text);
+    this._isNeedRecord = false;
+  }
   async exec() {
     let str = this._text;
     let paras = str.split(' ');
@@ -30,7 +35,10 @@ class SceneSaveasCom extends Command {
     const jsonString = JSON.stringify(data, null, 2);
 
     let filename = 'Scene_' + new Date().toLocaleString() + '.json';
-    filename = filename.replace(/[\/\\:*?"<>|]/g, '_'); // 替换非法字符
+    filename = filename.replace(/[\/\\ :*?"<>|]/g, '_'); // 替换非法字符
+    if (paras.length > 1) {
+      filename = paras[1];
+    }
     Global.filename = filename;
     this._text = paras[0] + ' ' + filename;
     // 触发 React 组件更新（通过自定义事件）

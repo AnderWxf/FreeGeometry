@@ -31,9 +31,17 @@ class Command {
   protected _isCancel: boolean = false;
   protected _isDone: boolean = false;
   protected _executer: CommandExecuter;
+  protected _isNeedRecord: boolean = true;
+  protected _isNeedHistory: boolean = true;
   constructor(executer: CommandExecuter, text: string) {
     this._executer = executer;
     this._text = text;
+  }
+  get isNeedRecord(): boolean {
+    return this._isNeedRecord;
+  }
+  get isNeedHistory(): boolean {
+    return this._isNeedHistory;
   }
   get text(): string {
     return this._text;

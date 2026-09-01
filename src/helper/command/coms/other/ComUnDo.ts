@@ -12,6 +12,7 @@ import * as THREE from "three";
 class ComUnDo extends Command {
   constructor(executer: CommandExecuter, text: string) {
     super(executer, text);
+    this._isNeedHistory = false;
   }
 
   async exec(): Promise<void> {

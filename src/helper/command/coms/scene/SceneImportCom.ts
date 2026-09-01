@@ -13,6 +13,7 @@ class SceneImportCom extends Command {
   constructor(executer: CommandExecuter, text: string) {
     super(executer, text);
     this.results = [];
+    this._isNeedRecord = false;
   }
   static this_: SceneImportCom;
   static input_: HTMLInputElement;
@@ -27,7 +28,11 @@ class SceneImportCom extends Command {
         SceneImportCom.input_ = document.createElement('input');
         SceneImportCom.input_.type = 'file';
         SceneImportCom.input_.hidden = true;
-        SceneImportCom.input_.accept = '.json,application/json';
+        if (paras.length > 1) {
+          SceneImportCom.input_.accept = paras[1] + ',application/json';
+        } else {
+          SceneImportCom.input_.accept = '.json,application/json';
+        }
       }
       SceneImportCom.input_.addEventListener('change', this.onLoaded);
       SceneImportCom.input_.addEventListener('cancel', this.onCancel);
@@ -60,13 +65,22 @@ class SceneImportCom extends Command {
       this.cancel();
       return;
     }
-    // 验证文件类型
-    if (!file.name.endsWith('.json') && file.type !== 'application/json') {
-      alert('请上传 JSON 文件');
-      this.cancel();
-      return;
+    if (paras.length > 1) {
+      // 验证文件类型
+      if (!file.name.endsWith(paras[1]) && file.type !== 'application/json') {
+        alert('请上传指定的 JSON 文件');
+        this.cancel();
+        return;
+      }
+    } else {
+      // 验证文件类型
+      if (!file.name.endsWith('.json') && file.type !== 'application/json') {
+        alert('请上传 JSON 文件');
+        this.cancel();
+        return;
+      }
     }
-    this._text = paras[0] + ' ' + file.name;
+    this_._text = paras[0] + ' ' + file.name;
     const reader = new FileReader();
 
     reader.onload = function (e: any) {

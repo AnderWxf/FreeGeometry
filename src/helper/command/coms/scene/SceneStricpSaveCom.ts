@@ -1,5 +1,6 @@
 import { Global } from "../../../../core/Global";
 import { Command } from "../../Command";
+import type { CommandExecuter } from "../../CommandExecuter";
 
 /**
  * Stricp save command class.
@@ -7,16 +8,24 @@ import { Command } from "../../Command";
  */
 class SceneStricpSaveCom extends Command {
   static link: HTMLAnchorElement = null;
+  constructor(executer: CommandExecuter, text: string) {
+    super(executer, text);
+    this._isNeedRecord = false;
+  }
   async exec() {
     let str = this._text;
     let paras = str.split(' ');
     let records = Global.comExector.records;
 
     let filename = 'Stricp_' + new Date().toLocaleString() + '.fg.txt';
-    filename = filename.replace(/[\/\\:*?"<>|]/g, '_'); // 替换非法字符
+    filename = filename.replace(/[\/\\ :*?"<>|]/g, '_'); // 替换非法字符
     if (Global.filename) {
       filename = Global.filename.split('.')[0] + '.fg.txt';
     } else {
+      Global.filename = filename;
+    }
+    if (paras.length > 1) {
+      filename = paras[1];
       Global.filename = filename;
     }
     this._text = paras[0] + ' ' + filename;

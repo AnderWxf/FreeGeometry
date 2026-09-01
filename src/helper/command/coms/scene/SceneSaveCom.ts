@@ -4,6 +4,7 @@ import { type DocNode } from "../../../Doc";
 import type { UserData } from "../../../UserData";
 import { Command } from "../../Command";
 import * as THREE from "three";
+import type { CommandExecuter } from "../../CommandExecuter";
 
 /**
  * Save command class.
@@ -11,6 +12,10 @@ import * as THREE from "three";
  */
 class SceneSaveCom extends Command {
   static link: HTMLAnchorElement = null;
+  constructor(executer: CommandExecuter, text: string) {
+    super(executer, text);
+    this._isNeedRecord = false;
+  }
   async exec() {
     let str = this._text;
     let paras = str.split(' ');
@@ -28,12 +33,15 @@ class SceneSaveCom extends Command {
     }
     // 1. 将数据对象转为格式化的 JSON 字符串
     const jsonString = JSON.stringify(data, null, 2);
-
     let filename = 'Scene_' + new Date().toLocaleString() + '.json';
-    filename = filename.replace(/[\/\\:*?"<>|]/g, '_'); // 替换非法字符
+    filename = filename.replace(/[\/\\ :*?"<>|]/g, '_'); // 替换非法字符
     if (Global.filename) {
       filename = Global.filename.split('.')[0] + '.json';
     } else {
+      Global.filename = filename;
+    }
+    if (paras.length > 1) {
+      filename = paras[1];
       Global.filename = filename;
     }
     this._text = paras[0] + ' ' + filename;
