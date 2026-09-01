@@ -1,12 +1,15 @@
+import { Brep2Inter } from "../../geometry/algorithm/relation/intersection/Brep2Inter";
 import { Brep3Inter } from "../../geometry/algorithm/relation/intersection/Brep3Inter";
+import type { Edge2 } from "../../geometry/data/brep/Brep2";
 import type { Edge3 } from "../../geometry/data/brep/Brep3";
 
-export function process(input: any[]): any[] {
-  let edge1 = input[0].userData.original as Edge3;
-  let edge2 = input[1].userData.original as Edge3;
+export function process(edge1: Edge2, edge2: Edge2): any[] {
 
-  let resut = [];
-  let inters = Brep3Inter.EdgeXEdge(edge1, edge2, 1e-4, 1e-10);
+  let resut: any[] = [];
+  if (edge1 === null || edge2 === null) {
+    return resut;
+  }
+  let inters = Brep2Inter.EdgeXEdge(edge1, edge2, 1e-4, 1e-10);
   for (let i = 0; i < inters.length; i++) {
     let inter = inters[i];
     let p = inter.p;
@@ -18,7 +21,7 @@ export function process(input: any[]): any[] {
     };
     resut.push({ userData: userData });
   }
-  inters = Brep3Inter.EdgeXEdge(edge2, edge1, 1e-4, 1e-10);
+  inters = Brep2Inter.EdgeXEdge(edge2, edge1, 1e-4, 1e-10);
   for (let i = 0; i < inters.length; i++) {
     let inter = inters[i];
     let p = inter.p;
@@ -29,6 +32,6 @@ export function process(input: any[]): any[] {
       "original": p
     };
     resut.push({ userData: userData });
-  }  
+  }
   return resut;
 }

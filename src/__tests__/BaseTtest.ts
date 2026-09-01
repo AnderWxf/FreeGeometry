@@ -207,20 +207,15 @@ function ExecuteDescribeInsertPoint2(typeName: string, typeDir: string, process:
 }
 
 // 执行描述Object 3维交点集合
-function ExecuteDescribeInsertPoint3(typeName: string, typeDir: string, process: (input: any) => any) {
+function ExecuteDescribeInsertPoint3(typeName: string, typeDir: string, process: (edge1: Edge2, edge2: Edge2) => any) {
   let dir = __dirname;
   dir = dir.replace(/\\/g, '/').replace(/\/src/, '');
   describe(typeName, () => {
     const dataDir = path.join(dir, 'data', typeDir);
     const files = fs.readdirSync(dataDir);
     files.forEach(file => {
-      const testCases = DiscoverTestCases(typeDir + '/' + file);
-      // 如果没有找到测试用例，给出提示
-      if (testCases.length === 0) {
-        console.warn('⚠️ 未找到测试数据文件，请检查 data/ 目录');
-      }
       describe(file, () => {
-        const testCases = DiscoverTestCases(typeDir + '/' + file);
+        const testCases = DiscoverTestCasesInsertPoint2(typeDir + '/' + file);
         // 如果没有找到测试用例，给出提示
         if (testCases.length === 0) {
           console.warn('⚠️ 未找到测试数据文件，请检查 data/ 目录');
@@ -229,24 +224,71 @@ function ExecuteDescribeInsertPoint3(typeName: string, typeDir: string, process:
           let c = testCases[i];
           test(c.name, () => {
             const input = LoadScene(c.inputFile);
-            const expected = LoadScene(c.expectedFile) as [any];
-            const result = process(input) as [any];
-            // 交点距离判定，
-            for (let j = expected.length - 1; j >= 0; j--) {
-              let exp = expected[j].userData as UserData;
-              for (let k = result.length - 1; k >= 0; k--) {
-                let ret = result[k].userData as UserData;
-                if (exp.original instanceof Vector3
-                  && ret.original instanceof Vector3
-                  && exp.original.distanceTo(ret.original) < 1e-4
-                ) {
-                  result.splice(k, 1);
-                  expected.splice(j, 1);
-                  break;
+            // 获取所有的预设交点和需要求交的边
+            let expected: Array<any> = [];
+            let edge1: Edge2 = null;
+            let edge2: Edge2 = null;
+            for (let i = 0; i < input.length; i++) {
+              if (input[i].userData.original instanceof Vector2) {
+                expected.push(input[i]);
+              }
+              if (input[i].userData.original instanceof Point2Data) {
+                expected.push(input[i]);
+              }
+              if (input[i].userData.original instanceof Edge2) {
+                if (edge1 === null) {
+                  edge1 = input[i].userData.original;
+                  continue;
+                }
+                if (edge2 === null) {
+                  edge2 = input[i].userData.original;
+                  continue;
                 }
               }
             }
-            expect(IsCloseTo(result, expected, 1e-8)).toBe(true);
+
+            let tol = 1e-4;
+            const result = process(edge1, edge2) as [any];
+            if (result.length > 0) {
+              // 交点距离判定，
+              for (let j = result.length - 1; j >= 0; j--) {
+                let exp = result[j].userData as UserData;
+                for (let k = expected.length - 1; k >= 0; k--) {
+                  let ret = expected[k].userData as UserData;
+                  if (exp.original instanceof Vector2
+                    && ret.original instanceof Vector2
+                    && exp.original.distanceTo(ret.original) < tol
+                  ) {
+                    result.splice(j, 1);
+                    break;
+                  }
+                  else if (exp.original instanceof Point2Data
+                    && ret.original instanceof Vector2
+                    && exp.original.pos.distanceTo(ret.original) < tol
+                  ) {
+                    result.splice(j, 1);
+                    break;
+                  }
+                  else if (exp.original instanceof Point2Data
+                    && ret.original instanceof Point2Data
+                    && exp.original.pos.distanceTo(ret.original.pos) < tol
+                  ) {
+                    result.splice(j, 1);
+                    break;
+                  }
+                  else if (exp.original instanceof Vector2
+                    && ret.original instanceof Point2Data
+                    && exp.original.distanceTo(ret.original.pos) < tol
+                  ) {
+                    result.splice(j, 1);
+                    break;
+                  }
+                }
+              }
+              expect(IsCloseTo([], result, 1e-8)).toBe(true);
+            } else {
+              expect(IsCloseTo([], expected, 1e-8)).toBe(true);
+            }
           });
         }
       });
