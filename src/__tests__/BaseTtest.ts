@@ -6,7 +6,6 @@ import { unserialize } from '../geometry/data/base/Unserialize';
 import { isEqualWith } from 'lodash';
 import { describe, expect, test } from 'vitest';
 import { Vector2, Vector3 } from '../math/Math';
-import { vec2 } from 'three/src/nodes/TSL';
 import { Edge2 } from '../geometry/data/brep/Brep2';
 import { Point2Data } from '../geometry/data/base/Point2Data';
 
@@ -302,12 +301,8 @@ function ExecuteDescribeBools(typeName: string, typeDir: string, process: (input
   describe(typeName, () => {
     const dataDir = path.join(dir, 'data', typeDir);
     const files = fs.readdirSync(dataDir);
+
     files.forEach(file => {
-      const testCases = DiscoverTestCases(typeDir + '/' + file);
-      // 如果没有找到测试用例，给出提示
-      if (testCases.length === 0) {
-        console.warn('⚠️ 未找到测试数据文件，请检查 data/ 目录');
-      }
       describe(file, () => {
         const testCases = DiscoverTestCases(typeDir + '/' + file);
         // 如果没有找到测试用例，给出提示

@@ -51,7 +51,7 @@ class Arc3Algo extends Curve3Algo {
           ret.applyMatrix4(m);
           return ret;
         }
-      case 3:
+      case 2:
         {
           let m = this.dat.trans.makeLocalMatrix();
           let ret = new Vector3(-this.dat.radius.x * Math.cos(u), -this.dat.radius.y * Math.sin(u));
