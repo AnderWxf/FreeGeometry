@@ -1,154 +1,234 @@
 [
   {
     "userData": {
-      "type": 0,
+      "type": 254,
+      "typename": "DATA_TYPE_POINT2",
+      "canPick": true,
+      "isAssist": false,
+      "assistPoints": [],
+      "color": 11403055,
+      "original": {
+        "uuid": "be0db205-8ec6-4423-a377-4ffeb77b41d9",
+        "type": 254,
+        "typename": "DATA_TYPE_POINT2",
+        "pos": {
+          "type": -1,
+          "typename": "MATH_VECTOR2",
+          "x": -5.16551591728453,
+          "y": -1.4851927251209682
+        }
+      }
+    }
+  },
+  {
+    "userData": {
+      "type": 254,
+      "typename": "DATA_TYPE_POINT2",
+      "canPick": true,
+      "isAssist": false,
+      "assistPoints": [],
+      "color": 11403055,
+      "original": {
+        "uuid": "a583238f-2301-4309-872a-a75c90cd18ea",
+        "type": 254,
+        "typename": "DATA_TYPE_POINT2",
+        "pos": {
+          "type": -1,
+          "typename": "MATH_VECTOR2",
+          "x": -6.922070570934103,
+          "y": 14.467717028663323
+        }
+      }
+    }
+  },
+  {
+    "userData": {
+      "type": 254,
+      "typename": "DATA_TYPE_POINT2",
+      "canPick": true,
+      "isAssist": false,
+      "assistPoints": [],
+      "color": 11403055,
+      "original": {
+        "uuid": "e010ea36-910d-4b21-bc83-65fa622087ac",
+        "type": 254,
+        "typename": "DATA_TYPE_POINT2",
+        "pos": {
+          "type": -1,
+          "typename": "MATH_VECTOR2",
+          "x": -2.5503420337971745,
+          "y": 29.14629003811748
+        }
+      }
+    }
+  },
+  {
+    "userData": {
+      "type": 254,
+      "typename": "DATA_TYPE_POINT2",
+      "canPick": true,
+      "isAssist": false,
+      "assistPoints": [],
+      "color": 11403055,
+      "original": {
+        "uuid": "7da4294c-9947-42dc-97aa-a99a77c6097d",
+        "type": 254,
+        "typename": "DATA_TYPE_POINT2",
+        "pos": {
+          "type": -1,
+          "typename": "MATH_VECTOR2",
+          "x": 27.310686303590774,
+          "y": -11.233965520593948
+        }
+      }
+    }
+  },
+  {
+    "userData": {
+      "type": 254,
+      "typename": "DATA_TYPE_POINT2",
+      "canPick": true,
+      "isAssist": false,
+      "assistPoints": [],
+      "color": 11403055,
+      "original": {
+        "uuid": "3ba88712-7445-4e93-801f-c1231f948e77",
+        "type": 254,
+        "typename": "DATA_TYPE_POINT2",
+        "pos": {
+          "type": -1,
+          "typename": "MATH_VECTOR2",
+          "x": 14.24362093519786,
+          "y": -11.36090765753315
+        }
+      }
+    }
+  },
+  {
+    "userData": {
+      "type": 8,
       "canPick": true,
       "isAssist": false,
       "assistPoints": [
         {
           "p": {
             "type": -1,
-            "x": -4.085497835497838,
-            "y": 0.6628787878787877
+            "typename": "MATH_VECTOR2",
+            "x": 20.520880030657775,
+            "y": -11.579506110411835
           },
-          "c": 11403055
+          "c": 255
         },
         {
           "p": {
             "type": -1,
-            "x": 8.22510814666748,
-            "y": 3.828463315963745
+            "typename": "MATH_VECTOR2",
+            "x": -2.5503423808800614,
+            "y": 29.146289177724558
           },
-          "c": 3329330
+          "c": 255
         }
       ],
       "color": 16711680,
       "original": {
-        "uuid": "4d64df7e-ed65-45de-a2b8-8b99052744f9",
+        "uuid": "808b5d98-84e6-48da-b5ff-e43baa298bf3",
         "type": 296,
+        "typename": "DATA_TYPE_BREP2_EDGE2",
         "v0i": -1,
         "v1i": -1,
         "curvei": -1,
-        "u": {
-          "type": -1,
-          "x": 0,
-          "y": 12.711095352194294
-        },
         "curve": {
-          "uuid": "c5b87cec-3f1d-463d-ac43-76841879e81d",
+          "uuid": "b2d6e04f-c66d-41d0-8d29-c72054756f46",
           "trans": {
+            "type": 252,
+            "typename": "DATA_TYPE_TRANSFORM2",
             "pos": {
               "type": -1,
-              "x": -4.085497835497838,
-              "y": 0.6628787878787877
+              "typename": "MATH_VECTOR2",
+              "x": -4.062500000000003,
+              "y": -3.2031250000000027
             },
-            "rot": 0.2516899818667526,
+            "rot": -0.9340518719373974,
             "scale": {
               "type": -1,
+              "typename": "MATH_VECTOR2",
               "x": 1,
               "y": 1
             }
           },
-          "type": 257
+          "type": 259,
+          "typename": "DATA_TYPE_CURVE2_PARABOLA2",
+          "f": 7.708509288532315
+        },
+        "u": {
+          "type": -1,
+          "typename": "MATH_VECTOR2",
+          "x": 21.351720685599105,
+          "y": -25.11098367047707
+        }
+      },
+      "typename": "DRAW_CURVE2_PA"
+    }
+  },
+  {
+    "userData": {
+      "canPick": true,
+      "isAssist": false,
+      "color": 255,
+      "original": {
+        "uuid": "f4da9dff-4060-4a6e-9f5b-1ebf2046706d",
+        "type": 254,
+        "typename": "DATA_TYPE_POINT2",
+        "pos": {
+          "type": -1,
+          "typename": "MATH_VECTOR2",
+          "x": 20.520880030657775,
+          "y": -11.579506110411833
+        }
+      },
+      "type": 254,
+      "typename": "DATA_TYPE_POINT2"
+    }
+  },
+  {
+    "userData": {
+      "type": 254,
+      "typename": "DATA_TYPE_POINT2",
+      "canPick": true,
+      "isAssist": false,
+      "assistPoints": [],
+      "color": 11403055,
+      "original": {
+        "uuid": "a98ee1f8-6974-4a87-b4f5-07f9857802cb",
+        "type": 254,
+        "typename": "DATA_TYPE_POINT2",
+        "pos": {
+          "type": -1,
+          "typename": "MATH_VECTOR2",
+          "x": 4.852819057142749,
+          "y": -4.94284344501969
         }
       }
     }
   },
   {
     "userData": {
-      "type": -1,
+      "type": 254,
+      "typename": "DATA_TYPE_POINT2",
       "canPick": true,
       "isAssist": false,
       "assistPoints": [],
       "color": 11403055,
       "original": {
-        "type": -1,
-        "x": 1.2987012987013005,
-        "y": 3.5037878787878807
-      }
-    }
-  },
-  {
-    "userData": {
-      "type": -1,
-      "canPick": true,
-      "isAssist": false,
-      "assistPoints": [],
-      "color": 11403055,
-      "original": {
-        "type": -1,
-        "x": 4.139610389610392,
-        "y": 1.6639610389610389
-      }
-    }
-  },
-  {
-    "userData": {
-      "type": -1,
-      "canPick": true,
-      "isAssist": false,
-      "assistPoints": [],
-      "color": 11403055,
-      "original": {
-        "type": -1,
-        "x": 2.0792313666587607,
-        "y": 2.248094949242712
-      }
-    }
-  },
-  {
-    "userData": {
-      "type": -1,
-      "canPick": true,
-      "isAssist": false,
-      "assistPoints": [],
-      "color": 11403055,
-      "original": {
-        "type": -1,
-        "x": 8.22510814666748,
-        "y": 3.828463315963745
-      }
-    }
-  },
-  {
-    "userData": {
-      "type": -1,
-      "canPick": true,
-      "isAssist": false,
-      "assistPoints": [],
-      "color": 11403055,
-      "original": {
-        "type": -1,
-        "x": -4.085497835497838,
-        "y": 0.6628787878787877
-      }
-    }
-  },
-  {
-    "userData": {
-      "type": -1,
-      "canPick": true,
-      "isAssist": false,
-      "assistPoints": [],
-      "color": 11403055,
-      "original": {
-        "type": -1,
-        "x": 5.4653119731501665,
-        "y": 3.1188014194851883
-      }
-    }
-  },
-  {
-    "userData": {
-      "type": -1,
-      "canPick": true,
-      "isAssist": false,
-      "assistPoints": [],
-      "color": 11403055,
-      "original": {
-        "type": -1,
-        "x": -0.1065380609307689,
-        "y": 1.6860399351323365
+        "uuid": "c2257949-9642-4fb5-9162-39d650e39285",
+        "type": 254,
+        "typename": "DATA_TYPE_POINT2",
+        "pos": {
+          "type": -1,
+          "typename": "MATH_VECTOR2",
+          "x": -5.234078577064402,
+          "y": -5.799900106749712
+        }
       }
     }
   }
