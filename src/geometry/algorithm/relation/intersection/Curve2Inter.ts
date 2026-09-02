@@ -345,7 +345,7 @@ class Curve2Inter {
       if (c0.trans.pos.distanceTo(c1.trans.pos) < Math.min(c1.radius.x, c1.radius.y) - Math.max(c0.radius.x, c0.radius.y)) {
         return new Array<InterOfCurve2>();
       }
-      if (c0.trans.pos.distanceTo(c1.trans.pos) < tol0 && c0.radius.x == c0.radius.y && c1.radius.x == c1.radius.y) {
+      if (c0.trans.pos.distanceTo(c1.trans.pos) <= tol0 && c0.radius.x == c0.radius.y && c1.radius.x == c1.radius.y) {
         return new Array<InterOfCurve2>();
       }
       // if (Math.max(c0.radius.x, c0.radius.y) > Math.max(c1.radius.x, c1.radius.y)) {
@@ -440,7 +440,7 @@ class Curve2Inter {
       let isExist = false;
       for (let k = 0; k < ret.length; k++) {
         let exist = ret[k];
-        if (p.distanceTo(exist.p) < tol0) {
+        if (p.distanceTo(exist.p) <= tol0) {
           isExist = true;
           break;
         }
@@ -456,17 +456,17 @@ class Curve2Inter {
         }
         let g0 = c0a.g(inter.p);
         let g1 = c1a.g(inter.p);
-        if (Math.abs(g0) < tol1 && Math.abs(g1) < tol1) {
+        if (Math.abs(g0) <= tol1 && Math.abs(g1) <= tol1) {
           inter.u0 = c0a.u(inter.p); inter.u1 = c1a.u(inter.p);
           ret.push(inter);
         }
-        else if (Math.abs(g0) < tol1 /*&& Math.abs(g1) < 1*/) {
+        else if (Math.abs(g0) <= tol1 /*&& Math.abs(g1) < 1*/) {
           inter.u0 = c0a.u(inter.p);
           // Curve2Inter.Binary(c0a, c1a, inter, tol0, tol1);
           Curve2Inter.Newton(c0, c1, c0a, c1a, inter, tol0, tol1);
           g0 = c0a.g(inter.p);
           g1 = c1a.g(inter.p);
-          if (Math.abs(g0) < tol1 && Math.abs(g1) < tol1) {
+          if (Math.abs(g0) <= tol1 && Math.abs(g1) <= tol1) {
             if (!isExist(inter.p)) {
               inter.u0 = c0a.u(inter.p); inter.u1 = c1a.u(inter.p);
               ret.push(inter);
@@ -474,13 +474,13 @@ class Curve2Inter {
 
           }
         }
-        else if (Math.abs(g1) < tol1 /*&& Math.abs(g0) < 1*/) {
+        else if (Math.abs(g1) <= tol1 /*&& Math.abs(g0) < 1*/) {
           inter.u0 = c1a.u(inter.p);
           // Curve2Inter.Binary(c1a, c0a, inter, tol0, tol1);
           Curve2Inter.Newton(c0, c1, c0a, c1a, inter, tol0, tol1);
           g0 = c0a.g(inter.p);
           g1 = c1a.g(inter.p);
-          if (Math.abs(g0) < tol1 && Math.abs(g1) < tol1) {
+          if (Math.abs(g0) <= tol1 && Math.abs(g1) <= tol1) {
             if (!isExist(inter.p)) {
               inter.u0 = c0a.u(inter.p); inter.u1 = c1a.u(inter.p);
               ret.push(inter);
@@ -630,7 +630,7 @@ class Curve2Inter {
       //   let isFound = false;
       //   for (let k = intersX2.length - 1; k > -1; k--) {
       //     let p2 = intersX2[k];
-      //     if (p1.distanceTo(p2) < tol0) {
+      //     if (p1.distanceTo(p2) <= tol0) {
       //       inters.push({ p: p1, u0: null, u1: null });
       //       intersX2.splice(k, 1);
       //       isFound = true;
@@ -692,7 +692,7 @@ class Curve2Inter {
       let isExist = false;
       for (let k = 0; k < ret.length; k++) {
         let exist = ret[k];
-        if (p.distanceTo(exist.p) < tol0) {
+        if (p.distanceTo(exist.p) <= tol0) {
           isExist = true;
           break;
         }
@@ -708,16 +708,16 @@ class Curve2Inter {
         }
         let g0 = c0a.g(inter.p);
         let g1 = c1a.g(inter.p);
-        if (Math.abs(g0) < tol1 && Math.abs(g1) < tol1) {
+        if (Math.abs(g0) <= tol1 && Math.abs(g1) <= tol1) {
           inter.u0 = c0a.u(inter.p); inter.u1 = c1a.u(inter.p);
           ret.push(inter);
         }
-        else if (Math.abs(g0) < tol1) {
+        else if (Math.abs(g0) <= tol1) {
           inter.u0 = c0a.u(inter.p);
           Curve2Inter.Binary(c0a, c1a, inter, tol0, tol1);
           g0 = c0a.g(inter.p);
           g1 = c1a.g(inter.p);
-          if (Math.abs(g0) < tol1 && Math.abs(g1) < tol1) {
+          if (Math.abs(g0) <= tol1 && Math.abs(g1) <= tol1) {
             if (!isExist(inter.p)) {
               inter.u0 = c0a.u(inter.p); inter.u1 = c1a.u(inter.p);
               ret.push(inter);
@@ -725,12 +725,12 @@ class Curve2Inter {
 
           }
         }
-        else if (Math.abs(g1) < tol1) {
+        else if (Math.abs(g1) <= tol1) {
           inter.u0 = c1a.u(inter.p);
           Curve2Inter.Binary(c1a, c0a, inter, tol0, tol1);
           g0 = c0a.g(inter.p);
           g1 = c1a.g(inter.p);
-          if (Math.abs(g0) < tol1 && Math.abs(g1) < tol1) {
+          if (Math.abs(g0) <= tol1 && Math.abs(g1) <= tol1) {
             if (!isExist(inter.p)) {
               inter.u0 = c0a.u(inter.p); inter.u1 = c1a.u(inter.p);
               ret.push(inter);
@@ -992,7 +992,7 @@ class Curve2Inter {
         let p = c0a.p(u);
         let g = c1a.g(p);
         // 一般方程返回值是0，则恰好是交点。
-        if (Math.abs(g) < tol1 /*|| Math.abs(a.u - b.u) < tol1 && a.p.distanceTo(b.p) < tol0*/) {
+        if (Math.abs(g) <= tol1 /*|| Math.abs(a.u - b.u) <= tol1 && a.p.distanceTo(b.p) <= tol0*/) {
           ret.p = p;
           ret.u0 = u;
           ret.u1 = c1a.u(p);
@@ -1041,13 +1041,13 @@ class Curve2Inter {
       //     // }
       // }
       // 满足要求,找到了在c1上的点
-      if (Math.abs(dg) < tol1) {
+      if (Math.abs(dg) <= tol1) {
         ret.p = dp;
         ret.u1 = c1a.u(dp);
         break;
       }
       // 迭代结果不变，认为已经收敛，或者du已经很小。
-      else if (Math.abs(g - dg) < tol1 && du_ == du || Math.abs(du) < 1e-15) {
+      else if (Math.abs(g - dg) <= tol1 && du_ == du || Math.abs(du) < 1e-15) {
         ret.p = dp;
         ret.u1 = c1a.u(dp);
         break;
@@ -1115,7 +1115,7 @@ class Curve2Inter {
     let g = c1a.g(P);
     let fp = Curve2Inter.General(c0, P);
     let gp = Curve2Inter.General(c1, P);
-    if (Math.abs(fp) < tol1 && Math.abs(gp) < tol1) {
+    if (Math.abs(fp) <= tol1 && Math.abs(gp) <= tol1) {
       return;
     }
     while (true) {
@@ -1127,7 +1127,7 @@ class Curve2Inter {
         dg.x, dg.y
       );
       // 矩阵奇异，行列式≈0
-      if (Math.abs(JP_.determinant()) < tol1) {
+      if (Math.abs(JP_.determinant()) <= tol1) {
         return;
       }
       JP_.invert();
@@ -1140,28 +1140,28 @@ class Curve2Inter {
       let P_ = P.clone();
       P_.sub(FP);
       // 目标点已经在c0上，从c0上取一点。
-      if (Math.abs(f) < tol1 && Math.abs(g) > tol1) {
+      if (Math.abs(f) <= tol1 && Math.abs(g) > tol1) {
         P_ = c0a.p(c0a.u(P_));
       }
       // 目标点已经在c1上，从c1上取一点。
-      if (Math.abs(f) > tol1 && Math.abs(g) < tol1) {
+      if (Math.abs(f) > tol1 && Math.abs(g) <= tol1) {
         P_ = c1a.p(c1a.u(P_));
       }
       let f_ = c0a.g(P_);
       let g_ = c1a.g(P_);
       // 已经满足要求
-      if (Math.abs(f_) < tol1 && Math.abs(g_) < tol1) {
+      if (Math.abs(f_) <= tol1 && Math.abs(g_) <= tol1) {
         P.set(P_.x, P_.y);
         return;
       }
       // 已经发生扩张了
-      if (Math.abs(f) < tol1 && Math.abs(g) > tol1) {
+      if (Math.abs(f) <= tol1 && Math.abs(g) > tol1) {
         if (Math.abs(g_) > Math.abs(g)) {
           return;
         }
       }
       // 已经发生扩张了
-      if (Math.abs(f) > tol1 && Math.abs(g) < tol1) {
+      if (Math.abs(f) > tol1 && Math.abs(g) <= tol1) {
         if (Math.abs(f_) > Math.abs(f)) {
           return;
         }
@@ -1313,7 +1313,7 @@ class Curve2Inter {
         let p = algor0.p(u);
         let g = algor1.g(p);
         // 一般方程返回值是0，则恰好是交点。
-        if (Math.abs(g) < tol1 || Math.abs(a.u - b.u) < tol1 && a.p.distanceTo(b.p) < tol0) {
+        if (Math.abs(g) <= tol1 || Math.abs(a.u - b.u) <= tol1 && a.p.distanceTo(b.p) <= tol0) {
           ret.push({ p: p, u0: u, u1: algor1.u(p) });
           break;
         } else {
@@ -1340,7 +1340,7 @@ class Curve2Inter {
         let p = algor0.p(u);
         let g = algor1.g(p);
         // 一般方程返回值是0，则恰好是交点。
-        if (Math.abs(g) < tol1 /*|| Math.abs(du) < tol1 && a.p.distanceTo(p) < tol0*/) {
+        if (Math.abs(g) <= tol1 /*|| Math.abs(du) <= tol1 && a.p.distanceTo(p) <= tol0*/) {
           ret.push({ p: p, u0: u, u1: algor1.u(p) });
           break;
         } else {
@@ -1350,7 +1350,7 @@ class Curve2Inter {
             break;
           }
           // 迭代结果不变，认为已经收敛，或者du已经很小。
-          else if (Math.abs(g - a.g) < tol1 || Math.abs(du) < 1e-15) {
+          else if (Math.abs(g - a.g) <= tol1 || Math.abs(du) < 1e-15) {
             break;
           }
           // 扩张时，反向
@@ -1377,7 +1377,7 @@ class Curve2Inter {
       let cur = ps[i - 0];
       let nex = i < ps.length - 1 ? ps[i + 1] : undefined;
       // g值是0，则恰好是交点。
-      if (Math.abs(cur.g) < tol1) {
+      if (Math.abs(cur.g) <= tol1) {
         ret.push({ p: cur.p, u0: cur.u, u1: algor1.u(cur.p) });
         continue;
       }
@@ -1437,7 +1437,7 @@ class Curve2Inter {
     });
     for (let i = ret.length - 1; i > 0; i--) {
       for (let j = 0; j < i; j++) {
-        if (ret[i].p.distanceTo(ret[j].p) < tol0) {
+        if (ret[i].p.distanceTo(ret[j].p) <= tol0) {
           ret.splice(i, 1);
           break;
         }

@@ -387,7 +387,7 @@ class BrepMeshBuilder {
         [ub, ue] = [ue, ub];
       }
       let step = (ue - ub) / edgeSegment;
-      for (let u = ub, i = 0; i <= edgeSegment; u += step, i++) {
+      for (let u = ub, i = 0; i < edgeSegment; u += step, i++) {
         let p = algor.p(u);
         points.push(new THREE.Vector2(p.x, p.y));
       }
@@ -416,7 +416,7 @@ class BrepMeshBuilder {
           [ub, ue] = [ue, ub];
         }
         let step = (ue - ub) / edgeSegment;
-        for (let u = ub, i = 0; i <= edgeSegment; u += step, i++) {
+        for (let u = ub, i = 0; i < edgeSegment; u += step, i++) {
           let p = algor.p(u);
           holePoints.push(new THREE.Vector2(p.x, p.y));
         }
@@ -512,7 +512,7 @@ class BrepMeshBuilder {
           [ub, ue] = [ue, ub];
         }
         let step = (ue - ub) / edgeSegment;
-        for (let u = ub, i = 0; i <= edgeSegment; u += step, i++) {
+        for (let u = ub, i = 0; i < edgeSegment; u += step, i++) {
           let p = algor.p(u);
           points.push(new THREE.Vector2(p.x, p.y));
         }
@@ -541,7 +541,7 @@ class BrepMeshBuilder {
             [ub, ue] = [ue, ub];
           }
           let step = (ue - ub) / edgeSegment;
-          for (let u = ub, i = 0; i <= edgeSegment; u += step, i++) {
+          for (let u = ub, i = 0; i < edgeSegment; u += step, i++) {
             let p = algor.p(u);
             holePoints.push(new THREE.Vector2(p.x, p.y));
           }

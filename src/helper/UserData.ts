@@ -25,7 +25,7 @@ type UserData = {
   detail: number;   // 造型的精细等级（此值序列化是应该忽略）
   isAssist: boolean;// 是否是辅助物体
   assistPoints: AssisPoint2[];// 辅助点数组
-  original: DataBase | DataBase[]; // 原始数据对象
+  original: Vector2 | DataBase | DataBase[]; // 原始数据对象
 };
 
 function CreateGeomUserData(type: GeomType): UserData {
@@ -60,6 +60,16 @@ function CloneUserData(src: UserData): UserData {
       detail: Global.scene.detail // 以事件发生时的场景精细度为准
     } as UserData;
   } else if (src.original instanceof DataBase) {
+    return {
+      type: src.type,
+      canPick: src.canPick,
+      isAssist: src.isAssist,
+      assistPoints: src.assistPoints?.map(ap => ({ p: ap.p.clone(), c: ap.c })),
+      color: src.color,
+      original: src.original.clone(),
+      detail: Global.scene.detail // 以事件发生时的场景精细度为准
+    } as UserData;
+  } else {
     return {
       type: src.type,
       canPick: src.canPick,

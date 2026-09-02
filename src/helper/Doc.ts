@@ -43,7 +43,7 @@ function ImportJson(json: string): THREE.Object3D[] {
       let original = originals[0];
       if (original instanceof Vector2) {
         let geo = CreateAssistPoint({ p: original, c: userData.color }, false);
-        userData.original = new Point2Data(original);
+        userData.original = original;
         geo.userData = userData;
         results.push(geo);
       }

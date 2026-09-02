@@ -8,6 +8,7 @@ import { Face2Algo } from "../../../../geometry/algorithm/brep/Brep2Algo";
 import { ActPickObject } from "../../acts/ActPickObject";
 import { Vector2 } from "../../../../math/Math";
 import type { UserData } from "../../../UserData";
+import { Point2Data } from "../../../../geometry/data/base/Point2Data";
 
 
 /**
@@ -81,6 +82,9 @@ class CalculatePointFace2AutoCom extends Command {
         let userData = o.userData as UserData;
         if (userData.original instanceof Vector2) {
           this.points.push(userData.original);
+        }
+        if (userData.original instanceof Point2Data) {
+          this.points.push(userData.original.pos);
         }
       }
     }

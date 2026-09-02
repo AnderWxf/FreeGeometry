@@ -25,10 +25,10 @@ function toPeriod(u: number, period: number, tol1: number): number {
   while (u >= period) {
     u -= period;
   }
-  if (Math.abs(u) < tol1) {
+  if (Math.abs(u) <= tol1) {
     u = 0;
   }
-  if (Math.abs(u - period) < tol1) {
+  if (Math.abs(u - period) <= tol1) {
     u = 0;
   }
   return u

@@ -1,4 +1,6 @@
 import { Vector2 } from "../../../math/Math";
+import { PI2, PI_2 } from "../../../math/MathUtils";
+import { Arc2Data } from "../../data/base/curve2/Arc2Data";
 import { Line2Data } from "../../data/base/curve2/Line2Data";
 import type { Curve2Data } from "../../data/base/Curve2Data";
 import { Coedge2, Loop2, Vertice2, type Digraph2, type Edge2, type Face2 } from "../../data/brep/Brep2";
@@ -97,6 +99,15 @@ class Edge2Algo {
     return Math.abs(u - ur.x) <= tol1
       || Math.abs(u - ur.y) <= tol1
       || this.isInURange(u);
+  }
+  // u ∈ (a,b) ∈ [0,period)
+  isInURangePeriod(u: number, period: number, tol1: number): boolean {
+    return this._e.isInURangePeriod(u, period, tol1);
+  }
+
+  // u ∈ [a,b] ∈ [0,period)
+  isOnURangePeriod(u: number, period: number, tol1: number): boolean {
+    return this._e.isOnURangePeriod(u, period, tol1);
   }
 
   getBeginPoint(): Vector2 {
@@ -243,7 +254,12 @@ class Coedge2Algo {
    */
   isPointAtInner(p: Vector2, tol0: number, tol1: number): boolean {
     let u = this._curve.u(p);
-    return this.isInURange(u);
+
+    if (this.curve.dat instanceof Arc2Data) {
+      return this.isInURangePeriod(u, PI2, tol1);
+    } else {
+      return this.isInURange(u);
+    }
   }
 
   /**
@@ -314,6 +330,16 @@ class Coedge2Algo {
       || Math.abs(u - ur.y) <= tol1
       || this.isInURange(u);
   }
+  // u ∈ (a,b) ∈ [0,period)
+  isInURangePeriod(u: number, period: number, tol1: number): boolean {
+    return this._c.e.isInURangePeriod(u, period, tol1);
+  }
+
+  // u ∈ [a,b] ∈ [0,period)
+  isOnURangePeriod(u: number, period: number, tol1: number): boolean {
+    return this._c.e.isOnURangePeriod(u, period, tol1);
+  }
+
   get ur(): Vector2 {
     return this._c.e.ur;
   }
@@ -507,6 +533,10 @@ class Loop2Algo {
       let nextAlgo = algos[(i + count + 1) % count];
       for (let j = 0; j < inters.length; j++) {
         let inter = inters[j];
+        // 交点在射线原点
+        if (p.distanceTo(inter.p) <= tol0) {
+          continue;
+        }
         // 射线反向的直接跳过
         if (inter.u0 < 0) {
           continue;
@@ -514,16 +544,30 @@ class Loop2Algo {
         // 是否为穿透点判定：
         // A 如果交点在曲线内部，取曲线在交点上的切线，若射线与切线重合，则是切点，不认为是穿透点。
         let u = currAlgo.u;
-        if (!currAlgo.isOnUBoder(inter.u1, tol1) && currAlgo.isInURange(inter.u1)) {
-          let d = currAlgo.t(inter.u1);//切线方向
-          // 如果是水平切线，就是切点
-          if (Math.abs(d.y) <= tol1) {
-            //不认为是穿透点。
+        if (currAlgo.curve.dat instanceof Arc2Data) {
+          if (!currAlgo.isOnUBoder(inter.u1, tol1) && currAlgo.isInURangePeriod(inter.u1, PI2, tol1)) {
+            let d = currAlgo.t(inter.u1);//切线方向
+            // 如果是水平切线，就是切点
+            if (Math.abs(d.y) <= tol1) {
+              //不认为是穿透点。
+              continue;
+            }
+            cross.push(inter.p);
             continue;
           }
-          cross.push(inter.p);
-          continue;
+        } else {
+          if (!currAlgo.isOnUBoder(inter.u1, tol1) && currAlgo.isInURange(inter.u1)) {
+            let d = currAlgo.t(inter.u1);//切线方向
+            // 如果是水平切线，就是切点
+            if (Math.abs(d.y) <= tol1) {
+              //不认为是穿透点。
+              continue;
+            }
+            cross.push(inter.p);
+            continue;
+          }
         }
+
         // B 如果交点在曲线两端，取交点在前后两段很小范围内的两个点，检查两个点是否同在射线的左侧或者右侧。
         //   如果同在射线的左侧或者右侧，则是切点，不认为是穿透点。
         //取交点在射线前后很小范围内的两个点

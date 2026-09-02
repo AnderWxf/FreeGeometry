@@ -71,7 +71,7 @@ class ComTransform extends ComBatch {
       if (old.userData.type == GeomType.MATH_VECTOR2) {
         let point = (old.userData.original as Vector2).clone();
         point.applyMatrix3(trans);
-        userData.original = new Point2Data(point);
+        userData.original = point;
         let geo = this.createAssistPoint({ p: point, c: userData.color }, false);
         geo.userData = userData;
         geo.visible = true;
@@ -236,6 +236,31 @@ class ComTransform extends ComBatch {
             for (let i = 0; i < array.length; i++) {
               if (array[i] instanceof Vector2) {
                 let point = (array[i] as Vector2).clone();
+                point.applyMatrix3(trans);
+                let t = this.createAssistPoint({ p: point, c: THREE.Color.NAMES.gray }, false);
+                t.userData.type = old.userData.type;
+                t.name = "temp";
+                this.tempResults.push(t);
+              }
+            }
+          }
+        }
+        // 点
+        if (old.userData.type == GeomType.DATA_TYPE_POINT2) {
+          // 单例
+          if (old.userData.original instanceof Point2Data) {
+            let point = (old.userData.original.pos as Vector2).clone();
+            point.applyMatrix3(trans);
+            let t = this.createAssistPoint({ p: point, c: THREE.Color.NAMES.gray }, false);
+            t.name = "temp";
+            this.tempResults.push(t);
+          }
+          // 数组
+          if (old.userData.original instanceof Array) {
+            let array = old.userData.original as Array<any>;
+            for (let i = 0; i < array.length; i++) {
+              if (array[i] instanceof Point2Data) {
+                let point = (array[i] as Point2Data).pos.clone();
                 point.applyMatrix3(trans);
                 let t = this.createAssistPoint({ p: point, c: THREE.Color.NAMES.gray }, false);
                 t.userData.type = old.userData.type;

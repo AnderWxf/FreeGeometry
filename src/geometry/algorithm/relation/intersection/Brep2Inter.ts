@@ -1,4 +1,4 @@
-import { PI2, toRange } from "../../../../math/MathUtils";
+import { PI2, PI_2, toRange } from "../../../../math/MathUtils";
 import { Arc2Data } from "../../../data/base/curve2/Arc2Data";
 import { Hyperbola2Data } from "../../../data/base/curve2/Hyperbola2Data";
 import { Line2Data } from "../../../data/base/curve2/Line2Data";
@@ -132,11 +132,25 @@ class Brep2Inter {
             isValid0 = true;
             break;
           }
+          if (coedges0[l].curve.dat instanceof Arc2Data) {
+            isOn = coedges0[l].isOnURangePeriod(interp.u0, PI_2, tol1);
+          }
+          if (isOn) {
+            isValid0 = true;
+            break;
+          }
         }
         for (let l = 0; l < coedges1.length; l++) {
           let isOn = coedges1[l].isOnURange(interp.u1, tol1);
           if (isOn) {
             isValid1 = true;
+            break;
+          }
+          if (coedges1[l].curve.dat instanceof Arc2Data) {
+            isOn = coedges1[l].isOnURangePeriod(interp.u0, PI_2, tol1);
+          }
+          if (isOn) {
+            isValid0 = true;
             break;
           }
         }

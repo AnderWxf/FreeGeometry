@@ -1,4 +1,6 @@
 
+import { PI2 } from "../../../../math/MathUtils";
+import { Arc2Data } from "../../../data/base/curve2/Arc2Data";
 import { Digraph2, Face2, Loop2 } from "../../../data/brep/Brep2";
 import { Coedge2Algo, Digraph2Algo, Face2Algo, Face2Algos, Loop2Algo } from "../../brep/Brep2Algo";
 import { Brep2Inter, type InterOfFace2 } from "../intersection/Brep2Inter";
@@ -372,14 +374,26 @@ class Bool2 {
           for (let l = loopAlgo.coedges.length - 1; l > -1; l--) {
             let coedgeAlgo = loopAlgo.coedges[l];
             if (coedgeAlgo.curve.dat == c0) {
-              if (!coedgeAlgo.isOnUBoder(ip.u0, tol1) && coedgeAlgo.isInURange(ip.u0)) {
-                // 对coedge进行切割
-                let afterCoedge = coedgeAlgo.c.clone();
-                afterCoedge.e.umin = ip.u0;
-                coedgeAlgo.c.e.umax = ip.u0;
-                let afterCoedgeAlgo = new Coedge2Algo(afterCoedge, coedgeAlgo.f);
-                loopAlgo.coedges.splice(l + 1, 0, afterCoedgeAlgo);
+              if (coedgeAlgo.curve.dat instanceof Arc2Data) {
+                if (!coedgeAlgo.isOnUBoder(ip.u0, tol1) && coedgeAlgo.isInURangePeriod(ip.u0, PI2, tol1)) {
+                  // 对coedge进行切割
+                  let afterCoedge = coedgeAlgo.c.clone();
+                  afterCoedge.e.umin = ip.u0;
+                  coedgeAlgo.c.e.umax = ip.u0;
+                  let afterCoedgeAlgo = new Coedge2Algo(afterCoedge, coedgeAlgo.f);
+                  loopAlgo.coedges.splice(l + 1, 0, afterCoedgeAlgo);
+                }
+              } else {
+                if (!coedgeAlgo.isOnUBoder(ip.u0, tol1) && coedgeAlgo.isInURange(ip.u0)) {
+                  // 对coedge进行切割
+                  let afterCoedge = coedgeAlgo.c.clone();
+                  afterCoedge.e.umin = ip.u0;
+                  coedgeAlgo.c.e.umax = ip.u0;
+                  let afterCoedgeAlgo = new Coedge2Algo(afterCoedge, coedgeAlgo.f);
+                  loopAlgo.coedges.splice(l + 1, 0, afterCoedgeAlgo);
+                }
               }
+
             }
           }
         }
@@ -390,13 +404,24 @@ class Bool2 {
           for (let l = loopAlgo.coedges.length - 1; l > -1; l--) {
             let coedgeAlgo = loopAlgo.coedges[l];
             if (coedgeAlgo.curve.dat == c1) {
-              if (!coedgeAlgo.isOnUBoder(ip.u1, tol1) && coedgeAlgo.isInURange(ip.u1)) {
-                // 对coedge进行切割
-                let afterCoedge = coedgeAlgo.c.clone();
-                afterCoedge.e.umin = ip.u1;
-                coedgeAlgo.c.e.umax = ip.u1;
-                let afterCoedgeAlgo = new Coedge2Algo(afterCoedge, coedgeAlgo.f);
-                loopAlgo.coedges.splice(l + 1, 0, afterCoedgeAlgo);
+              if (coedgeAlgo.curve.dat instanceof Arc2Data) {
+                if (!coedgeAlgo.isOnUBoder(ip.u1, tol1) && coedgeAlgo.isInURangePeriod(ip.u1, PI2, tol1)) {
+                  // 对coedge进行切割
+                  let afterCoedge = coedgeAlgo.c.clone();
+                  afterCoedge.e.umin = ip.u1;
+                  coedgeAlgo.c.e.umax = ip.u1;
+                  let afterCoedgeAlgo = new Coedge2Algo(afterCoedge, coedgeAlgo.f);
+                  loopAlgo.coedges.splice(l + 1, 0, afterCoedgeAlgo);
+                }
+              } else {
+                if (!coedgeAlgo.isOnUBoder(ip.u1, tol1) && coedgeAlgo.isInURange(ip.u1)) {
+                  // 对coedge进行切割
+                  let afterCoedge = coedgeAlgo.c.clone();
+                  afterCoedge.e.umin = ip.u1;
+                  coedgeAlgo.c.e.umax = ip.u1;
+                  let afterCoedgeAlgo = new Coedge2Algo(afterCoedge, coedgeAlgo.f);
+                  loopAlgo.coedges.splice(l + 1, 0, afterCoedgeAlgo);
+                }
               }
             }
           }

@@ -1,15 +1,25 @@
 import { Face2Algo } from "../../geometry/algorithm/brep/Brep2Algo";
-import type { Face2 } from "../../geometry/data/brep/Brep2";
-import type { Vector2 } from "../../math/Math";
+import { Point2Data } from "../../geometry/data/base/Point2Data";
+import { Face2 } from "../../geometry/data/brep/Brep2";
+import type { UserData } from "../../helper/UserData";
+import { Vector2 } from "../../math/Math";
 
 export function process(input: any[]): any {
-  let face = input[0].userData.original as Face2;
-  let algo = new Face2Algo(face);
+  let algo: Face2Algo;
   let points: Vector2[] = [];
-  for (let i = 1; i < input.length; i++) {
-    let point = input[i].userData.original as Vector2;
-    points.push(point);
+  for (let i = 0; i < input.length; i++) {
+    let userData = input[i].userData as UserData;
+    if (userData.original instanceof Face2) {
+      algo = new Face2Algo(userData.original);
+    }
+    if (userData.original instanceof Vector2) {
+      points.push(userData.original);
+    }
+    if (userData.original instanceof Point2Data) {
+      points.push(userData.original.pos);
+    }
   }
+
   let ai: Object[] = [];
   let ab: Object[] = [];
   let ao: Object[] = [];
