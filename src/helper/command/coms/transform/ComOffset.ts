@@ -1,4 +1,3 @@
-import { Global } from "../../../../core/Global";
 import { Matrix3, Vector2 } from "../../../../math/Math";
 import type { CommandExecuter } from "../../CommandExecuter";
 import { ComTransform } from "./ComTransform";

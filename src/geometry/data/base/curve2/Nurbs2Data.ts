@@ -52,11 +52,31 @@ class Nurbs2Data extends Curve2Data {
   }
 
   /**
-   * Returns a new Nurbs2Data with copied values from this instance.
+   * Returns a new Nurbs2Data with clone values from this instance.
    *
    * @return {Nurbs2Data} A clone of this instance.
    */
   override clone() {
+    let result = super.clone() as Nurbs2Data;
+    result.trans = this.trans.clone();
+    let controls = new Array<Vector3>();
+    let knots = new Array<number>();
+    for (let i = 0; i < this.controls.length; i++) {
+      controls.push(this.controls[i].clone());
+    }
+    knots.push(...this.knots);
+    result.controls = controls;
+    result.knots = knots;
+    result.degree = this.degree;
+    return result;
+  }
+
+  /**
+   * Returns a new Nurbs2Data with copied values from this instance.
+   *
+   * @return {Nurbs2Data} A copy of this instance.
+   */
+  override copy() {
     let controls = new Array<Vector3>();
     let knots = new Array<number>();
     for (let i = 0; i < this.controls.length; i++) {

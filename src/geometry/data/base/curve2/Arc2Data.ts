@@ -33,11 +33,23 @@ class Arc2Data extends Curve2Data {
     this.radius = radius;
   }
   /**
-   * Returns a new Arc2Data with copied values from this instance.
+   * Returns a new Arc2Data with clone values from this instance.
    *
    * @return {Arc2Data} A clone of this instance.
    */
   override clone() {
+    let result = super.clone() as Arc2Data;
+    result.trans = this.trans.clone();
+    result.radius = this.radius.clone();
+    return result;
+  }
+
+  /**
+   * Returns a new Arc2Data with copied values from this instance.
+   *
+   * @return {Arc2Data} A copy of this instance.
+   */
+  override copy() {
     return new Arc2Data(this.trans.clone(), this.radius.clone());
   }
 

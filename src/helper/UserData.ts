@@ -89,7 +89,6 @@ function CopyUserData(src: UserData, des: UserData): void {
   des.isAssist = src.isAssist;
   des.assistPoints = src.assistPoints?.map(ap => ({ p: ap.p.clone(), c: ap.c }));
   des.color = src.color;
-  des.original = src.original;
   des.detail = Global.scene.detail;// 以事件发生时的场景精细度为准
 }
 

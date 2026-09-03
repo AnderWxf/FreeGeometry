@@ -7,33 +7,45 @@ import { Transform3 } from "./Transform3";
  * 
  */
 class Curve3Data extends DataBase {
-    /**
-     * The transfrom value of this Curve3Data.
-     *
-     * @type {Transform3}
-     */
-    public trans: Transform3;
+  /**
+   * The transfrom value of this Curve3Data.
+   *
+   * @type {Transform3}
+   */
+  public trans: Transform3;
 
-    /**
-     * Constructs a new 3D Transfrom.
-     *
-     * @param {Vector3} [position=(0,0,0)] - The position value of this Transfrom.
-     * @param {rotation} [rotation=(0,0,0)] - The rotation value of this Transfrom.
-     * @param {number} [scale=1] - The rotation value of this Transfrom.
-     */
-    constructor(trans = new Transform3()) {
-        super();
-        this.trans = trans;
-    }
+  /**
+   * Constructs a new 3D Transfrom.
+   *
+   * @param {Vector3} [position=(0,0,0)] - The position value of this Transfrom.
+   * @param {rotation} [rotation=(0,0,0)] - The rotation value of this Transfrom.
+   * @param {number} [scale=1] - The rotation value of this Transfrom.
+   */
+  constructor(trans = new Transform3()) {
+    super();
+    this.trans = trans;
+  }
 
-    /**
-     * Returns a new Curve3Data with copied values from this instance.
-     *
-     * @return {Curve3Data} A clone of this instance.
-     */
-    override clone() {
-        return new Curve3Data(this.trans.clone());
-    }
+  /**
+   * Returns a new Curve3Data with clone values from this instance.
+   *
+   * @return {Curve3Data} A clone of this instance.
+   */
+  override clone() {
+    let result = super.clone() as Curve3Data;
+    result.trans = this.trans.clone();
+    return result;
+  }
+
+  /**
+   * Returns a new Curve3Data with copied values from this instance.
+   *
+   * @return {Curve3Data} A copy of this instance.
+   */
+  override copy() {
+    return new Curve3Data(this.trans.clone());
+  }  
+  
 }
 
 export { Curve3Data };

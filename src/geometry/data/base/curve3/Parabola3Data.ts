@@ -33,13 +33,25 @@ class Parabola3Data extends Curve3Data {
   }
 
   /**
-   * Returns a new Parabola3Data with copied values from this instance.
+   * Returns a new Parabola3Data with clone values from this instance.
    *
    * @return {Parabola3Data} A clone of this instance.
    */
   override clone() {
-    return new Parabola3Data(this.trans.clone(), this.f);
+    let result = super.clone() as Parabola3Data;
+    result.trans = this.trans.clone();
+    result.f = this.f;
+    return result;
   }
+
+  /**
+   * Returns a new Parabola3Data with copied values from this instance.
+   *
+   * @return {Parabola3Data} A copy of this instance.
+   */
+  override copy() {
+    return new Parabola3Data(this.trans.clone(), this.f);
+  }    
 
   /**
    * Returns a new Parabola3Data with unserialize data.

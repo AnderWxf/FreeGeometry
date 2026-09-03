@@ -32,13 +32,25 @@ class Parabola2Data extends Curve2Data {
   }
 
   /**
-   * Returns a new Parabola2Data with copied values from this instance.
+   * Returns a new Parabola2Data with clone values from this instance.
    *
    * @return {Parabola2Data} A clone of this instance.
    */
   override clone() {
-    return new Parabola2Data(this.trans.clone(), this.f);
+    let result = super.clone() as Parabola2Data;
+    result.trans = this.trans.clone();
+    result.f = this.f;
+    return result;
   }
+
+  /**
+   * Returns a new Parabola2Data with copied values from this instance.
+   *
+   * @return {Parabola2Data} A copy of this instance.
+   */
+  override copy() {
+    return new Parabola2Data(this.trans.clone(), this.f);
+  }  
 
   /**
    * Returns a new Parabola2Data with unserialize data.

@@ -230,7 +230,7 @@ class Vector2 {
   }
 
   /**
-   * Returns a new vector with copied values from this instance.
+   * Returns a new vector with clone values from this instance.
    *
    * @return {Vector2} A clone of this instance.
    */
@@ -1108,7 +1108,7 @@ class Vector3 {
   }
 
   /**
-   * Returns a new vector with copied values from this instance.
+   * Returns a new vector with clone values from this instance.
    *
    * @return {Vector3} A clone of this instance.
    */
@@ -2464,7 +2464,7 @@ class Vector4 {
   }
 
   /**
-   * Returns a new vector with copied values from this instance.
+   * Returns a new vector with clone values from this instance.
    *
    * @return {Vector4} A clone of this instance.
    */
@@ -3446,7 +3446,7 @@ class Euler {
   }
 
   /**
-   * Returns a new Euler instance with copied values from this instance.
+   * Returns a new Euler instance with clone values from this instance.
    *
    * @return {Euler} A clone of this instance.
    */
@@ -4022,7 +4022,7 @@ class Quaternion {
   }
 
   /**
-   * Returns a new quaternion with copied values from this instance.
+   * Returns a new quaternion with clone values from this instance.
    *
    * @return {Quaternion} A clone of this instance.
    */
@@ -4817,7 +4817,7 @@ class Matrix2 {
   }
 
   /**
-   * Returns a matrix with copied values from this instance.
+   * Returns a matrix with clone values from this instance.
    *
    * @return {Matrix2} A clone of this instance.
    */
@@ -5625,7 +5625,7 @@ class Matrix3 {
   }
 
   /**
-   * Returns a matrix with copied values from this instance.
+   * Returns a matrix with clone values from this instance.
    *
    * @return {Matrix3} A clone of this instance.
    */
@@ -5819,7 +5819,7 @@ class Matrix4 {
   }
 
   /**
-   * Returns a matrix with copied values from this instance.
+   * Returns a matrix with clone values from this instance.
    *
    * @return {Matrix4} A clone of this instance.
    */
@@ -7281,7 +7281,7 @@ class Line3 {
   }
 
   /**
-   * Returns a new line segment with copied values from this instance.
+   * Returns a new line segment with clone values from this instance.
    *
    * @return {Line3} A clone of this instance.
    */
@@ -7658,7 +7658,7 @@ class Plane {
   }
 
   /**
-   * Returns a new plane with copied values from this instance.
+   * Returns a new plane with clone values from this instance.
    *
    * @return {Plane} A clone of this instance.
    */
@@ -7800,7 +7800,7 @@ class Cylindrical {
   }
 
   /**
-   * Returns a new cylindrical with copied values from this instance.
+   * Returns a new cylindrical with clone values from this instance.
    *
    * @return {Cylindrical} A clone of this instance.
    */
@@ -8457,7 +8457,7 @@ class Ray {
   }
 
   /**
-   * Returns a new ray with copied values from this instance.
+   * Returns a new ray with clone values from this instance.
    *
    * @return {Ray} A clone of this instance.
    */
@@ -8855,7 +8855,7 @@ class Sphere {
   }
 
   /**
-   * Returns a new sphere with copied values from this instance.
+   * Returns a new sphere with clone values from this instance.
    *
    * @return {Sphere} A clone of this instance.
    */
@@ -9050,7 +9050,7 @@ class Spherical {
   }
 
   /**
-   * Returns a new spherical with copied values from this instance.
+   * Returns a new spherical with clone values from this instance.
    *
    * @return {Spherical} A clone of this instance.
    */
@@ -9353,7 +9353,7 @@ class Triangle {
   }
 
   /**
-   * Returns a new triangle with copied values from this instance.
+   * Returns a new triangle with clone values from this instance.
    *
    * @return {Triangle} A clone of this instance.
    */
@@ -9708,7 +9708,7 @@ class Box2 {
   }
 
   /**
-   * Returns a new box with copied values from this instance.
+   * Returns a new box with clone values from this instance.
    *
    * @return {Box2} A clone of this instance.
    */
@@ -10158,7 +10158,7 @@ class Box3 {
   // }
 
   /**
-   * Returns a new box with copied values from this instance.
+   * Returns a new box with clone values from this instance.
    *
    * @return {Box3} A clone of this instance.
    */

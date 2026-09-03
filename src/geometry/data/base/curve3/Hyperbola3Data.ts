@@ -33,13 +33,25 @@ class Hyperbola3Data extends Curve3Data {
   }
 
   /**
-   * Returns a new Hyperbola3Data with copied values from this instance.
+   * Returns a new Hyperbola3Data with clone values from this instance.
    *
    * @return {Hyperbola3Data} A clone of this instance.
    */
   override clone() {
-    return new Hyperbola3Data(this.trans.clone(), this.radius.clone());
+    let result = super.clone() as Hyperbola3Data;
+    result.trans = this.trans.clone();
+    result.radius = this.radius.clone();
+    return result;
   }
+
+  /**
+   * Returns a new Hyperbola3Data with copied values from this instance.
+   *
+   * @return {Hyperbola3Data} A copy of this instance.
+   */
+  override copy() {
+    return new Hyperbola3Data(this.trans.clone(), this.radius.clone());
+  }    
 
   /**
    * Returns a new Hyperbola3Data with unserialize data.

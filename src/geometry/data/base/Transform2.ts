@@ -128,12 +128,21 @@ class Transform2 {
   // }
 
   /**
-   * Returns a new Transform2 with copied values from this instance.
+   * Returns a new Transform2 with clone values from this instance.
    *
    * @return {Transform2} A clone of this instance.
    */
   clone() {
     return new Transform2(this.pos.clone(), this.rot, this.scale.clone(), this.parent);
+  }
+
+  /**
+   * Returns a new Transform2 with copied values from this instance.
+   *
+   * @return {Transform2} A copy of this instance.
+   */
+  copy() {
+    return this.clone();
   }
 
   /**

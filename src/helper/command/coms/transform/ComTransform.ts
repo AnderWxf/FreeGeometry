@@ -10,27 +10,38 @@ import { ComBatch } from "../ComBatch";
 import { Brep2Builder } from "../../../../geometry/algorithm/builder/Brep2Builder";
 import type { Transform2 } from "../../../../geometry/data/base/Transform2";
 import { GeomType } from "../../../../core/Constents";
-import { CloneUserData, CopyUserData, type UserData } from "../../../UserData";
+import { CloneUserData, type UserData } from "../../../UserData";
 import { Point2Data } from "../../../../geometry/data/base/Point2Data";
 import { DataBase } from "../../../../geometry/data/DataBase";
+import type { CommandExecuter } from "../../CommandExecuter";
+import { v4 as uuidv4 } from 'uuid';
 
 /**
  * Transform command class.
- * 格式：命令类型 begin.x begin.y end.x end.y uuid0 uuid1...
+ * 格式：命令类型 begin.x begin.y end.x end.y n uuid0 uuid1...
  */
 class ComTransform extends ComBatch {
   begin: Vector2;
   end: Vector2;
+  constructor(executer: CommandExecuter, text: string) {
+    super(executer, text);
+  }
   override async exec(): Promise<void> {
     let str = this._text;
     let paras = str.split(' ');
+    let n = 0;
 
     if (paras.length >= 5) {
       // 创建一个直线段
       this.begin = new Vector2(new Number(paras[1]).valueOf(), new Number(paras[2]).valueOf());
       this.end = new Vector2(new Number(paras[3]).valueOf(), new Number(paras[4]).valueOf());
+
       if (paras.length >= 6) {
-        let objs = Global.scene.getObjectsByUUIDs(paras.slice(5));
+        n = new Number(paras[5]).valueOf();
+      }
+
+      if (paras.length >= 7) {
+        let objs = Global.scene.getObjectsByUUIDs(paras.slice(6, 6 + n));
         this.olds.push(...objs);
       } else {
         if (Global.select.selectedObjects.length > 0) {
@@ -62,8 +73,9 @@ class ComTransform extends ComBatch {
       if (this._isCancel || act_pick_end.isCancel) { this.cancel(); return; }
       this.end = new Vector2(act_pick_end.result.x, act_pick_end.result.y);
     }
+    n = 0;
     let trans = this.makeTransfrom(this.begin, this.end);
-    // 创建n个线段
+    // 创建n个对象
     for (let i = 0; i < this.olds.length; i++) {
       let old = this.olds[i];
       let userData = CloneUserData(old.userData as UserData);
@@ -79,8 +91,17 @@ class ComTransform extends ComBatch {
       }
       // 几何点
       else if (old.userData.type == GeomType.DATA_TYPE_POINT2) {
-        let point = (old.userData.original as Point2Data).clone();
-        point.uuid = old.userData.original.uuid;
+        n++;
+        let point: Point2Data;
+        if (!this.isDeleteOld) {
+          point = (old.userData.original as Point2Data).copy();
+          // 以指定新的uuid
+          if (paras.length >= 6 + n) {
+            point.uuid = paras[6 + n];
+          }
+        } else {
+          point = (old.userData.original as Point2Data).clone();
+        }
         point.pos.applyMatrix3(trans);
         userData.original = point;
         let geo = this.createAssistPoint({ p: point.pos, c: userData.color }, false);
@@ -95,9 +116,18 @@ class ComTransform extends ComBatch {
           let array = old.userData.original as Array<any>;
           let edges: Edge2[] = [];
           for (let i = 0; i < array.length; i++) {
+            n++;
             if (array[i] instanceof Edge2) {
-              let edge = (array[i] as Edge2).clone();
-              edge.uuid = (array[i] as Edge2).uuid;
+              let edge: Edge2;
+              if (!this.isDeleteOld) {
+                edge = (array[i] as Edge2).copy();
+                // 以指定新的uuid
+                if (paras.length >= 6 + n) {
+                  edge.uuid = paras[6 + n];
+                }
+              } else {
+                edge = (array[i] as Edge2).clone();
+              }
               this.appTransfrom(edge.curve.trans, trans);
               edges.push(edge);
             }
@@ -115,8 +145,17 @@ class ComTransform extends ComBatch {
         }
         // 单例
         if (old.userData.original instanceof Edge2) {
-          let edge = old.userData.original.clone();
-          edge.uuid = old.userData.original.uuid;
+          n++;
+          let edge: Edge2;
+          if (!this.isDeleteOld) {
+            edge = old.userData.original.copy();
+            // 以指定新的uuid
+            if (paras.length >= 6 + n) {
+              edge.uuid = paras[6 + n];
+            }
+          } else {
+            edge = old.userData.original.clone();
+          }
           this.appTransfrom(edge.curve.trans, trans);
           userData.original = edge;
           let geo = BrepMeshBuilder.BuildEdge2Mesh(edge, userData.color);
@@ -137,9 +176,18 @@ class ComTransform extends ComBatch {
           let array = old.userData.original as Array<any>;
           let faces: Face2[] = [];
           for (let i = 0; i < array.length; i++) {
+            n++;
             if (array[i] instanceof Face2) {
-              let face = (array[i] as Face2).clone();
-              face.uuid = array[i].uuid;
+              let face: Face2;
+              if (!this.isDeleteOld) {
+                face = (array[i] as Face2).copy();
+                // 以指定新的uuid
+                if (paras.length >= 6 + n) {
+                  face.uuid = paras[6 + n];
+                }
+              } else {
+                face = (array[i] as Face2).clone();
+              }
               face.curves.forEach((curve) => {
                 this.appTransfrom(curve.trans, trans);
               });
@@ -159,8 +207,17 @@ class ComTransform extends ComBatch {
         }
         // 单例
         if (old.userData.original instanceof Face2) {
-          let face = (old.userData.original as Face2).clone() as Face2;
-          face.uuid = old.userData.original.uuid;
+          n++;
+          let face: Face2;
+          if (!this.isDeleteOld) {
+            face = old.userData.original.copy();
+            // 以指定新的uuid
+            if (paras.length >= 6 + n) {
+              face.uuid = paras[6 + n];
+            }
+          } else {
+            face = old.userData.original.clone();
+          }
           for (let i = 0; i < face.curves.length; i++) {
             this.appTransfrom(face.curves[i].trans, trans);
           }
@@ -181,9 +238,22 @@ class ComTransform extends ComBatch {
 
     this._text = paras[0]
       + ' ' + this.begin.x + ' ' + this.begin.y
-      + ' ' + this.end.x + ' ' + this.end.y;
+      + ' ' + this.end.x + ' ' + this.end.y
+      + ' ' + n;
     for (let i = 0; i < this.olds.length; i++) {
-      let userData = CloneUserData(this.olds[i].userData as UserData);
+      let userData = this.olds[i].userData as UserData;
+      if (userData.original instanceof DataBase) {
+        this._text += ' ' + userData.original.uuid;
+      }
+      if (userData.original instanceof Array) {
+        for (let j = 0; j < userData.original.length; j++) {
+          this._text += ' ' + userData.original[i].uuid;
+        }
+      }
+    }
+
+    for (let i = 0; i < this.results.length; i++) {
+      let userData = this.results[i].userData as UserData;
       if (userData.original instanceof DataBase) {
         this._text += ' ' + userData.original.uuid;
       }

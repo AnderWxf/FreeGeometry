@@ -37,16 +37,29 @@ class Vertice2 extends DataBase {
   constructor() {
     super();
   }
+
   /**
-   * Returns a new Vertice2 with copied values from this instance.
+   * Returns a new Vertice2 with clone values from this instance.
    *
    * @return {Vertice2} A clone of this instance.
    */
   override clone() {
-    let result = new Vertice2();
+    let result = super.clone() as Vertice2;
     result.p = this.p?.clone();
     return result;
   }
+
+  /**
+   * Returns a new Vertice2 with copied values from this instance.
+   *
+   * @return {Vertice2} A copy of this instance.
+   */
+  override copy() {
+    let result = new Vertice2;
+    result.p = this.p?.clone();
+    return result;
+  }
+
   /**
    * Returns a new Vertice2 with unserialize data.
    *
@@ -133,12 +146,12 @@ class Edge2 extends DataBase {
   }
 
   /**
-   * Returns a new Edge2 with copied values from this instance.
+   * Returns a new Edge2 with clone values from this instance.
    *
    * @return {Edge2} A clone of this instance.
    */
   override clone() {
-    let result = new Edge2();
+    let result = super.clone() as Edge2;
     result.curve = this.curve?.clone();
     result.u = this.u?.clone();
     result.v0 = this.v0?.clone();
@@ -148,6 +161,23 @@ class Edge2 extends DataBase {
     result.curvei = this.curvei;
     return result;
   }
+
+  /**
+   * Returns a new Edge2 with copied values from this instance.
+   *
+   * @return {Edge2} A copy of this instance.
+   */
+  override copy() {
+    let result = new Edge2;
+    result.curve = this.curve?.copy();
+    result.u = this.u?.clone();
+    result.v0 = this.v0?.copy();
+    result.v1 = this.v1?.copy();
+    result.v0i = this.v0i;
+    result.v1i = this.v1i;
+    result.curvei = this.curvei;
+    return result;
+  }  
 
   get umin(): number {
     return Math.min(this.u.x, this.u.y);
@@ -297,17 +327,30 @@ class Coedge2 extends DataBase {
     super();
   }
   /**
-   * Returns a new Coedge2 with copied values from this instance.
+   * Returns a new Coedge2 with clone values from this instance.
    *
    * @return {Coedge2} A clone of this instance.
    */
   override clone() {
-    let result = new Coedge2();
+    let result = super.clone() as Coedge2;
     result.e = this.e?.clone();
     result.ei = this.ei;
     result.isForward = this.isForward;
     return result;
   }
+
+  /**
+   * Returns a new Coedge2 with copied values from this instance.
+   *
+   * @return {Coedge2} A copy of this instance.
+   */
+  override copy() {
+    let result = new Coedge2;
+    result.e = this.e?.clone();
+    result.ei = this.ei;
+    result.isForward = this.isForward;
+    return result;
+  }  
 
   /**
    * is positive? (u.y > u.x)
@@ -383,15 +426,26 @@ class Loop2 extends DataBase {
   }
 
   /**
-   * Returns a new Loop2 with copied values from this instance.
+   * Returns a new Loop2 with clone values from this instance.
    *
    * @return {Loop2} A clone of this instance.
    */
   override clone() {
-    let result = new Loop2();
+    let result = super.clone() as Loop2;
     result.coedges = this.coedges?.map((c) => c.clone());
     return result;
   }
+
+  /**
+   * Returns a new Loop2 with copied values from this instance.
+   *
+   * @return {Loop2} A copy of this instance.
+   */
+  override copy() {
+    let result = new Loop2;
+    result.coedges = this.coedges?.map((c) => c.copy());
+    return result;
+  }    
 
   /**
    * Returns a new Loop2 with unserialize data.
@@ -461,12 +515,12 @@ class Face2 extends DataBase {
     this.holes = [];
   }
   /**
-   * Returns a new Face2 with copied values from this instance.
+   * Returns a new Face2 with clone values from this instance.
    *
    * @return {Face2} A clone of this instance.
    */
   override clone() {
-    let result = new Face2();
+    let result = super.clone() as Face2;
     result.curves = this.curves?.map((c) => c.clone());
     result.vertices = this.vertices?.map((v) => v.clone());
     result.edges = this.edges?.map((e) => e.clone());
@@ -474,6 +528,21 @@ class Face2 extends DataBase {
     result.holes = this.holes?.map((h) => h.clone());
     return result;
   }
+
+  /**
+   * Returns a new Face2 with copied values from this instance.
+   *
+   * @return {Face2} A copy of this instance.
+   */
+  override copy() {
+    let result = new Face2;
+    result.curves = this.curves?.map((c) => c.copy());
+    result.vertices = this.vertices?.map((v) => v.copy());
+    result.edges = this.edges?.map((e) => e.copy());
+    result.border = this.border?.copy();
+    result.holes = this.holes?.map((h) => h.copy());
+    return result;
+  }   
 
   /**
    * Returns all edges from the face.

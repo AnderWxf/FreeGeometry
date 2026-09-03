@@ -7,31 +7,43 @@ import { Transform3 } from "./Transform3";
  * 
  */
 class SurfaceData extends DataBase {
-    /**
-     * The transfrom value of this Curve3Data.
-     *
-     * @type {Transform3}
-     */
-    public trans: Transform3;
+  /**
+   * The transfrom value of this Curve3Data.
+   *
+   * @type {Transform3}
+   */
+  public trans: Transform3;
 
-    /**
-     * Constructs a surface.
-     *
-     * @param {Transform3} [trans] - The base transfrom of surface.
-     */
-    constructor(trans = new Transform3()) {
-        super();
-        this.trans = trans;
-    }
+  /**
+   * Constructs a surface.
+   *
+   * @param {Transform3} [trans] - The base transfrom of surface.
+   */
+  constructor(trans = new Transform3()) {
+    super();
+    this.trans = trans;
+  }
 
-    /**
-     * Returns a new SurfaceData with copied values from this instance.
-     *
-     * @return {SurfaceData} A clone of this instance.
-     */
-    override clone() {
-        return new SurfaceData(this.trans.clone());
-    }
+  /**
+   * Returns a new SurfaceData with clone values from this instance.
+   *
+   * @return {SurfaceData} A clone of this instance.
+   */
+  override clone() {
+    let result = super.clone() as SurfaceData;
+    result.trans = this.trans.clone();
+    return result;
+  }
+
+  /**
+   * Returns a new SurfaceData with copied values from this instance.
+   *
+   * @return {SurfaceData} A copy of this instance.
+   */
+  override copy() {
+    return new SurfaceData(this.trans.clone());
+  }
+
 }
 
 export { SurfaceData };

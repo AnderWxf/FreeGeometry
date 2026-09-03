@@ -51,11 +51,31 @@ class Nurbs3Data extends Curve3Data {
   }
 
   /**
-   * Returns a new Nurbs3Data with copied values from this instance.
+   * Returns a new Nurbs3Data with clone values from this instance.
    *
    * @return {Nurbs3Data} A clone of this instance.
    */
   override clone() {
+    let result = super.clone() as Nurbs3Data;
+    result.trans = this.trans.clone();
+    let controls = new Array<Vector4>();
+    let knots = new Array<number>();
+    for (let i = 0; i < this.controls.length; i++) {
+      controls.push(this.controls[i].clone());
+    }
+    knots.push(...this.knots);
+    result.controls = controls;
+    result.knots = knots;
+    result.degree = this.degree;
+    return result;
+  }
+
+  /**
+   * Returns a new Nurbs2Data with copied values from this instance.
+   *
+   * @return {Nurbs3Data} A copy of this instance.
+   */
+  override copy() {
     let controls = new Array<Vector4>();
     let knots = new Array<number>();
     for (let i = 0; i < this.controls.length; i++) {
@@ -63,7 +83,7 @@ class Nurbs3Data extends Curve3Data {
     }
     knots.push(...this.knots);
     return new Nurbs3Data(this.trans.clone(), controls, knots, this.degree);
-  }
+  }  
 
   /**
    * Returns a new Nurbs3Data with unserialize data.

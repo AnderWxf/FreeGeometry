@@ -55,11 +55,25 @@ class UvCurveData extends Curve3Data {
   }
 
   /**
-   * Returns a new UvCurveData with copied values from this instance.
+   * Returns a new UvCurveData with clone values from this instance.
    *
    * @return {UvCurveData} A clone of this instance.
    */
   override clone() {
+    let result = super.clone() as UvCurveData;
+    result.c = this.c.clone();
+    result.trans = this.trans.clone();
+    result.s1 = this.s1.clone();
+    result.s2 = this.s2.clone();
+    return result;
+  }
+
+  /**
+   * Returns a new UvCurveData with copied values from this instance.
+   *
+   * @return {UvCurveData} A copy of this instance.
+   */
+  override copy() {
     return new UvCurveData(this.c.clone(), this.s1.clone(), this.s2.clone());
   }
 

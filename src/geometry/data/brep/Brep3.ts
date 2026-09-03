@@ -41,15 +41,27 @@ class Vertice3 extends DataBase {
     super();
   }
   /**
-   * Returns a new Vertice3 with copied values from this instance.
+   * Returns a new Vertice3 with clone values from this instance.
    *
    * @return {Vertice3} A clone of this instance.
    */
   override clone() {
-    let result = new Vertice3();
+    let result = super.clone() as Vertice3;
     result.p = this.p?.clone();
     return result;
   }
+
+  /**
+   * Returns a new Vertice3 with copied values from this instance.
+   *
+   * @return {Vertice3} A copy of this instance.
+   */
+  override copy() {
+    let result = new Vertice3;
+    result.p = this.p?.clone();
+    return result;
+  }
+
   /**
    * Returns a new Vertice2 with unserialize data.
    *
@@ -135,13 +147,30 @@ class Edge3 extends DataBase {
   }
 
   /**
-   * Returns a new Edge3 with copied values from this instance.
+   * Returns a new Edge3 with clone values from this instance.
    *
    * @return {Edge3} A clone of this instance.
    */
   override clone() {
-    let result = new Edge3();
+    let result = super.clone() as Edge3;
     result.curve = this.curve?.clone();
+    result.u = this.u?.clone();
+    result.v0 = this.v0?.clone();
+    result.v1 = this.v1?.clone();
+    result.v0i = this.v0i;
+    result.v1i = this.v1i;
+    result.curvei = this.curvei;
+    return result;
+  }
+
+  /**
+   * Returns a new Edge3 with copied values from this instance.
+   *
+   * @return {Edge3} A copy of this instance.
+   */
+  override copy() {
+    let result = new Edge3;
+    result.curve = this.curve?.copy();
     result.u = this.u?.clone();
     result.v0 = this.v0?.clone();
     result.v1 = this.v1?.clone();
@@ -255,13 +284,26 @@ class Coedge3 extends DataBase {
     super();
   }
   /**
-   * Returns a new Coedge3 with copied values from this instance.
+   * Returns a new Coedge3 with clone values from this instance.
    *
    * @return {Coedge3} A clone of this instance.
    */
   override clone() {
-    let result = new Coedge3();
+    let result = super.clone() as Coedge3;
     result.e = this.e?.clone();
+    result.ei = this.ei;
+    result.isForward = this.isForward;
+    return result;
+  }
+
+  /**
+   * Returns a new Coedge3 with copied values from this instance.
+   *
+   * @return {Coedge3} A copy of this instance.
+   */
+  override copy() {
+    let result = new Coedge3;
+    result.e = this.e?.copy();
     result.ei = this.ei;
     result.isForward = this.isForward;
     return result;
@@ -341,13 +383,24 @@ class Loop3 extends DataBase {
   }
 
   /**
-   * Returns a new Loop3 with copied values from this instance.
+   * Returns a new Loop3 with clone values from this instance.
    *
    * @return {Loop3} A clone of this instance.
    */
   override clone() {
-    let result = new Loop3();
+    let result = super.clone() as Loop3;
     result.coedges = this.coedges?.map((c) => c.clone());
+    return result;
+  }
+
+  /**
+   * Returns a new Loop3 with copied values from this instance.
+   *
+   * @return {Loop3} A copy of this instance.
+   */
+  override copy() {
+    let result = new Loop3;
+    result.coedges = this.coedges?.map((c) => c.copy());
     return result;
   }
 
@@ -437,18 +490,36 @@ class Face3 extends DataBase {
   }
 
   /**
-   * Returns a new Face3 with copied values from this instance.
+   * Returns a new Face3 with clone values from this instance.
    *
    * @return {Face3} A clone of this instance.
    */
   override clone() {
-    let result = new Face3();
+    let result = super.clone() as Face3;
     result.curves = this.curves?.map((c) => c.clone());
     result.vertices = this.vertices?.map((v) => v.clone());
     result.edges = this.edges?.map((e) => e.clone());
     result.border = this.border?.clone();
     result.holes = this.holes?.map((v) => v.clone());
     result.surface = this.surface?.clone();
+    result.surfaceIndex = this.surfaceIndex;
+    result.uv = this.uv;
+    return result;
+  }
+
+  /**
+   * Returns a new Face3 with copied values from this instance.
+   *
+   * @return {Face3} A copy of this instance.
+   */
+  override copy() {
+    let result = new Face3;
+    result.curves = this.curves?.map((c) => c.copy());
+    result.vertices = this.vertices?.map((v) => v.copy());
+    result.edges = this.edges?.map((e) => e.copy());
+    result.border = this.border?.copy();
+    result.holes = this.holes?.map((v) => v.copy());
+    result.surface = this.surface?.copy();
     result.surfaceIndex = this.surfaceIndex;
     result.uv = this.uv;
     return result;
@@ -550,6 +621,29 @@ class Shell3 extends DataBase {
   constructor() {
     super();
   }
+
+  /**
+   * Returns a new Shell3 with clone values from this instance.
+   *
+   * @return {Shell3} A clone of this instance.
+   */
+  override clone() {
+    let result = super.clone() as Shell3;
+    result.faces = this.faces?.map((c) => c.clone());
+    return result;
+  }
+
+  /**
+   * Returns a new Shell3 with copied values from this instance.
+   *
+   * @return {Shell3} A copy of this instance.
+   */
+  override copy() {
+    let result = new Shell3;
+    result.faces = this.faces?.map((c) => c.copy());
+    return result;
+  }
+
   /**
    * Returns a new Shell3 with unserialize data.
    *
@@ -590,6 +684,29 @@ class Lump3 extends DataBase {
   constructor() {
     super();
   }
+
+  /**
+   * Returns a new Lump3 with clone values from this instance.
+   *
+   * @return {Lump3} A clone of this instance.
+   */
+  override clone() {
+    let result = super.clone() as Lump3;
+    result.shells = this.shells?.map((c) => c.clone());
+    return result;
+  }
+
+  /**
+   * Returns a new Lump3 with copied values from this instance.
+   *
+   * @return {Lump3} A copy of this instance.
+   */
+  override copy() {
+    let result = new Lump3;
+    result.shells = this.shells?.map((c) => c.copy());
+    return result;
+  }
+
   /**
    * Returns a new Lump3 with unserialize data.
    *
@@ -656,6 +773,36 @@ class Body3 extends DataBase {
    */
   constructor() {
     super();
+  }
+
+  /**
+   * Returns a new Body3 with clone values from this instance.
+   *
+   * @return {Body3} A clone of this instance.
+   */
+  override clone() {
+    let result = super.clone() as Body3;
+    result.vertices = this.vertices?.map((c) => c.clone());
+    result.curves = this.curves?.map((c) => c.clone());
+    result.edges = this.edges?.map((c) => c.clone());
+    result.transform = this.transform ? this.transform.clone() : undefined;
+    result.lumps = this.lumps?.map((c) => c.clone());
+    return result;
+  }
+
+  /**
+   * Returns a new Body3 with copied values from this instance.
+   *
+   * @return {Body3} A copy of this instance.
+   */
+  override copy() {
+    let result = new Body3;
+    result.vertices = this.vertices?.map((c) => c.copy());
+    result.curves = this.curves?.map((c) => c.copy());
+    result.edges = this.edges?.map((c) => c.copy());
+    result.transform = this.transform ? this.transform.copy() : undefined;
+    result.lumps = this.lumps?.map((c) => c.copy());
+    return result;
   }
 
   /**

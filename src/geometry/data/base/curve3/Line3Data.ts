@@ -23,13 +23,24 @@ class Line3Data extends Curve3Data {
   }
 
   /**
-   * Returns a new Line3Data with copied values from this instance.
+   * Returns a new Line3Data with clone values from this instance.
    *
    * @return {Line3Data} A clone of this instance.
    */
   override clone() {
-    return new Line3Data(this.trans.clone());
+    let result = super.clone() as Line3Data;
+    result.trans = this.trans.clone();
+    return result;
   }
+
+  /**
+   * Returns a new Line3Data with copied values from this instance.
+   *
+   * @return {Line3Data} A copy of this instance.
+   */
+  override copy() {
+    return new Line3Data(this.trans.clone());
+  }    
 
   /**
    * Returns a new Line3Data with unserialize data.

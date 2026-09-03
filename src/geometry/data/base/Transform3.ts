@@ -124,13 +124,22 @@ class Transform3 {
   // }
 
   /**
-   * Returns a new Transform3 with copied values from this instance.
+   * Returns a new Transform3 with clone values from this instance.
    *
    * @return {Transform3} A clone of this instance.
    */
   clone() {
     return new Transform3(this.pos.clone(), this.rot.clone(), this.scale.clone(), this.parent);
   }
+
+  /**
+   * Returns a new Transform3 with copied values from this instance.
+   *
+   * @return {Transform3} A copy of this instance.
+   */
+  copy() {
+    return this.clone();
+  }  
 
   /**
    * Returns a new Transform3 with unserialize data.

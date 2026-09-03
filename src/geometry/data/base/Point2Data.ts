@@ -31,11 +31,22 @@ class Point2Data extends DataBase {
     this.pos = pos;
   }
   /**
-   * Returns a new Point2Data with copied values from this instance.
+   * Returns a new Point2Data with clone values from this instance.
    *
    * @return {Point2Data} A clone of this instance.
    */
   override clone() {
+    let result = super.clone() as Point2Data;
+    result.pos = this.pos.clone();
+    return result;
+  }
+
+  /**
+   * Returns a new Point2Data with copied values from this instance.
+   *
+   * @return {Point2Data} A copy of this instance.
+   */
+  override copy() {
     return new Point2Data(this.pos.clone());
   }
 

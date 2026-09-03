@@ -31,13 +31,24 @@ class Point3Data extends DataBase {
     this.pos = pos;
   }
   /**
-   * Returns a new Point3Data with copied values from this instance.
+   * Returns a new Point3Data with clone values from this instance.
    *
    * @return {Point3Data} A clone of this instance.
    */
   override clone() {
-    return new Point3Data(this.pos.clone());
+    let result = super.clone() as Point3Data;
+    result.pos = this.pos.clone();
+    return result;
   }
+
+  /**
+   * Returns a new Point3Data with copied values from this instance.
+   *
+   * @return {Point3Data} A copy of this instance.
+   */
+  override copy() {
+    return new Point3Data(this.pos.clone());
+  }  
 
   /**
    * Returns a new Point3Data with unserialize data.
