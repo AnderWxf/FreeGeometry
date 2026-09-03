@@ -12,7 +12,7 @@ class DataBase {
 
   /**
    * Returns a new DataBase with clone values from this instance.
-   *
+   * clone() 方法保持uuid不变，可以保证序列化后的json内容一致。
    * @return {DataBase} A clone of this instance.
    */
   clone(): DataBase {
@@ -24,13 +24,12 @@ class DataBase {
 
   /**
    * Returns a new DataBase with copied values from this instance.
-   *
+   * copy() 方法产生新的uuid，不保证序列化后的json内容一致。
    * @return {DataBase} A copy of this instance.
    */
   copy() {
     return new DataBase();
   }
-
 }
 export {
   DataBase

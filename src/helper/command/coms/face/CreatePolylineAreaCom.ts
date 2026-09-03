@@ -11,6 +11,7 @@ import { GeomType } from "../../../../core/Constents";
 import { Coedge2, Face2, Vertice2, type Edge2 } from "../../../../geometry/data/brep/Brep2";
 import { CreateGeomUserData, type UserData } from "../../../UserData";
 import { CreateFaceCom } from "./CreateFaceCom";
+import { Face2Algo } from "../../../../geometry/algorithm/brep/Brep2Algo";
 
 
 /**
@@ -71,10 +72,16 @@ class CreatePolylineAreaCom extends CreateFaceCom {
     let endPoint = this.points[0];
     let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(beginPoint, endPoint);
     edges.push(edge);
+
     // 创建一个面
     let face = Brep2Builder.BuildFaceByEdges(edges);
     if (paras.length > edges.length * 2 + 2) {
       face.uuid = paras[edges.length * 2 + 2];
+    }
+
+    let algo = new Face2Algo(face);
+    if (!algo.isPositive()) {
+      algo.reverse();
     }
 
     userData.color = THREE.Color.NAMES.blue;

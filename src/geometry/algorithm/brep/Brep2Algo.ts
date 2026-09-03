@@ -657,6 +657,21 @@ class Face2Algo {
   }
 
   /**
+   * directed area > 0? 
+   */
+  isPositive() {
+    return this.area() > 0;
+  }
+
+  reverse() {
+    this._balgo.reverse();
+    this._halgos = this._halgos.reverse();
+    this._halgos.forEach((algo) => {
+      algo.reverse();
+    });
+  }
+
+  /**
    * get a point inner the face.
    * @retun {Vector2} 
    */

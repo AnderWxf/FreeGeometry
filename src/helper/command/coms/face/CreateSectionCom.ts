@@ -9,6 +9,7 @@ import { Edge2 } from "../../../../geometry/data/brep/Brep2";
 import { ActPickObjects } from "../../acts/ActPickObjects";
 import { CreateGeomUserData, type UserData } from "../../../UserData";
 import { CreateFaceCom } from "./CreateFaceCom";
+import { Face2Algo } from "../../../../geometry/algorithm/brep/Brep2Algo";
 
 
 /**
@@ -96,6 +97,14 @@ class CreateSectionCom extends CreateFaceCom {
           faces[i].uuid = paras[3 + n0 + i];
         }
       }
+      
+      faces.forEach(face => {
+        let algo = new Face2Algo(face);
+        if (!algo.isPositive()) {
+          algo.reverse();
+        }
+      });
+
       n1 = faces.length;
       let geo = BrepMeshBuilder.BuildFace2sMesh(faces, userData.color);
       userData.original = faces;
