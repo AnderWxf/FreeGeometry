@@ -58,9 +58,9 @@ class CreateRectangleAreaCom extends CreateFaceCom {
     let points: Vector2[] = [];
     let edges: Edge2[] = [];
     let p0 = this.begin.clone();
-    let p1 = this.begin.clone().add(new Vector2(this.end.x - this.begin.x, 0));
+    let p1 = this.begin.clone().add(new Vector2(0, this.end.y - this.begin.y));
     let p2 = this.end.clone();
-    let p3 = this.end.clone().add(new Vector2(this.begin.x - this.end.x, 0));
+    let p3 = this.end.clone().add(new Vector2(0, this.begin.y - this.end.y,));
     points.push(p0);
     points.push(p1);
     points.push(p2);
