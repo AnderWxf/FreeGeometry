@@ -14,7 +14,7 @@
           "typename": "DATA_TYPE_BREP2_FACE2",
           "curves": [
             {
-              "uuid": "42b43b1d-0917-45e2-833f-9f296e1eebf7",
+              "uuid": "a3848229-16fc-43af-b3b3-60f8948dc790",
               "trans": {
                 "type": 252,
                 "typename": "DATA_TYPE_TRANSFORM2",
@@ -42,7 +42,7 @@
               }
             },
             {
-              "uuid": "bbd75cb0-8ad9-41a2-b7bf-1c3a45b6d624",
+              "uuid": "e37c47da-6ce9-4120-81d1-16755bdd51ec",
               "trans": {
                 "type": 252,
                 "typename": "DATA_TYPE_TRANSFORM2",
@@ -72,7 +72,7 @@
           ],
           "vertices": [
             {
-              "uuid": "80f33f06-8ac8-4bda-ab59-aa5215d5f88c",
+              "uuid": "6b977465-ded3-4bd1-92ac-349b741d4507",
               "type": 295,
               "typename": "DATA_TYPE_BREP2_VERTICE2",
               "p": {
@@ -83,7 +83,7 @@
               }
             },
             {
-              "uuid": "47cdefef-f4dd-4096-b9d7-826a930ad262",
+              "uuid": "faa2d0ac-608b-4ed2-9a8f-37aed38bf8ed",
               "type": 295,
               "typename": "DATA_TYPE_BREP2_VERTICE2",
               "p": {
@@ -94,7 +94,7 @@
               }
             },
             {
-              "uuid": "32d9a742-e61f-4574-9f9d-d9b6326694ab",
+              "uuid": "0de3ccf9-0d99-4245-9041-3066380ede92",
               "type": 295,
               "typename": "DATA_TYPE_BREP2_VERTICE2",
               "p": {
@@ -107,18 +107,18 @@
           ],
           "edges": [],
           "border": {
-            "uuid": "f925c819-e87c-4fff-8a2b-0e5bac92cfe3",
+            "uuid": "84d987a2-6d72-45bb-8ed0-8ac035dd5e92",
             "type": 298,
             "typename": "DATA_TYPE_BREP2_LOOP2",
             "coedges": [
               {
-                "uuid": "0585d6cd-ae06-4fde-a49f-d7e4d9e7c9ae",
+                "uuid": "3f52182d-201a-4f14-b878-a1f119743959",
                 "type": 297,
                 "typename": "DATA_TYPE_BREP2_COEDGE2",
                 "ei": -1,
                 "isForward": true,
                 "e": {
-                  "uuid": "ac31bb0d-5740-47d9-8c8c-b8c7bb3afdd9",
+                  "uuid": "7be0d33c-8321-41a3-95e3-1759d4eb4400",
                   "type": 296,
                   "typename": "DATA_TYPE_BREP2_EDGE2",
                   "v0i": -1,
@@ -132,7 +132,7 @@
                   },
                   "curve": null,
                   "v0": {
-                    "uuid": "80f33f06-8ac8-4bda-ab59-aa5215d5f88c",
+                    "uuid": "6b977465-ded3-4bd1-92ac-349b741d4507",
                     "type": 295,
                     "typename": "DATA_TYPE_BREP2_VERTICE2",
                     "p": {
@@ -143,7 +143,7 @@
                     }
                   },
                   "v1": {
-                    "uuid": "47cdefef-f4dd-4096-b9d7-826a930ad262",
+                    "uuid": "faa2d0ac-608b-4ed2-9a8f-37aed38bf8ed",
                     "type": 295,
                     "typename": "DATA_TYPE_BREP2_VERTICE2",
                     "p": {
@@ -156,13 +156,13 @@
                 }
               },
               {
-                "uuid": "41d822ef-5bb3-4b71-a3fb-b0ecb1833ca8",
+                "uuid": "c5a2d260-fb5c-4a32-bd4e-b9cecacd1018",
                 "type": 297,
                 "typename": "DATA_TYPE_BREP2_COEDGE2",
                 "ei": -1,
                 "isForward": true,
                 "e": {
-                  "uuid": "17f4e95f-92e2-4892-8b0e-d5f120bb9b7d",
+                  "uuid": "22ac446b-0e5d-444a-a121-1721b244fa40",
                   "type": 296,
                   "typename": "DATA_TYPE_BREP2_EDGE2",
                   "v0i": -1,
@@ -176,7 +176,7 @@
                   },
                   "curve": null,
                   "v0": {
-                    "uuid": "47cdefef-f4dd-4096-b9d7-826a930ad262",
+                    "uuid": "faa2d0ac-608b-4ed2-9a8f-37aed38bf8ed",
                     "type": 295,
                     "typename": "DATA_TYPE_BREP2_VERTICE2",
                     "p": {
@@ -187,7 +187,7 @@
                     }
                   },
                   "v1": {
-                    "uuid": "32d9a742-e61f-4574-9f9d-d9b6326694ab",
+                    "uuid": "0de3ccf9-0d99-4245-9041-3066380ede92",
                     "type": 295,
                     "typename": "DATA_TYPE_BREP2_VERTICE2",
                     "p": {
@@ -200,13 +200,13 @@
                 }
               },
               {
-                "uuid": "0585d6cd-ae06-4fde-a49f-d7e4d9e7c9ae",
+                "uuid": "3f52182d-201a-4f14-b878-a1f119743959",
                 "type": 297,
                 "typename": "DATA_TYPE_BREP2_COEDGE2",
                 "ei": -1,
                 "isForward": true,
                 "e": {
-                  "uuid": "ac31bb0d-5740-47d9-8c8c-b8c7bb3afdd9",
+                  "uuid": "7be0d33c-8321-41a3-95e3-1759d4eb4400",
                   "type": 296,
                   "typename": "DATA_TYPE_BREP2_EDGE2",
                   "v0i": -1,
@@ -220,7 +220,7 @@
                   },
                   "curve": null,
                   "v0": {
-                    "uuid": "32d9a742-e61f-4574-9f9d-d9b6326694ab",
+                    "uuid": "0de3ccf9-0d99-4245-9041-3066380ede92",
                     "type": 295,
                     "typename": "DATA_TYPE_BREP2_VERTICE2",
                     "p": {
@@ -231,7 +231,7 @@
                     }
                   },
                   "v1": {
-                    "uuid": "80f33f06-8ac8-4bda-ab59-aa5215d5f88c",
+                    "uuid": "6b977465-ded3-4bd1-92ac-349b741d4507",
                     "type": 295,
                     "typename": "DATA_TYPE_BREP2_VERTICE2",
                     "p": {

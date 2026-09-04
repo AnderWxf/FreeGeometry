@@ -2,6 +2,7 @@ import { GeomType } from "../../../core/Constents";
 import { Vector2 } from "../../../math/Math";
 import { toPeriod } from "../../../math/MathUtils";
 import type { Curve2Data } from "../base/Curve2Data";
+import { Point2Data } from "../base/Point2Data";
 import { unserialize } from "../base/Unserialize";
 import { DataBase } from "../DataBase";
 /**
@@ -28,7 +29,7 @@ class Vertice2 extends DataBase {
    * point of Vertice.
    *
    */
-  p: Vector2;
+  p: Point2Data;
 
   /**
    * Constructs a Vertice.
@@ -67,7 +68,7 @@ class Vertice2 extends DataBase {
    */
   static Unserialize(data: any): Vertice2 {
     let ret = new Vertice2();
-    ret.p = data.p ? Vector2.Unserialize(data.p) : null;
+    ret.p = data.p ? Point2Data.Unserialize(data.p) : null;
     ret.uuid = data.uuid;
     return ret;
   }

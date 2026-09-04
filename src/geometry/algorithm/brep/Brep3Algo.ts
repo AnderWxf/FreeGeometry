@@ -1,6 +1,7 @@
 import { Vector2, Vector3 } from "../../../math/Math";
 import { Line3Data } from "../../data/base/curve3/Line3Data";
 import type { Curve3Data } from "../../data/base/Curve3Data";
+import { Point3Data } from "../../data/base/Point3Data";
 import { Coedge3, Loop3, Vertice3, type Digraph3, type Edge3, type Face3 } from "../../data/brep/Brep3";
 import type { Curve3Algo } from "../base/Curve3Algo";
 import { CurveBuilder } from "../builder/CurveBuilder";
@@ -940,11 +941,66 @@ class Digraph3Algo {
       }
     }
   }
+  resort() {
+    let algos = this._algos;
+    let vertices = this._g.vertice3s;
+    // 对顶点进行排序。
+    vertices.sort((a, b) => {
+      if (a.p.pos.x > b.p.pos.x) {
+        return -1;
+      }
+      if (a.p.pos.x < b.p.pos.x) {
+        return 1;
+      }
+      if (a.p.pos.y > b.p.pos.y) {
+        return -1;
+      }
+      if (a.p.pos.y < b.p.pos.y) {
+        return 1;
+      }
+      if (a.p.pos.z > b.p.pos.z) {
+        return -1;
+      }
+      if (a.p.pos.z < b.p.pos.z) {
+        return 1;
+      }
+      return 0;
+    });
 
+    // 对有向边进行排序。
+    algos.sort((a, b) => {
+      // 先比较起点顶点索引
+      let av0i = vertices.indexOf(a.v0);
+      let bv0i = vertices.indexOf(b.v0);
+      if (av0i != bv0i) {
+        return av0i - bv0i;
+      }
+      // 再比较终点顶点索引
+      let av1i = vertices.indexOf(a.v1);
+      let bv1i = vertices.indexOf(b.v1);
+      if (av1i != bv1i) {
+        return av1i - bv1i;
+      }
+      // 再比较起点切线方向
+      let tav0 = a.getBeginTangent();
+      let tbv0 = b.getBeginTangent();
+      let angle = tav0.angleTo(tbv0);
+      if (angle != 0) {
+        return angle;
+      }
+      // 最后比较起点前进十分之处切线方向
+      let tav_ = a.t(a.u.x + (a.u.y - a.u.x) * 0.1);
+      let tbv_ = b.t(b.u.x + (b.u.y - b.u.x) * 0.1);
+      let angle_ = tav_.angleTo(tbv_);
+      return angle_;
+    });
+  }
   getAllLoops(): Loop3Algo[] {
     let loops: Loop3Algo[] = [];
     let algos = this._algos;
     let visited: Coedge3Algo[] = [];
+
+    this.resort();
 
     for (let i = 0; i < algos.length; i++) {
       let curr = algos[i];
@@ -971,7 +1027,7 @@ class Digraph3Algo {
 
   findVerticeByPoint(p: Vector3, tol0: number): Vertice3 {
     for (let i = 0; i < this._g.vertice3s.length; i++) {
-      if (this._g.vertice3s[i].p.distanceTo(p) <= tol0) {
+      if (this._g.vertice3s[i].p.pos.distanceTo(p) <= tol0) {
         return this._g.vertice3s[i];
       }
     }
@@ -986,7 +1042,7 @@ class Digraph3Algo {
         let v0 = this.findVerticeByPoint(v0p, tol0);
         if (!v0) {
           v0 = new Vertice3();
-          v0.p = v0p;
+          v0.p = new Point3Data(v0p);
           this._g.vertice3s.push(v0);
         }
         coedge.v0 = v0;
@@ -995,7 +1051,7 @@ class Digraph3Algo {
         let v1 = this.findVerticeByPoint(v1p, tol0);
         if (!v1) {
           v1 = new Vertice3();
-          v1.p = v1p;
+          v1.p = new Point3Data(v1p);
           this._g.vertice3s.push(v1);
         }
         coedge.v1 = v1;
@@ -1018,7 +1074,7 @@ class Digraph3Algo {
       let v0f = this.findVerticeByPoint(v0pf, tol0);
       if (!v0f) {
         v0f = new Vertice3();
-        v0f.p = v0pf;
+        v0f.p = new Point3Data(v0pf);
         this._g.vertice3s.push(v0f);
       }
       cfalgo.v0 = v0f;
@@ -1027,7 +1083,7 @@ class Digraph3Algo {
       let v1f = this.findVerticeByPoint(v1pf, tol0);
       if (!v1f) {
         v1f = new Vertice3();
-        v1f.p = v1pf;
+        v1f.p = new Point3Data(v1pf);
         this._g.vertice3s.push(v1f);
       }
       cfalgo.v1 = v1f;
@@ -1037,7 +1093,7 @@ class Digraph3Algo {
       let v0b = this.findVerticeByPoint(v0pb, tol0);
       if (!v0b) {
         v0b = new Vertice3();
-        v0b.p = v0pb;
+        v0b.p = new Point3Data(v0pb);
         this._g.vertice3s.push(v0b);
       }
       cbalgo.v0 = v0b;
@@ -1046,7 +1102,7 @@ class Digraph3Algo {
       let v1b = this.findVerticeByPoint(v1pb, tol0);
       if (!v1b) {
         v1b = new Vertice3();
-        v1b.p = v1pb;
+        v1b.p = new Point3Data(v1pb);
         this._g.vertice3s.push(v1b);
       }
       cbalgo.v1 = v1b;

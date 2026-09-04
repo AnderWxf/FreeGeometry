@@ -3,6 +3,7 @@ import { PI2, PI_2 } from "../../../math/MathUtils";
 import { Arc2Data } from "../../data/base/curve2/Arc2Data";
 import { Line2Data } from "../../data/base/curve2/Line2Data";
 import type { Curve2Data } from "../../data/base/Curve2Data";
+import { Point2Data } from "../../data/base/Point2Data";
 import { Coedge2, Loop2, Vertice2, type Digraph2, type Edge2, type Face2 } from "../../data/brep/Brep2";
 import type { Curve2Algo } from "../base/Curve2Algo";
 import { CurveBuilder } from "../builder/CurveBuilder";
@@ -1006,11 +1007,61 @@ class Digraph2Algo {
       }
     }
   }
+  resort() {
+    let algos = this._algos;
+    let vertices = this._g.vertice2s;
+    // 对顶点进行排序。
+    vertices.sort((a, b) => {
+      if (a.p.pos.x > b.p.pos.x) {
+        return -1;
+      }
+      if (a.p.pos.x < b.p.pos.x) {
+        return 1;
+      }
+      if (a.p.pos.y > b.p.pos.y) {
+        return -1;
+      }
+      if (a.p.pos.y < b.p.pos.y) {
+        return 1;
+      }
+      return 0;
+    });
+
+    // 对有向边进行排序。
+    algos.sort((a, b) => {
+      // 先比较起点顶点索引
+      let av0i = vertices.indexOf(a.v0);
+      let bv0i = vertices.indexOf(b.v0);
+      if (av0i != bv0i) {
+        return av0i - bv0i;
+      }
+      // 再比较终点顶点索引
+      let av1i = vertices.indexOf(a.v1);
+      let bv1i = vertices.indexOf(b.v1);
+      if (av1i != bv1i) {
+        return av1i - bv1i;
+      }
+      // 再比较起点切线方向
+      let tav0 = a.getBeginTangent();
+      let tbv0 = b.getBeginTangent();
+      let angle = tav0.angleTo(tbv0);
+      if (angle != 0) {
+        return angle;
+      }
+      // 最后比较起点前进十分之处切线方向
+      let tav_ = a.t(a.u.x + (a.u.y - a.u.x) * 0.1);
+      let tbv_ = b.t(b.u.x + (b.u.y - b.u.x) * 0.1);
+      let angle_ = tav_.angleTo(tbv_);
+      return angle_;
+    });
+  }
 
   getAllLoops(): Loop2Algo[] {
     let loops: Loop2Algo[] = [];
     let algos = this._algos;
     let visited: Coedge2Algo[] = [];
+
+    this.resort();
 
     for (let i = 0; i < algos.length; i++) {
       let curr = algos[i];
@@ -1037,7 +1088,7 @@ class Digraph2Algo {
 
   findVerticeByPoint(p: Vector2, tol0: number): Vertice2 {
     for (let i = 0; i < this._g.vertice2s.length; i++) {
-      if (this._g.vertice2s[i].p.distanceTo(p) <= tol0) {
+      if (this._g.vertice2s[i].p.pos.distanceTo(p) <= tol0) {
         return this._g.vertice2s[i];
       }
     }
@@ -1052,7 +1103,7 @@ class Digraph2Algo {
         let v0 = this.findVerticeByPoint(v0p, tol0);
         if (!v0) {
           v0 = new Vertice2();
-          v0.p = v0p;
+          v0.p = new Point2Data(v0p);
           this._g.vertice2s.push(v0);
         }
         coedge.v0 = v0;
@@ -1061,7 +1112,7 @@ class Digraph2Algo {
         let v1 = this.findVerticeByPoint(v1p, tol0);
         if (!v1) {
           v1 = new Vertice2();
-          v1.p = v1p;
+          v1.p = new Point2Data(v1p);
           this._g.vertice2s.push(v1);
         }
         coedge.v1 = v1;
@@ -1084,7 +1135,7 @@ class Digraph2Algo {
       let v0f = this.findVerticeByPoint(v0pf, tol0);
       if (!v0f) {
         v0f = new Vertice2();
-        v0f.p = v0pf;
+        v0f.p = new Point2Data(v0pf);
         this._g.vertice2s.push(v0f);
       }
       cfalgo.v0 = v0f;
@@ -1093,7 +1144,7 @@ class Digraph2Algo {
       let v1f = this.findVerticeByPoint(v1pf, tol0);
       if (!v1f) {
         v1f = new Vertice2();
-        v1f.p = v1pf;
+        v1f.p = new Point2Data(v1pf);
         this._g.vertice2s.push(v1f);
       }
       cfalgo.v1 = v1f;
@@ -1103,7 +1154,7 @@ class Digraph2Algo {
       let v0b = this.findVerticeByPoint(v0pb, tol0);
       if (!v0b) {
         v0b = new Vertice2();
-        v0b.p = v0pb;
+        v0b.p = new Point2Data(v0pb);
         this._g.vertice2s.push(v0b);
       }
       cbalgo.v0 = v0b;
@@ -1112,7 +1163,7 @@ class Digraph2Algo {
       let v1b = this.findVerticeByPoint(v1pb, tol0);
       if (!v1b) {
         v1b = new Vertice2();
-        v1b.p = v1pb;
+        v1b.p = new Point2Data(v1pb);
         this._g.vertice2s.push(v1b);
       }
       cbalgo.v1 = v1b;

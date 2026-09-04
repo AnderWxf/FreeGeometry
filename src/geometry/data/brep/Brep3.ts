@@ -1,6 +1,7 @@
 import { GeomType } from "../../../core/Constents";
 import { Vector2, Vector3, Vector4 } from "../../../math/Math";
 import type { Curve3Data } from "../base/Curve3Data";
+import { Point3Data } from "../base/Point3Data";
 import type { SurfaceData } from "../base/SurfaceData";
 import { Transform3 } from "../base/Transform3";
 import { unserialize } from "../base/Unserialize";
@@ -31,7 +32,7 @@ class Vertice3 extends DataBase {
    * point of Vertice.
    *
    */
-  p: Vector3;
+  p: Point3Data;
 
   /**
    * Constructs a Vertice.
@@ -69,7 +70,7 @@ class Vertice3 extends DataBase {
    */
   static Unserialize(data: any): Vertice3 {
     let ret = new Vertice3();
-    ret.p = data.p ? Vector3.Unserialize(data.p) : null;
+    ret.p = data.p ? Point3Data.Unserialize(data.p) : null;
     ret.uuid = data.uuid;
     return ret;
   }

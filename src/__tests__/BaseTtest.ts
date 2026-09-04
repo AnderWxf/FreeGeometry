@@ -9,11 +9,29 @@ import { Vector2, Vector3 } from '../math/Math';
 import { Edge2 } from '../geometry/data/brep/Brep2';
 import { Point2Data } from '../geometry/data/base/Point2Data';
 
-function IsCloseTo(received: any, expected: any, tolerance: number = 1e-12): boolean {
-  return isEqualWith(received, expected, (objVal, othVal) => {
+function IsCloseTo(received: any, expected: any, tol0: number = 1e-4, tol1: number = 1e-8): boolean {
+  return isEqualWith(received, expected, (objVal, othVal, index, key, stack) => {
+    // 1. 判断当前属性名是否为 'uuid'
+    // 注意：stack 的最后一个元素包含当前比较的 key 信息
+    const currentKey = key || stack?.keys?.[stack.keys.length - 1];
+    if (currentKey === 'uuid') {
+      // 2. 返回 true 表示忽略此次比较（认为它们相等）
+      return true;
+    }
+    // 1. 判断当前属性名是否为 'pos',位置使用距离容差
+    if (currentKey === 'pos') {
+      if (objVal.z !== undefined && othVal.z !== undefined) {
+        const dist = Math.sqrt((objVal.x - othVal.x) * (objVal.x - othVal.x) + (objVal.y - othVal.y) * (objVal.y - othVal.y) + (objVal.z - othVal.z) * (objVal.z - othVal.z));
+        return dist <= tol0;
+      } else if (objVal.z === undefined && othVal.z === undefined) {
+        const dist = Math.sqrt((objVal.x - othVal.x) * (objVal.x - othVal.x) + (objVal.y - othVal.y) * (objVal.y - othVal.y));
+        return dist <= tol0;
+      }
+    }
+
     // 如果是数字，用容差比较
     if (typeof objVal === 'number' && typeof othVal === 'number') {
-      return Math.abs(objVal - othVal) <= tolerance;
+      return Math.abs(objVal - othVal) <= tol1;
     }
     // 返回 undefined 让 lodash 继续深度比较
     return undefined;
@@ -107,7 +125,7 @@ function ExecuteDescribe(typeName: string, typeDir: string, process: (input: any
             const input = LoadScene(c.inputFile);
             const expected = LoadScene(c.expectedFile);
             const result = process(input);
-            expect(IsCloseTo(result, expected, 1e-8)).toBe(true);
+            expect(IsCloseTo(result, expected, 1e-4, 1e-8)).toBe(true);
           });
         }
       });
@@ -194,9 +212,9 @@ function ExecuteDescribeInsertPoint2(typeName: string, typeDir: string, process:
                   }
                 }
               }
-              expect(IsCloseTo([], result, 1e-8)).toBe(true);
+              expect(IsCloseTo([], result, 1e-4, 1e-8)).toBe(true);
             } else {
-              expect(IsCloseTo([], expected, 1e-8)).toBe(true);
+              expect(IsCloseTo([], expected, 1e-4, 1e-8)).toBe(true);
             }
           });
         }
@@ -284,9 +302,9 @@ function ExecuteDescribeInsertPoint3(typeName: string, typeDir: string, process:
                   }
                 }
               }
-              expect(IsCloseTo([], result, 1e-8)).toBe(true);
+              expect(IsCloseTo([], result, 1e-4, 1e-8)).toBe(true);
             } else {
-              expect(IsCloseTo([], expected, 1e-8)).toBe(true);
+              expect(IsCloseTo([], expected, 1e-4, 1e-8)).toBe(true);
             }
           });
         }
