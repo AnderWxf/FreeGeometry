@@ -68,7 +68,15 @@ class Vertice2 extends DataBase {
    */
   static Unserialize(data: any): Vertice2 {
     let ret = new Vertice2();
-    ret.p = data.p ? Point2Data.Unserialize(data.p) : null;
+    if (data.p) {
+      if (data.p.type == GeomType.MATH_VECTOR2) {
+        ret.p = new Point2Data(Vector2.Unserialize(data.p));
+        ret.p.uuid = data.p.uuid;
+      }
+      if (data.p.type == GeomType.DATA_TYPE_POINT2) {
+        ret.p = Point2Data.Unserialize(data.p);
+      }
+    }
     ret.uuid = data.uuid;
     return ret;
   }
@@ -178,7 +186,7 @@ class Edge2 extends DataBase {
     result.v1i = this.v1i;
     result.curvei = this.curvei;
     return result;
-  }  
+  }
 
   get umin(): number {
     return Math.min(this.u.x, this.u.y);
@@ -351,7 +359,7 @@ class Coedge2 extends DataBase {
     result.ei = this.ei;
     result.isForward = this.isForward;
     return result;
-  }  
+  }
 
   /**
    * is positive? (u.y > u.x)
@@ -446,7 +454,7 @@ class Loop2 extends DataBase {
     let result = new Loop2;
     result.coedges = this.coedges?.map((c) => c.copy());
     return result;
-  }    
+  }
 
   /**
    * Returns a new Loop2 with unserialize data.
@@ -543,7 +551,7 @@ class Face2 extends DataBase {
     result.border = this.border?.copy();
     result.holes = this.holes?.map((h) => h.copy());
     return result;
-  }   
+  }
 
   /**
    * Returns all edges from the face.

@@ -5,9 +5,9 @@ import type { Edge3 } from "../../geometry/data/brep/Brep3";
 
 export function process(edge1: Edge2, edge2: Edge2): any[] {
 
-  let resut: any[] = [];
+  let result: any[] = [];
   if (edge1 === null || edge2 === null) {
-    return resut;
+    return result;
   }
   let inters = Brep2Inter.EdgeXEdge(edge1, edge2, 1e-4, 1e-10);
   for (let i = 0; i < inters.length; i++) {
@@ -19,7 +19,7 @@ export function process(edge1: Edge2, edge2: Edge2): any[] {
       "color": 255,
       "original": p
     };
-    resut.push({ userData: userData });
+    result.push({ userData: userData });
   }
   inters = Brep2Inter.EdgeXEdge(edge2, edge1, 1e-4, 1e-10);
   for (let i = 0; i < inters.length; i++) {
@@ -31,7 +31,7 @@ export function process(edge1: Edge2, edge2: Edge2): any[] {
       "color": 255,
       "original": p
     };
-    resut.push({ userData: userData });
+    result.push({ userData: userData });
   }
-  return resut;
+  return result;
 }

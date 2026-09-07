@@ -14,15 +14,17 @@ class Bool2 {
   static Differences(a: Face2[], b: Face2[], tol0: number, tol1: number): Face2[] {
     let algorigin = new Face2Algos(a);
     let blgorigin = new Face2Algos(b);
+    let a_: Face2[] = [];
+    let b_: Face2[] = [];
     for (let i = 0; i < a.length; i++) {
-      a[i] = a[i].clone();
+      a_.push(a[i].clone());
     }
     for (let i = 0; i < b.length; i++) {
-      b[i] = b[i].clone();
+      b_.push(b[i].clone());
     }
     // 计算面与面的轮廓交点
-    let algo = new Face2Algos(a);
-    let blgo = new Face2Algos(b);
+    let algo = new Face2Algos(a_);
+    let blgo = new Face2Algos(b_);
     // 被减的一方轮廓需要翻转
     blgo.loops.forEach((loop) => {
       loop.reverse();
@@ -69,15 +71,17 @@ class Bool2 {
   static Intersections(a: Face2[], b: Face2[], tol0: number, tol1: number): Face2[] {
     let algorigin = new Face2Algos(a);
     let blgorigin = new Face2Algos(b);
+    let a_: Face2[] = [];
+    let b_: Face2[] = [];
     for (let i = 0; i < a.length; i++) {
-      a[i] = a[i].clone();
+      a_.push(a[i].clone());
     }
     for (let i = 0; i < b.length; i++) {
-      b[i] = b[i].clone();
+      b_.push(b[i].clone());
     }
     // 计算面与面的轮廓交点
-    let algo = new Face2Algos(a);
-    let blgo = new Face2Algos(b);
+    let algo = new Face2Algos(a_);
+    let blgo = new Face2Algos(b_);
     let inters = Brep2Inter.FaceXFace(algo, blgo, tol0, tol1);
     if (inters.length) {
       // 根据轮廓交点对面轮廓进行切割
@@ -120,15 +124,17 @@ class Bool2 {
   static Unions(a: Face2[], b: Face2[], tol0: number, tol1: number): Face2[] {
     let algorigin = new Face2Algos(a);
     let blgorigin = new Face2Algos(b);
+    let a_: Face2[] = [];
+    let b_: Face2[] = [];
     for (let i = 0; i < a.length; i++) {
-      a[i] = a[i].clone();
+      a_.push(a[i].clone());
     }
     for (let i = 0; i < b.length; i++) {
-      b[i] = b[i].clone();
+      b_.push(b[i].clone());
     }
     // 计算面与面的轮廓交点
-    let algo = new Face2Algos(a);
-    let blgo = new Face2Algos(b);
+    let algo = new Face2Algos(a_);
+    let blgo = new Face2Algos(b_);
     let inters = Brep2Inter.FaceXFace(algo, blgo, tol0, tol1);
     if (inters.length) {
       // 根据轮廓交点对面轮廓进行切割
@@ -170,17 +176,17 @@ class Bool2 {
   static Difference(a: Face2, b: Face2, tol0: number, tol1: number): Face2[] {
     let algorigin = new Face2Algo(a);
     let blgorigin = new Face2Algo(b);
-    a = a.clone();
-    b = b.clone();
+    let a_ = a.clone();
+    let b_ = b.clone();
     // 计算面与面的轮廓交点
-    let algo = new Face2Algo(a);
-    let blgo = new Face2Algo(b);
+    let algo = new Face2Algo(a_);
+    let blgo = new Face2Algo(b_);
     // 被减的一方轮廓需要翻转
     blgo.loops.forEach((loop) => {
       loop.reverse();
     });
     let inters = Brep2Inter.FaceXFace(algo, blgo, tol0, tol1);
-    if (inters.length == 0 && a.holes.length == 0 && b.holes.length == 0) {
+    if (inters.length == 0 && a_.holes.length == 0 && b_.holes.length == 0) {
       let pa = algo.getInnerPoint();
       let pb = blgo.getInnerPoint();
       // a在b内
@@ -189,9 +195,9 @@ class Bool2 {
       }
       // b在a内
       else if (algo.isPointAtInner(pb, tol0, tol1)) {
-        a.holes.push(b.border);
-        let ret = [a];
-        b.holes.forEach((hole) => {
+        a_.holes.push(b_.border);
+        let ret = [a_];
+        b_.holes.forEach((hole) => {
           let f = new Face2();
           f.border = hole;
           ret.push(f);
@@ -199,7 +205,7 @@ class Bool2 {
         return ret;
       } else {
         // a,b相离
-        return [a];
+        return [a_];
       }
     }
     // 根据轮廓交点对面轮廓进行切割
@@ -244,22 +250,22 @@ class Bool2 {
   static Intersection(a: Face2, b: Face2, tol0: number, tol1: number): Face2[] {
     let algorigin = new Face2Algo(a);
     let blgorigin = new Face2Algo(b);
-    a = a.clone();
-    b = b.clone();
+    let a_ = a.clone();
+    let b_ = b.clone();
     // 计算面与面的轮廓交点
-    let algo = new Face2Algo(a);
-    let blgo = new Face2Algo(b);
+    let algo = new Face2Algo(a_);
+    let blgo = new Face2Algo(b_);
     let inters = Brep2Inter.FaceXFace(algo, blgo, tol0, tol1);
-    if (inters.length == 0 && a.holes.length == 0 && b.holes.length == 0) {
+    if (inters.length == 0 && a_.holes.length == 0 && b_.holes.length == 0) {
       let pa = algo.getInnerPoint();
       let pb = blgo.getInnerPoint();
       // a在b内
       if (blgo.isPointAtInner(pa, tol0, tol1)) {
-        return [a];
+        return [a_];
       }
       // b在a内
       else if (algo.isPointAtInner(pb, tol0, tol1)) {
-        return [b];
+        return [b_];
       } else {
         // a,b相离
         return [];
@@ -303,25 +309,25 @@ class Bool2 {
   static Union(a: Face2, b: Face2, tol0: number, tol1: number): Face2[] {
     let algorigin = new Face2Algo(a);
     let blgorigin = new Face2Algo(b);
-    a = a.clone();
-    b = b.clone();
+    let a_ = a.clone();
+    let b_ = b.clone();
     // 计算面与面的轮廓交点
-    let algo = new Face2Algo(a);
-    let blgo = new Face2Algo(b);
+    let algo = new Face2Algo(a_);
+    let blgo = new Face2Algo(b_);
     let inters = Brep2Inter.FaceXFace(algo, blgo, tol0, tol1);
-    if (inters.length == 0 && a.holes.length == 0 && b.holes.length == 0) {
+    if (inters.length == 0 && a_.holes.length == 0 && b_.holes.length == 0) {
       let pa = algo.getInnerPoint();
       let pb = blgo.getInnerPoint();
       // a在b内
       if (blgo.isPointAtInner(pa, tol0, tol1)) {
-        return [b];
+        return [b_];
       }
       // b在a内
       else if (algo.isPointAtInner(pb, tol0, tol1)) {
-        return [a];
+        return [a_];
       } else {
         // a,b相离
-        return [a, b];
+        return [a_, b_];
       }
     }
     // 根据轮廓交点对面轮廓进行切割

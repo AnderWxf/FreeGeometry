@@ -10,6 +10,7 @@ import { GeomType } from "../../../../core/Constents";
 import { type Edge2 } from "../../../../geometry/data/brep/Brep2";
 import { CreateGeomUserData, type UserData } from "../../../UserData";
 import { CreateFaceCom } from "./CreateFaceCom";
+import { Face2Algo } from "../../../../geometry/algorithm/brep/Brep2Algo";
 
 
 /**
@@ -77,6 +78,12 @@ class CreateRectangleAreaCom extends CreateFaceCom {
 
     // 创建一个面
     let face = Brep2Builder.BuildFaceByEdges(edges);
+
+    let algo = new Face2Algo(face);
+    if (!algo.isPositive()) {
+      algo.reverse();
+    }
+
     if (paras.length >= 6) { face.uuid = paras[5]; }
     userData.color = THREE.Color.NAMES.blue;
     let geo = BrepMeshBuilder.BuildFace2Mesh(face, userData.color);

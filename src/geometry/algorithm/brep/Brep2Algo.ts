@@ -1029,13 +1029,13 @@ class Digraph2Algo {
 
     // 对有向边进行排序。
     algos.sort((a, b) => {
-      // 先比较起点顶点索引
+      // A 比较起点顶点索引
       let av0i = vertices.indexOf(a.v0);
       let bv0i = vertices.indexOf(b.v0);
       if (av0i != bv0i) {
         return av0i - bv0i;
       }
-      // 再比较终点顶点索引
+      // B 比较终点顶点索引
       let av1i = vertices.indexOf(a.v1);
       let bv1i = vertices.indexOf(b.v1);
       if (av1i != bv1i) {
@@ -1048,11 +1048,56 @@ class Digraph2Algo {
       if (angle != 0) {
         return angle;
       }
-      // 最后比较起点前进十分之处切线方向
+      // C 后比较起点前进十分之处切线方向
       let tav_ = a.t(a.u.x + (a.u.y - a.u.x) * 0.1);
       let tbv_ = b.t(b.u.x + (b.u.y - b.u.x) * 0.1);
       let angle_ = tav_.angleTo(tbv_);
-      return angle_;
+      if (angle_ != 0) {
+        return angle_;
+      }
+
+      // D 比较几何变换矩阵的原点坐标
+      let apos = a.curve.dat.trans.pos;
+      let bpos = b.curve.dat.trans.pos;
+      if (apos.x > bpos.x) {
+        return -1;
+      }
+      if (apos.x < bpos.x) {
+        return 1;
+      }
+      if (apos.y > bpos.y) {
+        return -1;
+      }
+      if (apos.y < bpos.y) {
+        return 1;
+      }
+      // E 比较几何变换矩阵的旋转
+      let arot = a.curve.dat.trans.rot;
+      let brot = b.curve.dat.trans.rot;
+      if (arot > brot) {
+        return -1;
+      }
+      if (arot < brot) {
+        return 1;
+      }
+
+      // F 比较几何变换矩阵的缩放
+      let ascale = a.curve.dat.trans.scale;
+      let bscale = b.curve.dat.trans.scale;
+      if (ascale.x > bscale.x) {
+        return -1;
+      }
+      if (ascale.x < bscale.x) {
+        return 1;
+      }
+      if (ascale.y > bscale.y) {
+        return -1;
+      }
+      if (ascale.y < bscale.y) {
+        return 1;
+      }
+
+      return 0;
     });
   }
 

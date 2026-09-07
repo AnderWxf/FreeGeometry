@@ -6,14 +6,18 @@ import { unserialize } from '../geometry/data/base/Unserialize';
 import { isEqualWith } from 'lodash';
 import { describe, expect, test } from 'vitest';
 import { Vector2, Vector3 } from '../math/Math';
-import { Edge2 } from '../geometry/data/brep/Brep2';
+import { Edge2, Face2 } from '../geometry/data/brep/Brep2';
 import { Point2Data } from '../geometry/data/base/Point2Data';
 
 function IsCloseTo(received: any, expected: any, tol0: number = 1e-4, tol1: number = 1e-8): boolean {
-  return isEqualWith(received, expected, (objVal, othVal, index, key, stack) => {
+  return isEqualWith(received, expected, (objVal, othVal, key, des, src) => {
+
     // 1. 判断当前属性名是否为 'uuid'
     // 注意：stack 的最后一个元素包含当前比较的 key 信息
-    const currentKey = key || stack?.keys?.[stack.keys.length - 1];
+    const currentKey = key;
+    console.log(currentKey);
+    console.log(objVal, othVal);
+
     if (currentKey === 'uuid') {
       // 2. 返回 true 表示忽略此次比较（认为它们相等）
       return true;
@@ -59,6 +63,7 @@ type TestCase = {
   name: string;
   inputFile: string;
   expectedFile: string;
+  expectedFile2: string;
 };
 type TestCaseInsertPoint2 = {
   dir: string;
@@ -80,6 +85,7 @@ function DiscoverTestCases(caseDir: string): TestCase[] {
       name: baseName,
       inputFile: path.join(dataDir, inputFile),
       expectedFile: path.join(dataDir, `${baseName}-expected.json`),
+      expectedFile2: path.join(dataDir, `${baseName}-expected2.json`),
     };
   });
 }
@@ -126,6 +132,74 @@ function ExecuteDescribe(typeName: string, typeDir: string, process: (input: any
             const expected = LoadScene(c.expectedFile);
             const result = process(input);
             expect(IsCloseTo(result, expected, 1e-4, 1e-8)).toBe(true);
+          });
+        }
+      });
+    });
+  });
+}
+
+// 执行描述Object 2D布尔运算
+function ExecuteDescribeBool2(typeName: string, typeDir: string, process: (a: Face2[], b: Face2[]) => any) {
+  let dir = __dirname;
+  dir = dir.replace(/\\/g, '/').replace(/\/src/, '');
+  describe(typeName, () => {
+    const dataDir = path.join(dir, 'data', typeDir);
+    const files = fs.readdirSync(dataDir);
+    files.forEach(file => {
+      const testCases = DiscoverTestCases(typeDir + '/' + file);
+      // 如果没有找到测试用例，给出提示
+      if (testCases.length === 0) {
+        console.warn('⚠️ 未找到测试数据文件，请检查 data/ 目录');
+      }
+      describe(file, () => {
+        const testCases = DiscoverTestCases(typeDir + '/' + file);
+        // 如果没有找到测试用例，给出提示
+        if (testCases.length === 0) {
+          console.warn('⚠️ 未找到测试数据文件，请检查 data/ 目录');
+        }
+        for (let i = 0; i < testCases.length; i++) {
+          let c = testCases[i];
+          test(c.name, () => {
+            const input = LoadScene(c.inputFile);
+            const expected = LoadScene(c.expectedFile);
+            let expected2: any;
+            if (fs.existsSync(c.expectedFile2)) {
+              expected2 = LoadScene(c.expectedFile2);
+            }
+
+            let a: Face2[] = [];
+            let b: Face2[] = [];
+            for (let i = 0; i < input.length; i++) {
+              if (input[i].userData.original instanceof Face2) {
+                let f = input[i].userData.original as Face2;
+                if (i < input.length / 2) {
+                  a.push(f);
+                } else {
+                  b.push(f);
+                }
+              }
+              if (input[i].userData.original instanceof Array) {
+                let arr = input[i].userData.original as Array<Face2>;
+                arr.forEach((f) => {
+                  if (f instanceof Face2) {
+                    if (i < input.length / 2) {
+                      a.push(f);
+                    } else {
+                      b.push(f);
+                    }
+                  }
+                })
+              }
+            }
+            const result0 = process(a, b);
+            expect(IsCloseTo(result0, expected, 1e-4, 1e-8)).toBe(true);
+            const result1 = process(b, a);
+            if (!expected2) {
+              expect(IsCloseTo(result1, expected, 1e-4, 1e-8)).toBe(true);
+            } else {
+              expect(IsCloseTo(result1, expected2, 1e-4, 1e-8)).toBe(true);
+            }
           });
         }
       });
@@ -312,7 +386,8 @@ function ExecuteDescribeInsertPoint3(typeName: string, typeDir: string, process:
     });
   });
 }
-// 执行描述Bool
+
+// 执行描述Bool值
 function ExecuteDescribeBools(typeName: string, typeDir: string, process: (input: any) => any) {
   let dir = __dirname;
   dir = dir.replace(/\\/g, '/').replace(/\/src/, '');
@@ -349,5 +424,6 @@ export {
   ExecuteDescribeBools,
   ExecuteDescribeInsertPoint2,
   ExecuteDescribeInsertPoint3,
+  ExecuteDescribeBool2,
 };
 export type { TestCase };

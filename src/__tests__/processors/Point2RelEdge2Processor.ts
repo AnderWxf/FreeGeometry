@@ -37,11 +37,11 @@ export function process(input: any[]): any {
     ab.push({ userData: { "original": isAtBoder } });
     ao.push({ userData: { "original": isAtOn } });
   }
-  let resut = {
+  let result = {
     as: as,
     ai: ai,
     ab: ab,
     ao: ao,
   }
-  return resut;
+  return result;
 }
