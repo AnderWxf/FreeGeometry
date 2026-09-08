@@ -79,21 +79,21 @@ class Arc2Algo extends Curve2Algo {
         }
       case 1:
         {
-          let m = this.dat.trans.makeLocalMatrix();
+          let m = this.dat.trans.makeLinearMatrix();
           let ret = new Vector2(-this.dat.radius.x * Math.sin(u), this.dat.radius.y * Math.cos(u));
           ret.applyMatrix3(m);
           return ret;
         }
       case 2:
         {
-          let m = this.dat.trans.makeLocalMatrix();
+          let m = this.dat.trans.makeLinearMatrix();
           let ret = new Vector2(-this.dat.radius.x * Math.cos(u), -this.dat.radius.y * Math.sin(u));
           ret.applyMatrix3(m);
           return ret;
         }
       case 3:
         {
-          let m = this.dat.trans.makeLocalMatrix();
+          let m = this.dat.trans.makeLinearMatrix();
           let ret = new Vector2(this.dat.radius.x * Math.sin(u), -this.dat.radius.y * Math.cos(u));
           ret.applyMatrix3(m);
           return ret;

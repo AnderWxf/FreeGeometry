@@ -25,7 +25,7 @@ import { Hyperbola2Algo } from "../base/curve2/Hyperbola2Algo";
 import { NURBSCurve } from 'three/examples/jsm/curves/NURBSCurve';
 import { Hyperbola3Data } from "../../data/base/curve3/Hyperbola3Data";
 import { Hyperbola3Algo } from "../base/curve3/Hyperbola3Algo";
-import { Hyperbola2AlgoAb } from "../base/curve2/Hyperbola2AlgoAb";
+// import { Hyperbola2AlgoAb } from "../base/curve2/Hyperbola2AlgoAb";
 
 /**
  * curvr builder.
@@ -263,7 +263,8 @@ class CurveBuilder {
         case 0:
           return new Hyperbola2Algo(dat);
         case 1:
-          return new Hyperbola2AlgoAb(dat);
+          // return new Hyperbola2AlgoAb(dat);
+          return new Hyperbola2Algo(dat);
         default:
           return new Hyperbola2Algo(dat);
       }

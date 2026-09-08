@@ -216,7 +216,10 @@ class Hyperbola2AlgoAb extends Curve2Algo {
   d(u: number, r: number = 0): Vector2 {
     const a = this.dat.radius.x;
     const b = this.dat.radius.y;
-    const m = this.dat.trans.makeLocalMatrix();
+    let m = this.dat.trans.makeLocalMatrix();
+    if (r > 0) {
+      m = this.dat.trans.makeLinearMatrix();
+    }
     let v0 = new Vector2(a, b);
     let v1 = new Vector2(-a, b);
     let M = new Matrix2(
@@ -309,4 +312,4 @@ class Hyperbola2AlgoAb extends Curve2Algo {
   }
 }
 
-export { Hyperbola2AlgoAb };
+// export { Hyperbola2AlgoAb };

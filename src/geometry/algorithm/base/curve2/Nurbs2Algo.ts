@@ -120,7 +120,7 @@ class Nurbs2Algo extends Curve2Algo {
       return ret;
     } else {
       let points = verb.eval.Eval.rationalCurveDerivatives(this.curve_._data, u, r) as number[][];
-      let m = this.dat.trans.makeLocalMatrix();
+      let m = this.dat.trans.makeLinearMatrix();
       let ret = new Vector2(points[1][0], points[1][1]);
       ret.applyMatrix3(m);
       return ret;

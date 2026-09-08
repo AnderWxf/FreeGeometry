@@ -1,4 +1,3 @@
-// user-processor.test.ts
 import { process } from '../src/__tests__/processors/Point2RelEdge2Processor';
 import { ExecuteDescribeBools } from '../src/__tests__/BaseTtest';
 

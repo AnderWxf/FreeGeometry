@@ -4837,7 +4837,9 @@ class Matrix2 {
    * @param {number} n22 - 2-2 matrix element.
    * @return {Matrix2} A reference to this matrix.
    */
-  set(n11: number, n12: number, n21: number, n22: number) {
+  set(
+    n11: number, n12: number,
+    n21: number, n22: number) {
 
     const te = this.elements;
 
@@ -5025,13 +5027,16 @@ class Matrix3 {
    * @param {number} [n33] - 3-3 matrix element.
    * @return {Matrix3} A reference to this matrix.
    */
-  set(n11: number, n12: number, n13: number, n21: number, n22: number, n23: number, n31: number, n32: number, n33: number) {
+  set(
+    n11: number, n12: number, n13: number,
+    n21: number, n22: number, n23: number,
+    n31: number, n32: number, n33: number) {
 
     const te = this.elements;
 
-    te[0] = n11; te[1] = n21; te[2] = n31;
-    te[3] = n12; te[4] = n22; te[5] = n32;
-    te[6] = n13; te[7] = n23; te[8] = n33;
+    te[0] = n11; te[3] = n12; te[6] = n13;
+    te[1] = n21; te[4] = n22; te[7] = n23;
+    te[2] = n31; te[5] = n32; te[8] = n33;
 
     return this;
 
@@ -5782,7 +5787,8 @@ class Matrix4 {
    * @param {number} [n44] - 4-4 matrix element.
    * @return {Matrix4} A reference to this matrix.
    */
-  set(n11: number, n12: number, n13: number, n14: number,
+  set(
+    n11: number, n12: number, n13: number, n14: number,
     n21: number, n22: number, n23: number, n24: number,
     n31: number, n32: number, n33: number, n34: number,
     n41: number, n42: number, n43: number, n44: number) {

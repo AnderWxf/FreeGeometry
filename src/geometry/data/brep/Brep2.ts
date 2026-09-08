@@ -76,6 +76,8 @@ class Vertice2 extends DataBase {
       if (data.p.type == GeomType.DATA_TYPE_POINT2) {
         ret.p = Point2Data.Unserialize(data.p);
       }
+    } else {
+      ret.p = data.p;
     }
     ret.uuid = data.uuid;
     return ret;

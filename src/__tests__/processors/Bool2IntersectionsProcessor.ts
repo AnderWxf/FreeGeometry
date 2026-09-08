@@ -5,7 +5,12 @@ import type { UserData } from "../../helper/UserData";
 
 export function process(a: Face2[], b: Face2[]): any[] {
   let result: any[] = [];
-  let fs = Bool2.Intersections(a, b, 1e-4, 1e-10);
+  let fs:Face2[] = [];
+  if (a.length === 1 && b.length === 1) {
+    fs =  Bool2.Intersection(a[0], b[0], 1e-4, 1e-10);
+  } else {
+    fs = Bool2.Intersections(a, b, 1e-4, 1e-10);
+  }
   let userData = {
     type: GeomType.DRAW_SURFACE_SEC,
     typename: GeomType[GeomType.DRAW_SURFACE_SEC],

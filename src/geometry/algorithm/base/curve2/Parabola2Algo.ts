@@ -76,12 +76,13 @@ class Parabola2Algo extends Curve2Algo {
    */
   override d(u: number, r: number = 0): Vector2 {
     const x = MATHJS.bignumber(u);
-    const m = this.dat.trans.makeLocalMatrix();
+
     const f4_ = MATHJS.divide(MATHJS.bignumber(1), MATHJS.multiply(MATHJS.bignumber(this.dat.f), 4)) as MATHJS.BigNumber;
     switch (r) {
       case 0:
         {
-          // y = x²/4f         
+          // y = x²/4f       
+          const m = this.dat.trans.makeLocalMatrix();
           const y = MATHJS.multiply(x, x, f4_) as MATHJS.BigNumber;
           const ret = new Vector2(x.toNumber(), y.toNumber());
           ret.applyMatrix3(m);
@@ -89,7 +90,8 @@ class Parabola2Algo extends Curve2Algo {
         }
       case 1:
         {
-          // y' = 2x/4f           
+          // y' = 2x/4f   
+          const m = this.dat.trans.makeLinearMatrix();
           const y = MATHJS.add(x, x, f4_, 2) as MATHJS.BigNumber;
           const ret = new Vector2(x.toNumber(), y.toNumber());
           ret.applyMatrix3(m);
@@ -98,6 +100,7 @@ class Parabola2Algo extends Curve2Algo {
       case 2:
         {
           // y'' = 2/4f     
+          const m = this.dat.trans.makeLinearMatrix();
           const ret = new Vector2(u, f4_.toNumber() * 2);
           ret.applyMatrix3(m);
           return ret;

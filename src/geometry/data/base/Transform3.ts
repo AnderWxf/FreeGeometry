@@ -1,5 +1,5 @@
 import { GeomType } from "../../../core/Constents";
-import { Euler, Matrix4, Vector3 } from "../../../math/Math";
+import { Euler, Matrix3, Matrix4, Vector3 } from "../../../math/Math";
 
 /**
  * 3D translation transfrom =.
@@ -102,10 +102,42 @@ class Transform3 {
     ret.elements[9] *= sz;
     ret.elements[10] *= sz;
 
-    ret.elements[3] = this.pos.x;
-    ret.elements[7] = this.pos.y;
-    ret.elements[11] = this.pos.z;
+    ret.elements[12] = this.pos.x;
+    ret.elements[13] = this.pos.y;
+    ret.elements[14] = this.pos.z;
     ret.elements[15] = 1;
+    return ret;
+  }
+
+
+  /**
+   * comput linear matrix as a 3D translation trans.
+   * not include translation.
+   * @return {Matrix4} A reference to this matrix.
+   */
+  makeLinearMatrix() {
+    let ret = new Matrix4();
+    ret.makeRotationFromEuler(this.rot);
+    let sx = this.scale.x;
+    let sy = this.scale.y;
+    let sz = this.scale.z;
+
+    ret.elements[0] *= sx;
+    ret.elements[1] *= sx;
+    ret.elements[2] *= sx;
+
+    ret.elements[4] *= sy;
+    ret.elements[5] *= sy;
+    ret.elements[6] *= sy;
+
+    ret.elements[8] *= sz;
+    ret.elements[9] *= sz;
+    ret.elements[10] *= sz;
+
+    ret.elements[12] = 0;
+    ret.elements[13] = 0;
+    ret.elements[14] = 0;
+    ret.elements[15] = 0;
     return ret;
   }
 
@@ -139,7 +171,7 @@ class Transform3 {
    */
   copy() {
     return this.clone();
-  }  
+  }
 
   /**
    * Returns a new Transform3 with unserialize data.

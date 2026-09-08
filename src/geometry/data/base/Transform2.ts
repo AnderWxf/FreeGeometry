@@ -1,5 +1,5 @@
 import { GeomType } from "../../../core/Constents";
-import { Matrix3, Vector2 } from "../../../math/Math";
+import { Matrix2, Matrix3, Vector2 } from "../../../math/Math";
 
 /**
  * 2D translation transfrom .
@@ -96,6 +96,25 @@ class Transform2 {
       c * sx, -s * sy, x,
       s * sx, c * sy, y,
       0, 0, 1
+    );
+    return ret;
+  }
+
+  /**
+   * comput linear matrix as a 2D translation trans.
+   * not include translation.
+   * @return {Matrix3} A reference to this matrix.
+   */
+  makeLinearMatrix() {
+    let ret = new Matrix3();
+    const c = Math.cos(this.rot);
+    const s = Math.sin(this.rot);
+    const sx = this.scale.x;
+    const sy = this.scale.y;
+    ret.set(
+      c * sx, -s * sy, 0,
+      s * sx, c * sy, 0,
+      0, 0, 0
     );
     return ret;
   }

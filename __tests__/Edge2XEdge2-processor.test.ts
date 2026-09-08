@@ -1,4 +1,3 @@
-// user-processor.test.ts
 import { process } from '../src/__tests__/processors/Edge2XEdge2Processor';
 import { ExecuteDescribeInsertPoint2 } from "../src/__tests__/BaseTtest";
 

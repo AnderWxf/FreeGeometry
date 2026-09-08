@@ -354,7 +354,7 @@ class Hyperbola2Algo extends Curve2Algo {
   d(u: number, r: number = 0): Vector2 {
     const a = MATHJS.bignumber(this.dat.radius.x);
     const b = MATHJS.bignumber(this.dat.radius.y);
-    const m = this.dat.trans.makeLocalMatrix();
+
     const secu = MATHJS.sec(u);
     const tanu = MATHJS.tan(u);
     switch (r) {
@@ -362,6 +362,7 @@ class Hyperbola2Algo extends Curve2Algo {
         {
           // x = a sec(u)
           // y = b tan(u)         
+          const m = this.dat.trans.makeLocalMatrix();
           const x = MATHJS.multiply(a, secu) as MATHJS.BigNumber;
           const y = MATHJS.multiply(b, tanu) as MATHJS.BigNumber;
           let ret = new Vector2(x.toNumber(), y.toNumber());
@@ -371,7 +372,8 @@ class Hyperbola2Algo extends Curve2Algo {
       case 1:
         {
           // x' = a sec(u) tan(u)
-          // y' = b sec(u) sec(u)              
+          // y' = b sec(u) sec(u)    
+          const m = this.dat.trans.makeLinearMatrix();
           const x = MATHJS.multiply(a, secu, tanu) as MATHJS.BigNumber;
           const y = MATHJS.multiply(b, secu, secu) as MATHJS.BigNumber;
           let ret = new Vector2(x.toNumber(), y.toNumber());
@@ -382,6 +384,7 @@ class Hyperbola2Algo extends Curve2Algo {
         {
           // x'' = a(sec(u)tan(u)tan(u) + sec(u)sec(u)sec(u)) = a(sec(u)tan^2(u) + sec^3(u))
           // y'' = b(2sec(u)sec(u)tan(u)) = 2bsec^2(u)tan(u)  
+          const m = this.dat.trans.makeLinearMatrix();
           const x = MATHJS.add(MATHJS.multiply(secu, tanu, tanu), MATHJS.multiply(secu, secu, secu)) as MATHJS.BigNumber;
           const y = MATHJS.multiply(b, secu, secu, tanu, 2) as MATHJS.BigNumber;
           let ret = new Vector2(x.toNumber(), y.toNumber());
@@ -392,6 +395,7 @@ class Hyperbola2Algo extends Curve2Algo {
         {
           // x'' = a(sec(u)tan^3(u) + 2tan(u)sec^3(u) + 3sec^3(u)tan(u))
           // y'' = 2b(2sec^2(u)tan^2(u) + sec^4(u))
+          const m = this.dat.trans.makeLinearMatrix();
           let x = MATHJS.add(MATHJS.multiply(a, secu, tanu, tanu, tanu), MATHJS.multiply(a, tanu, secu, secu, secu, 2), MATHJS.multiply(a, secu, secu, secu, tanu, 3)) as MATHJS.BigNumber;
           let y = MATHJS.add(MATHJS.multiply(b, secu, secu, tanu, tanu, 4), MATHJS.multiply(b, secu, secu, secu, secu, 2)) as MATHJS.BigNumber;
           let ret = new Vector2(x.toNumber(), y.toNumber());

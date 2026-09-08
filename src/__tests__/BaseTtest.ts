@@ -18,6 +18,19 @@ function IsCloseTo(received: any, expected: any, tol0: number = 1e-4, tol1: numb
     console.log(currentKey);
     console.log(objVal, othVal);
 
+    if (objVal === undefined && othVal === undefined) {
+      return true;
+    }
+    if (objVal === null && othVal === null) {
+      return true;
+    }
+    if (objVal === undefined && othVal === null) {
+      return true;
+    }
+    if (objVal === null && othVal === undefined) {
+      return true;
+    }
+
     if (currentKey === 'uuid') {
       // 2. 返回 true 表示忽略此次比较（认为它们相等）
       return true;
@@ -47,7 +60,12 @@ function LoadScene(filename: string) {
   let datas = JSON.parse(fs.readFileSync(filePath, 'utf-8')) as [any];
   for (let i = 0; i < datas.length; i++) {
     let userData = datas[i].userData as UserData;
-    userData.original = unserialize(userData.original)[0];
+    let uns = unserialize(userData.original);
+    if (uns.length > 0) {
+      userData.original = uns[0];
+    } else {
+      userData.original = uns;
+    }
   }
   return datas as any;
 }
