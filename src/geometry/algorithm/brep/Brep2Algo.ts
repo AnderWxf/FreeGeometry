@@ -916,7 +916,9 @@ class Face2Algos {
   get fs(): Face2[] {
     return this._fs;
   }
-
+  get fsa(): Face2Algo[] {
+    return this._fas;
+  }
   get curves(): Curve2Data[] {
     let result: Curve2Data[] = [];
     let algos = this._fas;

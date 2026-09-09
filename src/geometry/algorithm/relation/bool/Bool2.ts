@@ -136,6 +136,43 @@ class Bool2 {
     let algo = new Face2Algos(a_);
     let blgo = new Face2Algos(b_);
     let inters = Brep2Inter.FaceXFace(algo, blgo, tol0, tol1);
+    if (inters.length == 0) {
+      // 剔除相互包含的部分
+      let afsa = algo.fsa;
+      let afs = algo.fs;
+      for (let i = afsa.length - 1; i > -1; i--) {
+        let pa = afsa[i].getInnerPoint();
+        // a在b内
+        if (blgorigin.isPointAtInner(pa, tol0, tol1)) {
+          afsa.slice(i, 1);
+          afs.slice(i, 1);
+        }
+      }
+      let bfsa = blgo.fsa;
+      let bfs = blgo.fs;
+      for (let i = bfsa.length - 1; i > -1; i--) {
+        let pb = bfsa[i].getInnerPoint();
+        // b在a内
+        if (algorigin.isPointAtInner(pb, tol0, tol1)) {
+          bfsa.slice(i, 1);
+          bfs.slice(i, 1);
+        }
+      }
+      // 合并结果
+      let result: Face2[] = [];
+      result.push(...afs);
+      result.push(...bfs);
+      result.sort((fa, fb) => {
+        if (fa.uuid < fb.uuid) {
+          return -1;
+        }
+        if (fa.uuid > fb.uuid) {
+          return 1;
+        }
+        return 0;
+      });
+      return result;
+    }
     if (inters.length) {
       // 根据轮廓交点对面轮廓进行切割
       Bool2.Cutting(algo.loops, blgo.loops, inters, tol0, tol1);
@@ -195,14 +232,8 @@ class Bool2 {
       }
       // b在a内
       else if (algo.isPointAtInner(pb, tol0, tol1)) {
-        a_.holes.push(b_.border);
-        let ret = [a_];
-        b_.holes.forEach((hole) => {
-          let f = new Face2();
-          f.border = hole;
-          ret.push(f);
-        });
-        return ret;
+        let result: Face2[] = Bool2.FaceRebuild(algo, blgo, tol0, tol1);
+        return result;
       } else {
         // a,b相离
         return [a_];
@@ -327,7 +358,17 @@ class Bool2 {
         return [a_];
       } else {
         // a,b相离
-        return [a_, b_];
+        let result = [a_, b_];
+        result.sort((fa, fb) => {
+          if (fa.uuid < fb.uuid) {
+            return -1;
+          }
+          if (fa.uuid > fb.uuid) {
+            return 1;
+          }
+          return 0;
+        });
+        return result;
       }
     }
     // 根据轮廓交点对面轮廓进行切割

@@ -188,8 +188,8 @@ class Curve2Algo {
     let b = m.elements[1];
     let c = m.elements[3];
     let d = m.elements[4];
-    let Tx = m.elements[2];
-    let Ty = m.elements[5];
+    let Tx = m.elements[6];
+    let Ty = m.elements[7];
     let Δ = a * d - b * c;
     let begin = this.p(u0);
     let end = this.p(u1);

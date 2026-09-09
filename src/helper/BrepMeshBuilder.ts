@@ -387,7 +387,7 @@ class BrepMeshBuilder {
         [ub, ue] = [ue, ub];
       }
       let step = (ue - ub) / edgeSegment;
-      for (let u = ub, i = 0; i < edgeSegment; u += step, i++) {
+      for (let u = ub, i = 0; i <= edgeSegment; u += step, i++) {
         let p = algor.p(u);
         points.push(new THREE.Vector2(p.x, p.y));
       }
@@ -416,7 +416,7 @@ class BrepMeshBuilder {
           [ub, ue] = [ue, ub];
         }
         let step = (ue - ub) / edgeSegment;
-        for (let u = ub, i = 0; i < edgeSegment; u += step, i++) {
+        for (let u = ub, i = 0; i <= edgeSegment; u += step, i++) {
           let p = algor.p(u);
           holePoints.push(new THREE.Vector2(p.x, p.y));
         }
@@ -456,18 +456,19 @@ class BrepMeshBuilder {
       borderMesh.frustumCulled = false;
       ret.children.push(borderMesh);
       holes.forEach(hole => {
-        let vertices = new Array<number>;
-        hole.getPoints().forEach(p => {
-          vertices.push(p.x);
-          vertices.push(p.y);
-          vertices.push(0);
+        let holeVertices = new Array<number>;
+        let holePoints = hole.getPoints();
+        holePoints.forEach(p => {
+          holeVertices.push(p.x);
+          holeVertices.push(p.y);
+          holeVertices.push(0);
         });
-        let p = points[0];
-        vertices.push(p.x);
-        vertices.push(p.y);
-        vertices.push(0);
+        let p = holePoints[0];
+        holeVertices.push(p.x);
+        holeVertices.push(p.y);
+        holeVertices.push(0);
         let holeBuff = new THREE.BufferGeometry()
-        holeBuff.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+        holeBuff.setAttribute('position', new THREE.Float32BufferAttribute(holeVertices, 3));
         let holeMesh = new THREE.Line(holeBuff, materialline);
         holeMesh.frustumCulled = false;
         ret.children.push(holeMesh);
@@ -512,7 +513,7 @@ class BrepMeshBuilder {
           [ub, ue] = [ue, ub];
         }
         let step = (ue - ub) / edgeSegment;
-        for (let u = ub, i = 0; i < edgeSegment; u += step, i++) {
+        for (let u = ub, i = 0; i <= edgeSegment; u += step, i++) {
           let p = algor.p(u);
           points.push(new THREE.Vector2(p.x, p.y));
         }
@@ -541,7 +542,7 @@ class BrepMeshBuilder {
             [ub, ue] = [ue, ub];
           }
           let step = (ue - ub) / edgeSegment;
-          for (let u = ub, i = 0; i < edgeSegment; u += step, i++) {
+          for (let u = ub, i = 0; i <= edgeSegment; u += step, i++) {
             let p = algor.p(u);
             holePoints.push(new THREE.Vector2(p.x, p.y));
           }
@@ -589,18 +590,19 @@ class BrepMeshBuilder {
         borderMesh.frustumCulled = false;
         ret.children.push(borderMesh);
         holes.forEach(hole => {
-          let vertices = new Array<number>;
-          hole.getPoints().forEach(p => {
-            vertices.push(p.x);
-            vertices.push(p.y);
-            vertices.push(0);
+          let holeVertices = new Array<number>;
+          let holePoints = hole.getPoints();
+          holePoints.forEach(p => {
+            holeVertices.push(p.x);
+            holeVertices.push(p.y);
+            holeVertices.push(0);
           });
-          let p = points[0];
-          vertices.push(p.x);
-          vertices.push(p.y);
-          vertices.push(0);
+          let p = holePoints[0];
+          holeVertices.push(p.x);
+          holeVertices.push(p.y);
+          holeVertices.push(0);
           let holeBuff = new THREE.BufferGeometry()
-          holeBuff.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+          holeBuff.setAttribute('position', new THREE.Float32BufferAttribute(holeVertices, 3));
           let holeMesh = new THREE.Line(holeBuff, materialline);
           holeMesh.frustumCulled = false;
           ret.children.push(holeMesh);

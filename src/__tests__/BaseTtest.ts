@@ -61,9 +61,13 @@ function LoadScene(filename: string) {
   for (let i = 0; i < datas.length; i++) {
     let userData = datas[i].userData as UserData;
     let uns = unserialize(userData.original);
-    if (uns.length > 0) {
+    if (uns.length == 1) {
       userData.original = uns[0];
-    } else {
+    }
+    else if (uns.length > 1) {
+      userData.original = uns;
+    }
+    else {
       userData.original = uns;
     }
   }
