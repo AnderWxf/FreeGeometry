@@ -48,7 +48,8 @@
                 "typename": "MATH_VECTOR2",
                 "x": 1,
                 "y": 1
-              }
+              },
+              "parent": null
             },
             "type": 255,
             "typename": "DATA_TYPE_CURVE2_ARC2",
@@ -86,13 +87,13 @@
                 "v0i": -1,
                 "v1i": -1,
                 "curvei": 0,
+                "curve": null,
                 "u": {
                   "type": -1,
                   "typename": "MATH_VECTOR2",
                   "x": 0,
                   "y": 6.283185307179586
                 },
-                "curve": null,
                 "v0": {
                   "uuid": "05ce01e7-f6f1-4426-9bd0-a8d3e697f93a",
                   "type": 295,
@@ -114,7 +115,6 @@
   {
     "userData": {
       "type": 31,
-      "typename": "DRAW_SURFACE_EL",
       "canPick": true,
       "isAssist": false,
       "assistPoints": [
@@ -122,8 +122,8 @@
           "p": {
             "type": -1,
             "typename": "MATH_VECTOR2",
-            "x": -10,
-            "y": 8.046875
+            "x": 1.5104166666666785,
+            "y": 4.661458333333332
           },
           "c": 11403055
         },
@@ -131,8 +131,8 @@
           "p": {
             "type": -1,
             "typename": "MATH_VECTOR2",
-            "x": -24.635416666666675,
-            "y": 17.630208333333336
+            "x": -13.125,
+            "y": 14.244791666666668
           },
           "c": 3329330
         },
@@ -140,8 +140,8 @@
           "p": {
             "type": -1,
             "typename": "MATH_VECTOR2",
-            "x": -14.303440527580062,
-            "y": 1.4747728899456618
+            "x": -2.7930238609133866,
+            "y": -1.910643776721006
           },
           "c": 139
         }
@@ -160,8 +160,8 @@
               "pos": {
                 "type": -1,
                 "typename": "MATH_VECTOR2",
-                "x": -10,
-                "y": 8.046875
+                "x": 1.5104166666666785,
+                "y": 4.661458333333332
               },
               "rot": 2.561847500673107,
               "scale": {
@@ -169,7 +169,8 @@
                 "typename": "MATH_VECTOR2",
                 "x": 1,
                 "y": 1
-              }
+              },
+              "parent": null
             },
             "type": 255,
             "typename": "DATA_TYPE_CURVE2_ARC2",
@@ -213,7 +214,6 @@
                   "x": 0,
                   "y": 6.283185307179586
                 },
-                "curve": null,
                 "v0": {
                   "uuid": "10a6f457-8818-42d6-8938-8735013c6029",
                   "type": 295,
@@ -229,7 +229,8 @@
           ]
         },
         "holes": []
-      }
+      },
+      "typename": "DRAW_SURFACE_EL"
     }
   }
 ]

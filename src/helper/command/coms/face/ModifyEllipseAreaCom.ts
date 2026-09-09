@@ -90,7 +90,11 @@ class ModifyEllipseAreaCom extends ModifyFaceCom {
     userData.original = face;
     geo.userData = userData;
     this.results = geo;
-    let alg = CurveBuilder.Algorithm2ByData(edge.curve);
+    let curve = edge.curve;
+    if (!curve) {
+      curve = face.curves[edge.curvei];
+    }
+    let alg = CurveBuilder.Algorithm2ByData(curve);
     let minorP = alg.p(PI_2);
     minor.set(minorP.x, minorP.y);
 

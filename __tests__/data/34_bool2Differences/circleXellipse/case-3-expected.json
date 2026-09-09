@@ -1,0 +1,97 @@
+[
+  {
+    "userData": {
+      "type": 34,
+      "typename": "DRAW_SURFACE_SEC",
+      "canPick": true,
+      "isAssist": false,
+      "assistPoints": [],
+      "color": 255,
+      "original": [
+        {
+          "uuid": "ab0944eb-a7f7-42aa-b479-7519f5a25eff",
+          "type": 299,
+          "typename": "DATA_TYPE_BREP2_FACE2",
+          "curves": [
+            {
+              "uuid": "69d0483e-218b-4d39-8903-c007778f8124",
+              "trans": {
+                "type": 252,
+                "typename": "DATA_TYPE_TRANSFORM2",
+                "pos": {
+                  "type": -1,
+                  "typename": "MATH_VECTOR2",
+                  "x": -22.864583333333336,
+                  "y": 16.43229166666667
+                },
+                "rot": 0,
+                "scale": {
+                  "type": -1,
+                  "typename": "MATH_VECTOR2",
+                  "x": 1,
+                  "y": 1
+                },
+                "parent": null
+              },
+              "type": 255,
+              "typename": "DATA_TYPE_CURVE2_ARC2",
+              "radius": {
+                "type": -1,
+                "typename": "MATH_VECTOR2",
+                "x": 8.47054998296385,
+                "y": 8.47054998296385
+              }
+            }
+          ],
+          "vertices": [
+            {
+              "uuid": "05ce01e7-f6f1-4426-9bd0-a8d3e697f93a",
+              "type": 295,
+              "typename": "DATA_TYPE_BREP2_VERTICE2"
+            }
+          ],
+          "edges": [],
+          "border": {
+            "uuid": "df14fdd3-606e-4c08-a187-8a9435e7abdf",
+            "type": 298,
+            "typename": "DATA_TYPE_BREP2_LOOP2",
+            "coedges": [
+              {
+                "uuid": "afd0bdcc-f9ed-432c-b1f3-bb9c918f3734",
+                "type": 297,
+                "typename": "DATA_TYPE_BREP2_COEDGE2",
+                "ei": -1,
+                "isForward": true,
+                "e": {
+                  "uuid": "7c0a9cdf-8f53-4255-acd2-d35fe9fad965",
+                  "type": 296,
+                  "typename": "DATA_TYPE_BREP2_EDGE2",
+                  "v0i": -1,
+                  "v1i": -1,
+                  "curvei": 0,
+                  "u": {
+                    "type": -1,
+                    "typename": "MATH_VECTOR2",
+                    "x": 0,
+                    "y": 6.283185307179586
+                  },
+                  "v0": {
+                    "uuid": "05ce01e7-f6f1-4426-9bd0-a8d3e697f93a",
+                    "type": 295,
+                    "typename": "DATA_TYPE_BREP2_VERTICE2"
+                  },
+                  "v1": {
+                    "uuid": "05ce01e7-f6f1-4426-9bd0-a8d3e697f93a",
+                    "type": 295,
+                    "typename": "DATA_TYPE_BREP2_VERTICE2"
+                  }
+                }
+              }
+            ]
+          },
+          "holes": []
+        }
+      ]
+    }
+  }
+]
