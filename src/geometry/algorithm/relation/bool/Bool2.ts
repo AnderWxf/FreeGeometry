@@ -373,6 +373,7 @@ class Bool2 {
     }
     // 根据轮廓交点对面轮廓进行切割
     Bool2.Cutting(algo.loops, blgo.loops, inters, tol0, tol1);
+    let isChanged = false;
     // 删除a中在b的原始形状内部的边。
     algo.loops.forEach((loop) => {
       let count = loop.coedges.length;
@@ -382,6 +383,7 @@ class Bool2 {
         let mp = coedge.p((u.x + u.y) * 0.5);
         if (blgorigin.isPointAtInner(mp, tol0, tol1)) {
           loop.coedges.splice(i, 1);
+          isChanged = true;
         }
       }
     });
@@ -394,12 +396,28 @@ class Bool2 {
         let mp = coedge.p((u.x + u.y) * 0.5);
         if (algorigin.isPointAtInner(mp, tol0, tol1)) {
           loop.coedges.splice(i, 1);
+          isChanged = true;
         }
       }
     });
-    // 面重构
-    let result: Face2[] = Bool2.FaceRebuild(algo, blgo, tol0, tol1);
-    return result;
+    if (isChanged) {
+      // 面重构
+      let result: Face2[] = Bool2.FaceRebuild(algo, blgo, tol0, tol1);
+      return result;
+    } else {
+      // a,b外相切
+      let result = [a_, b_];
+      result.sort((fa, fb) => {
+        if (fa.uuid < fb.uuid) {
+          return -1;
+        }
+        if (fa.uuid > fb.uuid) {
+          return 1;
+        }
+        return 0;
+      });
+      return result;
+    }
   }
 
   /*
@@ -429,6 +447,7 @@ class Bool2 {
                   coedgeAlgo.c.e.umax = ip.u0;
                   let afterCoedgeAlgo = new Coedge2Algo(afterCoedge, coedgeAlgo.f);
                   loopAlgo.coedges.splice(l + 1, 0, afterCoedgeAlgo);
+                  loopAlgo.loop.coedges.splice(l + 1, 0, afterCoedge);
                 }
               } else {
                 if (!coedgeAlgo.isOnUBoder(ip.u0, tol1) && coedgeAlgo.isInURange(ip.u0)) {
@@ -438,6 +457,7 @@ class Bool2 {
                   coedgeAlgo.c.e.umax = ip.u0;
                   let afterCoedgeAlgo = new Coedge2Algo(afterCoedge, coedgeAlgo.f);
                   loopAlgo.coedges.splice(l + 1, 0, afterCoedgeAlgo);
+                  loopAlgo.loop.coedges.splice(l + 1, 0, afterCoedge);
                 }
               }
 
@@ -459,6 +479,7 @@ class Bool2 {
                   coedgeAlgo.c.e.umax = ip.u1;
                   let afterCoedgeAlgo = new Coedge2Algo(afterCoedge, coedgeAlgo.f);
                   loopAlgo.coedges.splice(l + 1, 0, afterCoedgeAlgo);
+                  loopAlgo.loop.coedges.splice(l + 1, 0, afterCoedge);
                 }
               } else {
                 if (!coedgeAlgo.isOnUBoder(ip.u1, tol1) && coedgeAlgo.isInURange(ip.u1)) {
@@ -468,6 +489,7 @@ class Bool2 {
                   coedgeAlgo.c.e.umax = ip.u1;
                   let afterCoedgeAlgo = new Coedge2Algo(afterCoedge, coedgeAlgo.f);
                   loopAlgo.coedges.splice(l + 1, 0, afterCoedgeAlgo);
+                  loopAlgo.loop.coedges.splice(l + 1, 0, afterCoedge);
                 }
               }
             }

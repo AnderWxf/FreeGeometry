@@ -249,12 +249,12 @@ const MenuItems = [
     children: [
       { key: CommandType.SCENE_SAVE, label: '保存' + ' ' + CommandType.SCENE_SAVE + ' Ct + S' },
       { key: CommandType.SCENE_SAVEAS, label: '另存为' + ' ' + CommandType.SCENE_SAVEAS + ' Ct + Sh + S' },
-      { key: CommandType.SCENE_LOAD, label: '加载' + ' ' + CommandType.SCENE_LOAD + ' Ct + O' },
-      { key: CommandType.SCENE_IMPORT, label: '导入' + ' ' + CommandType.SCENE_IMPORT + ' Ct + I' },
+      { key: CommandType.SCENE_LOAD, label: '加载' + ' ' + CommandType.SCENE_LOAD + ' Ct + F' },
+      { key: CommandType.SCENE_IMPORT, label: '导入' + ' ' + CommandType.SCENE_IMPORT + ' Ct + R' },
       { key: CommandType.SCENE_CLEAR, label: '清空' + ' ' + CommandType.SCENE_CLEAR + ' Ct + X' },
       { key: CommandType.SCENE_CLEAR_POINT, label: '清空点' + ' ' + CommandType.SCENE_CLEAR_POINT },
-      { key: CommandType.SCENE_STRICP_SAVE, label: '保存脚本' + ' ' + CommandType.SCENE_STRICP_SAVE + ' Ct + R' },
-      { key: CommandType.SCENE_STRICP_EXEC, label: '执行脚本' + ' ' + CommandType.SCENE_STRICP_EXEC + ' Ct + Sh + R' },
+      { key: CommandType.SCENE_STRICP_SAVE, label: '保存脚本' + ' ' + CommandType.SCENE_STRICP_SAVE + ' Ct + T' },
+      { key: CommandType.SCENE_STRICP_EXEC, label: '执行脚本' + ' ' + CommandType.SCENE_STRICP_EXEC + ' Ct + Sh + T' },
     ],
   },
   {

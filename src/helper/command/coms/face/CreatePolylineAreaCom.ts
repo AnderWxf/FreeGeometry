@@ -82,6 +82,7 @@ class CreatePolylineAreaCom extends CreateFaceCom {
     let algo = new Face2Algo(face);
     if (!algo.isPositive()) {
       algo.reverse();
+      this.assists = this.assists.reverse();
     }
 
     userData.color = THREE.Color.NAMES.blue;

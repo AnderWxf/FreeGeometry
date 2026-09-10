@@ -280,11 +280,11 @@ class CommandExecuter {
   * 'Ctrl' + 'Y', REDO
   * 'Ctrl' + 'S', SAVE 
   * 'Ctrl' + 'Shift' + 'S', SAVEAS  
-  * 'Ctrl' + 'O', LOAD 
-  * 'Ctrl' + 'I', IMPORT 
+  * 'Ctrl' + 'F', LOAD File
+  * 'Ctrl' + 'R', IMPORT 
   * 'Ctrl' + 'X', CLEAR  
-  * 'Ctrl' + 'R', STRICP_SAVE
-  * 'Ctrl' + 'Shift' + 'R', STRICP_EXEC  
+  * 'Ctrl' + 'T', STRICP_SAVE
+  * 'Ctrl' + 'Shift' + 'T', STRICP_EXEC  
   */
   onKeyDown = (event: KeyboardEvent) => {
     event.preventDefault();
@@ -310,14 +310,7 @@ class CommandExecuter {
         break;
       // I：镜像
       case 'KeyI':
-        if (this.KeyCtrlDown) {
-          this.KeyCtrlDown = false;
-          event.preventDefault();
-          this.execute(CommandType.SCENE_IMPORT);
-          return;
-        } else {
-          this.execute(CommandType.TRANSFORM_MIRROR);
-        }
+        this.execute(CommandType.TRANSFORM_MIRROR);
         break;
       // M：移动
       case 'KeyM':
@@ -325,6 +318,16 @@ class CommandExecuter {
         break;
       // R：旋转
       case 'KeyR':
+        if (this.KeyCtrlDown) {
+          this.KeyCtrlDown = false;
+          event.preventDefault();
+          this.execute(CommandType.SCENE_IMPORT);
+          return;
+        }
+        this.execute(CommandType.TRANSFORM_ROTATE);
+        break;
+      // T：
+      case 'KeyT':
         if (this.KeyCtrlDown && !this.KeyShiftDown) {
           this.KeyCtrlDown = false;
           event.preventDefault();
@@ -337,18 +340,19 @@ class CommandExecuter {
           this.execute(CommandType.SCENE_STRICP_EXEC);
           return;
         }
-        this.execute(CommandType.TRANSFORM_ROTATE);
         break;
-      // O：偏移
-      case 'KeyO':
+      // F：
+      case 'KeyF':
         if (this.KeyCtrlDown) {
           this.KeyCtrlDown = false;
           event.preventDefault();
           this.execute(CommandType.SCENE_LOAD);
           return;
-        } else {
-          this.execute(CommandType.TRANSFORM_OFFSET);
         }
+        break;
+      // O：偏移
+      case 'KeyO':
+        this.execute(CommandType.TRANSFORM_OFFSET);
         break;
       // S：拉伸
       case 'KeyS':

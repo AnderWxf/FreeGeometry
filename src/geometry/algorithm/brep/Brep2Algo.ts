@@ -189,25 +189,14 @@ class Coedge2Algo {
     this._outs = [];
   }
   // Get the next coedge in the loop, return null if no next coedge or all next coedges have been visited.
-  GetNext(visited: Coedge2Algo[] = []): Coedge2Algo {
-    let ret: Coedge2Algo = null;
-    let min = Number.MAX_VALUE;
-    let t0 = this.t(this.u.y);
-    this._outs.forEach(out => {
+  getNext(visited: Coedge2Algo[] = []): Coedge2Algo {
+    for (let i = 0; i < this._outs.length; i++) {
+      let out = this._outs[i];
       if (!visited.includes(out)) {
-        if (!ret) {
-          ret = out;
-        } else {
-          let t1 = out.t(out.u.x);
-          let angle = t0.angleTo(t1);
-          if (angle < min) {
-            min = angle;
-            ret = out;
-          }
-        }
+        return out;
       }
-    });
-    return ret;
+    }
+    return null;
   }
 
   /**
@@ -291,6 +280,19 @@ class Coedge2Algo {
     if (!this._outs.includes(coedgeAlgo)) {
       this._outs.push(coedgeAlgo);
     }
+  }
+  outSort() {
+    let t0 = this.t(this.u.y);
+    this._outs.sort((a, b) => {
+      if (a._f != this._f && b._f == this._f) {
+        return -1;
+      }
+      let t1 = a.t(a.u.x);
+      let t2 = b.t(b.u.x);
+      let angleA = t0.angleTo(t1);
+      let angleB = t0.angleTo(t2);
+      return angleA - angleB;
+    });
   }
   getBeginPoint(): Vector2 {
     return this.p(this.u.x);
@@ -1101,6 +1103,11 @@ class Digraph2Algo {
 
       return 0;
     });
+
+    // 对有向边出口进行排序。
+    algos.forEach(algo => {
+      algo.outSort();
+    });
   }
 
   getAllLoops(): Loop2Algo[] {
@@ -1120,13 +1127,13 @@ class Digraph2Algo {
       loop.coedges.push(curr.c);
       loopAlgo.coedges.push(curr);
       visited.push(curr);
-      let next = curr.GetNext(visited);
+      let next = curr.getNext(visited);
       while (next) {
         curr = next;
         loop.coedges.push(curr.c);
         loopAlgo.coedges.push(curr);
         visited.push(curr);
-        next = curr.GetNext(visited);
+        next = curr.getNext(visited);
       }
       loops.push(loopAlgo);
     }
