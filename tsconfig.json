@@ -50,9 +50,18 @@
   },
   "include": [
     "src/**/*",
+    // "src/__tests__/**/*",
+    // "src/core/**/*",
+    // "src/geometry/**/*",
+    // "src/math/**/*",
+    // "src/mathjs/**/*",
+    // "src/ui/**/*",
+    // "src/main.ts",
+    // "src/verb-nurbs.d.ts",
     "*.d.ts"
   ],
   "exclude": [
+    "src/wasm/**/*",
     "node_modules",
     "build",
     "dist",

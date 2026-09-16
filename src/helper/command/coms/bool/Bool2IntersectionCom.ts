@@ -15,9 +15,9 @@ class Bool2IntersectionCom extends Bool2Com {
 
   override execute(): Face2[] {
     if (this.src.length === 1 && this.des.length === 1) {
-      return Bool2.Intersection(this.src[0], this.des[0], 1e-4, 1e-10);
+      return Bool2.Intersection(this.src[0], this.des[0], 0.0001, 0.0000000001);
     } else {
-      return Bool2.Intersections(this.src, this.des, 1e-4, 1e-10);
+      return Bool2.Intersections(this.src, this.des, 0.0001, 0.0000000001);
     }
   }
 }

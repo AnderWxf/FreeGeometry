@@ -10,7 +10,8 @@ module.exports = {
   // devtool: 'inline-source-map', // 将 source map 内联在 bundle 中
   entry: './src/main.ts',
   module: {
-    rules: [{
+    rules: [
+      {
         test: /\.ts$/,
         use: {
           loader: 'ts-loader',
@@ -19,7 +20,15 @@ module.exports = {
             configFile: 'tsconfig.json'
           }
         },
-        exclude: '/node_modules/|/src/__tests__/',
+        exclude: [
+          '/node_modules/',
+          '/src/wasm/',
+          // 排除 wasmtk 生成的 bindings 文件，避免其内部类型报错
+          '/\.bindings\.ts$/',
+          // runner 可能也会引用到 bindings，一并排除
+          '/\.runner\.ts$/'
+        ],
+        // exclude: '/node_modules/|/src/__tests__/|/src/wasm/',
       },
       {
         test: /\.tsx$/,
@@ -30,8 +39,16 @@ module.exports = {
             configFile: 'tsconfig.json'
           }
         },
-        exclude: '/node_modules/|/src/__tests__/',
+        exclude: '/node_modules/',
       },
+      {
+        test: /\.wasm$/,
+        type: 'asset/resource',
+        generator: {
+          // 输出到 wasm 目录，并保留原始文件名
+          filename: '[name][ext]',
+        },
+      }
     ],
   },
   resolve: {
@@ -42,7 +59,11 @@ module.exports = {
     modules: [
       path.resolve(__dirname, 'node_modules'),
       path.resolve(__dirname, 'types')
-    ]
+    ],
+    fallback: {
+      fs: false,  // 告诉 webpack：不要尝试解析 'fs' 模块
+      path: false,
+    },
   },
   output: {
     filename: 'bundle.js',

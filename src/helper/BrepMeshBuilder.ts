@@ -45,17 +45,59 @@ class BrepMeshBuilder {
   static ReDetialBuildEdge2sMesh(userData: UserData, mesh: THREE.Mesh | THREE.Line): void {
     let original = userData.original;
     if (original instanceof Edge2) {
+      if (original.curve instanceof Line2Data) {
+        return;
+      }
       BrepMeshBuilder.BuildEdge2Mesh(original, userData.color, null, 0, mesh as THREE.Line);
     }
     else if (original instanceof Face2) {
-      BrepMeshBuilder.BuildFace2Mesh(original, userData.color, null, true, mesh as THREE.Mesh);
+      let curves = original.curves;
+      let isLines = true;
+      for (let i = 0; i < curves.length; i++) {
+        if (curves[i] instanceof Line2Data) {
+        } else {
+          isLines = false;
+          break;
+        }
+      }
+      if (!isLines) {
+        BrepMeshBuilder.BuildFace2Mesh(original, userData.color, null, true, mesh as THREE.Mesh);
+      }
     }
     else if (original instanceof Array) {
       if (original[0] instanceof Edge2) {
-        BrepMeshBuilder.BuildEdge2sMesh(original as Edge2[], userData.color, null, 0, mesh as THREE.Line);
+        let edges = original as Edge2[];
+        let isLines = true;
+        for (let i = 0; i < edges.length; i++) {
+          if (edges[i].curve instanceof Line2Data) {
+          } else {
+            isLines = false;
+            break;
+          }
+        }
+        if (!isLines) {
+          BrepMeshBuilder.BuildEdge2sMesh(edges, userData.color, null, 0, mesh as THREE.Line);
+        }
       }
       else if (original[0] instanceof Face2) {
-        BrepMeshBuilder.BuildFace2sMesh(original as Face2[], userData.color, null, true, mesh as THREE.Mesh);
+        let faces = original as Face2[];
+        let isLines = true;
+        for (let i = 0; i < faces.length; i++) {
+          let curves = faces[i].curves;
+          for (let j = 0; j < curves.length; j++) {
+            if (curves[j] instanceof Line2Data) {
+            } else {
+              isLines = false;
+              break;
+            }
+          }
+          if (!isLines) {
+            break;
+          }
+        }
+        if (!isLines) {
+          BrepMeshBuilder.BuildFace2sMesh(faces, userData.color, null, true, mesh as THREE.Mesh);
+        }
       }
     }
   }

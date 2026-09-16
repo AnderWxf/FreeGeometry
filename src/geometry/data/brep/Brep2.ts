@@ -1,6 +1,7 @@
 import { GeomType } from "../../../core/Constents";
 import { Vector2 } from "../../../math/Math";
-import { toPeriod } from "../../../math/MathUtils";
+// import { toPeriod } from "../../../math/MathUtils";
+import { MathUtils } from "../../../wasm/math/MathUtils_runner";
 import type { Curve2Data } from "../base/Curve2Data";
 import { Point2Data } from "../base/Point2Data";
 import { unserialize } from "../base/Unserialize";
@@ -239,10 +240,10 @@ class Edge2 extends DataBase {
 
   // u ∈ (a,b) ∈ [0,period)
   isInURangePeriod(u: number, period: number, tol1: number): boolean {
-    u = toPeriod(u, period, tol1);
+    u = MathUtils.toPeriod(u, period, tol1);
     let ur = this.ur;
     let off = ur.y - ur.x;
-    ur.x = toPeriod(ur.x, period, tol1);
+    ur.x = MathUtils.toPeriod(ur.x, period, tol1);
     ur.y = ur.x + off;
     let up = u > ur.x && u < ur.y;
     if (up) {
@@ -250,7 +251,7 @@ class Edge2 extends DataBase {
     }
     ur = this.ur;
     off = ur.y - ur.x;
-    ur.y = toPeriod(ur.y, period, tol1);
+    ur.y = MathUtils.toPeriod(ur.y, period, tol1);
     ur.x = ur.y - off;
     let down = u > ur.x && u < ur.y;
     if (down) {
@@ -261,9 +262,9 @@ class Edge2 extends DataBase {
   // u ∈ [a,b] ∈ [0,period)
   isOnURangePeriod(u: number, period: number, tol1: number): boolean {
     let ur = this.ur;
-    u = toPeriod(u, period, tol1);
+    u = MathUtils.toPeriod(u, period, tol1);
     let off = ur.y - ur.x;
-    ur.x = toPeriod(ur.x, period, tol1);
+    ur.x = MathUtils.toPeriod(ur.x, period, tol1);
     ur.y = ur.x + off;
     let up = Math.abs(u - ur.x) <= tol1 || Math.abs(u - ur.y) <= tol1 || u > ur.x && u < ur.y;
     if (up) {
@@ -271,7 +272,7 @@ class Edge2 extends DataBase {
     }
     ur = this.ur;
     off = ur.y - ur.x;
-    ur.y = toPeriod(ur.y, period, tol1);
+    ur.y = MathUtils.toPeriod(ur.y, period, tol1);
     ur.x = ur.y - off;
     let down = Math.abs(u - ur.x) <= tol1 || Math.abs(u - ur.y) <= tol1 || u > ur.x && u < ur.y;
     if (down) {

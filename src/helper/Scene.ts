@@ -27,10 +27,14 @@ class Scene {
       this._detail = detail;
       for (const value of this._objects.values()) {
         let userData = value.userData as UserData;
-        if ((value instanceof THREE.Mesh || value instanceof THREE.Line)
-          && (userData.detail == undefined || userData.detail < detail)) {
-          BrepMeshBuilder.ReDetialBuildEdge2sMesh(userData, value);
-          userData.detail = detail;
+        if (userData.isAssist) {
+          value.scale.setScalar(1 / zoom);
+        } else {
+          if ((value instanceof THREE.Mesh || value instanceof THREE.Line)
+            && (userData.detail == undefined || userData.detail < detail)) {
+            BrepMeshBuilder.ReDetialBuildEdge2sMesh(userData, value);
+            userData.detail = detail;
+          }
         }
       }
     };

@@ -970,6 +970,8 @@ class Curve2Inter {
    * @param {number} [tol1] - The tolerance of algebraic.
    */
   static totaltimes = 0;
+
+  // @wasm
   static Binary(
     c0a: Curve2Algo,
     c1a: Curve2Algo,
@@ -1102,6 +1104,7 @@ class Curve2Inter {
    * @param {number} [tol0] - The tolerance of geometric.
    * @param {number} [tol1] - The tolerance of algebraic.
    */
+  // @wasm
   static Newton(
     c0: { A: BigNumber, B: BigNumber, C: BigNumber, D: BigNumber, E: BigNumber, F: BigNumber },
     c1: { A: BigNumber, B: BigNumber, C: BigNumber, D: BigNumber, E: BigNumber, F: BigNumber },

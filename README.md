@@ -14,6 +14,8 @@ npm install -save vitest
 
 npm install -save lodash
 
+npm install -save deno
+
 # Build:
 ./build
 
