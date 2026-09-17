@@ -970,7 +970,7 @@ function findRealIntersectionsByResultant(c0, c1) {
     const roots = math.roots([R4, R3, R2, R1, R0]);
     
     // 3. 筛选实根
-    const realYRoots = roots.filter(r => Math.abs(math.im(r)) < 1e-10)
+    const realYRoots = roots.filter(r => MathUtils.abs(math.im(r)) < 1e-10)
                             .map(r => math.re(r));
     
     // 4. 对每个实根 y，求对应的 x
@@ -984,7 +984,7 @@ function findRealIntersectionsByResultant(c0, c1) {
         
         const xRoots = solveQuadratic(A1, B1, C1);
         for (const x of xRoots) {
-            if (Math.abs(math.im(x)) < 1e-10) {
+            if (MathUtils.abs(math.im(x)) < 1e-10) {
                 intersections.push({
                     x: math.re(x),
                     y: y,

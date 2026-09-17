@@ -1,5 +1,5 @@
 import { GeomType } from "../core/Constents";
-import { clamp } from "./MathUtils"
+import { clamp, MathUtils } from "./MathUtils"
 
 /**
  * WebGL coordinate system.

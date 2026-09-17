@@ -1,6 +1,4 @@
 import * as THREE from "three";
-import { Command } from "../../Command";
-import { ComCreate } from "../ComCreate";
 import { ActionContext3D } from "../../Active";
 import { Global } from "../../../../core/Global";
 import { ActPickPoint2 } from "../../acts/ActPickPoint2";
@@ -10,12 +8,9 @@ import { BrepMeshBuilder } from "../../../BrepMeshBuilder";
 import type { CommandExecuter } from "../../CommandExecuter";
 import { ComModify } from "../ComModify";
 import { ActPickObject } from "../../acts/ActPickObject";
-import { Edge2 } from "../../../../geometry/data/brep/Brep2";
-import { Arc2Data } from "../../../../geometry/data/base/curve2/Arc2Data";
 import { GeomType } from "../../../../core/Constents";
 import { ActPickAssist } from "../../acts/ActPickAssist";
 import { CurveBuilder } from "../../../../geometry/algorithm/builder/CurveBuilder";
-import { PI2, PI_2 } from "../../../../math/MathUtils";
 import { CloneUserData, CopyUserData, CreateGeomUserData, type UserData } from "../../../UserData";
 
 

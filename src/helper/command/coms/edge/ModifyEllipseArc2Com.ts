@@ -15,7 +15,7 @@ import { Arc2Data } from "../../../../geometry/data/base/curve2/Arc2Data";
 import { GeomType } from "../../../../core/Constents";
 import { ActPickAssist } from "../../acts/ActPickAssist";
 import { CurveBuilder } from "../../../../geometry/algorithm/builder/CurveBuilder";
-import { PI2, PI_2 } from "../../../../math/MathUtils";
+import { PI2, PI_2 } from "../../../../wasm/math/MathUtils_runner";
 import { CloneUserData, CopyUserData, CreateGeomUserData, type UserData } from "../../../UserData";
 
 
@@ -83,7 +83,7 @@ class ModifyEllipseArc2Com extends ComModify {
     if (paras.length >= 6) {
       this.isForward = new Boolean(paras[5]).valueOf();
     }
-    
+
     let centerPoint = userData.assistPoints[0].p as Vector2;
     let majorPoint = userData.assistPoints[1].p as Vector2;
     let minorPoint = userData.assistPoints[2].p as Vector2;

@@ -1,6 +1,5 @@
 import { GeomType } from "../../../core/Constents";
 import { Vector2 } from "../../../math/Math";
-// import { toPeriod } from "../../../math/MathUtils";
 import { MathUtils } from "../../../wasm/math/MathUtils_runner";
 import type { Curve2Data } from "../base/Curve2Data";
 import { Point2Data } from "../base/Point2Data";

@@ -10,7 +10,7 @@ import { BrepMeshBuilder } from "../../../BrepMeshBuilder";
 import type { CommandExecuter } from "../../CommandExecuter";
 import { GeomType } from "../../../../core/Constents";
 import { CurveBuilder } from "../../../../geometry/algorithm/builder/CurveBuilder";
-import { PI_2 } from "../../../../math/MathUtils";
+import { PI_2 } from "../../../../wasm/math/MathUtils_runner";
 import { CreateGeomUserData, type UserData } from "../../../UserData";
 
 
@@ -39,10 +39,10 @@ class CreateEllipse2Com extends ComCreate {
       userData.assistPoints.push({ p: this.center, c: THREE.Color.NAMES.greenyellow });
       this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
       Global.scene.add(this.assists[this.assists.length - 1]);
-      
+
       userData.assistPoints.push({ p: this.major, c: THREE.Color.NAMES.limegreen });
       this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
-      Global.scene.add(this.assists[this.assists.length - 1]);      
+      Global.scene.add(this.assists[this.assists.length - 1]);
 
     } else {
       this.bind(window);

@@ -1,5 +1,4 @@
 import { Matrix3, Vector2, Vector3 } from "../../../../math/Math";
-import { MathUtils } from "../../../../math/MathUtils";
 import * as MATHJS from '../../../../mathjs';
 import { Parabola2Data } from "../../../data/base/curve2/Parabola2Data";
 import { Curve2Algo } from "../Curve2Algo";

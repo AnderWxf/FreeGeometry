@@ -2,36 +2,41 @@
 // deno-lint-ignore-file
 
 export function toPeriod(u: number, period: number, tol1: number): number {
-  console.log('toPeriod begin');
-  console.log('u:' + u + ' period:' + period + ' tol1:' + tol1);
   while (u < 0) {
     u += period;
   }
-  console.log('u:' + u + ' period:' + period + ' tol1:' + tol1);
   while (u >= period) {
     u -= period;
   }
-  console.log('u:' + u + ' period:' + period + ' tol1:' + tol1);
-  console.log('Math.abs(u):' + Math.abs(u));
 
-  let d1 = Math.abs(u);
-  console.log('d1 = Math.abs(u):' + d1);
+  let d1 = abs(u);
   const b1 = d1 <= tol1;
   if (b1) {
     u = 0;
   }
 
-  console.log('u:' + u + ' period:' + period + ' tol1:' + tol1);
   let d2 = u - period;
-  console.log('d2:' + d2);
-  d2 = Math.abs(d2);
-  console.log('Math.abs(d2):' + d2);
+  d2 = abs(d2);
   const b2 = d2 <= tol1;
-  console.log('b2 = Math.abs(d) <= tol1:' + b2);
   if (b2) {
     u = 0;
   }
-  console.log('u:' + u + ' period:' + period + ' tol1:' + tol1);
-  console.log('toPeriod end');
   return u
+}
+
+export function toRange(u: number, a: number, b: number, period: number): number {
+  while (u < a) {
+    u += period;
+  }
+  while (u > b) {
+    u -= period;
+  }
+  return u
+}
+
+export function abs(x: number): number {
+  if (x >= 0) {
+    return x;
+  }
+  return -x;
 }

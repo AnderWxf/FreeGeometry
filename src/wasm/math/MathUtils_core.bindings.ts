@@ -4,6 +4,8 @@
 
 export interface ModuleExports {
   toPeriod(u: number, period: number, tol1: number): number;
+  toRange(u: number, a: number, b: number, period: number): number;
+  abs(x: number): number;
 }
 
 export async function loadModule(
@@ -80,5 +82,7 @@ export async function loadModule(
   (exp["_initialize"] as (() => void) | undefined)?.();
   return {
     toPeriod(u: number, period: number, tol1: number): number { return (_ex("toPeriod") as (...a: unknown[]) => unknown)(u, period, tol1) as number; },
+    toRange(u: number, a: number, b: number, period: number): number { return (_ex("toRange") as (...a: unknown[]) => unknown)(u, a, b, period) as number; },
+    abs(x: number): number { return (_ex("abs") as (...a: unknown[]) => unknown)(x) as number; },
   };
 }

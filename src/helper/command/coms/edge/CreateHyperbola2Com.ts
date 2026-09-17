@@ -10,7 +10,7 @@ import { BrepMeshBuilder } from "../../../BrepMeshBuilder";
 import type { CommandExecuter } from "../../CommandExecuter";
 import { GeomType } from "../../../../core/Constents";
 import { CurveBuilder } from "../../../../geometry/algorithm/builder/CurveBuilder";
-import { PI, PI2, PI_2 } from "../../../../math/MathUtils";
+import { PI, PI2, PI_2 } from "../../../../wasm/math/MathUtils_runner";
 import { CreateGeomUserData, type UserData } from "../../../UserData";
 
 
@@ -48,8 +48,8 @@ class CreateHyperbola2Com extends ComCreate {
 
       userData.assistPoints.push({ p: this.major, c: THREE.Color.NAMES.limegreen });
       this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
-      Global.scene.add(this.assists[this.assists.length - 1]);      
-      
+      Global.scene.add(this.assists[this.assists.length - 1]);
+
     } else {
       this.bind(window);
       let context: ActionContext3D = new ActionContext3D(Global.scene.scene, Global.camera, Global.renderer, Global.select);

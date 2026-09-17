@@ -10,7 +10,7 @@ import { ActPickObject } from "../../acts/ActPickObject";
 import { GeomType } from "../../../../core/Constents";
 import { ActPickAssist } from "../../acts/ActPickAssist";
 import { CloneUserData, CopyUserData, CreateGeomUserData, type UserData } from "../../../UserData";
-import { PI_2 } from "../../../../math/MathUtils";
+import { PI_2 } from "../../../../wasm/math/MathUtils_runner";
 import { CurveBuilder } from "../../../../geometry/algorithm/builder/CurveBuilder";
 import { ModifyFaceCom } from "./ModifyFaceCom";
 

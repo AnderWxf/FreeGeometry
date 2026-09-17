@@ -20,37 +20,25 @@ const RAD2DEG = 180 / Math.PI;
  */
 // @wasm
 function toPeriod(u: number, period: number, tol1: number): number {
-  console.log('toPeriod begin');
-  console.log('u:' + u + ' period:' + period + ' tol1:' + tol1);
   while (u < 0) {
     u += period;
   }
-  console.log('u:' + u + ' period:' + period + ' tol1:' + tol1);
   while (u >= period) {
     u -= period;
   }
-  console.log('u:' + u + ' period:' + period + ' tol1:' + tol1);
-  console.log('Math.abs(u):' + Math.abs(u));
 
-  let d1 = Math.abs(u);
-  console.log('d1 = Math.abs(u):' + d1);
+  let d1 = abs(u);
   const b1 = d1 <= tol1;
   if (b1) {
     u = 0;
   }
 
-  console.log('u:' + u + ' period:' + period + ' tol1:' + tol1);
   let d2 = u - period;
-  console.log('d2:' + d2);
-  d2 = Math.abs(d2);
-  console.log('Math.abs(d2):' + d2);
+  d2 = abs(d2);
   const b2 = d2 <= tol1;
-  console.log('b2 = Math.abs(d) <= tol1:' + b2);
   if (b2) {
     u = 0;
   }
-  console.log('u:' + u + ' period:' + period + ' tol1:' + tol1);
-  console.log('toPeriod end');
   return u
 }
 
@@ -60,6 +48,7 @@ function toPeriod(u: number, period: number, tol1: number): number {
  *
  * @return {number} The u ∈ [a,b].
  */
+// @wasm
 function toRange(u: number, a: number, b: number, period: number): number {
   while (u < a) {
     u += period;
@@ -68,6 +57,19 @@ function toRange(u: number, a: number, b: number, period: number): number {
     u -= period;
   }
   return u
+}
+
+/**
+ * Returns the absolute value of a number (the value without regard to whether it is positive or negative).
+ * For example, the absolute value of -5 is the same as the absolute value of 5.
+ * @param x A numeric expression for which the absolute value is needed.
+ */
+// @wasm
+function abs(x: number): number {
+  if (x >= 0) {
+    return x;
+  }
+  return -x;
 }
 
 /**
@@ -210,7 +212,7 @@ function pingpong(x: number, length = 1) {
 
   // https://www.desmos.com/calculator/vcsjnyz7x4
 
-  return length - Math.abs(euclideanModulo(x, length * 2) - length);
+  return length - abs(euclideanModulo(x, length * 2) - length);
 
 }
 
@@ -492,6 +494,15 @@ const MathUtils = {
    * @return {number} The u ∈ [a,b].
    */
   toRange: toRange,
+
+  /**
+   * Returns the absolute value of a number (the value without regard to whether it is positive or negative).
+   * For example, the absolute value of -5 is the same as the absolute value of 5.
+   * @param x A numeric expression for which the absolute value is needed.
+   */
+  // @wasm
+  abs: abs,
+
   /**
    * Generate a [UUID]{@link https://en.wikipedia.org/wiki/Universally_unique_identifier}
    * (universally unique identifier).
