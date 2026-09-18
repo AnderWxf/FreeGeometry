@@ -1,6 +1,6 @@
 import { Matrix3, Vector2 } from "../../../../math/Math";
 import * as MATHJS from '../../../../mathjs';
-import { MathUtils } from "../../../../wasm/math/MathUtils_runner";
+import { MathUtils } from "../../../..//math/MathUtils";
 import { Arc2Data } from "../../../data/base/curve2/Arc2Data";
 import { Curve2Algo } from "../Curve2Algo";
 /**

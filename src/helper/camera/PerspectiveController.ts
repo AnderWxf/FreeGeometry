@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { Global } from '../../core/Global';
-import { MathUtils } from '../../wasm/math/MathUtils_runner';
+import { MathUtils } from '../..//math/MathUtils';
 
 /**
  * Perspective controller.

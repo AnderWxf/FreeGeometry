@@ -10,7 +10,7 @@ import type { CommandExecuter } from "../../CommandExecuter";
 import { GeomType } from "../../../../core/Constents";
 import { CreateGeomUserData, type UserData } from "../../../UserData";
 import { CurveBuilder } from "../../../../geometry/algorithm/builder/CurveBuilder";
-import { PI2 } from "../../../../wasm/math/MathUtils_runner";
+import { PI2 } from "../../../..//math/MathUtils";
 
 
 /**

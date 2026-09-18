@@ -1,5 +1,5 @@
 import { Vector2 } from "../../../math/Math";
-import { MathUtils, PI2, PI_2 } from "../../../wasm/math/MathUtils_runner";
+import { MathUtils, PI2, PI_2 } from "../../..//math/MathUtils";
 import { Arc2Data } from "../../data/base/curve2/Arc2Data";
 import { Line2Data } from "../../data/base/curve2/Line2Data";
 import type { Curve2Data } from "../../data/base/Curve2Data";

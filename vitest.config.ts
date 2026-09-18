@@ -4,7 +4,10 @@ import wasm from "vite-plugin-wasm";
 import topLevelAwait from "vite-plugin-top-level-await";
 
 export default defineConfig({
-  plugins: [wasm(), topLevelAwait()],
+  plugins: [
+    wasm(),
+    topLevelAwait(),
+  ],
   test: {
     environment: 'jsdom', // 👈 使用 jsdom 模拟浏览器环境
     // 指定测试文件匹配模式

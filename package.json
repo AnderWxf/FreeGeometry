@@ -2,7 +2,6 @@
   "dependencies": {
     "@ant-design/icons": "^6.1.0",
     "antd": "^6.5.3",
-    "deno": "^2.9.6",
     "es-module-loader": "^2.3.0",
     "es6-module-loader": "^0.17.11",
     "lodash": "^4.18.1",
@@ -32,6 +31,7 @@
     "@types/react-dom": "^19.2.2",
     "@types/three": "^0.180.0",
     "@vitest/ui": "^4.1.9",
+    "assemblyscript": "^0.28.20",
     "baseline-browser-mapping": "^2.9.6",
     "jsdom": "^29.1.1",
     "terser-webpack-plugin": "^5.3.14",

@@ -1,6 +1,6 @@
 import { GeomType } from "../../../core/Constents";
 import { Vector2 } from "../../../math/Math";
-import { MathUtils } from "../../../wasm/math/MathUtils_runner";
+import { MathUtils } from "../../..//math/MathUtils";
 import type { Curve2Data } from "../base/Curve2Data";
 import { Point2Data } from "../base/Point2Data";
 import { unserialize } from "../base/Unserialize";

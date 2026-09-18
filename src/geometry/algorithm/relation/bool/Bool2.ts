@@ -1,5 +1,5 @@
 
-import { MathUtils, PI2 } from "../../../../wasm/math/MathUtils_runner";
+import { MathUtils, PI2 } from "../../../..//math/MathUtils";
 import { Arc2Data } from "../../../data/base/curve2/Arc2Data";
 import { Digraph2, Face2, Loop2 } from "../../../data/brep/Brep2";
 import { Coedge2Algo, Digraph2Algo, Face2Algo, Face2Algos, Loop2Algo } from "../../brep/Brep2Algo";

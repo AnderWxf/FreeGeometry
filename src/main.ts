@@ -1,14 +1,26 @@
 import * as THREE from 'three';
 import * as WEBGPU from 'three/src/three.WebGPU';
-import CamToolBar from "./ui/CamToolBar";
+import CamToolBar, { StartRender } from "./ui/CamToolBar";
 import { Select } from './helper/Select';
 import { Global } from './core/Global';
 import { CommandExecuter } from './helper/command/CommandExecuter';
 import { Scene } from './helper/Scene';
+
 // import App from './ui/PropsTrans';
 
 // import CommandBar from './ui/CommandBar';
 
+import { sumArray, doubleArray } from '../build/assembly/asm.asc';
+
+console.log(await sumArray(new Float64Array([1, 2, 3])));
+console.log(await doubleArray(new Float64Array([1, 2, 3])));
+
+
+
+
+Global.isInit = true;
+
+StartRender();
 
 console.log("fg");
 
@@ -19,6 +31,7 @@ Global.scene = new Scene(scene);
 // const app = App();
 // const ui: HTMLElement = document.getElementById('ui');
 // ui.append(app.props);
+
 const cam = CamToolBar;
 
 const gpu: HTMLElement = document.getElementById('gpu');
@@ -183,5 +196,8 @@ window.addEventListener("resize", (event) => {
 // // 计算整个弧长
 // const arcLength = verb.eval.Analyze.rationalCurveArcLength(curve1._data, 1);
 // console.log('弧长:', arcLength); // 
+
+
+
 
 

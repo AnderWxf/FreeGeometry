@@ -18,7 +18,6 @@ const RAD2DEG = 180 / Math.PI;
  *
  * @return {number} The u ∈ [0,period).
  */
-// @wasm
 function toPeriod(u: number, period: number, tol1: number): number {
   while (u < 0) {
     u += period;
@@ -27,14 +26,14 @@ function toPeriod(u: number, period: number, tol1: number): number {
     u -= period;
   }
 
-  let d1 = abs(u);
+  let d1 = Math.abs(u);
   const b1 = d1 <= tol1;
   if (b1) {
     u = 0;
   }
 
   let d2 = u - period;
-  d2 = abs(d2);
+  d2 = Math.abs(d2);
   const b2 = d2 <= tol1;
   if (b2) {
     u = 0;
@@ -48,7 +47,6 @@ function toPeriod(u: number, period: number, tol1: number): number {
  *
  * @return {number} The u ∈ [a,b].
  */
-// @wasm
 function toRange(u: number, a: number, b: number, period: number): number {
   while (u < a) {
     u += period;
@@ -59,18 +57,6 @@ function toRange(u: number, a: number, b: number, period: number): number {
   return u
 }
 
-/**
- * Returns the absolute value of a number (the value without regard to whether it is positive or negative).
- * For example, the absolute value of -5 is the same as the absolute value of 5.
- * @param x A numeric expression for which the absolute value is needed.
- */
-// @wasm
-function abs(x: number): number {
-  if (x >= 0) {
-    return x;
-  }
-  return -x;
-}
 
 /**
  * Generate a [UUID]{@link https://en.wikipedia.org/wiki/Universally_unique_identifier}
@@ -212,7 +198,7 @@ function pingpong(x: number, length = 1) {
 
   // https://www.desmos.com/calculator/vcsjnyz7x4
 
-  return length - abs(euclideanModulo(x, length * 2) - length);
+  return length - Math.abs(euclideanModulo(x, length * 2) - length);
 
 }
 
@@ -494,14 +480,6 @@ const MathUtils = {
    * @return {number} The u ∈ [a,b].
    */
   toRange: toRange,
-
-  /**
-   * Returns the absolute value of a number (the value without regard to whether it is positive or negative).
-   * For example, the absolute value of -5 is the same as the absolute value of 5.
-   * @param x A numeric expression for which the absolute value is needed.
-   */
-  // @wasm
-  abs: abs,
 
   /**
    * Generate a [UUID]{@link https://en.wikipedia.org/wiki/Universally_unique_identifier}

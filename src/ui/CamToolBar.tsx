@@ -459,23 +459,27 @@ const MenuBar: React.FC = () => (
 );
 export default { perspective, orthographic, grid_xz, grid_xy, grid_yz, CamViewChange };
 
-const root = ReactDOM.createRoot(document.getElementById('ui'));
-root.render(
-  <React.StrictMode>
-    <ConfigProvider
-      theme={{
-        token: {
-          colorTextBase: '#00AA00', // 修改为你需要的颜色，例如红色
-          colorBgBase: 'transparent',
-          // fontWeightStrong: 700
-        },
-      }}
-    >
-      <ComOptionBar />
-      <MenuBar />
-      <CommandBar />
-    </ConfigProvider>
-  </React.StrictMode>
-);
+export function StartRender() {
+  const root = ReactDOM.createRoot(document.getElementById('ui'));
+
+  root.render(
+    <React.StrictMode>
+      <ConfigProvider
+        theme={{
+          token: {
+            colorTextBase: '#00AA00', // 修改为你需要的颜色，例如红色
+            colorBgBase: 'transparent',
+            // fontWeightStrong: 700
+          },
+        }}
+      >
+        <ComOptionBar />
+        <MenuBar />
+        <CommandBar />
+      </ConfigProvider>
+    </React.StrictMode>
+  );
+}
+
 
 

@@ -1,7 +1,7 @@
 import type { BigNumber } from '../../../mathjs';
 import { multiply as mul, add, unaryMinus as un, bignumber as big, subtract as sub, equal, largerEq, divide as div, abs } from '../../../mathjs';
 import * as MATHJS from '../../../mathjs';
-import { PI2, PI4, PI_4 } from '../../../wasm/math/MathUtils_runner';
+import { PI2, PI4, PI_4 } from '../../..//math/MathUtils';
 import nerdamer from 'nerdamer-prime';
 
 class SolveEquation {

@@ -1,5 +1,5 @@
 const path = require('path');
-const TerserPlugin = require('terser-webpack-plugin');
+const webpack = require('webpack');
 
 module.exports = {
   mode: 'development',
@@ -21,12 +21,9 @@ module.exports = {
           }
         },
         exclude: [
+          [/\.asc\.ts?$/],
           '/node_modules/',
-          '/src/wasm/',
-          // 排除 wasmtk 生成的 bindings 文件，避免其内部类型报错
-          '/\.bindings\.ts$/',
-          // runner 可能也会引用到 bindings，一并排除
-          '/\.runner\.ts$/'
+          // '/src/wasm/',
         ],
         // exclude: '/node_modules/|/src/__tests__/|/src/wasm/',
       },
@@ -42,13 +39,12 @@ module.exports = {
         exclude: '/node_modules/',
       },
       {
-        test: /\.wasm$/,
+        test: [/\.wasm$/],
         type: 'asset/resource',
         generator: {
-          // 输出到 wasm 目录，并保留原始文件名
-          filename: '[name][ext]',
+          filename: 'build/assembly/[name][ext]',
         },
-      }
+      },
     ],
   },
   resolve: {
@@ -60,10 +56,10 @@ module.exports = {
       path.resolve(__dirname, 'node_modules'),
       path.resolve(__dirname, 'types')
     ],
-    fallback: {
-      fs: false,  // 告诉 webpack：不要尝试解析 'fs' 模块
-      path: false,
-    },
+    // fallback: {
+    //   fs: false,  // 告诉 webpack：不要尝试解析 'fs' 模块
+    //   path: false,
+    // },
   },
   output: {
     filename: 'bundle.js',
@@ -76,6 +72,7 @@ module.exports = {
 
   experiments: {
     outputModule: true, // 启用 ES 模块输出
+    asyncWebAssembly: true,
   },
 
   // 优化配置
@@ -88,4 +85,14 @@ module.exports = {
   cache: {
     type: 'filesystem',
   },
+
+  plugins: [
+    new webpack.DefinePlugin({
+      'process.versions.node': null, // 强制让 isNode 判断为 false
+    }),
+    new webpack.NormalModuleReplacementPlugin(
+      /^node:fs\/promises$/,
+      path.resolve(__dirname, 'empty.js') // 一个空的 JS 文件
+    ),
+  ],
 };

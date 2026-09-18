@@ -8,7 +8,7 @@ import { BrepMeshBuilder } from "../../../BrepMeshBuilder";
 import type { CommandExecuter } from "../../CommandExecuter";
 import { GeomType } from "../../../../core/Constents";
 import { CurveBuilder } from "../../../../geometry/algorithm/builder/CurveBuilder";
-import { PI_2 } from "../../../../wasm/math/MathUtils_runner";
+import { PI_2 } from "../../../..//math/MathUtils";
 import { CreateGeomUserData } from "../../../UserData";
 import { CreateFaceCom } from "./CreateFaceCom";
 

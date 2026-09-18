@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { Edge2, Face2 } from '../geometry/data/brep/Brep2';
 import type { Edge3, Face3 } from '../geometry/data/brep/Brep3';
 import { CurveBuilder } from '../geometry/algorithm/builder/CurveBuilder';
-import { MathUtils } from '../wasm/math/MathUtils_runner';
+import { MathUtils } from '..//math/MathUtils';
 import { Brep2Builder } from '../geometry/algorithm/builder/Brep2Builder';
 import { Line2Data } from '../geometry/data/base/curve2/Line2Data';
 import { Line3Data } from '../geometry/data/base/curve3/Line3Data';

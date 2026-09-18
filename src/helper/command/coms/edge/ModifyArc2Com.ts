@@ -13,7 +13,7 @@ import { ComModify } from "../ComModify";
 import { ActPickAssist } from "../../acts/ActPickAssist";
 import { ActPickObject } from "../../acts/ActPickObject";
 import { CloneUserData, CopyUserData, CreateGeomUserData, type UserData } from "../../../UserData";
-import { PI2 } from "../../../../wasm/math/MathUtils_runner";
+import { PI2 } from "../../../..//math/MathUtils";
 
 
 /**

@@ -11,7 +11,7 @@
     "target": "ES2020",
     "module": "ESNext",
     "moduleResolution": "node",
-    "types": ["node", "vitest"],
+  
     // For nodejs:
     // "lib": ["esnext"],
     // "types": ["node"],
@@ -46,7 +46,8 @@
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
     "skipLibCheck": true,
-    "allowJs": true
+    "allowJs": true,
+    "types": ["node", "vitest"],
   },
   "include": [
     "src/**/*",
@@ -61,7 +62,7 @@
     "*.d.ts"
   ],
   "exclude": [
-    "src/wasm/**/*",
+    "src/asm/**/*",
     "node_modules",
     "build",
     "dist",
