@@ -44,13 +44,15 @@ export declare function detMatrix4(te: Float64Array): number;
 /**
  * src/assembly/asm.asc/invertMatrix3
  * @param te `~lib/typedarray/Float64Array`
+ * @returns `~lib/typedarray/Float64Array`
  */
-export declare function invertMatrix3(te: Float64Array): void;
+export declare function invertMatrix3(te: Float64Array): Float64Array;
 /**
  * src/assembly/asm.asc/invertMatrix4
  * @param te `~lib/typedarray/Float64Array`
+ * @returns `~lib/typedarray/Float64Array`
  */
-export declare function invertMatrix4(te: Float64Array): void;
+export declare function invertMatrix4(te: Float64Array): Float64Array;
 /** src/assembly/asm.asc/FLOAT64ARRAY_ID */
 export declare const FLOAT64ARRAY_ID: {
   /** @type `u32` */

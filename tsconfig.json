@@ -62,7 +62,7 @@
     "*.d.ts"
   ],
   "exclude": [
-    "src/asm/**/*",
+    // "src/asm/**/*",
     "node_modules",
     "build",
     "dist",

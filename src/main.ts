@@ -10,12 +10,12 @@ import { Scene } from './helper/Scene';
 
 // import CommandBar from './ui/CommandBar';
 
-import { sumArray, doubleArray } from '../build/assembly/asm.asc';
+import { sumArray, doubleArray } from '../wasm/assembly/asm.asc';
 
-console.log(await sumArray(new Float64Array([1, 2, 3])));
-console.log(await doubleArray(new Float64Array([1, 2, 3])));
-
-
+console.log(sumArray(new Float64Array([1, 2, 3])));
+let ret = new Float64Array([1, 2, 3]);
+let ret2 = doubleArray(ret);
+console.log(ret2);
 
 
 Global.isInit = true;

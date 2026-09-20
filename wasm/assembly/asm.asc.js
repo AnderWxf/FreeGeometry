@@ -38,14 +38,14 @@ async function instantiate(module, imports = {}) {
       return exports.detMatrix4(te);
     },
     invertMatrix3(te) {
-      // src/assembly/asm.asc/invertMatrix3(~lib/typedarray/Float64Array) => void
+      // src/assembly/asm.asc/invertMatrix3(~lib/typedarray/Float64Array) => ~lib/typedarray/Float64Array
       te = __lowerTypedArray(Float64Array, 4, 3, te) || __notnull();
-      exports.invertMatrix3(te);
+      return __liftTypedArray(Float64Array, exports.invertMatrix3(te) >>> 0);
     },
     invertMatrix4(te) {
-      // src/assembly/asm.asc/invertMatrix4(~lib/typedarray/Float64Array) => void
+      // src/assembly/asm.asc/invertMatrix4(~lib/typedarray/Float64Array) => ~lib/typedarray/Float64Array
       te = __lowerTypedArray(Float64Array, 4, 3, te) || __notnull();
-      exports.invertMatrix4(te);
+      return __liftTypedArray(Float64Array, exports.invertMatrix4(te) >>> 0);
     },
     FLOAT64ARRAY_ID: {
       // src/assembly/asm.asc/FLOAT64ARRAY_ID: u32
@@ -127,4 +127,4 @@ export const {
     else { return await globalThis.WebAssembly.compileStreaming(globalThis.fetch(url)); }
   })(), {
 }
-))("./build/assembly/asm.asc.wasm"/*new URL("asm.asc.wasm", import.meta.url)*/);
+))("./wasm/assembly/asm.asc.wasm"/*new URL("asm.asc.wasm", import.meta.url)*/);

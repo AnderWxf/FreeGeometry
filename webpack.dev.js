@@ -21,7 +21,7 @@ module.exports = {
           }
         },
         exclude: [
-          [/\.asc\.ts?$/],
+          // [/\.asc\.ts?$/],
           '/node_modules/',
           // '/src/wasm/',
         ],
