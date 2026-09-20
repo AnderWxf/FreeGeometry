@@ -13,6 +13,8 @@ export class Global {
 
   static isInit = false;
 
+  static isUseWasm = false;
+
   static select: Select;        // 全局选择和高亮工具
   static scene: Scene;          // 全局选场景对象
   static renderer: WEBGPU.WebGPURenderer;

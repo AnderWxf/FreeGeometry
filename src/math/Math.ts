@@ -2,6 +2,7 @@ import { GeomType } from "../core/Constents";
 import { clamp } from "./MathUtils"
 
 import { detMatrix3, detMatrix4, invertMatrix3, invertMatrix4 } from '../../wasm/assembly/asm.asc';
+import { Global } from "../core/Global";
 
 /**
  * WebGL coordinate system.
@@ -5224,16 +5225,15 @@ class Matrix3 {
    * @return {number} The determinant.
    */
   determinant() {
+    if (Global.isUseWasm) {
+      return detMatrix3(new Float64Array(this.elements));
+    }
+    const te = this.elements;
+    const a = te[0], b = te[1], c = te[2],
+      d = te[3], e = te[4], f = te[5],
+      g = te[6], h = te[7], i = te[8];
 
-    // const te = this.elements;
-
-    // const a = te[0], b = te[1], c = te[2],
-    //   d = te[3], e = te[4], f = te[5],
-    //   g = te[6], h = te[7], i = te[8];
-
-    // return a * e * i - a * f * h - b * d * i + b * f * g + c * d * h - c * e * g;
-
-    return detMatrix3(new Float64Array(this.elements));
+    return a * e * i - a * f * h - b * d * i + b * f * g + c * d * h - c * e * g;
   }
 
   /**
@@ -5244,51 +5244,54 @@ class Matrix3 {
    * @return {Matrix3} A reference to this matrix.
    */
   invert() {
+    if (Global.isUseWasm) {
+      const te = this.elements;
+      let ret = invertMatrix3(new Float64Array(te));
+      te[0] = ret[0];
+      te[1] = ret[1];
+      te[2] = ret[2];
 
-    // const te = this.elements,
+      te[3] = ret[3];
+      te[4] = ret[4];
+      te[5] = ret[5];
 
-    //   n11 = te[0], n21 = te[1], n31 = te[2],
-    //   n12 = te[3], n22 = te[4], n32 = te[5],
-    //   n13 = te[6], n23 = te[7], n33 = te[8],
+      te[6] = ret[6];
+      te[7] = ret[7];
+      te[8] = ret[8];
+      return this;
+    }
 
-    //   t11 = n33 * n22 - n32 * n23,
-    //   t12 = n32 * n13 - n33 * n12,
-    //   t13 = n23 * n12 - n22 * n13,
+    const te = this.elements,
 
-    //   det = n11 * t11 + n21 * t12 + n31 * t13;
+      n11 = te[0], n21 = te[1], n31 = te[2],
+      n12 = te[3], n22 = te[4], n32 = te[5],
+      n13 = te[6], n23 = te[7], n33 = te[8],
 
-    // if (det === 0) return this.set(0, 0, 0, 0, 0, 0, 0, 0, 0);
+      t11 = n33 * n22 - n32 * n23,
+      t12 = n32 * n13 - n33 * n12,
+      t13 = n23 * n12 - n22 * n13,
 
-    // const detInv = 1 / det;
+      det = n11 * t11 + n21 * t12 + n31 * t13;
 
-    // te[0] = t11 * detInv;
-    // te[1] = (n31 * n23 - n33 * n21) * detInv;
-    // te[2] = (n32 * n21 - n31 * n22) * detInv;
+    if (det === 0) return this.set(0, 0, 0, 0, 0, 0, 0, 0, 0);
 
-    // te[3] = t12 * detInv;
-    // te[4] = (n33 * n11 - n31 * n13) * detInv;
-    // te[5] = (n31 * n12 - n32 * n11) * detInv;
+    const detInv = 1 / det;
 
-    // te[6] = t13 * detInv;
-    // te[7] = (n21 * n13 - n23 * n11) * detInv;
-    // te[8] = (n22 * n11 - n21 * n12) * detInv;
+    te[0] = t11 * detInv;
+    te[1] = (n31 * n23 - n33 * n21) * detInv;
+    te[2] = (n32 * n21 - n31 * n22) * detInv;
 
-    // return this;
+    te[3] = t12 * detInv;
+    te[4] = (n33 * n11 - n31 * n13) * detInv;
+    te[5] = (n31 * n12 - n32 * n11) * detInv;
 
-    const te = this.elements;
-    let ret = invertMatrix3(new Float64Array(te));
-    te[0] = ret[0];
-    te[1] = ret[1];
-    te[2] = ret[2];
+    te[6] = t13 * detInv;
+    te[7] = (n21 * n13 - n23 * n11) * detInv;
+    te[8] = (n22 * n11 - n21 * n12) * detInv;
 
-    te[3] = ret[3];
-    te[4] = ret[4];
-    te[5] = ret[5];
-
-    te[6] = ret[6];
-    te[7] = ret[7];
-    te[8] = ret[8];
     return this;
+
+
   }
 
   /**
@@ -6296,53 +6299,55 @@ class Matrix4 {
    * @return {number} The determinant.
    */
   determinant() {
+    if (Global.isUseWasm) {
+      return detMatrix4(new Float64Array(this.elements));
+    }
+    const te = this.elements;
 
-    // const te = this.elements;
+    const n11 = te[0], n12 = te[4], n13 = te[8], n14 = te[12];
+    const n21 = te[1], n22 = te[5], n23 = te[9], n24 = te[13];
+    const n31 = te[2], n32 = te[6], n33 = te[10], n34 = te[14];
+    const n41 = te[3], n42 = te[7], n43 = te[11], n44 = te[15];
 
-    // const n11 = te[0], n12 = te[4], n13 = te[8], n14 = te[12];
-    // const n21 = te[1], n22 = te[5], n23 = te[9], n24 = te[13];
-    // const n31 = te[2], n32 = te[6], n33 = te[10], n34 = te[14];
-    // const n41 = te[3], n42 = te[7], n43 = te[11], n44 = te[15];
+    //TODO: make this more efficient
 
-    // //TODO: make this more efficient
+    return (
+      n41 * (
+        + n14 * n23 * n32
+        - n13 * n24 * n32
+        - n14 * n22 * n33
+        + n12 * n24 * n33
+        + n13 * n22 * n34
+        - n12 * n23 * n34
+      ) +
+      n42 * (
+        + n11 * n23 * n34
+        - n11 * n24 * n33
+        + n14 * n21 * n33
+        - n13 * n21 * n34
+        + n13 * n24 * n31
+        - n14 * n23 * n31
+      ) +
+      n43 * (
+        + n11 * n24 * n32
+        - n11 * n22 * n34
+        - n14 * n21 * n32
+        + n12 * n21 * n34
+        + n14 * n22 * n31
+        - n12 * n24 * n31
+      ) +
+      n44 * (
+        - n13 * n22 * n31
+        - n11 * n23 * n32
+        + n11 * n22 * n33
+        + n13 * n21 * n32
+        - n12 * n21 * n33
+        + n12 * n23 * n31
+      )
 
-    // return (
-    //   n41 * (
-    //     + n14 * n23 * n32
-    //     - n13 * n24 * n32
-    //     - n14 * n22 * n33
-    //     + n12 * n24 * n33
-    //     + n13 * n22 * n34
-    //     - n12 * n23 * n34
-    //   ) +
-    //   n42 * (
-    //     + n11 * n23 * n34
-    //     - n11 * n24 * n33
-    //     + n14 * n21 * n33
-    //     - n13 * n21 * n34
-    //     + n13 * n24 * n31
-    //     - n14 * n23 * n31
-    //   ) +
-    //   n43 * (
-    //     + n11 * n24 * n32
-    //     - n11 * n22 * n34
-    //     - n14 * n21 * n32
-    //     + n12 * n21 * n34
-    //     + n14 * n22 * n31
-    //     - n12 * n24 * n31
-    //   ) +
-    //   n44 * (
-    //     - n13 * n22 * n31
-    //     - n11 * n23 * n32
-    //     + n11 * n22 * n33
-    //     + n13 * n21 * n32
-    //     - n12 * n21 * n33
-    //     + n12 * n23 * n31
-    //   )
+    );
 
-    // );
 
-    return detMatrix4(new Float64Array(this.elements));
   }
 
   /**
@@ -6406,67 +6411,69 @@ class Matrix4 {
    * @return {Matrix4} A reference to this matrix.
    */
   invert() {
+    if (Global.isUseWasm) { 
 
-    // // based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm
-    // const te = this.elements,
+      const te = this.elements;
+      let ret = invertMatrix4(new Float64Array(te));
+      te[0] = ret[0];
+      te[1] = ret[1];
+      te[2] = ret[2];
+      te[3] = ret[3];
 
-    //   n11 = te[0], n21 = te[1], n31 = te[2], n41 = te[3],
-    //   n12 = te[4], n22 = te[5], n32 = te[6], n42 = te[7],
-    //   n13 = te[8], n23 = te[9], n33 = te[10], n43 = te[11],
-    //   n14 = te[12], n24 = te[13], n34 = te[14], n44 = te[15],
+      te[4] = ret[4];
+      te[5] = ret[5];
+      te[6] = ret[6];
+      te[7] = ret[7];
 
-    //   t11 = n23 * n34 * n42 - n24 * n33 * n42 + n24 * n32 * n43 - n22 * n34 * n43 - n23 * n32 * n44 + n22 * n33 * n44,
-    //   t12 = n14 * n33 * n42 - n13 * n34 * n42 - n14 * n32 * n43 + n12 * n34 * n43 + n13 * n32 * n44 - n12 * n33 * n44,
-    //   t13 = n13 * n24 * n42 - n14 * n23 * n42 + n14 * n22 * n43 - n12 * n24 * n43 - n13 * n22 * n44 + n12 * n23 * n44,
-    //   t14 = n14 * n23 * n32 - n13 * n24 * n32 - n14 * n22 * n33 + n12 * n24 * n33 + n13 * n22 * n34 - n12 * n23 * n34;
+      te[8] = ret[8];
+      te[9] = ret[9];
+      te[10] = ret[10];
+      te[11] = ret[11];
 
-    // const det = n11 * t11 + n21 * t12 + n31 * t13 + n41 * t14;
+      te[12] = ret[12];
+      te[13] = ret[13];
+      te[14] = ret[14];
+      te[15] = ret[15];
+      return this;
+    }
+    // based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm
+    const te = this.elements,
 
-    // if (det === 0) return this.set(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+      n11 = te[0], n21 = te[1], n31 = te[2], n41 = te[3],
+      n12 = te[4], n22 = te[5], n32 = te[6], n42 = te[7],
+      n13 = te[8], n23 = te[9], n33 = te[10], n43 = te[11],
+      n14 = te[12], n24 = te[13], n34 = te[14], n44 = te[15],
 
-    // const detInv = 1 / det;
+      t11 = n23 * n34 * n42 - n24 * n33 * n42 + n24 * n32 * n43 - n22 * n34 * n43 - n23 * n32 * n44 + n22 * n33 * n44,
+      t12 = n14 * n33 * n42 - n13 * n34 * n42 - n14 * n32 * n43 + n12 * n34 * n43 + n13 * n32 * n44 - n12 * n33 * n44,
+      t13 = n13 * n24 * n42 - n14 * n23 * n42 + n14 * n22 * n43 - n12 * n24 * n43 - n13 * n22 * n44 + n12 * n23 * n44,
+      t14 = n14 * n23 * n32 - n13 * n24 * n32 - n14 * n22 * n33 + n12 * n24 * n33 + n13 * n22 * n34 - n12 * n23 * n34;
 
-    // te[0] = t11 * detInv;
-    // te[1] = (n24 * n33 * n41 - n23 * n34 * n41 - n24 * n31 * n43 + n21 * n34 * n43 + n23 * n31 * n44 - n21 * n33 * n44) * detInv;
-    // te[2] = (n22 * n34 * n41 - n24 * n32 * n41 + n24 * n31 * n42 - n21 * n34 * n42 - n22 * n31 * n44 + n21 * n32 * n44) * detInv;
-    // te[3] = (n23 * n32 * n41 - n22 * n33 * n41 - n23 * n31 * n42 + n21 * n33 * n42 + n22 * n31 * n43 - n21 * n32 * n43) * detInv;
+    const det = n11 * t11 + n21 * t12 + n31 * t13 + n41 * t14;
 
-    // te[4] = t12 * detInv;
-    // te[5] = (n13 * n34 * n41 - n14 * n33 * n41 + n14 * n31 * n43 - n11 * n34 * n43 - n13 * n31 * n44 + n11 * n33 * n44) * detInv;
-    // te[6] = (n14 * n32 * n41 - n12 * n34 * n41 - n14 * n31 * n42 + n11 * n34 * n42 + n12 * n31 * n44 - n11 * n32 * n44) * detInv;
-    // te[7] = (n12 * n33 * n41 - n13 * n32 * n41 + n13 * n31 * n42 - n11 * n33 * n42 - n12 * n31 * n43 + n11 * n32 * n43) * detInv;
+    if (det === 0) return this.set(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
-    // te[8] = t13 * detInv;
-    // te[9] = (n14 * n23 * n41 - n13 * n24 * n41 - n14 * n21 * n43 + n11 * n24 * n43 + n13 * n21 * n44 - n11 * n23 * n44) * detInv;
-    // te[10] = (n12 * n24 * n41 - n14 * n22 * n41 + n14 * n21 * n42 - n11 * n24 * n42 - n12 * n21 * n44 + n11 * n22 * n44) * detInv;
-    // te[11] = (n13 * n22 * n41 - n12 * n23 * n41 - n13 * n21 * n42 + n11 * n23 * n42 + n12 * n21 * n43 - n11 * n22 * n43) * detInv;
+    const detInv = 1 / det;
 
-    // te[12] = t14 * detInv;
-    // te[13] = (n13 * n24 * n31 - n14 * n23 * n31 + n14 * n21 * n33 - n11 * n24 * n33 - n13 * n21 * n34 + n11 * n23 * n34) * detInv;
-    // te[14] = (n14 * n22 * n31 - n12 * n24 * n31 - n14 * n21 * n32 + n11 * n24 * n32 + n12 * n21 * n34 - n11 * n22 * n34) * detInv;
-    // te[15] = (n12 * n23 * n31 - n13 * n22 * n31 + n13 * n21 * n32 - n11 * n23 * n32 - n12 * n21 * n33 + n11 * n22 * n33) * detInv;
+    te[0] = t11 * detInv;
+    te[1] = (n24 * n33 * n41 - n23 * n34 * n41 - n24 * n31 * n43 + n21 * n34 * n43 + n23 * n31 * n44 - n21 * n33 * n44) * detInv;
+    te[2] = (n22 * n34 * n41 - n24 * n32 * n41 + n24 * n31 * n42 - n21 * n34 * n42 - n22 * n31 * n44 + n21 * n32 * n44) * detInv;
+    te[3] = (n23 * n32 * n41 - n22 * n33 * n41 - n23 * n31 * n42 + n21 * n33 * n42 + n22 * n31 * n43 - n21 * n32 * n43) * detInv;
 
-    const te = this.elements;
-    let ret = invertMatrix4(new Float64Array(te));
-    te[0] = ret[0];
-    te[1] = ret[1];
-    te[2] = ret[2];
-    te[3] = ret[3];
+    te[4] = t12 * detInv;
+    te[5] = (n13 * n34 * n41 - n14 * n33 * n41 + n14 * n31 * n43 - n11 * n34 * n43 - n13 * n31 * n44 + n11 * n33 * n44) * detInv;
+    te[6] = (n14 * n32 * n41 - n12 * n34 * n41 - n14 * n31 * n42 + n11 * n34 * n42 + n12 * n31 * n44 - n11 * n32 * n44) * detInv;
+    te[7] = (n12 * n33 * n41 - n13 * n32 * n41 + n13 * n31 * n42 - n11 * n33 * n42 - n12 * n31 * n43 + n11 * n32 * n43) * detInv;
 
-    te[4] = ret[4];
-    te[5] = ret[5];
-    te[6] = ret[6];
-    te[7] = ret[7];
+    te[8] = t13 * detInv;
+    te[9] = (n14 * n23 * n41 - n13 * n24 * n41 - n14 * n21 * n43 + n11 * n24 * n43 + n13 * n21 * n44 - n11 * n23 * n44) * detInv;
+    te[10] = (n12 * n24 * n41 - n14 * n22 * n41 + n14 * n21 * n42 - n11 * n24 * n42 - n12 * n21 * n44 + n11 * n22 * n44) * detInv;
+    te[11] = (n13 * n22 * n41 - n12 * n23 * n41 - n13 * n21 * n42 + n11 * n23 * n42 + n12 * n21 * n43 - n11 * n22 * n43) * detInv;
 
-    te[8] = ret[8];
-    te[9] = ret[9];
-    te[10] = ret[10];
-    te[11] = ret[11];
-
-    te[12] = ret[12];
-    te[13] = ret[13];
-    te[14] = ret[14];
-    te[15] = ret[15];
+    te[12] = t14 * detInv;
+    te[13] = (n13 * n24 * n31 - n14 * n23 * n31 + n14 * n21 * n33 - n11 * n24 * n33 - n13 * n21 * n34 + n11 * n23 * n34) * detInv;
+    te[14] = (n14 * n22 * n31 - n12 * n24 * n31 - n14 * n21 * n32 + n11 * n24 * n32 + n12 * n21 * n34 - n11 * n22 * n34) * detInv;
+    te[15] = (n12 * n23 * n31 - n13 * n22 * n31 + n13 * n21 * n32 - n11 * n23 * n32 - n12 * n21 * n33 + n11 * n22 * n33) * detInv;
     return this;
 
   }

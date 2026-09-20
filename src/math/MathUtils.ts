@@ -12,6 +12,8 @@ export const PI_6 = Math.PI / 6;
 
 const DEG2RAD = Math.PI / 180;
 const RAD2DEG = 180 / Math.PI;
+import { toPeriod as asmtoPeriod, toRange as asmtoRange, invertMatrix4 } from '../../wasm/assembly/asm.asc';
+import { Global } from '../core/Global';
 
 /**
  * u to [0,period)
@@ -19,6 +21,7 @@ const RAD2DEG = 180 / Math.PI;
  * @return {number} The u ∈ [0,period).
  */
 function toPeriod(u: number, period: number, tol1: number): number {
+  if (Global.isUseWasm) { return asmtoPeriod(u, period, tol1); }
   while (u < 0) {
     u += period;
   }
@@ -48,6 +51,7 @@ function toPeriod(u: number, period: number, tol1: number): number {
  * @return {number} The u ∈ [a,b].
  */
 function toRange(u: number, a: number, b: number, period: number): number {
+  if (Global.isUseWasm) { return asmtoRange(u, a, b, period); }
   while (u < a) {
     u += period;
   }
