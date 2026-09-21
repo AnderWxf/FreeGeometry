@@ -41,7 +41,7 @@ class SolveEquation {
       const root1 = div(MATHJS.add(_b, sqrtΔ), _2a) as BigNumber;
       const root2 = div(sub(_b, sqrtΔ), _2a) as BigNumber;
       roots.push(root1, root2);
-    } else if (abs(sub(Δ, ZERO)).lessThanOrEqualTo(tol1)) {
+    } else if (abs(Δ).lessThanOrEqualTo(tol1)) {
       // 两个相等实根
       const root = div(_b, _2a) as BigNumber;
       roots = [root, root];
