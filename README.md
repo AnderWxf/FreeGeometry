@@ -22,20 +22,20 @@ npm install --save assemblyscript
 
 Disable the check when the number of significant digits exceeds 15
 
-node_modules/mathjs/lib/cjs\core/function/typed.js :
-
+node_modules/mathjs/lib/cjs/core/function/typed.js :
+```JavaScript
 // // note: conversion from number to BigNumber can fail if x has >15 digits
 // if ((0, _number.digits)(x) > 15) {
 //   throw new TypeError('Cannot implicitly convert a number with >15 significant digits to BigNumber ' + '(value: ' + x + '). ' + 'Use function bignumber(x) to convert to BigNumber.');
 // }
-
+```
 node_modules/mathjs/lib/esm/core/function/typed.js :
-
+```JavaScript
 // // note: conversion from number to BigNumber can fail if x has >15 digits
 // if (digits(x) > 15) {
 //   throw new TypeError('Cannot implicitly convert a number with >15 significant digits to BigNumber ' + '(value: ' + x + '). ' + 'Use function bignumber(x) to convert to BigNumber.');
 // }
-
+```
 
 # Build:
 ./build
