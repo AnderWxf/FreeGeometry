@@ -1,10 +1,12 @@
 import { Matrix2, Matrix3, Vector2 } from "../../../../math/Math";
-import * as MATHJS from '../../../../mathjs';
+import * as MATHJS from 'mathjs';
 import { Hyperbola2Data } from "../../../data/base/curve2/Hyperbola2Data";
 import { CurveBuilder } from "../../builder/CurveBuilder";
 import { Curve2Inter } from "../../relation/intersection/Curve2Inter";
 import { Curve2Algo } from "../Curve2Algo";
 import verb from 'verb-nurbs';
+import type { BigNumber } from "mathjs";
+import { multiply as mul, add, unaryMinus as un, bignumber as big, subtract as sub, equal, largerEq, divide as div } from 'mathjs';
 
 /**
  * 2D Hyperbola algorithm. 
@@ -113,8 +115,8 @@ class Hyperbola2Algo extends Curve2Algo {
     return ret;
   }
   vernurbs1(u: Vector2 = new Vector2(-Math.PI / 4, Math.PI / 4)): Array<any> {
-    const a = MATHJS.bignumber(this.dat.radius.x);
-    const b = MATHJS.bignumber(this.dat.radius.y);
+    const a = big(this.dat.radius.x);
+    const b = big(this.dat.radius.y);
     const m = this.dat.trans.makeLocalMatrix();
 
     // P0=(a sec(θ0),b tan(θ0))
@@ -125,25 +127,25 @@ class Hyperbola2Algo extends Curve2Algo {
     let θ = Math.PI / 6;
     // 右支（对称）
     {
-      let θ0 = MATHJS.bignumber(0 + u.x + 1e-10);
-      let θ1 = MATHJS.bignumber(0 + u.y - 1e-10);
-      let θm = MATHJS.multiply(MATHJS.add(θ0, θ1), 0.5) as MATHJS.BigNumber;
-      let Δθ = MATHJS.subtract(θ1, θ0) as MATHJS.BigNumber;
-      let s = MATHJS.sec(MATHJS.divide(Δθ, 2) as MATHJS.BigNumber);
+      let θ0 = big(0 + u.x + 1e-10);
+      let θ1 = big(0 + u.y - 1e-10);
+      let θm = mul(add(θ0, θ1), 0.5) as BigNumber;
+      let Δθ = sub(θ1, θ0) as BigNumber;
+      let s = MATHJS.sec(div(Δθ, 2) as BigNumber);
       let w = s;
       const ws = [1.0, w.toNumber(), 1.0];
       let p0 = new Vector2(
-        (MATHJS.multiply(a, MATHJS.sec(θ0)) as MATHJS.BigNumber).toNumber(),
-        (MATHJS.multiply(b, MATHJS.tan(θ0)) as MATHJS.BigNumber).toNumber()
+        (mul(a, MATHJS.sec(θ0)) as BigNumber).toNumber(),
+        (mul(b, MATHJS.tan(θ0)) as BigNumber).toNumber()
       );
       let p1 = new Vector2(
-        // (MATHJS.divide(MATHJS.multiply(a, MATHJS.sec(θm)), s) as MATHJS.BigNumber).toNumber(),
-        // (MATHJS.divide(MATHJS.multiply(b, MATHJS.tan(θm)), s) as MATHJS.BigNumber).toNumber()
+        // (div(mul(a, MATHJS.sec(θm)), s) as BigNumber).toNumber(),
+        // (div(mul(b, MATHJS.tan(θm)), s) as BigNumber).toNumber()
         0, 0
       );
       let p2 = new Vector2(
-        (MATHJS.multiply(a, MATHJS.sec(θ1)) as MATHJS.BigNumber).toNumber(),
-        (MATHJS.multiply(b, MATHJS.tan(θ1)) as MATHJS.BigNumber).toNumber()
+        (mul(a, MATHJS.sec(θ1)) as BigNumber).toNumber(),
+        (mul(b, MATHJS.tan(θ1)) as BigNumber).toNumber()
       );
       p0.applyMatrix3(m);
       p1.applyMatrix3(m);
@@ -159,25 +161,25 @@ class Hyperbola2Algo extends Curve2Algo {
     }
     // 左支（对称）
     {
-      let θ0 = MATHJS.bignumber(Math.PI + u.x + 1e-10);
-      let θ1 = MATHJS.bignumber(Math.PI + u.y - 1e-10);
-      let θm = MATHJS.multiply(MATHJS.add(θ0, θ1), 0.5) as MATHJS.BigNumber;
-      let Δθ = MATHJS.subtract(θ1, θ0) as MATHJS.BigNumber;
-      let s = MATHJS.sec(MATHJS.divide(Δθ, 2) as MATHJS.BigNumber);
+      let θ0 = big(Math.PI + u.x + 1e-10);
+      let θ1 = big(Math.PI + u.y - 1e-10);
+      let θm = mul(add(θ0, θ1), 0.5) as BigNumber;
+      let Δθ = sub(θ1, θ0) as BigNumber;
+      let s = MATHJS.sec(div(Δθ, 2) as BigNumber);
       let w = s;
       const ws = [1.0, w.toNumber(), 1.0];
       let p0 = new Vector2(
-        (MATHJS.multiply(a, MATHJS.sec(θ0)) as MATHJS.BigNumber).toNumber(),
-        (MATHJS.multiply(b, MATHJS.tan(θ0)) as MATHJS.BigNumber).toNumber()
+        (mul(a, MATHJS.sec(θ0)) as BigNumber).toNumber(),
+        (mul(b, MATHJS.tan(θ0)) as BigNumber).toNumber()
       );
       let p1 = new Vector2(
-        // (MATHJS.divide(MATHJS.multiply(a, MATHJS.sec(θm)), s) as MATHJS.BigNumber).toNumber(),
-        // (MATHJS.divide(MATHJS.multiply(b, MATHJS.tan(θm)), s) as MATHJS.BigNumber).toNumber()
+        // (div(mul(a, MATHJS.sec(θm)), s) as BigNumber).toNumber(),
+        // (div(mul(b, MATHJS.tan(θm)), s) as BigNumber).toNumber()
         0, 0
       );
       let p2 = new Vector2(
-        (MATHJS.multiply(a, MATHJS.sec(θ1)) as MATHJS.BigNumber).toNumber(),
-        (MATHJS.multiply(b, MATHJS.tan(θ1)) as MATHJS.BigNumber).toNumber()
+        (mul(a, MATHJS.sec(θ1)) as BigNumber).toNumber(),
+        (mul(b, MATHJS.tan(θ1)) as BigNumber).toNumber()
       );
       p0.applyMatrix3(m);
       p1.applyMatrix3(m);
@@ -194,35 +196,35 @@ class Hyperbola2Algo extends Curve2Algo {
     return ret;
   }
   vernurbs2(u: Vector2 = new Vector2(-Math.PI / 4, Math.PI / 4)): Array<any> {
-    const a = MATHJS.bignumber(this.dat.radius.x);
-    const b = MATHJS.bignumber(this.dat.radius.y);
+    const a = big(this.dat.radius.x);
+    const b = big(this.dat.radius.y);
     const m = this.dat.trans.makeLocalMatrix();
 
     let ret = [];
     // let θ = Math.PI / 6;
     // 右支（对称）
     {
-      let θ0 = MATHJS.bignumber(0 + u.x + 1e-10);
-      let θ1 = MATHJS.bignumber(0 + u.y - 1e-10);
-      let θm = MATHJS.multiply(MATHJS.add(θ0, θ1), 0.5) as MATHJS.BigNumber;
+      let θ0 = big(0 + u.x + 1e-10);
+      let θ1 = big(0 + u.y - 1e-10);
+      let θm = mul(add(θ0, θ1), 0.5) as BigNumber;
       let p0 = new Vector2(
-        MATHJS.multiply(a, MATHJS.sec(θ0)) as number,
-        MATHJS.multiply(b, MATHJS.tan(θ0)) as number
+        mul(a, MATHJS.sec(θ0)) as number,
+        mul(b, MATHJS.tan(θ0)) as number
       );
       let p2 = new Vector2(
-        MATHJS.multiply(a, MATHJS.sec(θ1)) as number,
-        MATHJS.multiply(b, MATHJS.tan(θ1)) as number
+        mul(a, MATHJS.sec(θ1)) as number,
+        mul(b, MATHJS.tan(θ1)) as number
       );
       // 从二次曲线到有理二次Bézier曲线的转换（期刊） 施法中 工程图学学报 1989 (02)
 
       // 计算p0 p2 处的切线，计算控制点p1
       let v0 = new Vector2(
-        MATHJS.multiply(a, MATHJS.sec(θ0), MATHJS.tan(θ0)) as number,
-        MATHJS.multiply(b, MATHJS.sec(θ0), MATHJS.sec(θ0)) as number
+        mul(a, MATHJS.sec(θ0), MATHJS.tan(θ0)) as number,
+        mul(b, MATHJS.sec(θ0), MATHJS.sec(θ0)) as number
       );
       let v2 = new Vector2(
-        MATHJS.multiply(a, MATHJS.sec(θ1), MATHJS.tan(θ1)) as number,
-        MATHJS.multiply(b, MATHJS.sec(θ1), MATHJS.sec(θ1)) as number
+        mul(a, MATHJS.sec(θ1), MATHJS.tan(θ1)) as number,
+        mul(b, MATHJS.sec(θ1), MATHJS.sec(θ1)) as number
       );
       let line0 = CurveBuilder.BuildLine2FromPointAndVector(p0, v0);
       let line2 = CurveBuilder.BuildLine2FromPointAndVector(p2, v2);
@@ -232,8 +234,8 @@ class Hyperbola2Algo extends Curve2Algo {
       p1.y = (p1.y as any).toNumber();
       // 线上点p
       let p = new Vector2(
-        MATHJS.multiply(a, MATHJS.sec(θm)) as number,
-        MATHJS.multiply(b, MATHJS.tan(θm)) as number
+        mul(a, MATHJS.sec(θm)) as number,
+        mul(b, MATHJS.tan(θm)) as number
       );
 
       // p0.set(-1, 0);
@@ -241,40 +243,40 @@ class Hyperbola2Algo extends Curve2Algo {
       // p2.set(1, 0);
       // p.set(1 / 2, 3 / 8);
 
-      let x = MATHJS.bignumber(p.x);
-      let y = MATHJS.bignumber(p.y);
-      let x0 = MATHJS.bignumber(p0.x);
-      let y0 = MATHJS.bignumber(p0.y);
-      let x1 = MATHJS.bignumber(p1.x);
-      let y1 = MATHJS.bignumber(p1.y);
-      let x2 = MATHJS.bignumber(p2.x);
-      let y2 = MATHJS.bignumber(p2.y);
+      let x = big(p.x);
+      let y = big(p.y);
+      let x0 = big(p0.x);
+      let y0 = big(p0.y);
+      let x1 = big(p1.x);
+      let y1 = big(p1.y);
+      let x2 = big(p2.x);
+      let y2 = big(p2.y);
 
-      let detA = MATHJS.subtract(
-        MATHJS.multiply(MATHJS.subtract(x, x1), MATHJS.subtract(y2, y1)),
-        MATHJS.multiply(MATHJS.subtract(y, y1), MATHJS.subtract(x2, x1))
+      let detA = sub(
+        mul(sub(x, x1), sub(y2, y1)),
+        mul(sub(y, y1), sub(x2, x1))
       );
-      let detB = MATHJS.subtract(
-        MATHJS.multiply(MATHJS.subtract(x0, x1), MATHJS.subtract(y, y1)),
-        MATHJS.multiply(MATHJS.subtract(y0, y1), MATHJS.subtract(x, x1))
+      let detB = sub(
+        mul(sub(x0, x1), sub(y, y1)),
+        mul(sub(y0, y1), sub(x, x1))
       );
-      let det = MATHJS.subtract(
-        MATHJS.multiply(MATHJS.subtract(x0, x1), MATHJS.subtract(y2, y1)),
-        MATHJS.multiply(MATHJS.subtract(y0, y1), MATHJS.subtract(x2, x1))
+      let det = sub(
+        mul(sub(x0, x1), sub(y2, y1)),
+        mul(sub(y0, y1), sub(x2, x1))
       );
 
-      let α = MATHJS.divide(detA, det) as MATHJS.BigNumber;
-      let β = MATHJS.divide(detB, det) as MATHJS.BigNumber;
+      let α = div(detA, det) as BigNumber;
+      let β = div(detB, det) as BigNumber;
       let v10 = p0.clone().sub(p1);
       let v12 = p2.clone().sub(p1);
       let αv10 = v10.clone().multiplyScalar(α.toNumber());
       let βv12 = v12.clone().multiplyScalar(β.toNumber());
       let pp = p1.clone().add(αv10).add(βv12);
-      let λ = MATHJS.divide(MATHJS.multiply(α, β), MATHJS.add(MATHJS.multiply(α, β), MATHJS.pow(MATHJS.add(α, β, -1), 2)));
-      let w1 = MATHJS.multiply(MATHJS.sqrt(MATHJS.divide(MATHJS.subtract(MATHJS.bignumber(1), λ), λ) as MATHJS.BigNumber), 0.5);
-      let w = MATHJS.divide(
-        MATHJS.subtract(MATHJS.bignumber(1), MATHJS.add(α, β)),
-        MATHJS.multiply(MATHJS.sqrt(MATHJS.multiply(α, β) as MATHJS.BigNumber), 2));
+      let λ = div(mul(α, β), add(mul(α, β), MATHJS.pow(add(α, β, -1), 2)));
+      let w1 = mul(MATHJS.sqrt(div(sub(big(1), λ), λ) as BigNumber), 0.5);
+      let w = div(
+        sub(big(1), add(α, β)),
+        mul(MATHJS.sqrt(mul(α, β) as BigNumber), 2));
       // w = 1.25;
       const ws = [1.0, w, 1.0];
 
@@ -292,25 +294,25 @@ class Hyperbola2Algo extends Curve2Algo {
     }
     // 左支（对称）
     {
-      let θ0 = MATHJS.bignumber(Math.PI + u.x + 1e-10);
-      let θ1 = MATHJS.bignumber(Math.PI + u.y - 1e-10);
-      let θm = MATHJS.multiply(MATHJS.add(θ0, θ1), 0.5) as MATHJS.BigNumber;
-      let Δθ = MATHJS.subtract(θ1, θ0) as MATHJS.BigNumber;
-      let s = MATHJS.sec(MATHJS.divide(Δθ, 2) as MATHJS.BigNumber);
+      let θ0 = big(Math.PI + u.x + 1e-10);
+      let θ1 = big(Math.PI + u.y - 1e-10);
+      let θm = mul(add(θ0, θ1), 0.5) as BigNumber;
+      let Δθ = sub(θ1, θ0) as BigNumber;
+      let s = MATHJS.sec(div(Δθ, 2) as BigNumber);
       let w = s;
       const ws = [1.0, w.toNumber(), 1.0];
       let p0 = new Vector2(
-        (MATHJS.multiply(a, MATHJS.sec(θ0)) as MATHJS.BigNumber).toNumber(),
-        (MATHJS.multiply(b, MATHJS.tan(θ0)) as MATHJS.BigNumber).toNumber()
+        (mul(a, MATHJS.sec(θ0)) as BigNumber).toNumber(),
+        (mul(b, MATHJS.tan(θ0)) as BigNumber).toNumber()
       );
       let p1 = new Vector2(
-        // (MATHJS.divide(MATHJS.multiply(a, MATHJS.sec(θm)), s) as MATHJS.BigNumber).toNumber(),
-        // (MATHJS.divide(MATHJS.multiply(b, MATHJS.tan(θm)), s) as MATHJS.BigNumber).toNumber()
+        // (div(mul(a, MATHJS.sec(θm)), s) as BigNumber).toNumber(),
+        // (div(mul(b, MATHJS.tan(θm)), s) as BigNumber).toNumber()
         0, 0
       );
       let p2 = new Vector2(
-        (MATHJS.multiply(a, MATHJS.sec(θ1)) as MATHJS.BigNumber).toNumber(),
-        (MATHJS.multiply(b, MATHJS.tan(θ1)) as MATHJS.BigNumber).toNumber()
+        (mul(a, MATHJS.sec(θ1)) as BigNumber).toNumber(),
+        (mul(b, MATHJS.tan(θ1)) as BigNumber).toNumber()
       );
       p0.applyMatrix3(m);
       p1.applyMatrix3(m);
@@ -335,9 +337,9 @@ class Hyperbola2Algo extends Curve2Algo {
   u(point: Vector2): number {
     let v = point.clone();
     v.applyMatrix3(this.dat.trans.makeLocalMatrix().invert());
-    const b = MATHJS.bignumber(this.dat.radius.y);
-    const y = MATHJS.bignumber(v.y);
-    const φ = MATHJS.atan(MATHJS.divide(y, b) as MATHJS.BigNumber);
+    const b = big(this.dat.radius.y);
+    const y = big(v.y);
+    const φ = MATHJS.atan(div(y, b) as BigNumber);
     if (v.x > 0) {
       return φ.toNumber();
     } else {
@@ -352,8 +354,8 @@ class Hyperbola2Algo extends Curve2Algo {
    * @retun {Vector2}
    */
   d(u: number, r: number = 0): Vector2 {
-    const a = MATHJS.bignumber(this.dat.radius.x);
-    const b = MATHJS.bignumber(this.dat.radius.y);
+    const a = big(this.dat.radius.x);
+    const b = big(this.dat.radius.y);
 
     const secu = MATHJS.sec(u);
     const tanu = MATHJS.tan(u);
@@ -363,8 +365,8 @@ class Hyperbola2Algo extends Curve2Algo {
           // x = a sec(u)
           // y = b tan(u)         
           const m = this.dat.trans.makeLocalMatrix();
-          const x = MATHJS.multiply(a, secu) as MATHJS.BigNumber;
-          const y = MATHJS.multiply(b, tanu) as MATHJS.BigNumber;
+          const x = mul(a, secu) as BigNumber;
+          const y = mul(b, tanu) as BigNumber;
           let ret = new Vector2(x.toNumber(), y.toNumber());
           ret.applyMatrix3(m);
           return ret;
@@ -374,8 +376,8 @@ class Hyperbola2Algo extends Curve2Algo {
           // x' = a sec(u) tan(u)
           // y' = b sec(u) sec(u)    
           const m = this.dat.trans.makeLinearMatrix();
-          const x = MATHJS.multiply(a, secu, tanu) as MATHJS.BigNumber;
-          const y = MATHJS.multiply(b, secu, secu) as MATHJS.BigNumber;
+          const x = mul(a, secu, tanu) as BigNumber;
+          const y = mul(b, secu, secu) as BigNumber;
           let ret = new Vector2(x.toNumber(), y.toNumber());
           ret.applyMatrix3(m);
           return ret;
@@ -385,8 +387,8 @@ class Hyperbola2Algo extends Curve2Algo {
           // x'' = a(sec(u)tan(u)tan(u) + sec(u)sec(u)sec(u)) = a(sec(u)tan^2(u) + sec^3(u))
           // y'' = b(2sec(u)sec(u)tan(u)) = 2bsec^2(u)tan(u)  
           const m = this.dat.trans.makeLinearMatrix();
-          const x = MATHJS.add(MATHJS.multiply(secu, tanu, tanu), MATHJS.multiply(secu, secu, secu)) as MATHJS.BigNumber;
-          const y = MATHJS.multiply(b, secu, secu, tanu, 2) as MATHJS.BigNumber;
+          const x = add(mul(secu, tanu, tanu), mul(secu, secu, secu)) as BigNumber;
+          const y = mul(b, secu, secu, tanu, 2) as BigNumber;
           let ret = new Vector2(x.toNumber(), y.toNumber());
           ret.applyMatrix3(m);
           return ret;
@@ -396,8 +398,8 @@ class Hyperbola2Algo extends Curve2Algo {
           // x'' = a(sec(u)tan^3(u) + 2tan(u)sec^3(u) + 3sec^3(u)tan(u))
           // y'' = 2b(2sec^2(u)tan^2(u) + sec^4(u))
           const m = this.dat.trans.makeLinearMatrix();
-          let x = MATHJS.add(MATHJS.multiply(a, secu, tanu, tanu, tanu), MATHJS.multiply(a, tanu, secu, secu, secu, 2), MATHJS.multiply(a, secu, secu, secu, tanu, 3)) as MATHJS.BigNumber;
-          let y = MATHJS.add(MATHJS.multiply(b, secu, secu, tanu, tanu, 4), MATHJS.multiply(b, secu, secu, secu, secu, 2)) as MATHJS.BigNumber;
+          let x = add(mul(a, secu, tanu, tanu, tanu), mul(a, tanu, secu, secu, secu, 2), mul(a, secu, secu, secu, tanu, 3)) as BigNumber;
+          let y = add(mul(b, secu, secu, tanu, tanu, 4), mul(b, secu, secu, secu, secu, 2)) as BigNumber;
           let ret = new Vector2(x.toNumber(), y.toNumber());
           ret.applyMatrix3(m);
           return ret;
@@ -419,14 +421,14 @@ class Hyperbola2Algo extends Curve2Algo {
   g(point: Vector2): number {
     let v = point.clone();
     v.applyMatrix3(this.dat.trans.makeLocalMatrix().invert());
-    const x = MATHJS.bignumber(v.x);
-    const y = MATHJS.bignumber(v.y);
-    let a = MATHJS.bignumber(this.dat.radius.x);
-    let b = MATHJS.bignumber(this.dat.radius.y);
-    return (MATHJS.add(
-      MATHJS.divide(MATHJS.multiply(x, x), MATHJS.multiply(a, a)),
-      MATHJS.divide(MATHJS.multiply(y, y), MATHJS.unaryMinus(MATHJS.multiply(b, b))),
-      -1) as MATHJS.BigNumber).toNumber();
+    const x = big(v.x);
+    const y = big(v.y);
+    let a = big(this.dat.radius.x);
+    let b = big(this.dat.radius.y);
+    return (add(
+      div(mul(x, x), mul(a, a)),
+      div(mul(y, y), un(mul(b, b))),
+      -1) as BigNumber).toNumber();
   }
 
   /**
@@ -434,14 +436,14 @@ class Hyperbola2Algo extends Curve2Algo {
    * @param {Hyperbola2Data} [c = Hyperbola2Data] - The data struct of 2D Hyperbola.
    * @retun {A B C D E F} - General equation coefficients.
    */
-  ge(): { A: MATHJS.BigNumber, B: MATHJS.BigNumber, C: MATHJS.BigNumber, D: MATHJS.BigNumber, E: MATHJS.BigNumber, F: MATHJS.BigNumber } {
+  ge(): { A: BigNumber, B: BigNumber, C: BigNumber, D: BigNumber, E: BigNumber, F: BigNumber } {
     // Qnew = T^-T * Qold * T^-1
     let dat = this.dat;
     let T = dat.trans.makeLocalMatrix();
     let T_1 = T.clone().invert();
     let T_T = T_1.clone().transpose();
-    let a = (MATHJS.divide(MATHJS.bignumber(1), MATHJS.multiply(dat.radius.x, dat.radius.x)) as MATHJS.BigNumber).toNumber();
-    let c = -(MATHJS.divide(MATHJS.bignumber(1), MATHJS.multiply(dat.radius.y, dat.radius.y)) as MATHJS.BigNumber).toNumber();
+    let a = (div(big(1), mul(dat.radius.x, dat.radius.x)) as BigNumber).toNumber();
+    let c = -(div(big(1), mul(dat.radius.y, dat.radius.y)) as BigNumber).toNumber();
     let Qold = new Matrix3().set(
       a, 0, 0,
       0, c, 0,
@@ -451,12 +453,12 @@ class Hyperbola2Algo extends Curve2Algo {
     Qnew.multiply(Qold);
     Qnew.multiply(T_1);
     return {
-      A: MATHJS.bignumber(Qnew.elements[0]),
-      B: MATHJS.bignumber(Qnew.elements[1] + Qnew.elements[3]),
-      C: MATHJS.bignumber(Qnew.elements[4]),
-      D: MATHJS.bignumber(Qnew.elements[2] + Qnew.elements[6]),
-      E: MATHJS.bignumber(Qnew.elements[5] + Qnew.elements[7]),
-      F: MATHJS.bignumber(Qnew.elements[8])
+      A: big(Qnew.elements[0]),
+      B: big(Qnew.elements[1] + Qnew.elements[3]),
+      C: big(Qnew.elements[4]),
+      D: big(Qnew.elements[2] + Qnew.elements[6]),
+      E: big(Qnew.elements[5] + Qnew.elements[7]),
+      F: big(Qnew.elements[8])
     };
   }
 

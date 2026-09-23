@@ -1,7 +1,9 @@
 import { Matrix3, Vector2 } from "../../../../math/Math";
-import * as MATHJS from '../../../../mathjs';
+import * as MATHJS from 'mathjs';
 import { Line2Data } from "../../../data/base/curve2/Line2Data";
 import { Curve2Algo } from "../Curve2Algo";
+import type { BigNumber } from "mathjs";
+import { multiply as mul, add, unaryMinus as un, bignumber as big, subtract as sub, equal, largerEq, divide as div } from 'mathjs';
 
 /**
  * 2D line algorithm.
@@ -80,7 +82,7 @@ class Line2Algo extends Curve2Algo {
    * @param {Line2Data} [c = Line2Data] - The data struct of 2D line.
    * @retun {A B C} - General equation coefficients.
    */
-  ge(): { A: MATHJS.BigNumber, B: MATHJS.BigNumber, C: MATHJS.BigNumber } {
+  ge(): { A: BigNumber, B: BigNumber, C: BigNumber } {
     // Qnew = T^-T * Qold * T^-1
     let dat = this.dat;
     let T = dat.trans.makeLocalMatrix();
@@ -99,7 +101,7 @@ class Line2Algo extends Curve2Algo {
     let A = Qnew.elements[2] + Qnew.elements[6];
     let B = Qnew.elements[5] + Qnew.elements[7];
     let C = Qnew.elements[8];
-    return { A: MATHJS.bignumber(A), B: MATHJS.bignumber(B), C: MATHJS.bignumber(C) };
+    return { A: big(A), B: big(B), C: big(C) };
   }
 
   /**

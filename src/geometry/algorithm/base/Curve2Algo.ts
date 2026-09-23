@@ -1,5 +1,4 @@
 import { Matrix2, Vector2 } from "../../../math/Math";
-import * as MATHJS from '../../../mathjs';
 import { Curve2Data } from "../../data/base/Curve2Data";
 
 /**

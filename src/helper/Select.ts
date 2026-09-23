@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { Vector2, Vector3 } from '../math/Math';
 import { Global } from '../core/Global';
 import type { UserData } from './UserData';
-import * as MATHJS from '../mathjs';
+import * as MATHJS from 'mathjs';
 import { Edge2 } from '../geometry/data/brep/Brep2';
 import { Edge2Algo } from '../geometry/algorithm/brep/Brep2Algo';
 import { Point2Data } from '../geometry/data/base/Point2Data';

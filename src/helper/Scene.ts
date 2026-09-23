@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import type { UserData } from './UserData';
 import { Edge2 } from '../geometry/data/brep/Brep2';
 import { BrepMeshBuilder } from './BrepMeshBuilder';
-import * as MATHJS from '../mathjs';
+import * as MATHJS from 'mathjs';
 import { DataBase } from '../geometry/data/DataBase';
 
 class Scene {

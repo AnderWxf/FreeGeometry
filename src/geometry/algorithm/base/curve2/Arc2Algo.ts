@@ -1,8 +1,11 @@
 import { Matrix3, Vector2 } from "../../../../math/Math";
-import * as MATHJS from '../../../../mathjs';
+import * as MATHJS from 'mathjs';
+import type { BigNumber } from 'mathjs';
 import { MathUtils } from "../../../..//math/MathUtils";
 import { Arc2Data } from "../../../data/base/curve2/Arc2Data";
 import { Curve2Algo } from "../Curve2Algo";
+import { multiply as mul, add, unaryMinus as un, bignumber as big, subtract as sub, equal, largerEq, divide as div } from 'mathjs';
+
 /**
  * 2D arc algorithm.
  * x = acos(φ)
@@ -39,10 +42,10 @@ class Arc2Algo extends Curve2Algo {
   u(point: Vector2): number {
     let v = point.clone();
     v.applyMatrix3(this.dat.trans.makeLocalMatrix().invert());
-    // const x = MATHJS.bignumber(v.x);
-    // const y = MATHJS.bignumber(v.y);
-    // let a = MathUtils.clamp((MATHJS.divide(x, MATHJS.bignumber(this.dat.radius.x)) as MATHJS.BigNumber).toNumber(), -1, 1);
-    // let b = MathUtils.clamp((MATHJS.divide(y, MATHJS.bignumber(this.dat.radius.y)) as MATHJS.BigNumber).toNumber(), -1, 1);
+    // const x = big(v.x);
+    // const y = big(v.y);
+    // let a = MathUtils.clamp((div(x, big(this.dat.radius.x)) as BigNumber).toNumber(), -1, 1);
+    // let b = MathUtils.clamp((div(y, big(this.dat.radius.y)) as BigNumber).toNumber(), -1, 1);
 
     let x = MathUtils.clamp(v.x / this.dat.radius.x, -1, 1);
     let y = MathUtils.clamp(v.y / this.dat.radius.y, -1, 1);
@@ -112,14 +115,14 @@ class Arc2Algo extends Curve2Algo {
   g(point: Vector2): number {
     let v = point.clone();
     v.applyMatrix3(this.dat.trans.makeLocalMatrix().invert());
-    const x = MATHJS.bignumber(v.x);
-    const y = MATHJS.bignumber(v.y);
-    let a = MATHJS.bignumber(this.dat.radius.x);
-    let b = MATHJS.bignumber(this.dat.radius.y);
-    return (MATHJS.add(
-      MATHJS.divide(MATHJS.multiply(x, x), MATHJS.multiply(a, a)),
-      MATHJS.divide(MATHJS.multiply(y, y), MATHJS.multiply(b, b)),
-      -1) as MATHJS.BigNumber).toNumber();
+    const x = big(v.x);
+    const y = big(v.y);
+    let a = big(this.dat.radius.x);
+    let b = big(this.dat.radius.y);
+    return (add(
+      div(mul(x, x), mul(a, a)),
+      div(mul(y, y), mul(b, b)),
+      -1) as BigNumber).toNumber();
   }
 
   /**
@@ -127,14 +130,14 @@ class Arc2Algo extends Curve2Algo {
    * @param {Arc2Data} [c = Arc2Data] - The data struct of 2D arc.
    * @retun {A B C D E F} - General equation coefficients.
    */
-  ge(): { A: MATHJS.BigNumber, B: MATHJS.BigNumber, C: MATHJS.BigNumber, D: MATHJS.BigNumber, E: MATHJS.BigNumber, F: MATHJS.BigNumber } {
+  ge(): { A: BigNumber, B: BigNumber, C: BigNumber, D: BigNumber, E: BigNumber, F: BigNumber } {
     // Qnew = T^-T * Qold * T^-1
     let dat = this.dat;
     let T = dat.trans.makeLocalMatrix();
     let T_1 = T.clone().invert();
     let T_T = T_1.clone().transpose();
-    let a = (MATHJS.divide(MATHJS.bignumber(1), MATHJS.multiply(dat.radius.x, dat.radius.x)) as MATHJS.BigNumber).toNumber();
-    let c = (MATHJS.divide(MATHJS.bignumber(1), MATHJS.multiply(dat.radius.y, dat.radius.y)) as MATHJS.BigNumber).toNumber();
+    let a = (div(big(1), mul(dat.radius.x, dat.radius.x)) as BigNumber).toNumber();
+    let c = (div(big(1), mul(dat.radius.y, dat.radius.y)) as BigNumber).toNumber();
     let Qold = new Matrix3().set(
       a, 0, 0,
       0, c, 0,
@@ -144,12 +147,12 @@ class Arc2Algo extends Curve2Algo {
     Qnew.multiply(Qold);
     Qnew.multiply(T_1);
     return {
-      A: MATHJS.bignumber(Qnew.elements[0]),
-      B: MATHJS.bignumber(Qnew.elements[1] + Qnew.elements[3]),
-      C: MATHJS.bignumber(Qnew.elements[4]),
-      D: MATHJS.bignumber(Qnew.elements[2] + Qnew.elements[6]),
-      E: MATHJS.bignumber(Qnew.elements[5] + Qnew.elements[7]),
-      F: MATHJS.bignumber(Qnew.elements[8])
+      A: big(Qnew.elements[0]),
+      B: big(Qnew.elements[1] + Qnew.elements[3]),
+      C: big(Qnew.elements[4]),
+      D: big(Qnew.elements[2] + Qnew.elements[6]),
+      E: big(Qnew.elements[5] + Qnew.elements[7]),
+      F: big(Qnew.elements[8])
     };
   }
 

@@ -1,7 +1,7 @@
-import type { BigNumber } from '../../../../mathjs';
-import { multiply as mul, add, unaryMinus as un, bignumber as big, subtract as sub, equal, largerEq, divide as div } from '../../../../mathjs';
+import type { BigNumber } from 'mathjs';
+import { multiply as mul, add, unaryMinus as un, bignumber as big, subtract as sub, equal, largerEq, divide as div } from 'mathjs';
 import { Vector2 } from "../../../../math/Math";
-import * as MATHJS from '../../../../mathjs';
+import * as MATHJS from 'mathjs';
 import { Arc2Data } from "../../../data/base/curve2/Arc2Data";
 import { Line2Data } from "../../../data/base/curve2/Line2Data";
 import { Nurbs2Data } from "../../../data/base/curve2/Nurbs2Data";
@@ -18,7 +18,6 @@ import type { Curve2Algo } from "../../base/Curve2Algo";
 import verb from 'verb-nurbs';
 import { Nurbs2Algo } from '../../base/curve2/Nurbs2Algo';
 import { Bin, Binary, Close, Newton } from './Iteration';
-// import { multiply } from 'mathjs';
 // import * as SVD from "svd-js";
 
 
@@ -907,7 +906,7 @@ class Curve2Inter {
 
           let p = mul(u, λ0_sqrt) as BigNumber[];
           let q = mul(v, λ1_sqrt) as BigNumber[];
-          if (!MATHJS.largerEq(λ1, 0)) {
+          if (!largerEq(λ1, 0)) {
             q = un(q);
           }
           let l0 = add(p, q) as BigNumber[];

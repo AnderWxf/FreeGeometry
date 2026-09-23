@@ -1,8 +1,10 @@
 import { Matrix3, Vector2, Vector3 } from "../../../../math/Math";
-import * as MATHJS from '../../../../mathjs';
+import * as MATHJS from 'mathjs';
 import { Parabola2Data } from "../../../data/base/curve2/Parabola2Data";
 import { Curve2Algo } from "../Curve2Algo";
 import verb from 'verb-nurbs';
+import type { BigNumber } from "mathjs";
+import { multiply as mul, add, unaryMinus as un, bignumber as big, subtract as sub, equal, largerEq, divide as div } from 'mathjs';
 
 /**
  * 2D Parabola algorithm. 
@@ -74,15 +76,15 @@ class Parabola2Algo extends Curve2Algo {
    * @retun {Vector2}
    */
   override d(u: number, r: number = 0): Vector2 {
-    const x = MATHJS.bignumber(u);
+    const x = big(u);
 
-    const f4_ = MATHJS.divide(MATHJS.bignumber(1), MATHJS.multiply(MATHJS.bignumber(this.dat.f), 4)) as MATHJS.BigNumber;
+    const f4_ = div(big(1), mul(big(this.dat.f), 4)) as BigNumber;
     switch (r) {
       case 0:
         {
           // y = x²/4f       
           const m = this.dat.trans.makeLocalMatrix();
-          const y = MATHJS.multiply(x, x, f4_) as MATHJS.BigNumber;
+          const y = mul(x, x, f4_) as BigNumber;
           const ret = new Vector2(x.toNumber(), y.toNumber());
           ret.applyMatrix3(m);
           return ret;
@@ -91,7 +93,7 @@ class Parabola2Algo extends Curve2Algo {
         {
           // y' = 2x/4f   
           const m = this.dat.trans.makeLinearMatrix();
-          const y = MATHJS.add(x, x, f4_, 2) as MATHJS.BigNumber;
+          const y = add(x, x, f4_, 2) as BigNumber;
           const ret = new Vector2(x.toNumber(), y.toNumber());
           ret.applyMatrix3(m);
           return ret;
@@ -121,13 +123,13 @@ class Parabola2Algo extends Curve2Algo {
   g(point: Vector2): number {
     let v = point.clone();
     v.applyMatrix3(this.dat.trans.makeLocalMatrix().invert());
-    const x = MATHJS.bignumber(v.x);
-    const y = MATHJS.bignumber(v.y);
-    let f = MATHJS.bignumber(this.dat.f);
-    return (MATHJS.add(
-      MATHJS.multiply(y, f, 4),
-      MATHJS.unaryMinus(MATHJS.multiply(x, x))
-    ) as MATHJS.BigNumber).toNumber();
+    const x = big(v.x);
+    const y = big(v.y);
+    let f = big(this.dat.f);
+    return (add(
+      mul(y, f, 4),
+      un(mul(x, x))
+    ) as BigNumber).toNumber();
   }
 
   /**
@@ -135,7 +137,7 @@ class Parabola2Algo extends Curve2Algo {
    * @param {Hyperbola2Data} [c = Hyperbola2Data] - The data struct of 2D Hyperbola.
    * @retun {A B C D E F} - General equation coefficients.
    */
-  ge(): { A: MATHJS.BigNumber, B: MATHJS.BigNumber, C: MATHJS.BigNumber, D: MATHJS.BigNumber, E: MATHJS.BigNumber, F: MATHJS.BigNumber } {
+  ge(): { A: BigNumber, B: BigNumber, C: BigNumber, D: BigNumber, E: BigNumber, F: BigNumber } {
     // Qnew = T^-T * Qold * T^-1
     let dat = this.dat;
     let T = dat.trans.makeLocalMatrix();
@@ -152,12 +154,12 @@ class Parabola2Algo extends Curve2Algo {
     Qnew.multiply(Qold);
     Qnew.multiply(T_1);
     return {
-      A: MATHJS.bignumber(Qnew.elements[0]),
-      B: MATHJS.bignumber(Qnew.elements[1] + Qnew.elements[3]),
-      C: MATHJS.bignumber(Qnew.elements[4]),
-      D: MATHJS.bignumber(Qnew.elements[2] + Qnew.elements[6]),
-      E: MATHJS.bignumber(Qnew.elements[5] + Qnew.elements[7]),
-      F: MATHJS.bignumber(Qnew.elements[8])
+      A: big(Qnew.elements[0]),
+      B: big(Qnew.elements[1] + Qnew.elements[3]),
+      C: big(Qnew.elements[4]),
+      D: big(Qnew.elements[2] + Qnew.elements[6]),
+      E: big(Qnew.elements[5] + Qnew.elements[7]),
+      F: big(Qnew.elements[8])
     };
   }
 

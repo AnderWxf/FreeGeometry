@@ -1,8 +1,10 @@
 import { Matrix2, Vector2 } from "../../../../math/Math";
-import * as MATHJS from '../../../../mathjs';
+import * as MATHJS from 'mathjs';
 import { Hyperbola2Data } from "../../../data/base/curve2/Hyperbola2Data";
 import { Curve2Algo } from "../Curve2Algo";
 import verb from 'verb-nurbs';
+import type { BigNumber } from "mathjs";
+import { multiply as mul, add, unaryMinus as un, bignumber as big, subtract as sub, equal, largerEq, divide as div } from 'mathjs';
 
 /**
  * 2D Hyperbola algorithm. 
@@ -109,8 +111,8 @@ class Hyperbola2AlgoAb extends Curve2Algo {
     return ret;
   }
   vernurbs1(u: Vector2 = new Vector2(-Math.PI / 4, Math.PI / 4)): Array<any> {
-    const a = MATHJS.bignumber(this.dat.radius.x);
-    const b = MATHJS.bignumber(this.dat.radius.y);
+    const a = big(this.dat.radius.x);
+    const b = big(this.dat.radius.y);
     const m = this.dat.trans.makeLocalMatrix();
 
     // P0=(a sec(θ0),b tan(θ0))
@@ -121,24 +123,24 @@ class Hyperbola2AlgoAb extends Curve2Algo {
     let θ = Math.PI / 6;
     // 右支（对称）
     {
-      let θ0 = MATHJS.bignumber(0 + u.x + 1e-10);
-      let θ1 = MATHJS.bignumber(0 + u.y - 1e-10);
-      let θm = MATHJS.multiply(MATHJS.add(θ0, θ1), 0.5) as MATHJS.BigNumber;
-      let Δθ = MATHJS.subtract(θ1, θ0) as MATHJS.BigNumber;
-      let s = MATHJS.sec(MATHJS.divide(Δθ, 2) as MATHJS.BigNumber);
+      let θ0 = big(0 + u.x + 1e-10);
+      let θ1 = big(0 + u.y - 1e-10);
+      let θm = mul(add(θ0, θ1), 0.5) as BigNumber;
+      let Δθ = sub(θ1, θ0) as BigNumber;
+      let s = MATHJS.sec(div(Δθ, 2) as BigNumber);
       let w = s;
       const ws = [1.0, w.toNumber(), 1.0];
       let p0 = new Vector2(
-        (MATHJS.multiply(a, MATHJS.sec(θ0)) as MATHJS.BigNumber).toNumber(),
-        (MATHJS.multiply(b, MATHJS.tan(θ0)) as MATHJS.BigNumber).toNumber()
+        (mul(a, MATHJS.sec(θ0)) as BigNumber).toNumber(),
+        (mul(b, MATHJS.tan(θ0)) as BigNumber).toNumber()
       );
       let p1 = new Vector2(
-        (MATHJS.divide(MATHJS.multiply(a, MATHJS.sec(θm)), s) as MATHJS.BigNumber).toNumber(),
-        (MATHJS.divide(MATHJS.multiply(b, MATHJS.tan(θm)), s) as MATHJS.BigNumber).toNumber()
+        (div(mul(a, MATHJS.sec(θm)), s) as BigNumber).toNumber(),
+        (div(mul(b, MATHJS.tan(θm)), s) as BigNumber).toNumber()
       );
       let p2 = new Vector2(
-        (MATHJS.multiply(a, MATHJS.sec(θ1)) as MATHJS.BigNumber).toNumber(),
-        (MATHJS.multiply(b, MATHJS.tan(θ1)) as MATHJS.BigNumber).toNumber()
+        (mul(a, MATHJS.sec(θ1)) as BigNumber).toNumber(),
+        (mul(b, MATHJS.tan(θ1)) as BigNumber).toNumber()
       );
       p0.applyMatrix3(m);
       p1.applyMatrix3(m);
@@ -154,24 +156,24 @@ class Hyperbola2AlgoAb extends Curve2Algo {
     }
     // 左支（对称）
     {
-      let θ0 = MATHJS.bignumber(Math.PI + u.x + 1e-10);
-      let θ1 = MATHJS.bignumber(Math.PI + u.y - 1e-10);
-      let θm = MATHJS.multiply(MATHJS.add(θ0, θ1), 0.5) as MATHJS.BigNumber;
-      let Δθ = MATHJS.subtract(θ1, θ0) as MATHJS.BigNumber;
-      let s = MATHJS.sec(MATHJS.divide(Δθ, 2) as MATHJS.BigNumber);
+      let θ0 = big(Math.PI + u.x + 1e-10);
+      let θ1 = big(Math.PI + u.y - 1e-10);
+      let θm = mul(add(θ0, θ1), 0.5) as BigNumber;
+      let Δθ = sub(θ1, θ0) as BigNumber;
+      let s = MATHJS.sec(div(Δθ, 2) as BigNumber);
       let w = s;
       const ws = [1.0, w.toNumber(), 1.0];
       let p0 = new Vector2(
-        (MATHJS.multiply(a, MATHJS.sec(θ0)) as MATHJS.BigNumber).toNumber(),
-        (MATHJS.multiply(b, MATHJS.tan(θ0)) as MATHJS.BigNumber).toNumber()
+        (mul(a, MATHJS.sec(θ0)) as BigNumber).toNumber(),
+        (mul(b, MATHJS.tan(θ0)) as BigNumber).toNumber()
       );
       let p1 = new Vector2(
-        (MATHJS.divide(MATHJS.multiply(a, MATHJS.sec(θm)), s) as MATHJS.BigNumber).toNumber(),
-        (MATHJS.divide(MATHJS.multiply(b, MATHJS.tan(θm)), s) as MATHJS.BigNumber).toNumber()
+        (div(mul(a, MATHJS.sec(θm)), s) as BigNumber).toNumber(),
+        (div(mul(b, MATHJS.tan(θm)), s) as BigNumber).toNumber()
       );
       let p2 = new Vector2(
-        (MATHJS.multiply(a, MATHJS.sec(θ1)) as MATHJS.BigNumber).toNumber(),
-        (MATHJS.multiply(b, MATHJS.tan(θ1)) as MATHJS.BigNumber).toNumber()
+        (mul(a, MATHJS.sec(θ1)) as BigNumber).toNumber(),
+        (mul(b, MATHJS.tan(θ1)) as BigNumber).toNumber()
       );
       p0.applyMatrix3(m);
       p1.applyMatrix3(m);
@@ -196,9 +198,9 @@ class Hyperbola2AlgoAb extends Curve2Algo {
   u(point: Vector2): number {
     let v = point.clone();
     v.applyMatrix3(this.dat.trans.makeLocalMatrix().invert());
-    const b = MATHJS.bignumber(this.dat.radius.y);
-    const y = MATHJS.bignumber(v.y);
-    const φ = MATHJS.atan(MATHJS.divide(y, b) as MATHJS.BigNumber);
+    const b = big(this.dat.radius.y);
+    const y = big(v.y);
+    const φ = MATHJS.atan(div(y, b) as BigNumber);
     if (v.x > 0) {
       return φ.toNumber();
     } else {
@@ -226,9 +228,9 @@ class Hyperbola2AlgoAb extends Curve2Algo {
       v0.x, v1.x,
       v0.y, v1.y);
     // M.invert();
-    let x = MATHJS.bignumber(u);
+    let x = big(u);
     // y(n) = -1/4 * (-1)^n * n! * x^(-n-1)
-    let y = MATHJS.multiply(MATHJS.pow(x, - r - 1), -0.25, MATHJS.pow(-1, r), MATHJS.factorial(r)) as MATHJS.BigNumber;
+    let y = mul(MATHJS.pow(x, - r - 1), -0.25, MATHJS.pow(-1, r), MATHJS.factorial(r)) as BigNumber;
 
     let ret = new Vector2(x.toNumber(), y.toNumber());
     ret.applyMatrix2(M);
@@ -247,14 +249,14 @@ class Hyperbola2AlgoAb extends Curve2Algo {
   g(point: Vector2): number {
     let v = point.clone();
     v.applyMatrix3(this.dat.trans.makeLocalMatrix().invert());
-    const x = MATHJS.bignumber(v.x);
-    const y = MATHJS.bignumber(v.y);
-    let a = MATHJS.bignumber(this.dat.radius.x);
-    let b = MATHJS.bignumber(this.dat.radius.y);
-    return (MATHJS.add(
-      MATHJS.divide(MATHJS.multiply(x, x), MATHJS.multiply(a, a)),
-      MATHJS.divide(MATHJS.multiply(y, y), MATHJS.unaryMinus(MATHJS.multiply(b, b))),
-      -1) as MATHJS.BigNumber).toNumber();
+    const x = big(v.x);
+    const y = big(v.y);
+    let a = big(this.dat.radius.x);
+    let b = big(this.dat.radius.y);
+    return (add(
+      div(mul(x, x), mul(a, a)),
+      div(mul(y, y), un(mul(b, b))),
+      -1) as BigNumber).toNumber();
   }
 
   /**
@@ -262,7 +264,7 @@ class Hyperbola2AlgoAb extends Curve2Algo {
    * @param {Hyperbola2Data} [c = Hyperbola2Data] - The data struct of 2D Hyperbola.
    * @retun {A B C D E F} - General equation coefficients.
    */
-  ge(): { A: MATHJS.BigNumber, B: MATHJS.BigNumber, C: MATHJS.BigNumber, D: MATHJS.BigNumber, E: MATHJS.BigNumber, F: MATHJS.BigNumber } {
+  ge(): { A: BigNumber, B: BigNumber, C: BigNumber, D: BigNumber, E: BigNumber, F: BigNumber } {
     //设中心在 (x0,y0)，长半轴 a（沿旋转前 X 轴方向），短半轴 b（沿旋转前 Y 轴方向），旋转角为 φ（绕中心逆时针转）。
     // 曲线系数计算
     // A = cos²φ/a² - sin²φ/b², 
@@ -274,40 +276,40 @@ class Hyperbola2AlgoAb extends Curve2Algo {
     // 曲线的二元二次方程组
     // Ax² + Bxy + Cy² + Dx + Ey + F = 0
     const c = this.dat;
-    const a = MATHJS.bignumber(c.radius.x);
-    const b = MATHJS.bignumber(c.radius.y);
-    const φ = MATHJS.bignumber(c.trans.rot);
-    const x0 = MATHJS.bignumber(c.trans.pos.x);
-    const y0 = MATHJS.bignumber(c.trans.pos.y);
-    const aa = MATHJS.divide(MATHJS.bignumber(1), MATHJS.multiply(a, a));// 1/a²
-    const bb = MATHJS.divide(MATHJS.bignumber(1), MATHJS.multiply(b, b));// 1/b²
+    const a = big(c.radius.x);
+    const b = big(c.radius.y);
+    const φ = big(c.trans.rot);
+    const x0 = big(c.trans.pos.x);
+    const y0 = big(c.trans.pos.y);
+    const aa = div(big(1), mul(a, a));// 1/a²
+    const bb = div(big(1), mul(b, b));// 1/b²
     const sinφ = MATHJS.sin(φ);
     const cosφ = MATHJS.cos(φ);
-    const sin2φ = MATHJS.sin(MATHJS.multiply(φ, 2) as MATHJS.BigNumber);
+    const sin2φ = MATHJS.sin(mul(φ, 2) as BigNumber);
 
-    const A = MATHJS.subtract(
-      MATHJS.multiply(cosφ, cosφ, aa),
-      MATHJS.multiply(sinφ, sinφ, bb)
-    ) as MATHJS.BigNumber;
-    const B = MATHJS.multiply(MATHJS.add(aa, bb), sin2φ) as MATHJS.BigNumber;
-    const C = MATHJS.subtract(
-      MATHJS.multiply(aa, sinφ, sinφ),
-      MATHJS.multiply(bb, cosφ, cosφ)
-    ) as MATHJS.BigNumber;
-    const D = MATHJS.add(
-      MATHJS.unaryMinus(MATHJS.multiply(A, x0, 2)),
-      MATHJS.unaryMinus(MATHJS.multiply(B, y0))
-    ) as MATHJS.BigNumber;
-    const E = MATHJS.add(
-      MATHJS.unaryMinus(MATHJS.multiply(C, y0, 2)),
-      MATHJS.unaryMinus(MATHJS.multiply(B, x0))
-    ) as MATHJS.BigNumber;
-    const F = MATHJS.add(
-      MATHJS.multiply(A, x0, x0),
-      MATHJS.multiply(B, x0, y0),
-      MATHJS.multiply(C, y0, y0),
-      MATHJS.bignumber(-1),
-    ) as MATHJS.BigNumber;
+    const A = sub(
+      mul(cosφ, cosφ, aa),
+      mul(sinφ, sinφ, bb)
+    ) as BigNumber;
+    const B = mul(add(aa, bb), sin2φ) as BigNumber;
+    const C = sub(
+      mul(aa, sinφ, sinφ),
+      mul(bb, cosφ, cosφ)
+    ) as BigNumber;
+    const D = add(
+      un(mul(A, x0, 2)),
+      un(mul(B, y0))
+    ) as BigNumber;
+    const E = add(
+      un(mul(C, y0, 2)),
+      un(mul(B, x0))
+    ) as BigNumber;
+    const F = add(
+      mul(A, x0, x0),
+      mul(B, x0, y0),
+      mul(C, y0, y0),
+      big(-1),
+    ) as BigNumber;
     return { A, B, C, D, E, F };
   }
 }

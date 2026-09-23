@@ -1,7 +1,7 @@
 import { Matrix2, Vector2 } from '../../../../math/Math';
-import type { BigNumber } from '../../../../mathjs';
+import type { BigNumber } from 'mathjs';
 import type { Curve2Algo } from "../../base/Curve2Algo";
-import { multiply as mul, add } from '../../../../mathjs';
+import { multiply as mul, add } from 'mathjs';
 import type { InterOfCurve2, ValueOfBinary } from './Curve2Inter';
 
 // 符号相反二分法递归细分

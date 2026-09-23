@@ -1,6 +1,6 @@
-import type { BigNumber } from '../../../mathjs';
-import { multiply as mul, add, unaryMinus as un, bignumber as big, subtract as sub, equal, largerEq, divide as div, abs } from '../../../mathjs';
-import * as MATHJS from '../../../mathjs';
+import type { BigNumber } from 'mathjs';
+import { multiply as mul, add, unaryMinus as un, bignumber as big, subtract as sub, equal, largerEq, divide as div, abs } from 'mathjs';
+import * as MATHJS from 'mathjs';
 import { PI2, PI4, PI_4 } from '../../..//math/MathUtils';
 import nerdamer from 'nerdamer-prime';
 
@@ -38,7 +38,7 @@ class SolveEquation {
     if (MATHJS.larger(Δ, ZERO)) {
       // 两个不等实根
       const sqrtΔ = MATHJS.sqrt(Δ);
-      const root1 = div(MATHJS.add(_b, sqrtΔ), _2a) as BigNumber;
+      const root1 = div(add(_b, sqrtΔ), _2a) as BigNumber;
       const root2 = div(sub(_b, sqrtΔ), _2a) as BigNumber;
       roots.push(root1, root2);
     } else if (abs(Δ).lessThanOrEqualTo(tol1)) {
@@ -118,7 +118,7 @@ class SolveEquation {
     return roots;
 
     // Δ = 18abc − 4a^3c + a^2b^2 − 4b^3 − 27c^2
-    let Δ0 = MATHJS.add(
+    let Δ0 = add(
       mul(a, b, c, 18),
       mul(a, a, a, c, -4),
       mul(a, a, b, b),
@@ -131,7 +131,7 @@ class SolveEquation {
     // p = b − a^2/3
     // q = 2a^3/27 ​− ab/3 + c
     const p = sub(b, div(mul(a, a), 3)) as BigNumber;
-    const q = MATHJS.add(
+    const q = add(
       div(mul(mul(a, a, a), 2), 27),
       div(mul(a, b), -3),
       c
@@ -140,7 +140,7 @@ class SolveEquation {
     console.log(`q = 2a^3/27 ​− ab/3 + c => q:${q.toNumber()}`);
     // 判别式简化公式
     // Δ = − 4p^3 − 27q^2
-    let Δ = MATHJS.add(
+    let Δ = add(
       mul(p, p, p, -4),
       mul(q, q, -27),
     ) as BigNumber;
@@ -179,8 +179,8 @@ class SolveEquation {
       // x2 =2R^1/3 cos⁡(θ+2π / 3)
       // x3 =2R^1/3 cos⁡(θ+4π / 3)
       let x1 = mul(MATHJS.cbrt(R), MATHJS.cos(div(θ, 3) as BigNumber), 2) as BigNumber;
-      let x2 = mul(MATHJS.cbrt(R), MATHJS.cos(div(MATHJS.add(θ, PI2), 3) as BigNumber), 2) as BigNumber;
-      let x3 = mul(MATHJS.cbrt(R), MATHJS.cos(div(MATHJS.add(θ, PI4), 3) as BigNumber), 2) as BigNumber;
+      let x2 = mul(MATHJS.cbrt(R), MATHJS.cos(div(add(θ, PI2), 3) as BigNumber), 2) as BigNumber;
+      let x3 = mul(MATHJS.cbrt(R), MATHJS.cos(div(add(θ, PI4), 3) as BigNumber), 2) as BigNumber;
       console.log(`x1​ =2R^1/3​ cos(θ / 3) => x1​:${x1.toNumber()}`);
       console.log(`x2 =2R^1/3 cos⁡(θ+2π / 3) => x2:${x2.toNumber()}`);
       console.log(`x3 =2R^1/3 cos⁡(θ+4π / 3) => x3​:${x3.toNumber()}`);
@@ -197,16 +197,16 @@ class SolveEquation {
       // x1 = A + B
       // x2 = -x1/2 + isqrt(3)/2(A - B)
       // x3 = -x1/2 - isqrt(3)/2(A - B)
-      let A = MATHJS.cbrt(MATHJS.add(mul(q, -0.5), MATHJS.sqrt(div(Δ, -108) as BigNumber)) as BigNumber);
-      let B = MATHJS.cbrt(MATHJS.add(mul(q, -0.5), un(MATHJS.sqrt(div(Δ, -108) as BigNumber))) as BigNumber);
+      let A = MATHJS.cbrt(add(mul(q, -0.5), MATHJS.sqrt(div(Δ, -108) as BigNumber)) as BigNumber);
+      let B = MATHJS.cbrt(add(mul(q, -0.5), un(MATHJS.sqrt(div(Δ, -108) as BigNumber))) as BigNumber);
       console.log(`A = (-q/2 + (-Δ/108)^1/2)^1/3 => A:${A.toNumber()}`);
       console.log(`B = (-q/2 - (-Δ/108)^1/2)^1/3 => B:${B.toNumber()}`);
 
-      let x1 = MATHJS.add(A, B) as BigNumber;
+      let x1 = add(A, B) as BigNumber;
       let x2_r = mul(x1, -0.5) as BigNumber;
-      const x2_i = mul(MATHJS.sqrt(big(3)), MATHJS.add(A, un(B)), 0.5) as BigNumber;
+      const x2_i = mul(MATHJS.sqrt(big(3)), add(A, un(B)), 0.5) as BigNumber;
       let x3_r = mul(x1, -0.5) as BigNumber;
-      const x3_i = mul(MATHJS.sqrt(big(3)), MATHJS.add(A, un(B)), -0.5) as BigNumber;
+      const x3_i = mul(MATHJS.sqrt(big(3)), add(A, un(B)), -0.5) as BigNumber;
 
       console.log(`x1 = A + B => x1:${x1.toNumber()}`);
       console.log(`x2 = -x1/2 + isqrt(3)/2(A - B) => x2_r:${x2_r.toNumber()},x2_i:${x2_i.toNumber()}`);
@@ -418,8 +418,8 @@ class SolveEquation {
     // const C = s - (3 * p * p * p * p) / 256 + (p * p * q) / 16 - (p * r) / 4;
 
     const A = sub(q, div(mul(mul(p, p), 3), 8)) as BigNumber;
-    const B = sub(MATHJS.add(r, div(MATHJS.pow(p, 3), 8)), div(mul(p, q), 2)) as BigNumber;
-    const C = sub(MATHJS.add(sub(s, div(mul(MATHJS.pow(p, 4), 3), 256)), div(mul(MATHJS.pow(p, 2), q), 16)), div(mul(p, r), 4)) as BigNumber;
+    const B = sub(add(r, div(MATHJS.pow(p, 3), 8)), div(mul(p, q), 2)) as BigNumber;
+    const C = sub(add(sub(s, div(mul(MATHJS.pow(p, 4), 3), 256)), div(mul(MATHJS.pow(p, 2), q), 16)), div(mul(p, r), 4)) as BigNumber;
 
     console.log(`缺项方程 y⁴ + Ay² + By + C = 0: A :${A.toNumber()}, B:${B.toNumber()}, C:${C.toNumber()}`);
     let roots = new Array<MATHJS.Complex | BigNumber>();
@@ -519,7 +519,7 @@ class SolveEquation {
 
     // 解第一个二次方程: y² - αy + (m + β) = 0
     // const Δ1 = alpha * alpha - 4 * (m + beta);
-    const Δ1 = sub(mul(alpha, alpha), mul(MATHJS.add(m_, beta), 4));
+    const Δ1 = sub(mul(alpha, alpha), mul(add(m_, beta), 4));
     console.log(`Δ1: ${Δ1}`);
     // 检查 Δ1 是否为复数
     if (MATHJS.typeOf(Δ1) === 'Complex') {
@@ -527,7 +527,7 @@ class SolveEquation {
       // 复数判别式，使用复数公式
       const sqrtDisc = MATHJS.sqrt(Δ);
       console.log(`sqrtDisc: ${sqrtDisc}`);
-      const root1 = div(MATHJS.add(alpha, sqrtDisc), 2);
+      const root1 = div(add(alpha, sqrtDisc), 2);
       const root2 = div(sub(alpha, sqrtDisc), 2);
       console.log(`root1:${root1.toString()} root2:${root2.toString()} `);
       roots.push(sub(root1, p_4) as any);
@@ -537,7 +537,7 @@ class SolveEquation {
       let Δ = Δ1 as BigNumber;
       // const root1 = (alpha + MATHJS.sqrt(Δ1)) / 2;
       // const root2 = (alpha - MATHJS.sqrt(Δ1)) / 2;
-      const root1 = div(MATHJS.add(alpha, MATHJS.sqrt(Δ)), 2);
+      const root1 = div(add(alpha, MATHJS.sqrt(Δ)), 2);
       const root2 = div(sub(alpha, MATHJS.sqrt(Δ)), 2);
       console.log(`缺项方程根： root1:${root1.toString()} root2:${root2.toString()} `);
       // roots.push(root1 - p / 4, root2 - p / 4);
@@ -552,7 +552,7 @@ class SolveEquation {
       if (MATHJS.typeOf(alpha) === 'Complex') {
         // 如果 alpha 是复数，使用复数公式
         const sqrtDisc = MATHJS.sqrt(un(Δ));
-        const root1 = div(MATHJS.add(alpha, sqrtDisc), 2);
+        const root1 = div(add(alpha, sqrtDisc), 2);
         const root2 = div(sub(alpha, sqrtDisc), 2);
         console.log(`缺项方程根： root1:${root1.toString()} root2:${root2.toString()} `);
         const r1 = sub(root1, p_4) as any;
@@ -590,7 +590,7 @@ class SolveEquation {
       // 复数判别式，使用复数公式
       const sqrtDisc = MATHJS.sqrt(Δ);
       console.log(`sqrtDisc: ${sqrtDisc}`);
-      const root3 = div(MATHJS.add(alpha, sqrtDisc), 2);
+      const root3 = div(add(alpha, sqrtDisc), 2);
       const root4 = div(sub(alpha, sqrtDisc), 2);
       console.log(`缺项方程根：root3:${root3.toString()} root4:${root4.toString()} `);
       const r3 = sub(root3, p_4) as any;
@@ -603,7 +603,7 @@ class SolveEquation {
       // const root3 = (-alpha + MATHJS.sqrt(Δ2)) / 2;
       // const root4 = (-alpha - MATHJS.sqrt(Δ2)) / 2;
       // roots.push(root3 - p / 4, root4 - p / 4);
-      const root3 = div(MATHJS.add(un(alpha), MATHJS.sqrt(Δ)), 2);
+      const root3 = div(add(un(alpha), MATHJS.sqrt(Δ)), 2);
       const root4 = div(sub(un(alpha), MATHJS.sqrt(Δ)), 2);
       console.log(`缺项方程根：root3:${root3.toString()} root4:${root4.toString()} `);
       const r3 = sub(root3, p_4) as any;
@@ -616,7 +616,7 @@ class SolveEquation {
       if (MATHJS.typeOf(alpha) === 'Complex') {
         // 如果 alpha 是复数，使用复数公式
         const sqrtDisc = MATHJS.sqrt(un(Δ));
-        const root3 = div(MATHJS.add(alpha, sqrtDisc), 2);
+        const root3 = div(add(alpha, sqrtDisc), 2);
         const root4 = div(sub(alpha, sqrtDisc), 2);
         console.log(`缺项方程根：root3:${root3.toString()} root4:${root4.toString()} `);
         const r3 = sub(root3, p_4) as any;
@@ -835,29 +835,29 @@ class SolveEquation {
     let mean2 = big(0);
     // 比较两个结果，选择更准确的那个
     roots1.forEach(root => {
-      const v = MATHJS.add(
-        MATHJS.add(
-          MATHJS.add(
-            MATHJS.add(
+      const v = add(
+        add(
+          add(
+            add(
               mul(MATHJS.pow(root, 4), a),
               mul(MATHJS.pow(root, 3), b)),
             mul(MATHJS.pow(root, 2), c)),
           mul(root, d)),
         e);
-      mean1 = MATHJS.add(mean1, abs(v)) as BigNumber;
+      mean1 = add(mean1, abs(v)) as BigNumber;
     });
     mean1 = div(mean1, roots1.length) as BigNumber;
     roots2.forEach(root => {
-      const v = MATHJS.add(
-        MATHJS.add(
-          MATHJS.add(
-            MATHJS.add(
+      const v = add(
+        add(
+          add(
+            add(
               mul(MATHJS.pow(root, 4), a),
               mul(MATHJS.pow(root, 3), b)),
             mul(MATHJS.pow(root, 2), c)),
           mul(root, d)),
         e);
-      mean2 = MATHJS.add(mean2, abs(v)) as BigNumber;
+      mean2 = add(mean2, abs(v)) as BigNumber;
     });
     mean2 = div(mean2, roots2.length) as BigNumber;
     if (mean1.lessThanOrEqualTo(mean2)) {
