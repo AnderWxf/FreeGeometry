@@ -18,7 +18,6 @@ npm install --save assemblyscript
 
 
 # Modify:
-
 ## 1 mathjs
 
 Disable the check when the number of significant digits exceeds 15
@@ -39,12 +38,10 @@ node_modules/mathjs/lib/esm/core/function/typed.js :
 
 
 # Build:
-
 ./build
 
 if show errr, build again.
 
 # Test:
-
 ./test
 
