@@ -1,8 +1,9 @@
 
 import { MathUtils, PI2 } from "../../../..//math/MathUtils";
 import { Arc2Data } from "../../../data/base/curve2/Arc2Data";
-import { Digraph2, Face2, Loop2 } from "../../../data/brep/Brep2";
+import { Digraph2, Edge2, Face2, Loop2 } from "../../../data/brep/Brep2";
 import { Coedge2Algo, Digraph2Algo, Face2Algo, Face2Algos, Loop2Algo } from "../../brep/Brep2Algo";
+import { Brep2Builder } from "../../builder/Brep2Builder";
 import { Brep2Inter, type InterOfFace2 } from "../intersection/Brep2Inter";
 
 class Bool2 {
@@ -223,7 +224,7 @@ class Bool2 {
       loop.reverse();
     });
     let inters = Brep2Inter.FaceXFace(algo, blgo, tol0, tol1);
-    if (inters.length == 0 && a_.holes.length == 0 && b_.holes.length == 0) {
+    if (inters.length == 0 /*&& a_.holes.length == 0 && b_.holes.length == 0*/) {
       let pa = algo.getInnerPoint();
       let pb = blgo.getInnerPoint();
       // a在b内
@@ -287,7 +288,7 @@ class Bool2 {
     let algo = new Face2Algo(a_);
     let blgo = new Face2Algo(b_);
     let inters = Brep2Inter.FaceXFace(algo, blgo, tol0, tol1);
-    if (inters.length == 0 && a_.holes.length == 0 && b_.holes.length == 0) {
+    if (inters.length == 0 /*&& a_.holes.length == 0 && b_.holes.length == 0*/) {
       let pa = algo.getInnerPoint();
       let pb = blgo.getInnerPoint();
       // a在b内
@@ -346,7 +347,7 @@ class Bool2 {
     let algo = new Face2Algo(a_);
     let blgo = new Face2Algo(b_);
     let inters = Brep2Inter.FaceXFace(algo, blgo, tol0, tol1);
-    if (inters.length == 0 && a_.holes.length == 0 && b_.holes.length == 0) {
+    if (inters.length == 0 /*&& a_.holes.length == 0 && b_.holes.length == 0*/) {
       let pa = algo.getInnerPoint();
       let pb = blgo.getInnerPoint();
       // a在b内
@@ -581,6 +582,57 @@ class Bool2 {
       }
     }
     return result;
+  }
+
+  /*
+  * 面接触
+  * 
+  */
+  static ContactFace(a: Face2Algo, b: Face2Algo, tol0: number, tol1: number): boolean {
+    // 计算面与面的轮廓交点
+    let algo = a;
+    let blgo = b;
+    let inters = Brep2Inter.FaceXFace(algo, blgo, tol0, tol1);
+    if (inters.length == 0) {
+      let pa = algo.getInnerPoint();
+      let pb = blgo.getInnerPoint();
+      // a在b内
+      if (blgo.isPointAtInner(pa, tol0, tol1)) {
+        return true;
+      }
+      // b在a内
+      else if (algo.isPointAtInner(pb, tol0, tol1)) {
+        return true;
+      } else {
+        // a,b相离
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /*
+  * 边接触
+  * 
+  */
+  static ContactEdge(a: Face2, b: Edge2[], tol0: number, tol1: number): boolean {
+    let a_ = a;
+    let b_ = Brep2Builder.BuildFaceByEdges(b);
+    // 计算面与面的轮廓交点
+    let algo = new Face2Algo(a_);
+    let blgo = new Face2Algo(b_);
+    let inters = Brep2Inter.FaceXFace(algo, blgo, tol0, tol1);
+    if (inters.length == 0) {
+      let pb = blgo.getInnerPoint();
+      // b在a内
+      if (algo.isPointAtInner(pb, tol0, tol1)) {
+        return true;
+      } else {
+        // a,b相离
+        return false;
+      }
+    }
+    return true;
   }
 }
 

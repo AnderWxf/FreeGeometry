@@ -86,28 +86,10 @@ class ModifyRectangle2Com extends ComModify {
     endPoint.applyMatrix3(invert);
 
     // 创建一个多段线
-    let points: Vector2[] = [];
-    let edges: Edge2[] = [];
-    let p0 = beginPoint.clone();
-    let p1 = beginPoint.clone().add(new Vector2(endPoint.x - beginPoint.x, 0));
-    let p2 = endPoint.clone();
-    let p3 = endPoint.clone().add(new Vector2(beginPoint.x - endPoint.x, 0));
-    points.push(p0);
-    points.push(p1);
-    points.push(p2);
-    points.push(p3);
-    for (let i = 0; i < points.length; i++)
-      points[i].applyMatrix3(m);
-
-    for (let i = 1; i < points.length; i++) {
-      let beginPoint = points[i - 1];
-      let endPoint = points[i];
-      let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(beginPoint, endPoint);
-      edge.uuid = this.old.userData.original[i].uuid;
-      edges.push(edge);
+    let edges = Brep2Builder.BuildRectangleEdges(beginPoint, endPoint);
+    for (let i = 0; i < edges.length; i++) {
+      edges[i].uuid = this.old.userData.original[i].uuid;
     }
-    let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(points[points.length - 1], points[0]);
-    edges.push(edge);
 
     beginPoint.applyMatrix3(m);
     endPoint.applyMatrix3(m);
@@ -146,27 +128,7 @@ class ModifyRectangle2Com extends ComModify {
       endPoint.applyMatrix3(invert);
 
       // 创建一个临时直线段
-      let points: Vector2[] = [];
-      let edges: Edge2[] = [];
-      let p0 = beginPoint.clone();
-      let p1 = beginPoint.clone().add(new Vector2(endPoint.x - beginPoint.x, 0));
-      let p2 = endPoint.clone();
-      let p3 = endPoint.clone().add(new Vector2(beginPoint.x - endPoint.x, 0));
-      points.push(p0);
-      points.push(p1);
-      points.push(p2);
-      points.push(p3);
-      for (let i = 0; i < points.length; i++)
-        points[i].applyMatrix3(m);
-
-      for (let i = 1; i < points.length; i++) {
-        let beginPoint = points[i - 1];
-        let endPoint = points[i];
-        let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(beginPoint, endPoint);
-        edges.push(edge);
-      }
-      let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(points[points.length - 1], points[0]);
-      edges.push(edge);
+      let edges = Brep2Builder.BuildRectangleEdges(beginPoint, endPoint);
 
       beginPoint.applyMatrix3(m);
       endPoint.applyMatrix3(m);

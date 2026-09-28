@@ -1,12 +1,15 @@
 import * as THREE from 'three';
 import { Vector2, Vector3 } from '../math/Math';
 import { Global } from '../core/Global';
-import type { UserData } from './UserData';
+import { CreateGeomUserData, type UserData } from './UserData';
 import * as MATHJS from 'mathjs';
-import { Edge2 } from '../geometry/data/brep/Brep2';
-import { Edge2Algo } from '../geometry/algorithm/brep/Brep2Algo';
+import { Edge2, Face2 } from '../geometry/data/brep/Brep2';
+import { Edge2Algo, Face2Algo } from '../geometry/algorithm/brep/Brep2Algo';
 import { Point2Data } from '../geometry/data/base/Point2Data';
 import { Point3Data } from '../geometry/data/base/Point3Data';
+import { Brep2Builder } from '../geometry/algorithm/builder/Brep2Builder';
+import { BrepMeshBuilder } from './BrepMeshBuilder';
+import { Bool2 } from '../geometry/algorithm/relation/bool/Bool2';
 
 /**
  * Select controller.
@@ -20,6 +23,7 @@ class Select {
 
   private _isEditor: boolean = false;     // 编辑
   private _isMultiple: boolean = false;   // 多选
+  private _isFrame: boolean = false;      // 框选
   private _isSnap: boolean = false;       // 捕捉
   private _isSnapInter: boolean = false;  // 捕捉交点
 
@@ -28,6 +32,9 @@ class Select {
   overObjects: THREE.Object3D[] = [];     // 滑过结果
   pickedPoint: THREE.Vector3;             // 拾取的坐标
   overedPoint: THREE.Vector3;             // 滑过的坐标
+
+  frameBegin: THREE.Vector3;              // 框选的起点坐标
+  private _selectedFrame: THREE.Object3D; // 框选的显示框对象
   constructor(scene: THREE.Scene) {
     this._scene = scene;
 
@@ -43,6 +50,13 @@ class Select {
   }
   set isMultiple(value: boolean) {
     this._isMultiple = value;
+  }
+
+  get isFrame(): boolean {
+    return this._isFrame;
+  }
+  set isFrame(value: boolean) {
+    this._isFrame = value;
   }
 
   get isSnap(): boolean {
@@ -106,19 +120,43 @@ class Select {
   onKeyDown = (event: KeyboardEvent) => {
     switch (event.code) {
       case "ControlLeft":
-        this.isMultiple = true;
+        this._isMultiple = true;
+        break;
+      case "AltLeft":
+        this._isFrame = true;
         break;
     }
   }
   onKeyUp = (event: KeyboardEvent) => {
     switch (event.code) {
       case "ControlLeft":
-        this.isMultiple = false;
+        this._isMultiple = false;
+        break;
+      case "AltLeft":
+        this._isFrame = false;
         break;
     }
   }
+
+  private selectObj(obj: THREE.Object3D) {
+    if (this.overObjects.includes(obj)) {
+      this.overObjects.splice(this.overObjects.indexOf(obj), 1);
+    }
+    (obj as any).material?.color?.setHex(THREE.Color.NAMES.aqua);
+    let userData = obj.userData as UserData;
+    if (userData.isAssist && this.selectedAssist != obj) {
+      this.selectedAssist = obj;
+    } else {
+      this.selectedObjects.push(obj);
+    }
+  }
+
   onMouseClick = (event: MouseEvent) => {
     if (event.target != Global.canvas) {
+      return;
+    }
+    if (this._isFrame) {
+      this.onFrameEnd(event);
       return;
     }
     if (!this.isMultiple) {
@@ -151,6 +189,8 @@ class Select {
     let isCanPick = false;
     // 默认的点
     this.pickedPoint = raycaster.ray.origin; // 没有交点时，设置射线源点
+
+
     let objects: THREE.Object3D[] = [];
     // 有高亮物体时，从高亮物体中选择
     if (this.overObjects.length > 0) {
@@ -189,13 +229,7 @@ class Select {
         if (userData.isAssist) {
           //拾取的是一个存在的点对象
           this.pickedPoint.set(obj.position.x, obj.position.y, 0);
-          if (this.selectedAssist != obj) {
-            if (this.overObjects.includes(obj)) {
-              this.overObjects.splice(this.overObjects.indexOf(obj), 1);
-            }
-            (obj as any).material?.color?.setHex(THREE.Color.NAMES.aqua);
-            this.selectedAssist = obj;
-          }
+          this.selectObj(obj);
         }
         if (userData.original instanceof Edge2) {
           let p = new Vector2(this.pickedPoint.x, this.pickedPoint.y);
@@ -234,11 +268,7 @@ class Select {
           }
         }
         if (!this.selectedObjects.includes(obj)) {
-          if (this.overObjects.includes(obj)) {
-            this.overObjects.splice(this.overObjects.indexOf(obj), 1);
-          }
-          (obj as any).material?.color?.setHex(THREE.Color.NAMES.aqua);
-          this.selectedObjects.push(obj);
+          this.selectObj(obj);
           break;
         }
         obj.children.forEach(child => {
@@ -289,6 +319,10 @@ class Select {
     this.selectedObjects = this.selectedObjects.reverse();
   }
   onMouseMove = (event: MouseEvent) => {
+    // 框选处理
+    if (this._isFrame) {
+      return;
+    }
     // 可以在这里实现鼠标移动时的交互逻辑，例如高亮选中对象等
     for (let i = 0; i < this.overObjects.length; i++) {
       let obj = this.overObjects[i] as THREE.Object3D;
@@ -322,6 +356,7 @@ class Select {
     let isCanPick = false;
     // 默认的点
     this.overedPoint = raycaster.ray.origin; // 没有交点时，设置射线源点
+
     // 计算物体和射线的交点
     const intersects = raycaster.intersectObjects(this._scene.children);
     if (intersects.length > 0) {
@@ -422,17 +457,176 @@ class Select {
     }
   };
 
+  onFrameBegin = (event: MouseEvent) => {
+    if (event.target != Global.canvas) return;
+    if (event.button == 0) {
+      if (this._isFrame) {
+        const raycaster = this._raycasterForOver;
+        const mouse = new THREE.Vector2();
+        // 计算鼠标在canvas上的位置
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+        // 更新射线的起点和方向
+        raycaster.setFromCamera(mouse, this._camera);
+        this.frameBegin = raycaster.ray.origin.clone();
+      }
+    }
+
+  };
+
+
+  onFrameEnd = (event: MouseEvent) => {
+    if (event.target != Global.canvas) return;
+    if (event.button == 0) {
+      if (this._isFrame) {
+        if (!this.frameBegin) {
+          return;
+        }
+        const raycaster = this._raycasterForOver;
+        const mouse = new THREE.Vector2();
+        // 计算鼠标在canvas上的位置
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+        // 更新射线的起点和方向
+        raycaster.setFromCamera(mouse, this._camera);
+        let frameEnd = raycaster.ray.origin;
+
+        let begin = new Vector2(this.frameBegin.x, this.frameBegin.y);
+        let end = new Vector2(frameEnd.x, frameEnd.y);
+        let edges = Brep2Builder.BuildRectangleEdges(begin, end);
+        let face = Brep2Builder.BuildFaceByEdges(edges);
+        let faceAlg: Face2Algo = new Face2Algo(face);
+        // 计算相交的曲线或者面
+        let objects = Global.scene.allObjects;
+        for (let i = 0; i < objects.length; i++) {
+          let obj = objects[i];
+          if (this.selectedObjects.includes(obj)) {
+            continue;
+          }
+          let userData = obj.userData as UserData;
+          if (userData.original instanceof Edge2) {
+            if (Bool2.ContactFace(faceAlg, new Face2Algo(Brep2Builder.BuildFaceByEdges([userData.original.clone()])), 1e-3, 1e-10)) {
+              this.selectObj(obj);
+            }
+            continue;
+          }
+          if (userData.original instanceof Face2) {
+            if (Bool2.ContactFace(faceAlg, new Face2Algo(userData.original), 1e-3, 1e-10)) {
+              this.selectObj(obj);
+            }
+            continue;
+          }
+          if (userData.original instanceof Point2Data) {
+            if (faceAlg.isPointOn(userData.original.pos, 1e-3, 1e-10)) {
+              this.selectObj(obj);
+            }
+            continue;
+          }
+          if (userData.original instanceof Vector2) {
+            if (faceAlg.isPointOn(userData.original, 1e-3, 1e-10)) {
+              this.selectObj(obj);
+            }
+            continue;
+          }
+
+          if (userData.original instanceof Array) {
+            let arr = userData.original as Array<any>;
+            if (arr[0] instanceof Edge2) {
+              let fedges = new Array<Edge2>();
+              arr.forEach((e) => {
+                fedges.push(e.clone());
+              });
+              if (Bool2.ContactFace(faceAlg, new Face2Algo(Brep2Builder.BuildFaceByEdges(fedges)), 1e-3, 1e-10)) {
+                this.selectObj(obj);
+                continue;
+              }
+            }
+
+            for (let j = 0; j < arr.length; j++) {
+              let o = arr[j];
+              if (o instanceof Face2) {
+                if (Bool2.ContactFace(faceAlg, new Face2Algo(o), 1e-3, 1e-10)) {
+                  this.selectObj(obj);
+                }
+                break;
+              }
+              if (o instanceof Point2Data) {
+                if (faceAlg.isPointOn(o.pos, 1e-3, 1e-10)) {
+                  this.selectObj(obj);
+                }
+                break;
+              }
+              if (o instanceof Vector2) {
+                if (faceAlg.isPointOn(o, 1e-3, 1e-10)) {
+                  this.selectObj(obj);
+                }
+                break;
+              }
+            }
+          }
+        }
+      }
+
+      if (this._selectedFrame) {
+        this._scene.remove(this._selectedFrame);
+      }
+      this._isFrame = false;
+      this.frameBegin = null;
+      this._selectedFrame = null;
+    }
+  };
+
+  onFrameMove = (event: MouseEvent) => {
+    if (event.target != Global.canvas) return;
+    if (this._isFrame) {
+      if (!this.frameBegin) {
+        return;
+      }
+      const raycaster = this._raycasterForOver;
+      const mouse = new THREE.Vector2();
+      // 计算鼠标在canvas上的位置
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+      // 更新射线的起点和方向
+      raycaster.setFromCamera(mouse, this._camera);
+      let frameEnd = raycaster.ray.origin;
+
+      let begin = new Vector2(this.frameBegin.x, this.frameBegin.y);
+      let end = new Vector2(frameEnd.x, frameEnd.y);
+
+      if (begin.distanceTo(end) < 1) {
+        return;
+      }
+      let edges = Brep2Builder.BuildRectangleEdges(begin, end);
+      let geo = BrepMeshBuilder.BuildEdge2sMesh(edges, THREE.Color.NAMES.steelblue);
+      if (this._selectedFrame) {
+        this._scene.remove(this._selectedFrame);
+      }
+      this._selectedFrame = geo;
+      this._scene.add(this._selectedFrame);
+    }
+  };
+
   bind(window: Window) {
     window.addEventListener("keydown", this.onKeyDown);
     window.addEventListener("keyup", this.onKeyUp);
     window.addEventListener('click', this.onMouseClick);
     window.addEventListener("mousemove", this.onMouseMove);
+    window.addEventListener("mousedown", this.onFrameBegin);
+    // window.addEventListener("mouseup", this.onFrameEnd);
+    window.addEventListener("mousemove", this.onFrameMove);
   }
   unbind(window: Window) {
     window.removeEventListener("keydown", this.onKeyDown);
     window.removeEventListener("keyup", this.onKeyUp);
     window.removeEventListener('click', this.onMouseClick);
     window.removeEventListener("mousemove", this.onMouseMove);
+    window.removeEventListener("mousedown", this.onFrameBegin);
+    // window.removeEventListener("mouseup", this.onFrameEnd);
+    window.removeEventListener("mousemove", this.onFrameMove);
   }
 }
 export { Select };

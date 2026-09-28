@@ -14,6 +14,35 @@ import { CurveBuilder } from "./CurveBuilder";
  *
  */
 class Brep2Builder {
+  /**
+   * build rectangle from begin end poig.
+   *
+   * @param {Vector2} [begin] - The begin of rectangle.
+   * @param {Vector2} [end] - The end of rectangle.
+   */
+  static BuildRectangleEdges(begin: Vector2, end: Vector2): Edge2[] {
+    // 创建一个多段线
+    let points: Vector2[] = [];
+    let edges: Edge2[] = [];
+    let p0 = begin.clone();
+    let p1 = begin.clone().add(new Vector2(end.x - begin.x, 0));
+    let p2 = end.clone();
+    let p3 = end.clone().add(new Vector2(begin.x - end.x, 0));
+    points.push(p0);
+    points.push(p1);
+    points.push(p2);
+    points.push(p3);
+
+    for (let i = 1; i < points.length; i++) {
+      let beginPoint = points[i - 1];
+      let endPoint = points[i];
+      let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(beginPoint, endPoint);
+      edges.push(edge);
+    }
+    let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(points[points.length - 1], points[0]);
+    edges.push(edge);
+    return edges;
+  }
 
   /**
    * build line edge2 from begin point and end point.

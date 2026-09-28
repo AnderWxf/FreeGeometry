@@ -55,25 +55,7 @@ class CreateRectangle2Com extends ComCreate {
     this.assists.push(this.createAssistPoint(userData.assistPoints[userData.assistPoints.length - 1]));
     Global.scene.add(this.assists[this.assists.length - 1]);
     // 创建一个多段线
-    let points: Vector2[] = [];
-    let edges: Edge2[] = [];
-    let p0 = this.begin.clone();
-    let p1 = this.begin.clone().add(new Vector2(this.end.x - this.begin.x, 0));
-    let p2 = this.end.clone();
-    let p3 = this.end.clone().add(new Vector2(this.begin.x - this.end.x, 0));
-    points.push(p0);
-    points.push(p1);
-    points.push(p2);
-    points.push(p3);
-
-    for (let i = 1; i < points.length; i++) {
-      let beginPoint = points[i - 1];
-      let endPoint = points[i];
-      let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(beginPoint, endPoint);
-      edges.push(edge);
-    }
-    let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(points[points.length - 1], points[0]);
-    edges.push(edge);
+    let edges = Brep2Builder.BuildRectangleEdges(this.begin, this.end);
     if (paras.length >= 6) {
       for (let i = 0; i < edges.length; i++) {
         let uuid = paras[6 + i];
@@ -106,26 +88,7 @@ class CreateRectangle2Com extends ComCreate {
       // 创建一个临时多段线
       let endPoint: Vector2 = Global.select.overedPoint ? new Vector2(Global.select.overedPoint.x, Global.select.overedPoint.y) : new Vector2(0, 0);
 
-      let points: Vector2[] = [];
-      let edges: Edge2[] = [];
-      let p0 = this.begin.clone();
-      let p1 = this.begin.clone().add(new Vector2(endPoint.x - this.begin.x, 0));
-      let p2 = endPoint.clone();
-      let p3 = endPoint.clone().add(new Vector2(this.begin.x - endPoint.x, 0));
-      points.push(p0);
-      points.push(p1);
-      points.push(p2);
-      points.push(p3);
-
-      for (let i = 1; i < points.length; i++) {
-        let beginPoint = points[i - 1];
-        let endPoint = points[i];
-        let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(beginPoint, endPoint);
-        edges.push(edge);
-      }
-      let edge = Brep2Builder.BuildLineEdge2FromBeginEndPoint(points[points.length - 1], points[0]);
-      edges.push(edge);
-
+      let edges = Brep2Builder.BuildRectangleEdges(this.begin, endPoint);
       let geo = BrepMeshBuilder.BuildEdge2sMesh(edges, THREE.Color.NAMES.gray, undefined, 0);
       this.tempResult.children.push(geo);
       Global.scene.add(this.tempResult);

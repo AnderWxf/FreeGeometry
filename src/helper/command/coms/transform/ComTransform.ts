@@ -247,7 +247,7 @@ class ComTransform extends ComBatch {
       }
       if (userData.original instanceof Array) {
         for (let j = 0; j < userData.original.length; j++) {
-          this._text += ' ' + userData.original[i].uuid;
+          this._text += ' ' + userData.original[j].uuid;
         }
       }
     }
@@ -259,7 +259,7 @@ class ComTransform extends ComBatch {
       }
       if (userData.original instanceof Array) {
         for (let j = 0; j < userData.original.length; j++) {
-          this._text += ' ' + userData.original[i].uuid;
+          this._text += ' ' + userData.original[j].uuid;
         }
       }
     }
