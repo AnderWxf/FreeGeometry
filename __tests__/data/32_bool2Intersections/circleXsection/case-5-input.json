@@ -9,8 +9,8 @@
           "p": {
             "type": -1,
             "typename": "MATH_VECTOR2",
-            "x": -5.708333333333336,
-            "y": 3.5989583333333353
+            "x": 6.187499999999993,
+            "y": 9.526041666666675
           },
           "c": 11403055
         },
@@ -18,8 +18,8 @@
           "p": {
             "type": -1,
             "typename": "MATH_VECTOR2",
-            "x": 0.020833333333333925,
-            "y": 1.2031249999999991
+            "x": 11.916666666666663,
+            "y": 7.130208333333339
           },
           "c": 3329330
         }
@@ -38,8 +38,8 @@
               "pos": {
                 "type": -1,
                 "typename": "MATH_VECTOR2",
-                "x": -5.708333333333336,
-                "y": 3.5989583333333353
+                "x": 6.187499999999993,
+                "y": 9.526041666666675
               },
               "rot": 0,
               "scale": {
@@ -86,7 +86,6 @@
                 "v0i": -1,
                 "v1i": -1,
                 "curvei": 0,
-                "curve": null,
                 "u": {
                   "type": -1,
                   "typename": "MATH_VECTOR2",
@@ -115,7 +114,6 @@
   {
     "userData": {
       "type": 34,
-      "typename": "DRAW_SURFACE_SEC",
       "canPick": true,
       "isAssist": false,
       "assistPoints": [],
@@ -133,8 +131,8 @@
               "pos": {
                 "type": -1,
                 "typename": "MATH_VECTOR2",
-                "x": 0,
-                "y": 0
+                "x": 1.2500000000000036,
+                "y": 6.35416666666667
               },
               "rot": 0,
               "scale": {
@@ -197,8 +195,8 @@
               "pos": {
                 "type": -1,
                 "typename": "MATH_VECTOR2",
-                "x": 0,
-                "y": 0
+                "x": 1.2500000000000036,
+                "y": 6.35416666666667
               },
               "rot": 0,
               "scale": {
@@ -331,7 +329,6 @@
                 "v0i": -1,
                 "v1i": -1,
                 "curvei": 0,
-                "curve": null,
                 "u": {
                   "type": -1,
                   "typename": "MATH_VECTOR2",
@@ -385,7 +382,6 @@
                 "v0i": -1,
                 "v1i": -1,
                 "curvei": 1,
-                "curve": null,
                 "u": {
                   "type": -1,
                   "typename": "MATH_VECTOR2",
@@ -429,7 +425,8 @@
           ]
         },
         "holes": []
-      }
+      },
+      "typename": "DRAW_SURFACE_SEC"
     }
   }
 ]

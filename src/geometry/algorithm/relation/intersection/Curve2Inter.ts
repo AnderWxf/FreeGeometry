@@ -18,6 +18,8 @@ import type { Curve2Algo } from "../../base/Curve2Algo";
 import verb from 'verb-nurbs';
 import { Nurbs2Algo } from '../../base/curve2/Nurbs2Algo';
 import { Bin, Binary, Close, Newton } from './Iteration';
+import { MathUtils } from '../../../../math/MathUtils';
+import { Brep2Builder } from '../../builder/Brep2Builder';
 // import * as SVD from "svd-js";
 
 
@@ -321,7 +323,8 @@ class Curve2Inter {
    * @param {number} [n] - The max number of intersection points.
    */
   static LineXNurbs(c0: Line2Data, c1: Nurbs2Data, tol0: number, tol1: number, n: number = -1): Array<InterOfCurve2> {
-    let segment = c1.controls.length * c1.degree * 2;
+    // let segment = c1.controls.length * c1.degree * 2;
+    let segment = Math.ceil(MathUtils.clamp(Brep2Builder.Length(c1, new Vector2(0, 1), 1, 512), 64, 512));
     return Curve2Inter.SwapU(Curve2Inter.CurveXCurve(c1, c0, segment, tol0, tol1, n));
   }
 
@@ -399,14 +402,15 @@ class Curve2Inter {
   /**
    * compute arc to arc intersection point.
    *
-   * @param {Arc2Data} [c0] - The frist curve.
-   * @param {Arc2Data} [c1] - The second curve.
+   * @param {Arc2Data | Hyperbola2Data | Parabola2Data} [c0] - The frist curve.
+   * @param {Arc2Data | Hyperbola2Data | Parabola2Data} [c1] - The second curve.
    * @param {number} [tol0] - The tolerance of geometric.
    * @param {number} [tol1] - The tolerance of algebraic.
    * @param {number} [n] - The max number of intersection points.
    */
   static QuadraticXNurbs(c0: Arc2Data | Hyperbola2Data | Parabola2Data, c1: Nurbs2Data, tol0: number, tol1: number, n: number = -1): Array<InterOfCurve2> {
-    let segment = c1.controls.length * c1.degree * 2;
+    // let segment = c1.controls.length * c1.degree * 2;
+    let segment = Math.ceil(MathUtils.clamp(Brep2Builder.Length(c1, new Vector2(0, 1), 1, 512), 64, 512));
     return Curve2Inter.SwapU(Curve2Inter.CurveXCurve(c1, c0, segment, tol0, tol1, n));
   }
 
@@ -989,8 +993,9 @@ class Curve2Inter {
    * @param {number} [tol1] - The tolerance of algebraic.
    * @param {number} [n] - The max number of intersection points.
    */
-  static ArcXNurbs(c0: Arc2Data, c1: Nurbs2Data, tol0: number, tol1: number, n: number = 2): Array<InterOfCurve2> {
-    let segment = c1.controls.length * 2;
+  static ArcXNurbs(c0: Arc2Data, c1: Nurbs2Data, tol0: number, tol1: number, n: number = -1): Array<InterOfCurve2> {
+    // let segment = c1.controls.length * c1.degree * 2;
+    let segment = Math.ceil(MathUtils.clamp(Brep2Builder.Length(c1, new Vector2(0, 1), 1, 512), 64, 512));
     return Curve2Inter.SwapU(Curve2Inter.CurveXCurve(c1, c0, segment, tol0, tol1, n));
   }
 
@@ -1224,17 +1229,26 @@ class Curve2Inter {
         inters.push(...Curve2Inter.SwapU(Curve2Inter.LineXNurbs(c1, c0, tol0, tol1)));
       }
     }
+
     else if (c0 instanceof Arc2Data || c0 instanceof Hyperbola2Data || c0 instanceof Parabola2Data) {
       if (c1 instanceof Arc2Data || c1 instanceof Hyperbola2Data || c1 instanceof Parabola2Data) {
         inters.push(...Curve2Inter.QuadraticXQuadratic(c0, c1, tol0, tol1, 4));
       }
       else if (c1 instanceof Nurbs2Data) {
-        inters.push(...Curve2Inter.QuadraticXNurbs(c0, c1, tol0, tol1));
+        if (c0 instanceof Arc2Data) {
+          inters.push(...Curve2Inter.ArcXNurbs(c0, c1, tol0, tol1));
+        } else {
+          inters.push(...Curve2Inter.QuadraticXNurbs(c0, c1, tol0, tol1));
+        }
       }
     }
     else if (c1 instanceof Arc2Data || c1 instanceof Hyperbola2Data || c1 instanceof Parabola2Data) {
       if (c0 instanceof Nurbs2Data) {
-        inters.push(...Curve2Inter.SwapU(Curve2Inter.QuadraticXNurbs(c1, c0, tol0, tol1)));
+        if (c1 instanceof Arc2Data) {
+          inters.push(...Curve2Inter.SwapU(Curve2Inter.ArcXNurbs(c1, c0, tol0, tol1)));
+        } else {
+          inters.push(...Curve2Inter.SwapU(Curve2Inter.QuadraticXNurbs(c1, c0, tol0, tol1)));
+        }
       }
     }
     else if (c0 instanceof Nurbs2Data && c1 instanceof Nurbs2Data) {

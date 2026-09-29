@@ -193,10 +193,19 @@ class Nurbs2Algo extends Curve2Algo {
     return new Nurbs2Data(new Transform2(), controlPoints, dat.knots, dat.degree);
   }
 
-  //高斯-勒让德积分 data:NurbsCurveData
-  private static SegmentArea(u0: number, u1: number, data: any): number {
-    // 高斯-勒让德节点和权重（n=5）
-    const GaussData = {
+  /**
+   * the da(tn rotation matrix) function return directed area from u0 to u1 parameter.
+   * Use Green's theorem to calculate the area of the curve between u0 and u1.
+   * A = 0.5 * ∫(x dy - y dx) = 0.5 * ∫(x y' - y x') du
+   * @param {number} [u0 ∈ [0,a]] - the u0 parameter of curve.
+   * @param {number} [u1 ∈ [0,a]] - the u1 parameter of curve.* 
+   * @retun {number} 
+   */
+  da(u0: number, u1: number): number {
+    let Iworld = 0;
+    // 使用高斯-勒让德积分计算曲线的有向面积
+    // 高斯-勒让德常数（n=5）
+    const GAUSS_5 = {
       points: [
         -0.9061798459386640,
         -0.5384693101056831,
@@ -212,102 +221,42 @@ class Nurbs2Algo extends Curve2Algo {
         0.2369268850561891
       ]
     };
-    const halfLen = (u1 - u0) / 2;
-    const mid = (u0 + u1) / 2;
-    let integral = 0;
+    // 确保 u0 < u1
+    const sign = (u0 < u1) ? 1 : -1;
+    const uStart = Math.min(u0, u1);
+    const uEnd = Math.max(u0, u1);
 
-    for (let i = 0; i < GaussData.points.length; i++) {
-      // 将节点从 [-1,1] 映射到 [u0, u1]
-      const u = mid + halfLen * GaussData.points[i];
-      // 获取曲线在 u 处的位置和导数
-      let dts = verb.eval.Eval.rationalCurveDerivatives(data, u, 1) as number[][];
-      // {x, y}
-      let pt = new Vector2(dts[0][0], dts[0][1]);
-      // {dx, dy}
-      let der = new Vector2(dts[1][0], dts[1][1]);
-      // 计算被积函数值
-      const g = pt.x * der.y - pt.y * der.x;
-      // 累加
-      integral += GaussData.weights[i] * g;
+    // 找出区间内所有节点，分段积分
+    const breakpoints = [uStart];
+    let knots = this._dat.knots;
+    for (let i = 0; i < knots.length; i++) {
+      if (knots[i] > uStart && knots[i] < uEnd) {
+        breakpoints.push(knots[i]);
+      }
     }
+    breakpoints.push(uEnd);
 
-    // 乘以区间半长，再除以 2（格林公式的 1/2 因子）
-    return (halfLen * integral) / 2;
-  }
-  //有向面积 data:NurbsCurveData
-  private static Area(data: any): number {
-    // 使用高斯-勒让德积分计算曲线的有向面积
-    let knots: number[] = data.knots as number[];
-    let degree: number = data.degree as number;
     let totalArea = 0;
-    // 遍历每个非空节点区间 [knots[i], knots[i+1]]
-    for (let i = degree; i < knots.length - degree - 1; i++) {
-      const u0 = knots[i];
-      const u1 = knots[i + 1];
-      if (Math.abs(u1 - u0) < 1e-12) continue;  // 跳过重复节点
-      totalArea += Nurbs2Algo.SegmentArea(u0, u1, data);
-    }
-    return totalArea;
-  }
 
-  /**
-   * the da(tn rotation matrix) function return directed area from u0 to u1 parameter.
-   * Use Green's theorem to calculate the area of the curve between u0 and u1.
-   * A = 0.5 * ∫(x dy - y dx) = 0.5 * ∫(x y' - y x') du
-   * @param {number} [u0 ∈ [0,a]] - the u0 parameter of curve.
-   * @param {number} [u1 ∈ [0,a]] - the u1 parameter of curve.* 
-   * @retun {number} 
-   */
-  da(u0: number, u1: number): number {
-    let Ilocal = 0;
-    let m = this.dat.trans.makeLocalMatrix();
-    let a = m.elements[0];
-    let b = m.elements[1];
-    let c = m.elements[3];
-    let d = m.elements[4];
-    let Tx = m.elements[2];
-    let Ty = m.elements[5];
-    let Δ = a * d - b * c;
-    let begin = this.p(u0);
-    let end = this.p(u1);
-    let ΔX = end.x - begin.x;
-    let ΔY = end.y - begin.y;
-    // 使用高斯-勒让德积分计算曲线的有向面积
-    let data = this.curve_._data;
-    if (u0 < u1) {
-      if (u0 == 0 && u1 == 1) {
-        // data = this.curve_._data;
-      }
-      else if (u0 == 0) {
-        data = verb.eval.Divide.curveSplit(this.curve_._data, u1)[0];
-      }
-      else if (u1 == 1) {
-        data = verb.eval.Divide.curveSplit(this.curve_._data, u0)[1];
-      }
-      else {
-        data = verb.eval.Divide.curveSplit(this.curve_._data, u0)[1];
-        data = verb.eval.Divide.curveSplit(data, (u1 - u0) / (1 - u0))[0];
-      }
-      Ilocal = Nurbs2Algo.Area(data);
+    for (let s = 0; s < breakpoints.length - 1; s++) {
+      const s0 = breakpoints[s];
+      const s1 = breakpoints[s + 1];
+      if (s1 - s0 < 1e-12) continue;
 
+      const halfLen = (s1 - s0) / 2;
+      const mid = (s0 + s1) / 2;
+      let integral = 0;
+
+      for (let i = 0; i < GAUSS_5.points.length; i++) {
+        const u = mid + halfLen * GAUSS_5.points[i];
+        const pt = this.p(u);       // {x, y} 此处已经是世界坐标下的点
+        const der = this.d(u, 1);   // {dx, dy} 此处已经是世界坐标下的导数
+        const g = pt.x * der.y - pt.y * der.x;
+        integral += GAUSS_5.weights[i] * g;
+      }
+      totalArea += (halfLen * integral) / 2;
     }
-    if (u0 > u1) {
-      if (u0 == 1 && u1 == 0) {
-        // data = this.curve_._data;
-      }
-      else if (u1 == 0) {
-        data = verb.eval.Divide.curveSplit(this.curve_._data, u0)[0] as any;
-      }
-      else if (u0 == 1) {
-        data = verb.eval.Divide.curveSplit(this.curve_._data, u1)[1];
-      }
-      else {
-        data = verb.eval.Divide.curveSplit(this.curve_._data, u1)[1];
-        data = verb.eval.Divide.curveSplit(data, (u0 - u1) / (1 - u1))[0];
-      }
-      Ilocal = -Nurbs2Algo.Area(data);
-    }
-    let Iworld = Δ * Ilocal + 0.5 * (Tx * ΔY - Ty * ΔX);
+    Iworld = sign * totalArea;
     return Iworld;
   }
 }
