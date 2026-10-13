@@ -1,0 +1,230 @@
+[
+  {
+    "userData": {
+      "type": 34,
+      "typename": "DRAW_SURFACE_SEC",
+      "canPick": true,
+      "isAssist": false,
+      "assistPoints": [],
+      "color": 255,
+      "original": [
+        {
+          "uuid": "09290d83-1f6c-47e4-a0e2-3b8167505dba",
+          "type": 299,
+          "typename": "DATA_TYPE_BREP2_FACE2",
+          "curves": [
+            {
+              "uuid": "ce3e31e5-d54d-4322-8d64-7788808327ac",
+              "trans": {
+                "type": 252,
+                "typename": "DATA_TYPE_TRANSFORM2",
+                "pos": {
+                  "type": -1,
+                  "typename": "MATH_VECTOR2",
+                  "x": 12.33811936936932,
+                  "y": 2.9694538288288337
+                },
+                "rot": -0.08350579621789725,
+                "scale": {
+                  "type": -1,
+                  "typename": "MATH_VECTOR2",
+                  "x": 1,
+                  "y": 1
+                },
+                "parent": null
+              },
+              "type": 255,
+              "typename": "DATA_TYPE_CURVE2_ARC2",
+              "radius": {
+                "type": -1,
+                "typename": "MATH_VECTOR2",
+                "x": 11.864258665443687,
+                "y": 8.051873832381288
+              }
+            },
+            {
+              "uuid": "976ff989-39c6-4b15-aee7-87a3ec076c76",
+              "trans": {
+                "type": 252,
+                "typename": "DATA_TYPE_TRANSFORM2",
+                "pos": {
+                  "type": -1,
+                  "typename": "MATH_VECTOR2",
+                  "x": -0.3769610127369214,
+                  "y": 2.3773881640260925
+                },
+                "rot": -0.14135855169445027,
+                "scale": {
+                  "type": -1,
+                  "typename": "MATH_VECTOR2",
+                  "x": 0.9999999999999997,
+                  "y": 0.9999999999999997
+                },
+                "parent": null
+              },
+              "type": 255,
+              "typename": "DATA_TYPE_CURVE2_ARC2",
+              "radius": {
+                "type": -1,
+                "typename": "MATH_VECTOR2",
+                "x": 13.678098781801598,
+                "y": 10.804208636271184
+              }
+            }
+          ],
+          "vertices": [
+            {
+              "uuid": "d3c5e1ff-8da3-4494-be68-25aa72a94e2e",
+              "type": 295,
+              "typename": "DATA_TYPE_BREP2_VERTICE2",
+              "p": {
+                "uuid": "5243307d-810c-45b1-b4f1-e0c5acbcecd3",
+                "type": 254,
+                "typename": "DATA_TYPE_POINT2",
+                "pos": {
+                  "type": -1,
+                  "typename": "MATH_VECTOR2",
+                  "x": 7.795189571838281,
+                  "y": 10.623696483754532
+                }
+              }
+            },
+            {
+              "uuid": "8aff4420-5425-4073-8302-cd0f2e47e891",
+              "type": 295,
+              "typename": "DATA_TYPE_BREP2_VERTICE2",
+              "p": {
+                "uuid": "c831d876-5a31-4770-a6e3-be267a58cda9",
+                "type": 254,
+                "typename": "DATA_TYPE_POINT2",
+                "pos": {
+                  "type": -1,
+                  "typename": "MATH_VECTOR2",
+                  "x": 10.335797347495145,
+                  "y": -4.891302921586657
+                }
+              }
+            }
+          ],
+          "edges": [],
+          "border": {
+            "uuid": "0aea5092-c9d6-4d99-bc4f-c27edccef698",
+            "type": 298,
+            "typename": "DATA_TYPE_BREP2_LOOP2",
+            "coedges": [
+              {
+                "uuid": "acb3f7e1-3988-487e-be3f-b5a1c6c5b5fa",
+                "type": 297,
+                "typename": "DATA_TYPE_BREP2_COEDGE2",
+                "ei": -1,
+                "isForward": false,
+                "e": {
+                  "uuid": "420e5760-4d7b-404d-929d-261867e06d4c",
+                  "type": 296,
+                  "typename": "DATA_TYPE_BREP2_EDGE2",
+                  "v0i": -1,
+                  "v1i": -1,
+                  "curvei": 0,
+                  "curve": null,
+                  "u": {
+                    "type": -1,
+                    "typename": "MATH_VECTOR2",
+                    "x": 2.021263190764902,
+                    "y": 4.599229609723821
+                  },
+                  "v0": {
+                    "uuid": "d3c5e1ff-8da3-4494-be68-25aa72a94e2e",
+                    "type": 295,
+                    "typename": "DATA_TYPE_BREP2_VERTICE2",
+                    "p": {
+                      "uuid": "5243307d-810c-45b1-b4f1-e0c5acbcecd3",
+                      "type": 254,
+                      "typename": "DATA_TYPE_POINT2",
+                      "pos": {
+                        "type": -1,
+                        "typename": "MATH_VECTOR2",
+                        "x": 7.795189571838281,
+                        "y": 10.623696483754532
+                      }
+                    }
+                  },
+                  "v1": {
+                    "uuid": "8aff4420-5425-4073-8302-cd0f2e47e891",
+                    "type": 295,
+                    "typename": "DATA_TYPE_BREP2_VERTICE2",
+                    "p": {
+                      "uuid": "c831d876-5a31-4770-a6e3-be267a58cda9",
+                      "type": 254,
+                      "typename": "DATA_TYPE_POINT2",
+                      "pos": {
+                        "type": -1,
+                        "typename": "MATH_VECTOR2",
+                        "x": 10.335797347495145,
+                        "y": -4.891302921586657
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "uuid": "cb9b5c13-a7ce-4b2d-b929-e2c80ec54cdc",
+                "type": 297,
+                "typename": "DATA_TYPE_BREP2_COEDGE2",
+                "ei": -1,
+                "isForward": true,
+                "e": {
+                  "uuid": "b7b9d7e8-9a11-470d-a760-481e6542fcfd",
+                  "type": 296,
+                  "typename": "DATA_TYPE_BREP2_EDGE2",
+                  "v0i": -1,
+                  "v1i": -1,
+                  "curvei": 1,
+                  "curve": null,
+                  "u": {
+                    "type": -1,
+                    "typename": "MATH_VECTOR2",
+                    "x": 1.0396016060207265,
+                    "y": 5.728873155061645
+                  },
+                  "v0": {
+                    "uuid": "d3c5e1ff-8da3-4494-be68-25aa72a94e2e",
+                    "type": 295,
+                    "typename": "DATA_TYPE_BREP2_VERTICE2",
+                    "p": {
+                      "uuid": "5243307d-810c-45b1-b4f1-e0c5acbcecd3",
+                      "type": 254,
+                      "typename": "DATA_TYPE_POINT2",
+                      "pos": {
+                        "type": -1,
+                        "typename": "MATH_VECTOR2",
+                        "x": 7.795189571838281,
+                        "y": 10.623696483754532
+                      }
+                    }
+                  },
+                  "v1": {
+                    "uuid": "8aff4420-5425-4073-8302-cd0f2e47e891",
+                    "type": 295,
+                    "typename": "DATA_TYPE_BREP2_VERTICE2",
+                    "p": {
+                      "uuid": "c831d876-5a31-4770-a6e3-be267a58cda9",
+                      "type": 254,
+                      "typename": "DATA_TYPE_POINT2",
+                      "pos": {
+                        "type": -1,
+                        "typename": "MATH_VECTOR2",
+                        "x": 10.335797347495145,
+                        "y": -4.891302921586657
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "holes": []
+        }
+      ]
+    }
+  }
+]
