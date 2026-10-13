@@ -11,6 +11,7 @@ class SceneStricpSaveCom extends Command {
   constructor(executer: CommandExecuter, text: string) {
     super(executer, text);
     this._isNeedRecord = false;
+    this._isNeedHistory = false;
   }
   async exec() {
     let str = this._text;
