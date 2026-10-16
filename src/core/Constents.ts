@@ -30,6 +30,7 @@ enum GeomType {
   DRAW_CURVE2_NF = 10,      // Nurbs fitting
   DRAW_CURVE2_NC = 11,      // Nurbs control
   DRAW_CURVE2_RC = 12,      // REC：矩形
+  DRAW_CURVE2_EQ = 13,      // 等距线
 
   // 三维曲线绘制类型
 
@@ -80,6 +81,7 @@ enum GeomType {
   DATA_TYPE_CURVE2_LINE2 = 2 + 255,
   DATA_TYPE_CURVE2_NURBS2 = 3 + 255,
   DATA_TYPE_CURVE2_PARABOLA2 = 4 + 255,
+  DATA_TYPE_CURVE2_Equidistant2 = 5 + 255,
 
   // 三维曲线数据类型
   DATA_TYPE_CURVE3_ARC3 = 10 + 255,
@@ -87,7 +89,8 @@ enum GeomType {
   DATA_TYPE_CURVE3_LINE3 = 12 + 255,
   DATA_TYPE_CURVE3_NURBS3 = 13 + 255,
   DATA_TYPE_CURVE3_PARABOLA3 = 14 + 255,
-  DATA_TYPE_CURVE3_UVCURVE = 14 + 255,
+  DATA_TYPE_CURVE3_UVCURVE = 15 + 255,
+  DATA_TYPE_CURVE3_EQUIDISTANT = 16 + 255,
 
   // 三维曲面数据类型
   DATA_TYPE_SURFACE_CONICALSURFACE = 20 + 255,
