@@ -35,7 +35,7 @@ class Bool2 {
       // 根据轮廓交点对面轮廓进行切割
       Bool2.Cutting(algo.loops, blgo.loops, inters, tol0, tol1);
     }
-
+    // let isChanged = false;
     // 删除a中在b的原始形状内部的边。
     algo.loops.forEach((loop) => {
       let count = loop.coedges.length;
@@ -45,6 +45,7 @@ class Bool2 {
         let mp = coedge.p((u.x + u.y) * 0.5);
         if (blgorigin.isPointAtInner(mp, tol0, tol1)) {
           loop.coedges.splice(i, 1);
+          // isChanged = true;
         }
       }
     });
@@ -57,12 +58,38 @@ class Bool2 {
         let mp = coedge.p((u.x + u.y) * 0.5);
         if (!algorigin.isPointAtInner(mp, tol0, tol1)) {
           loop.coedges.splice(i, 1);
+          // isChanged = true;
         }
       }
     });
     // 面重构
-    let result: Face2[] = Bool2.FaceRebuild(algo, blgo, tol0, tol1);
+    // 构建全新的有向图
+    let galgo = new Digraph2Algo(new Digraph2());
+    let loops: Loop2Algo[] = [];
+    loops.push(...algo.loops);
+    loops.push(...blgo.loops);
+    galgo.addLoops(loops, tol0);
+    // if (galgo.removeZeroAreaEdges(tol0)) {
+    //   isChanged = true;
+    // }
+    // if (isChanged) {
+    // 面重构
+    let result: Face2[] = Bool2.FaceRebuild(galgo, tol0, tol1);
     return result;
+    // } else {
+    //   // a,b外相切
+    //   let result = [...a_, ...b_];
+    //   result.sort((fa, fb) => {
+    //     if (fa.uuid < fb.uuid) {
+    //       return -1;
+    //     }
+    //     if (fa.uuid > fb.uuid) {
+    //       return 1;
+    //     }
+    //     return 0;
+    //   });
+    //   return result;
+    // }
   }
 
   /*
@@ -88,7 +115,7 @@ class Bool2 {
       // 根据轮廓交点对面轮廓进行切割
       Bool2.Cutting(algo.loops, blgo.loops, inters, tol0, tol1);
     }
-
+    let isChanged = false;
     // 删除a中不在b的原始形状内部的边。
     algo.loops.forEach((loop) => {
       let count = loop.coedges.length;
@@ -98,6 +125,7 @@ class Bool2 {
         let mp = coedge.p((u.x + u.y) * 0.5);
         if (!blgorigin.isPointAtInner(mp, tol0, tol1)) {
           loop.coedges.splice(i, 1);
+          isChanged = true;
         }
       }
     });
@@ -110,12 +138,38 @@ class Bool2 {
         let mp = coedge.p((u.x + u.y) * 0.5);
         if (!algorigin.isPointAtInner(mp, tol0, tol1)) {
           loop.coedges.splice(i, 1);
+          isChanged = true;
         }
       }
     });
     // 面重构
-    let result: Face2[] = Bool2.FaceRebuild(algo, blgo, tol0, tol1);
-    return result;
+    // 构建全新的有向图
+    let galgo = new Digraph2Algo(new Digraph2());
+    let loops: Loop2Algo[] = [];
+    loops.push(...algo.loops);
+    loops.push(...blgo.loops);
+    galgo.addLoops(loops, tol0);
+    if (galgo.removeZeroAreaEdges(tol0)) {
+      isChanged = true;
+    }
+    if (isChanged) {
+      // 面重构
+      let result: Face2[] = Bool2.FaceRebuild(galgo, tol0, tol1);
+      return result;
+    } else {
+      // a,b外相切
+      let result = [...a_, ...b_];
+      result.sort((fa, fb) => {
+        if (fa.uuid < fb.uuid) {
+          return -1;
+        }
+        if (fa.uuid > fb.uuid) {
+          return 1;
+        }
+        return 0;
+      });
+      return result;
+    }
   }
 
   /*
@@ -178,6 +232,7 @@ class Bool2 {
       // 根据轮廓交点对面轮廓进行切割
       Bool2.Cutting(algo.loops, blgo.loops, inters, tol0, tol1);
     }
+    let isChanged = false;
     // 删除a中在b的原始形状内部的边。
     algo.loops.forEach((loop) => {
       let count = loop.coedges.length;
@@ -187,6 +242,7 @@ class Bool2 {
         let mp = coedge.p((u.x + u.y) * 0.5);
         if (blgorigin.isPointAtInner(mp, tol0, tol1)) {
           loop.coedges.splice(i, 1);
+          isChanged = true;
         }
       }
     });
@@ -199,12 +255,38 @@ class Bool2 {
         let mp = coedge.p((u.x + u.y) * 0.5);
         if (algorigin.isPointAtInner(mp, tol0, tol1)) {
           loop.coedges.splice(i, 1);
+          isChanged = true;
         }
       }
     });
     // 面重构
-    let result: Face2[] = Bool2.FaceRebuild(algo, blgo, tol0, tol1);
-    return result;
+    // 构建全新的有向图
+    let galgo = new Digraph2Algo(new Digraph2());
+    let loops: Loop2Algo[] = [];
+    loops.push(...algo.loops);
+    loops.push(...blgo.loops);
+    galgo.addLoops(loops, tol0);
+    if (galgo.removeZeroAreaEdges(tol0)) {
+      isChanged = true;
+    }
+    if (isChanged) {
+      // 面重构
+      let result: Face2[] = Bool2.FaceRebuild(galgo, tol0, tol1);
+      return result;
+    } else {
+      // a,b外相切
+      let result = [...a_, ...b_];
+      result.sort((fa, fb) => {
+        if (fa.uuid < fb.uuid) {
+          return -1;
+        }
+        if (fa.uuid > fb.uuid) {
+          return 1;
+        }
+        return 0;
+      });
+      return result;
+    }
   }
 
   /*
@@ -233,7 +315,14 @@ class Bool2 {
       }
       // b在a内
       else if (algo.isPointAtInner(pb, tol0, tol1)) {
-        let result: Face2[] = Bool2.FaceRebuild(algo, blgo, tol0, tol1);
+        // 构建全新的有向图
+        let galgo = new Digraph2Algo(new Digraph2());
+        let loops: Loop2Algo[] = [];
+        loops.push(...algo.loops);
+        loops.push(...blgo.loops);
+        galgo.addLoops(loops, tol0);
+        galgo.removeZeroAreaEdges(tol0);
+        let result: Face2[] = Bool2.FaceRebuild(galgo, tol0, tol1);
         return result;
       } else {
         // a,b相离
@@ -242,6 +331,7 @@ class Bool2 {
     }
     // 根据轮廓交点对面轮廓进行切割
     Bool2.Cutting(algo.loops, blgo.loops, inters, tol0, tol1);
+    // let isChanged = false;
     // 删除a中在b的原始形状内部的边。
     algo.loops.forEach((loop) => {
       let count = loop.coedges.length;
@@ -251,6 +341,7 @@ class Bool2 {
         let mp = coedge.p((u.x + u.y) * 0.5);
         if (blgorigin.isPointAtInner(mp, tol0, tol1)) {
           loop.coedges.splice(i, 1);
+          // isChanged = true;
         }
       }
     });
@@ -263,12 +354,38 @@ class Bool2 {
         let mp = coedge.p((u.x + u.y) * 0.5);
         if (!algorigin.isPointAtInner(mp, tol0, tol1)) {
           loop.coedges.splice(i, 1);
+          // isChanged = true;
         }
       }
     });
     // 面重构
-    let result: Face2[] = Bool2.FaceRebuild(algo, blgo, tol0, tol1);
+    // 构建全新的有向图
+    let galgo = new Digraph2Algo(new Digraph2());
+    let loops: Loop2Algo[] = [];
+    loops.push(...algo.loops);
+    loops.push(...blgo.loops);
+    galgo.addLoops(loops, tol0);
+    // if (galgo.removeZeroAreaEdges(tol0)) {
+    //   isChanged = true;
+    // }
+    // if (isChanged) {
+    // 面重构
+    let result: Face2[] = Bool2.FaceRebuild(galgo, tol0, tol1);
     return result;
+    // } else {
+    //   // a,b外相切
+    //   let result = [a_, b_];
+    //   result.sort((fa, fb) => {
+    //     if (fa.uuid < fb.uuid) {
+    //       return -1;
+    //     }
+    //     if (fa.uuid > fb.uuid) {
+    //       return 1;
+    //     }
+    //     return 0;
+    //   });
+    //   return result;
+    // }
   }
 
   /*
@@ -305,6 +422,7 @@ class Bool2 {
     }
     // 根据轮廓交点对面轮廓进行切割
     Bool2.Cutting(algo.loops, blgo.loops, inters, tol0, tol1);
+    let isChanged = false;
     // 删除a中不在b的原始形状内部的边。
     algo.loops.forEach((loop) => {
       let count = loop.coedges.length;
@@ -314,6 +432,7 @@ class Bool2 {
         let mp = coedge.p((u.x + u.y) * 0.5);
         if (!blgorigin.isPointAtInner(mp, tol0, tol1)) {
           loop.coedges.splice(i, 1);
+          isChanged = true;
         }
       }
     });
@@ -326,12 +445,38 @@ class Bool2 {
         let mp = coedge.p((u.x + u.y) * 0.5);
         if (!algorigin.isPointAtInner(mp, tol0, tol1)) {
           loop.coedges.splice(i, 1);
+          isChanged = true;
         }
       }
     });
     // 面重构
-    let result: Face2[] = Bool2.FaceRebuild(algo, blgo, tol0, tol1);
-    return result;
+    // 构建全新的有向图
+    let galgo = new Digraph2Algo(new Digraph2());
+    let loops: Loop2Algo[] = [];
+    loops.push(...algo.loops);
+    loops.push(...blgo.loops);
+    galgo.addLoops(loops, tol0);
+    if (galgo.removeZeroAreaEdges(tol0)) {
+      isChanged = true;
+    }
+    if (isChanged) {
+      // 面重构
+      let result: Face2[] = Bool2.FaceRebuild(galgo, tol0, tol1);
+      return result;
+    } else {
+      // a,b外相切
+      let result = [a_, b_];
+      result.sort((fa, fb) => {
+        if (fa.uuid < fb.uuid) {
+          return -1;
+        }
+        if (fa.uuid > fb.uuid) {
+          return 1;
+        }
+        return 0;
+      });
+      return result;
+    }
   }
 
   /*
@@ -401,9 +546,19 @@ class Bool2 {
         }
       }
     });
+
+    // 构建全新的有向图
+    let galgo = new Digraph2Algo(new Digraph2());
+    let loops: Loop2Algo[] = [];
+    loops.push(...algo.loops);
+    loops.push(...blgo.loops);
+    galgo.addLoops(loops, tol0);
+    if (galgo.removeZeroAreaEdges(tol0)) {
+      isChanged = true;
+    }
     if (isChanged) {
       // 面重构
-      let result: Face2[] = Bool2.FaceRebuild(algo, blgo, tol0, tol1);
+      let result: Face2[] = Bool2.FaceRebuild(galgo, tol0, tol1);
       return result;
     } else {
       // a,b外相切
@@ -504,22 +659,8 @@ class Bool2 {
   * 面重构
   * 
   */
-  static FaceRebuild(algo: Face2Algo | Face2Algos, blgo: Face2Algo | Face2Algos, tol0: number, tol1: number): Face2[] {
-    // 构建全新的有向图
-    let galgo = new Digraph2Algo(new Digraph2());
-    let loops: Loop2Algo[] = [];
-    loops.push(...algo.loops);
-    loops.push(...blgo.loops);
-    galgo.addLoops(loops, tol0);
+  static FaceRebuild(galgo: Digraph2Algo, tol0: number, tol1: number): Face2[] {
     let alloops = galgo.getAllLoops();
-    // 删除面积为0的环
-    let count = alloops.length;
-    for (let i = count - 1; i > -1; i--) {
-      // 面积为0
-      if (Math.abs(alloops[i].area()) <= tol1) {
-        alloops.splice(i, 1);
-      }
-    }
     let result: Face2[] = [];
     while (alloops.length) {
       let f = new Face2();

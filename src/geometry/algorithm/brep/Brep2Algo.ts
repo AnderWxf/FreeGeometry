@@ -190,10 +190,19 @@ class Coedge2Algo {
   }
   // Get the next coedge in the loop, return null if no next coedge or all next coedges have been visited.
   getNext(visited: Coedge2Algo[] = []): Coedge2Algo {
-    for (let i = 0; i < this._outs.length; i++) {
-      let out = this._outs[i];
+    if (this._outs.length == 1) {
+      let out = this._outs[0];
       if (!visited.includes(out)) {
         return out;
+      }
+    } else if (this._outs.length > 1) {
+      for (let i = 0; i < this._outs.length; i++) {
+        let out = this._outs[i];
+        if (!visited.includes(out)
+          && out._f != this._f
+        ) {
+          return out;
+        }
       }
     }
     return null;
@@ -424,6 +433,14 @@ class Coedge2Algo {
     return this._curve.da(u.x, u.y);
   }
 
+  getRing(): Coedge2Algo {
+    for (let i = 0; i < this._outs.length; i++) {
+      if (this._outs[i].v1 == this.v0) {
+        return this._outs[i];
+      }
+    }
+    return null;
+  }
 
   isPositive() {
     return this._c.isPositive();
@@ -612,7 +629,7 @@ class Loop2Algo {
       for (let j = 0; j < i; j++) {
         let befor = cross[j];
         if (curr.distanceTo(befor) <= tol0) {
-          cross.slice(i, 1);
+          cross.splice(i, 1);
           break;
         }
       }
@@ -788,6 +805,20 @@ class Face2Algo {
     let result: Loop2Algo[] = [];
     result.push(this._balgo);
     result.push(...this._halgos);
+    return result;
+  }
+
+  /**
+   * Returns all coedges algo from the face.
+   *
+   * @return {[Coedge2Algo]} .
+   */
+  get coedges(): Coedge2Algo[] {
+    let result: Coedge2Algo[] = [];
+    result.push(...this._balgo.coedges);
+    this._halgos.forEach(hole => {
+      result.push(...hole.coedges);
+    });
     return result;
   }
 
@@ -1109,6 +1140,23 @@ class Digraph2Algo {
       algo.outSort();
     });
   }
+  removeZeroAreaEdges(tol0: number):Boolean { 
+    // 剔除重复的边。
+    let isZeroAreaEdges = false;
+    let algos = this._algos;
+    for (let i = algos.length - 1; i >= 0; i--) {
+      let curr = algos[i];
+      let ring = curr.getRing();
+      if (ring) {
+        let area = curr.da() + ring.da();
+        if (Math.abs(area) <= 1e-4) {
+          algos.splice(i, 1);
+          isZeroAreaEdges = true;
+        }
+      }
+    }
+    return isZeroAreaEdges;
+  }
 
   getAllLoops(): Loop2Algo[] {
     let loops: Loop2Algo[] = [];
@@ -1116,6 +1164,8 @@ class Digraph2Algo {
     let visited: Coedge2Algo[] = [];
 
     this.resort();
+
+
 
     for (let i = 0; i < algos.length; i++) {
       let curr = algos[i];

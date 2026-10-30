@@ -563,7 +563,7 @@ class Loop3Algo {
       for (let j = 0; j < i; j++) {
         let befor = cross[j];
         if (curr.distanceTo(befor) <= tol0) {
-          cross.slice(i, 1);
+          cross.splice(i, 1);
           break;
         }
       }
