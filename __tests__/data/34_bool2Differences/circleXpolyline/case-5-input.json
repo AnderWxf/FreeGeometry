@@ -491,7 +491,8 @@
                 "typename": "MATH_VECTOR2",
                 "x": 1,
                 "y": 1
-              }
+              },
+              "parent": null
             },
             "type": 255,
             "typename": "DATA_TYPE_CURVE2_ARC2",
@@ -529,13 +530,13 @@
                 "v0i": -1,
                 "v1i": -1,
                 "curvei": 0,
+                "curve": null,
                 "u": {
                   "type": -1,
                   "typename": "MATH_VECTOR2",
                   "x": 0,
                   "y": 6.283185307179586
                 },
-                "curve": null,
                 "v0": {
                   "uuid": "2d22a883-8c32-4f04-b22c-bfc55c900dde",
                   "type": 295,

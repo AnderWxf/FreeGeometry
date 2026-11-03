@@ -328,9 +328,7 @@ class Brep2Builder {
       let coedge = new Coedge2();
       coedge.e = edge;
       face.border.coedges.push(coedge);
-      face.curves.push(edge.curve);
-      edge.curve = null;
-      edge.curvei = i;
+      // edge.curve = edge.curve;
     }
     return face;
   }
@@ -362,21 +360,21 @@ class Brep2Builder {
         // 正向的外轮廓
         let outside = alloops[i];
         f.border = outside.loop;
-        outside.coedges.forEach(coedge => {
-          let index = f.curves.indexOf(coedge.curve.dat);
-          if (index == -1) {
-            index = f.curves.length;
-            f.curves.push(coedge.curve.dat);
-          }
-          coedge.c.e.curve = null;
-          coedge.c.e.curvei = index;
-          if (!f.vertices.includes(coedge.c.e.v0)) {
-            f.vertices.push(coedge.c.e.v0);
-          }
-          if (!f.vertices.includes(coedge.c.e.v1)) {
-            f.vertices.push(coedge.c.e.v1);
-          }
-        });
+        // outside.coedges.forEach(coedge => {
+        //   let index = f.curves.indexOf(coedge.curve.dat);
+        //   if (index == -1) {
+        //     index = f.curves.length;
+        //     f.curves.push(coedge.curve.dat);
+        //   }
+        //   // coedge.c.e.curve = null;
+        //   coedge.c.e.curvei = index;
+        //   if (!f.vertices.includes(coedge.c.e.v0)) {
+        //     f.vertices.push(coedge.c.e.v0);
+        //   }
+        //   if (!f.vertices.includes(coedge.c.e.v1)) {
+        //     f.vertices.push(coedge.c.e.v1);
+        //   }
+        // });
         result.push(f);
       }
     }

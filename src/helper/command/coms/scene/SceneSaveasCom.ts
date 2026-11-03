@@ -5,6 +5,8 @@ import type { UserData } from "../../../UserData";
 import { Command } from "../../Command";
 import * as THREE from "three";
 import type { CommandExecuter } from "../../CommandExecuter";
+import { Bool2 } from "../../../../geometry/algorithm/relation/bool/Bool2";
+import { Face2 } from "../../../../geometry/data/brep/Brep2";
 
 /**
  * Saveas command class.
@@ -30,11 +32,40 @@ class SceneSaveasCom extends Command {
       userData.detail = undefined;
       // 使用string 保存type，便于直接阅读。
       (userData as any).typename = GeomType[userData.type];
+      // 清除对象,可以缩小存储需求。
+      if (userData.original instanceof Array) {
+        if (userData.original.length > 0 && userData.original[0] instanceof Face2) {
+          for (let j = 0; j < userData.original.length; j++) {
+            let face = userData.original[j] as Face2;
+            Bool2.FaceClearReference(face);
+          }
+        }
+      }
+      if (userData.original instanceof Face2) {
+        Bool2.FaceClearReference(userData.original as Face2);
+      }
       data.push({ userData: o.userData as UserData });
     }
     // 1. 将数据对象转为格式化的 JSON 字符串
     const jsonString = JSON.stringify(data, null, 2);
 
+    // 恢复对象,便于后面的计算。
+    for (let i = 0; i < os.length; i++) {
+      const o = os[i] as THREE.Object3D;
+      let userData = o.userData as UserData;
+      // 清除对象,可以缩小存储需求。
+      if (userData.original instanceof Array) {
+        if (userData.original.length > 0 && userData.original[0] instanceof Face2) {
+          for (let j = 0; j < userData.original.length; j++) {
+            let face = userData.original[j] as Face2;
+            Bool2.FaceObjectReference(face);
+          }
+        }
+      }
+      if (userData.original instanceof Face2) {
+        Bool2.FaceObjectReference(userData.original as Face2);
+      }
+    }
     let filename = 'Scene_' + new Date().toLocaleString() + '.json';
     filename = filename.replace(/[\/\\ :*?"<>|]/g, '_'); // 替换非法字符
     if (paras.length > 1) {

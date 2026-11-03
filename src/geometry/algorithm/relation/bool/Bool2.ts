@@ -1,10 +1,12 @@
 
 import { MathUtils, PI2 } from "../../../..//math/MathUtils";
 import { Arc2Data } from "../../../data/base/curve2/Arc2Data";
-import { Digraph2, Edge2, Face2, Loop2 } from "../../../data/brep/Brep2";
+import { Point2Data } from "../../../data/base/Point2Data";
+import { Digraph2, Edge2, Face2, Loop2, Vertice2 } from "../../../data/brep/Brep2";
 import { Coedge2Algo, Digraph2Algo, Face2Algo, Face2Algos, Loop2Algo } from "../../brep/Brep2Algo";
 import { Brep2Builder } from "../../builder/Brep2Builder";
 import { Brep2Inter, type InterOfFace2 } from "../intersection/Brep2Inter";
+import { v4 as uuidv4 } from 'uuid';
 
 class Bool2 {
 
@@ -594,13 +596,20 @@ class Bool2 {
           let loopAlgo = a[k];
           for (let l = loopAlgo.coedges.length - 1; l > -1; l--) {
             let coedgeAlgo = loopAlgo.coedges[l];
-            if (coedgeAlgo.curve.dat == c0) {
+            if (coedgeAlgo.curve.dat.uuid == c0.uuid) {
               if (coedgeAlgo.curve.dat instanceof Arc2Data) {
                 if (!coedgeAlgo.isOnUBoder(ip.u0, tol1) && coedgeAlgo.isInURangePeriod(ip.u0, PI2, tol1)) {
                   // 对coedge进行切割
                   let afterCoedge = coedgeAlgo.c.clone();
+                  afterCoedge.uuid = uuidv4();
+                  afterCoedge.e.uuid = uuidv4();
                   afterCoedge.e.umin = ip.u0;
                   coedgeAlgo.c.e.umax = ip.u0;
+
+                  let v = new Vertice2();
+                  afterCoedge.e.v0 = v;
+                  coedgeAlgo.c.e.v1 = v;
+
                   let afterCoedgeAlgo = new Coedge2Algo(afterCoedge, coedgeAlgo.f);
                   loopAlgo.coedges.splice(l + 1, 0, afterCoedgeAlgo);
                   loopAlgo.loop.coedges.splice(l + 1, 0, afterCoedge);
@@ -609,14 +618,20 @@ class Bool2 {
                 if (!coedgeAlgo.isOnUBoder(ip.u0, tol1) && coedgeAlgo.isInURange(ip.u0)) {
                   // 对coedge进行切割
                   let afterCoedge = coedgeAlgo.c.clone();
+                  afterCoedge.uuid = uuidv4();
+                  afterCoedge.e.uuid = uuidv4();
                   afterCoedge.e.umin = ip.u0;
                   coedgeAlgo.c.e.umax = ip.u0;
+
+                  let v = new Vertice2();
+                  afterCoedge.e.v0 = v;
+                  coedgeAlgo.c.e.v1 = v;
+
                   let afterCoedgeAlgo = new Coedge2Algo(afterCoedge, coedgeAlgo.f);
                   loopAlgo.coedges.splice(l + 1, 0, afterCoedgeAlgo);
                   loopAlgo.loop.coedges.splice(l + 1, 0, afterCoedge);
                 }
               }
-
             }
           }
         }
@@ -626,13 +641,20 @@ class Bool2 {
           let loopAlgo = b[k];
           for (let l = loopAlgo.coedges.length - 1; l > -1; l--) {
             let coedgeAlgo = loopAlgo.coedges[l];
-            if (coedgeAlgo.curve.dat == c1) {
+            if (coedgeAlgo.curve.dat.uuid == c1.uuid) {
               if (coedgeAlgo.curve.dat instanceof Arc2Data) {
                 if (!coedgeAlgo.isOnUBoder(ip.u1, tol1) && coedgeAlgo.isInURangePeriod(ip.u1, PI2, tol1)) {
                   // 对coedge进行切割
                   let afterCoedge = coedgeAlgo.c.clone();
+                  afterCoedge.uuid = uuidv4();
+                  afterCoedge.e.uuid = uuidv4();
                   afterCoedge.e.umin = ip.u1;
                   coedgeAlgo.c.e.umax = ip.u1;
+
+                  let v = new Vertice2();
+                  afterCoedge.e.v0 = v;
+                  coedgeAlgo.c.e.v1 = v;
+
                   let afterCoedgeAlgo = new Coedge2Algo(afterCoedge, coedgeAlgo.f);
                   loopAlgo.coedges.splice(l + 1, 0, afterCoedgeAlgo);
                   loopAlgo.loop.coedges.splice(l + 1, 0, afterCoedge);
@@ -641,8 +663,15 @@ class Bool2 {
                 if (!coedgeAlgo.isOnUBoder(ip.u1, tol1) && coedgeAlgo.isInURange(ip.u1)) {
                   // 对coedge进行切割
                   let afterCoedge = coedgeAlgo.c.clone();
+                  afterCoedge.uuid = uuidv4();
+                  afterCoedge.e.uuid = uuidv4();
                   afterCoedge.e.umin = ip.u1;
                   coedgeAlgo.c.e.umax = ip.u1;
+
+                  let v = new Vertice2();
+                  afterCoedge.e.v0 = v;
+                  coedgeAlgo.c.e.v1 = v;
+
                   let afterCoedgeAlgo = new Coedge2Algo(afterCoedge, coedgeAlgo.f);
                   loopAlgo.coedges.splice(l + 1, 0, afterCoedgeAlgo);
                   loopAlgo.loop.coedges.splice(l + 1, 0, afterCoedge);
@@ -672,21 +701,21 @@ class Bool2 {
         if (alloops[i].isPositive()) {
           outside = alloops[i];
           f.border = outside.loop;
-          outside.coedges.forEach(coedge => {
-            let index = f.curves.indexOf(coedge.curve.dat);
-            if (index == -1) {
-              index = f.curves.length;
-              f.curves.push(coedge.curve.dat);
-            }
-            coedge.c.e.curve = null;
-            coedge.c.e.curvei = index;
-            if (!f.vertices.includes(coedge.c.e.v0)) {
-              f.vertices.push(coedge.c.e.v0);
-            }
-            if (!f.vertices.includes(coedge.c.e.v1)) {
-              f.vertices.push(coedge.c.e.v1);
-            }
-          });
+          // outside.coedges.forEach(coedge => {
+          //   let index = f.curves.indexOf(coedge.curve.dat);
+          //   if (index == -1) {
+          //     index = f.curves.length;
+          //     f.curves.push(coedge.curve.dat);
+          //   }
+          //   coedge.c.e.curve = null;
+          //   coedge.c.e.curvei = index;
+          //   if (!f.vertices.includes(coedge.c.e.v0)) {
+          //     f.vertices.push(coedge.c.e.v0);
+          //   }
+          //   if (!f.vertices.includes(coedge.c.e.v1)) {
+          //     f.vertices.push(coedge.c.e.v1);
+          //   }
+          // });
           alloops.splice(i, 1);
           break;
         }
@@ -699,30 +728,253 @@ class Bool2 {
           let inp = inside.getRandomBorderPoint();
           if (outside.isPointAtInner(inp, tol0, tol1)) {
             f.holes.push(inside.loop);
-            inside.coedges.forEach(coedge => {
-              let index = f.curves.indexOf(coedge.curve.dat);
-              if (index == -1) {
-                index = f.curves.length;
-                f.curves.push(coedge.curve.dat);
-              }
-              coedge.c.e.curve = null;
-              coedge.c.e.curvei = index;
-              if (!f.vertices.includes(coedge.c.e.v0)) {
-                f.vertices.push(coedge.c.e.v0);
-              }
-              if (!f.vertices.includes(coedge.c.e.v1)) {
-                f.vertices.push(coedge.c.e.v1);
-              }
-            });
+            // inside.coedges.forEach(coedge => {
+            //   let index = f.curves.indexOf(coedge.curve.dat);
+            //   if (index == -1) {
+            //     index = f.curves.length;
+            //     f.curves.push(coedge.curve.dat);
+            //   }
+            //   coedge.c.e.curve = null;
+            //   coedge.c.e.curvei = index;
+            //   if (!f.vertices.includes(coedge.c.e.v0)) {
+            //     f.vertices.push(coedge.c.e.v0);
+            //   }
+            //   if (!f.vertices.includes(coedge.c.e.v1)) {
+            //     f.vertices.push(coedge.c.e.v1);
+            //   }
+            // });
             alloops.splice(i, 1);
           }
         }
         result.push(f);
+        Bool2.FaceIndexRelation(f);
       } else {
         break;
       }
     }
+
     return result;
+  }
+
+
+  /*
+  * 面索引重关联
+  * 
+  */
+  static FaceIndexRelation(face: Face2): void {
+    // 根据对象重新建立顶点和边间的索引关系
+    // Coedge2.e -- Coedge2.ei -- Face2.edges
+    for (let i = 0; i < face.border.coedges.length; i++) {
+      let coedge = face.border.coedges[i];
+      let index = face.edges.indexOf(coedge.e);
+      if (index == -1) {
+        for (let j = 0; j < face.edges.length; j++) {
+          if (face.edges[j].uuid === coedge.e.uuid) {
+            index = j;
+            break;
+          }
+        }
+        if (index == -1) {
+          index = face.edges.length;
+          face.edges.push(coedge.e);
+        }
+      }
+      coedge.ei = index;
+    }
+    for (let i = 0; i < face.holes.length; i++) {
+      let hole = face.holes[i];
+      for (let j = 0; j < hole.coedges.length; j++) {
+        let coedge = hole.coedges[j];
+        let index = face.edges.indexOf(coedge.e);
+        if (index == -1) {
+          for (let k = 0; k < face.edges.length; k++) {
+            if (face.edges[k].uuid === coedge.e.uuid) {
+              index = k;
+              break;
+            }
+          }
+          if (index == -1) {
+            index = face.edges.length;
+            face.edges.push(coedge.e);
+          }
+        }
+        coedge.ei = index;
+      }
+    }
+
+    // Edge2.curve -- Edge2.curvei --Face2.curves
+    for (let i = 0; i < face.edges.length; i++) {
+      let edge = face.edges[i];
+      if (edge.curve) {
+        let index = face.curves.indexOf(edge.curve);
+        if (index == -1) {
+          for (let j = 0; j < face.curves.length; j++) {
+            if (face.curves[j].uuid === edge.curve.uuid) {
+              index = j;
+              break;
+            }
+          }
+          if (index == -1) {
+            index = face.curves.length;
+            face.curves.push(edge.curve);
+          }
+          edge.curvei = index;
+        }
+      }
+      // Edge2.v0 -- Edge2.v0i -- Face2.vertices
+      if (edge.v0) {
+        let index = face.vertices.indexOf(edge.v0);
+        if (index == -1) {
+          for (let j = 0; j < face.vertices.length; j++) {
+            if (face.vertices[j].uuid === edge.v0.uuid) {
+              index = j;
+              break;
+            }
+          }
+          if (index == -1) {
+            index = face.vertices.length;
+            face.vertices.push(edge.v0);
+          }
+        }
+        edge.v0i = index;
+      }
+      // Edge2.v1 -- Edge2.v1i -- Face2.vertices
+      if (edge.v1) {
+        let index = face.vertices.indexOf(edge.v1);
+        if (index == -1) {
+          for (let j = 0; j < face.vertices.length; j++) {
+            if (face.vertices[j].uuid === edge.v1.uuid) {
+              index = j;
+              break;
+            }
+          }
+          if (index == -1) {
+            index = face.vertices.length;
+            face.vertices.push(edge.v1);
+          }
+        }
+        edge.v1i = index;
+      }
+    }
+  }
+
+  /*
+  * 面释放索引重关联
+  * 
+  */
+  static FaceFreeIndexRelation(face: Face2): void {
+    // 根据对象重新建立顶点和边间的索引关系
+    // Coedge2.e -- Coedge2.ei -- Face2.edges
+    for (let i = 0; i < face.border.coedges.length; i++) {
+      let coedge = face.border.coedges[i];
+      coedge.ei = -1;
+      coedge.e.curvei = -1;
+    }
+    for (let i = 0; i < face.holes.length; i++) {
+      let hole = face.holes[i];
+      for (let j = 0; j < hole.coedges.length; j++) {
+        let coedge = hole.coedges[j];
+        coedge.ei = -1;
+      }
+    }
+    // Edge2.curve-- Edge2.curvei--Face2.curves
+    // Edge2.v0-- Edge2.v0i-- Face2.vertices
+    // Edge2.v1-- Edge2.v1i-- Face2.vertices
+    for (let i = 0; i < face.edges.length; i++) {
+      let edge = face.edges[i];
+      edge.curvei = -1;
+      edge.v0i = -1;
+      edge.v1i = -1;
+    }
+    face.curves = [];
+    face.vertices = [];
+    face.edges = [];
+  }
+
+  /*
+  * 面对象重引用
+  * 
+  */
+  static FaceObjectReference(face: Face2): void {
+    // 根据索引关系重新引用顶点和边对象
+    // Coedge2.e -- Coedge2.ei -- Face2.edges
+    for (let i = 0; i < face.border.coedges.length; i++) {
+      let coedge = face.border.coedges[i];
+      if (coedge.ei != -1) {
+        coedge.e = face.edges[coedge.ei];
+      }
+      if (coedge.e && coedge.e.curvei != -1) {
+        coedge.e.curve = face.curves[coedge.e.curvei];
+      }
+    }
+    for (let i = 0; i < face.holes.length; i++) {
+      let hole = face.holes[i];
+      for (let j = 0; j < hole.coedges.length; j++) {
+        let coedge = hole.coedges[j];
+        if (coedge.ei != -1) {
+          coedge.e = face.edges[coedge.ei];
+        }
+        if (coedge.e && coedge.e.curvei != -1) {
+          coedge.e.curve = face.curves[coedge.e.curvei];
+        }
+      }
+    }
+    // Edge2.curve-- Edge2.curvei--Face2.curves
+    // Edge2.v0-- Edge2.v0i-- Face2.vertices
+    // Edge2.v1-- Edge2.v1i-- Face2.vertices
+    for (let i = 0; i < face.edges.length; i++) {
+      let edge = face.edges[i];
+      if (edge.curvei != -1) {
+        edge.curve = face.curves[edge.curvei];
+      }
+      if (edge.v0i != -1) {
+        edge.v0 = face.vertices[edge.v0i];
+      }
+      if (edge.v1i != -1) {
+        edge.v1 = face.vertices[edge.v1i];
+      }
+    }
+  }
+
+  /*
+  * 面对象清空引用
+  * 
+  */
+  static FaceClearReference(face: Face2): void {
+    Bool2.FaceIndexRelation(face);
+    // 清空引用
+    // Coedge2.e -- Coedge2.ei -- Face2.edges
+    for (let i = 0; i < face.border.coedges.length; i++) {
+      let coedge = face.border.coedges[i];
+      if (coedge.ei != -1) {
+        coedge.e = undefined;
+      }
+    }
+    for (let i = 0; i < face.holes.length; i++) {
+      let hole = face.holes[i];
+      for (let j = 0; j < hole.coedges.length; j++) {
+        let coedge = hole.coedges[j];
+        if (coedge.ei != -1) {
+          coedge.e = undefined;
+        }
+      }
+    }
+
+    // Edge2.curve-- Edge2.curvei--Face2.curves
+    // Edge2.v0-- Edge2.v0i-- Face2.vertices
+    // Edge2.v1-- Edge2.v1i-- Face2.vertices
+    for (let i = 0; i < face.edges.length; i++) {
+      let edge = face.edges[i];
+      if (edge.curvei != -1) {
+        edge.curve = undefined;
+      }
+      if (edge.v0i != -1) {
+        edge.v0 = undefined;
+      }
+      if (edge.v1i != -1) {
+        edge.v1 = undefined;
+      }
+    }
   }
 
   /*

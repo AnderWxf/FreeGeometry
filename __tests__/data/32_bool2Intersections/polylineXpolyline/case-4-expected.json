@@ -30,7 +30,8 @@
                   "typename": "MATH_VECTOR2",
                   "x": 1,
                   "y": 1
-                }
+                },
+                "parent": null
               },
               "type": 257,
               "typename": "DATA_TYPE_CURVE2_LINE2"
@@ -52,7 +53,8 @@
                   "typename": "MATH_VECTOR2",
                   "x": 1,
                   "y": 1
-                }
+                },
+                "parent": null
               },
               "type": 257,
               "typename": "DATA_TYPE_CURVE2_LINE2"
@@ -74,7 +76,8 @@
                   "typename": "MATH_VECTOR2",
                   "x": 1,
                   "y": 1
-                }
+                },
+                "parent": null
               },
               "type": 257,
               "typename": "DATA_TYPE_CURVE2_LINE2"
@@ -149,13 +152,13 @@
                   "v0i": -1,
                   "v1i": -1,
                   "curvei": 0,
+                  "curve": null,
                   "u": {
                     "type": -1,
                     "typename": "MATH_VECTOR2",
                     "x": 0,
                     "y": 5.303300858899106
                   },
-                  "curve": null,
                   "v0": {
                     "uuid": "63eafefc-c6a7-4d30-94c6-a3f679be4bf7",
                     "type": 295,
@@ -203,13 +206,13 @@
                   "v0i": -1,
                   "v1i": -1,
                   "curvei": 1,
+                  "curve": null,
                   "u": {
                     "type": -1,
                     "typename": "MATH_VECTOR2",
                     "x": 9.486832980505138,
                     "y": 13.439680055715613
                   },
-                  "curve": null,
                   "v0": {
                     "uuid": "1c831aa2-6a8c-4ee3-85e7-355dc6619aa7",
                     "type": 295,
@@ -257,13 +260,13 @@
                   "v0i": -1,
                   "v1i": -1,
                   "curvei": 2,
+                  "curve": null,
                   "u": {
                     "type": -1,
                     "typename": "MATH_VECTOR2",
                     "x": 5,
                     "y": 10
                   },
-                  "curve": null,
                   "v0": {
                     "uuid": "1c831aa2-6a8c-4ee3-85e7-355dc6619aa7",
                     "type": 295,
@@ -324,7 +327,8 @@
                   "typename": "MATH_VECTOR2",
                   "x": 1,
                   "y": 1
-                }
+                },
+                "parent": null
               },
               "type": 257,
               "typename": "DATA_TYPE_CURVE2_LINE2"
@@ -346,7 +350,8 @@
                   "typename": "MATH_VECTOR2",
                   "x": 1,
                   "y": 1
-                }
+                },
+                "parent": null
               },
               "type": 257,
               "typename": "DATA_TYPE_CURVE2_LINE2"
@@ -368,7 +373,8 @@
                   "typename": "MATH_VECTOR2",
                   "x": 1,
                   "y": 1
-                }
+                },
+                "parent": null
               },
               "type": 257,
               "typename": "DATA_TYPE_CURVE2_LINE2"
@@ -390,7 +396,8 @@
                   "typename": "MATH_VECTOR2",
                   "x": 0.9999999999999999,
                   "y": 0.9999999999999999
-                }
+                },
+                "parent": null
               },
               "type": 257,
               "typename": "DATA_TYPE_CURVE2_LINE2"
@@ -412,7 +419,8 @@
                   "typename": "MATH_VECTOR2",
                   "x": 1,
                   "y": 1
-                }
+                },
+                "parent": null
               },
               "type": 257,
               "typename": "DATA_TYPE_CURVE2_LINE2"
@@ -434,7 +442,8 @@
                   "typename": "MATH_VECTOR2",
                   "x": 1,
                   "y": 1
-                }
+                },
+                "parent": null
               },
               "type": 257,
               "typename": "DATA_TYPE_CURVE2_LINE2"
@@ -456,7 +465,8 @@
                   "typename": "MATH_VECTOR2",
                   "x": 1,
                   "y": 1
-                }
+                },
+                "parent": null
               },
               "type": 257,
               "typename": "DATA_TYPE_CURVE2_LINE2"
@@ -595,13 +605,13 @@
                   "v0i": -1,
                   "v1i": -1,
                   "curvei": 0,
+                  "curve": null,
                   "u": {
                     "type": -1,
                     "typename": "MATH_VECTOR2",
                     "x": 0,
                     "y": 7.559302470648085
                   },
-                  "curve": null,
                   "v0": {
                     "uuid": "922036ee-638b-415a-9edf-3873aecf7e4d",
                     "type": 295,
@@ -649,13 +659,13 @@
                   "v0i": -1,
                   "v1i": -1,
                   "curvei": 1,
+                  "curve": null,
                   "u": {
                     "type": -1,
                     "typename": "MATH_VECTOR2",
                     "x": 0,
                     "y": 2.9531341563937907
                   },
-                  "curve": null,
                   "v0": {
                     "uuid": "0feeff30-0c01-4cbd-8801-c07d5fe6832d",
                     "type": 295,
@@ -703,13 +713,13 @@
                   "v0i": -1,
                   "v1i": -1,
                   "curvei": 2,
+                  "curve": null,
                   "u": {
                     "type": -1,
                     "typename": "MATH_VECTOR2",
                     "x": 5.777061699151308,
                     "y": 9.02128589367099
                   },
-                  "curve": null,
                   "v0": {
                     "uuid": "f95fa20f-5737-4ac7-8fea-0ab51931e243",
                     "type": 295,
@@ -757,13 +767,13 @@
                   "v0i": -1,
                   "v1i": -1,
                   "curvei": 3,
+                  "curve": null,
                   "u": {
                     "type": -1,
                     "typename": "MATH_VECTOR2",
                     "x": 4.334144112428194,
                     "y": 5.830951894845301
                   },
-                  "curve": null,
                   "v0": {
                     "uuid": "f95fa20f-5737-4ac7-8fea-0ab51931e243",
                     "type": 295,
@@ -811,13 +821,13 @@
                   "v0i": -1,
                   "v1i": -1,
                   "curvei": 4,
+                  "curve": null,
                   "u": {
                     "type": -1,
                     "typename": "MATH_VECTOR2",
                     "x": 0,
                     "y": 0.7733560376970746
                   },
-                  "curve": null,
                   "v0": {
                     "uuid": "701048c5-22aa-4eb7-b319-1c36c42b5e81",
                     "type": 295,
@@ -865,13 +875,13 @@
                   "v0i": -1,
                   "v1i": -1,
                   "curvei": 5,
+                  "curve": null,
                   "u": {
                     "type": -1,
                     "typename": "MATH_VECTOR2",
                     "x": 0.7905694150420931,
                     "y": 10.3066827442525
                   },
-                  "curve": null,
                   "v0": {
                     "uuid": "fdd8ea0b-1dc9-415a-9664-ff7f0317430a",
                     "type": 295,
@@ -919,13 +929,13 @@
                   "v0i": -1,
                   "v1i": -1,
                   "curvei": 6,
+                  "curve": null,
                   "u": {
                     "type": -1,
                     "typename": "MATH_VECTOR2",
                     "x": 1.76776695296637,
                     "y": 7.0710678118654755
                   },
-                  "curve": null,
                   "v0": {
                     "uuid": "fdd8ea0b-1dc9-415a-9664-ff7f0317430a",
                     "type": 295,

@@ -50,7 +50,7 @@ class Transform2 {
    * @param {Vector2} [scale=(1,1)] - The scale value of this Transfrom.
    * @param {Transform2} [parent=null] - The parent transfrom of this Transfrom.
    */
-  constructor(position = new Vector2(), rotation = 0, scale = new Vector2(1, 1), parent?: Transform2) {
+  constructor(position = new Vector2(), rotation = 0, scale = new Vector2(1, 1), parent: Transform2 = undefined) {
     /**
      * The position value of this Transfrom2.
      *

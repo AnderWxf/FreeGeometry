@@ -52,7 +52,7 @@ class MeasureBody3VolumeCom extends ComCreate {
           let coedge = new Coedge2();
           coedge.e = edge;
           face.border.coedges.push(coedge);
-          face.curves.push(edge.curve);
+          // face.curves.push(edge.curve);
         }
         userData.color = THREE.Color.NAMES.blue;
         let geo = BrepMeshBuilder.BuildFace2Mesh(face, userData.color);
@@ -96,9 +96,9 @@ class MeasureBody3VolumeCom extends ComCreate {
           let coedge = new Coedge2();
           coedge.e = edge;
           face.border.coedges.push(coedge);
-          face.curves.push(edge.curve);
-          edge.curve = null;
-          edge.curvei = i;
+          // face.curves.push(edge.curve);
+          // edge.curve = null;
+          // edge.curvei = i;
         }
         userData.color = THREE.Color.NAMES.blue;
         let geo = BrepMeshBuilder.BuildFace2Mesh(face, userData.color);

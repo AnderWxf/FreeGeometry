@@ -15,6 +15,7 @@ import { Point2Data } from "../../../../geometry/data/base/Point2Data";
 import { DataBase } from "../../../../geometry/data/DataBase";
 import type { CommandExecuter } from "../../CommandExecuter";
 import { v4 as uuidv4 } from 'uuid';
+import { Face2Algo } from "../../../../geometry/algorithm/brep/Brep2Algo";
 
 /**
  * Transform command class.
@@ -188,7 +189,8 @@ class ComTransform extends ComBatch {
               } else {
                 face = (array[i] as Face2).clone();
               }
-              face.curves.forEach((curve) => {
+              let algo = new Face2Algo(face);
+              algo.curves.forEach((curve) => {
                 this.appTransfrom(curve.trans, trans);
               });
               faces.push(face);
@@ -218,9 +220,10 @@ class ComTransform extends ComBatch {
           } else {
             face = old.userData.original.clone();
           }
-          for (let i = 0; i < face.curves.length; i++) {
-            this.appTransfrom(face.curves[i].trans, trans);
-          }
+          let algo = new Face2Algo(face);
+          algo.curves.forEach((curve) => {
+            this.appTransfrom(curve.trans, trans);
+          });
           userData.original = face;
           userData.color = THREE.Color.NAMES.blue;
           let geo = BrepMeshBuilder.BuildFace2Mesh(face, userData.color, undefined, true);
@@ -382,9 +385,10 @@ class ComTransform extends ComBatch {
           // 单例
           if (old.userData.original instanceof Face2) {
             let face = (old.userData.original as Face2).clone() as Face2;
-            for (let i = 0; i < face.curves.length; i++) {
-              this.appTransfrom(face.curves[i].trans, trans);
-            }
+            let algo = new Face2Algo(face);
+            algo.curves.forEach((curve) => {
+              this.appTransfrom(curve.trans, trans);
+            });
             let t = BrepMeshBuilder.BuildFace2Mesh(face, THREE.Color.NAMES.gray, undefined, false);
             t.name = "temp";
             userData.assistPoints.forEach((ap) => {
@@ -400,7 +404,8 @@ class ComTransform extends ComBatch {
             for (let i = 0; i < array.length; i++) {
               if (array[i] instanceof Face2) {
                 let face = (array[i] as Face2).clone();
-                face.curves.forEach((curve) => {
+                let algo = new Face2Algo(face);
+                algo.curves.forEach((curve) => {
                   this.appTransfrom(curve.trans, trans);
                 });
                 faces.push(face);

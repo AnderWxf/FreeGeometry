@@ -165,12 +165,12 @@ class Coedge3Algo {
   constructor(c: Coedge3, face?: Face3) {
     this._c = c;
     this._f = face;
-    let curveData: Curve3Data | undefined;
-    if (face && c.e.curvei != -1) {
-      // Use the curve data from the face if available
-      curveData = face.curves[c.e.curvei];
-    }
-    this._curve = CurveBuilder.Algorithm3ByData(curveData || c.e.curve);
+    // let curveData: Curve3Data | undefined;
+    // if (face && c.e.curvei != -1) {
+    //   // Use the curve data from the face if available
+    //   curveData = face.curves[c.e.curvei];
+    // }
+    this._curve = CurveBuilder.Algorithm3ByData(c.e.curve);
     this._ins = [];
     this._outs = [];
   }
@@ -731,18 +731,21 @@ class Face3Algo {
    */
   getCoedgesByCurve(curve: Curve3Data): Coedge3Algo[] {
     let result: Coedge3Algo[] = [];
-    this._balgo.coedges.forEach(coedge => {
-      if (coedge.curve && coedge.curve.dat == curve) {
+    for (let i = 0; i < this._balgo.coedges.length; i++) {
+      let coedge = this._balgo.coedges[i];
+      if (coedge.curve && coedge.curve.dat.uuid == curve.uuid) {
         result.push(coedge);
       }
-    });
-    this._halgos.forEach(hole => {
-      hole.coedges.forEach(coedge => {
-        if (coedge.curve && coedge.curve.dat == curve) {
+    }
+    for (let i = 0; i < this._halgos.length; i++) {
+      let hole = this._halgos[i];
+      for (let j = 0; j < hole.coedges.length; j++) {
+        let coedge = hole.coedges[j];
+        if (coedge.curve && coedge.curve.dat.uuid == curve.uuid) {
           result.push(coedge);
         }
-      });
-    });
+      }
+    }
     return result;
   }
 }
@@ -916,11 +919,11 @@ class Digraph3Algo {
       if (curr.c.e) {
         algos.forEach(algo => {
           // 不能自己和自己的兄弟构成循环
-          if (curr.c.e != algo.c.e) {
-            if (algo.v0 == curr.v1) {
+          if (curr.c.e.uuid != algo.c.e.uuid) {
+            if (algo.v0.uuid == curr.v1.uuid) {
               curr.addOut(algo);
             }
-            if (algo.v1 == curr.v0) {
+            if (algo.v1.uuid == curr.v0.uuid) {
               curr.addIn(algo);
             }
           }
@@ -930,10 +933,10 @@ class Digraph3Algo {
         algos.forEach(algo => {
           // 不能自己和自己的兄弟构成循环
           if (curr.c.ei != algo.c.ei) {
-            if (algo.v0 == curr.v1) {
+            if (algo.v0.uuid == curr.v1.uuid) {
               curr.addOut(algo);
             }
-            if (algo.v1 == curr.v0) {
+            if (algo.v1.uuid == curr.v0.uuid) {
               curr.addIn(algo);
             }
           }

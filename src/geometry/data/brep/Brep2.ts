@@ -5,13 +5,19 @@ import type { Curve2Data } from "../base/Curve2Data";
 import { Point2Data } from "../base/Point2Data";
 import { unserialize } from "../base/Unserialize";
 import { DataBase } from "../DataBase";
+import { Bool2 } from "../../algorithm/relation/bool/Bool2";
 /**
  * Brep data on xy space;
  * face's border is loop.
  * edge's border is vertice.
- *
+ * 
+ * 因为一个对象可以被多个索引引用，计算时使用引用，所以存储时使用索引。
+ * 引用 -- 索引 -- 数组
+ * Edge2.curve -- Edge2.curvei --Face2.curves
+ * Edge2.v0 -- Edge2.v0i -- Face2.vertices
+ * Edge2.v1 -- Edge2.v1i -- Face2.vertices
+ * Coedge2.e -- Coedge2.ei -- Face2.edges
  */
-
 
 /**
  * Vertice2.
@@ -357,7 +363,7 @@ class Coedge2 extends DataBase {
    */
   override copy() {
     let result = new Coedge2;
-    result.e = this.e?.clone();
+    result.e = this.e?.copy();
     result.ei = this.ei;
     result.isForward = this.isForward;
     return result;
@@ -489,17 +495,17 @@ class Face2 extends DataBase {
   private readonly type = GeomType.DATA_TYPE_BREP2_FACE2;
   private readonly typename = GeomType[GeomType.DATA_TYPE_BREP2_FACE2];
   /**
-   *  vertices of Face.
+   *  vertices of Face. 存储时使用索引，计算时使用引用。
    */
   vertices: Array<Vertice2>;
 
   /**
-   * curves of Face.
+   * curves of Face. 存储时使用索引，计算时使用引用。
    */
   curves: Array<Curve2Data>;
 
   /**
-   *  edges of Face.
+   *  edges of Face. 存储时使用索引，计算时使用引用。
    */
   edges: Array<Edge2>;
 
@@ -532,9 +538,9 @@ class Face2 extends DataBase {
    */
   override clone() {
     let result = super.clone() as Face2;
-    result.curves = this.curves?.map((c) => c.clone());
-    result.vertices = this.vertices?.map((v) => v.clone());
-    result.edges = this.edges?.map((e) => e.clone());
+    // result.curves = this.curves?.map((c) => c.clone());
+    // result.vertices = this.vertices?.map((v) => v.clone());
+    // result.edges = this.edges?.map((e) => e.clone());
     result.border = this.border?.clone();
     result.holes = this.holes?.map((h) => h.clone());
     return result;
@@ -596,21 +602,21 @@ class Face2 extends DataBase {
   getEdgesByCurve(curve: Curve2Data): Edge2[] {
     let result: Edge2[] = [];
     this.border.coedges.forEach(coedge => {
-      if (coedge.e.curve && coedge.e.curve == curve) {
+      if (coedge.e.curve && coedge.e.curve.uuid == curve.uuid) {
         result.push(coedge.e);
       }
-      else if (coedge.e.curvei > -1 && this.curves[coedge.e.curvei] == curve) {
-        result.push(coedge.e);
-      }
+      // else if (coedge.e.curvei > -1 && this.curves[coedge.e.curvei] == curve) {
+      //   result.push(coedge.e);
+      // }
     });
     this.holes.forEach(hole => {
       hole.coedges.forEach(coedge => {
-        if (coedge.e.curve && coedge.e.curve == curve) {
+        if (coedge.e.curve && coedge.e.curve.uuid == curve.uuid) {
           result.push(coedge.e);
         }
-        else if (coedge.e.curvei > -1 && this.curves[coedge.e.curvei] == curve) {
-          result.push(coedge.e);
-        }
+        // else if (coedge.e.curvei > -1 && this.curves[coedge.e.curvei] == curve) {
+        //   result.push(coedge.e);
+        // }
       });
     });
     return result;
@@ -641,6 +647,8 @@ class Face2 extends DataBase {
       ret.holes.push(Loop2.Unserialize(holes[i]));
     }
     ret.uuid = data.uuid;
+    Bool2.FaceObjectReference(ret);
+    Bool2.FaceFreeIndexRelation(ret);
     return ret;
   }
 }

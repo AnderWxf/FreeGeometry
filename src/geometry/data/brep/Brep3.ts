@@ -1,5 +1,6 @@
 import { GeomType } from "../../../core/Constents";
 import { Vector2, Vector3, Vector4 } from "../../../math/Math";
+import { Bool2 } from "../../algorithm/relation/bool/Bool2";
 import type { Curve3Data } from "../base/Curve3Data";
 import { Point3Data } from "../base/Point3Data";
 import type { SurfaceData } from "../base/SurfaceData";

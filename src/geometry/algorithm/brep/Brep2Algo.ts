@@ -179,12 +179,12 @@ class Coedge2Algo {
   constructor(c: Coedge2, face?: Face2) {
     this._c = c;
     this._f = face;
-    let curveData: Curve2Data | undefined;
-    if (face && c.e.curvei != -1) {
-      // Use the curve data from the face if available
-      curveData = face.curves[c.e.curvei];
-    }
-    this._curve = CurveBuilder.Algorithm2ByData(curveData || c.e.curve);
+    // let curveData: Curve2Data = c.e.curve;
+    // if (face && c.e.curvei != -1) {
+    //   // Use the curve data from the face if available
+    //   curveData = face.curves[c.e.curvei];
+    // }
+    this._curve = CurveBuilder.Algorithm2ByData(c.e.curve);
     this._ins = [];
     this._outs = [];
   }
@@ -793,7 +793,12 @@ class Face2Algo {
   }
 
   get curves(): Curve2Data[] {
-    return this.f.curves;
+    let result: Curve2Data[] = [];
+    this._balgo.loop.coedges.forEach(coedge => result.push(coedge.e.curve));
+    this._halgos.forEach(hole => {
+      hole.loop.coedges.forEach(coedge => result.push(coedge.e.curve));
+    });
+    return result;
   }
 
   /**
@@ -829,18 +834,21 @@ class Face2Algo {
    */
   getCoedgesByCurve(curve: Curve2Data): Coedge2Algo[] {
     let result: Coedge2Algo[] = [];
-    this._balgo.coedges.forEach(coedge => {
-      if (coedge.curve && coedge.curve.dat == curve) {
+    for (let i = 0; i < this._balgo.coedges.length; i++) {
+      let coedge = this._balgo.coedges[i];
+      if (coedge.curve && coedge.curve.dat.uuid == curve.uuid) {
         result.push(coedge);
       }
-    });
-    this._halgos.forEach(hole => {
-      hole.coedges.forEach(coedge => {
-        if (coedge.curve && coedge.curve.dat == curve) {
+    }
+    for (let i = 0; i < this._halgos.length; i++) {
+      let hole = this._halgos[i];
+      for (let j = 0; j < hole.coedges.length; j++) {
+        let coedge = hole.coedges[j];
+        if (coedge.curve && coedge.curve.dat.uuid == curve.uuid) {
           result.push(coedge);
         }
-      });
-    });
+      }
+    }
     return result;
   }
 }
@@ -957,7 +965,7 @@ class Face2Algos {
     let algos = this._fas;
     let count = algos.length;
     for (let i = 0; i < count; i++) {
-      result.push(...algos[i].f.curves);
+      result.push(...algos[i].curves);
     }
     return result;
   }
@@ -1017,11 +1025,11 @@ class Digraph2Algo {
       if (curr.c.e) {
         algos.forEach(algo => {
           // 不能自己和自己的兄弟构成循环
-          if (curr.c.e != algo.c.e) {
-            if (algo.v0 == curr.v1) {
+          if (curr.c.e.uuid != algo.c.e.uuid) {
+            if (algo.v0.uuid == curr.v1.uuid) {
               curr.addOut(algo);
             }
-            if (algo.v1 == curr.v0) {
+            if (algo.v1.uuid == curr.v0.uuid) {
               curr.addIn(algo);
             }
           }
@@ -1031,10 +1039,10 @@ class Digraph2Algo {
         algos.forEach(algo => {
           // 不能自己和自己的兄弟构成循环
           if (curr.c.ei != algo.c.ei) {
-            if (algo.v0 == curr.v1) {
+            if (algo.v0.uuid == curr.v1.uuid) {
               curr.addOut(algo);
             }
-            if (algo.v1 == curr.v0) {
+            if (algo.v1.uuid == curr.v0.uuid) {
               curr.addIn(algo);
             }
           }
@@ -1140,7 +1148,7 @@ class Digraph2Algo {
       algo.outSort();
     });
   }
-  removeZeroAreaEdges(tol0: number):Boolean { 
+  removeZeroAreaEdges(tol0: number): Boolean {
     // 剔除重复的边。
     let isZeroAreaEdges = false;
     let algos = this._algos;

@@ -30,7 +30,8 @@
                   "typename": "MATH_VECTOR2",
                   "x": 0.9999999999999999,
                   "y": 0.9999999999999999
-                }
+                },
+                "parent": null
               },
               "type": 255,
               "typename": "DATA_TYPE_CURVE2_ARC2",
@@ -157,13 +158,13 @@
                   "v0i": -1,
                   "v1i": -1,
                   "curvei": 0,
+                  "curve": null,
                   "u": {
                     "type": -1,
                     "typename": "MATH_VECTOR2",
                     "x": 0.6406620500585555,
                     "y": 1.177845799283969
                   },
-                  "curve": null,
                   "v0": {
                     "uuid": "9568ca7b-5325-48c7-bbce-e8c457375117",
                     "type": 295,
@@ -332,7 +333,8 @@
                   "typename": "MATH_VECTOR2",
                   "x": 0.9999999999999999,
                   "y": 0.9999999999999999
-                }
+                },
+                "parent": null
               },
               "type": 255,
               "typename": "DATA_TYPE_CURVE2_ARC2",
@@ -436,13 +438,13 @@
                   "v0i": -1,
                   "v1i": -1,
                   "curvei": 0,
+                  "curve": null,
                   "u": {
                     "type": -1,
                     "typename": "MATH_VECTOR2",
                     "x": 0,
                     "y": 0.23624324972219174
                   },
-                  "curve": null,
                   "v0": {
                     "uuid": "6f0b287c-ac47-4d6c-b394-79942119d74a",
                     "type": 295,
@@ -532,25 +534,25 @@
                 }
               },
               {
-                "uuid": "0b305b79-6e3b-4dc4-a6a6-feedfd3f1b81",
+                "uuid": "5f6768fc-f503-4107-8be6-77da84dc1d92",
                 "type": 297,
                 "typename": "DATA_TYPE_BREP2_COEDGE2",
                 "ei": -1,
                 "isForward": true,
                 "e": {
-                  "uuid": "999a1367-db31-4e90-80c6-e5a2f3fd4fa7",
+                  "uuid": "2f446780-5acd-4d2a-b534-937bf3ab377f",
                   "type": 296,
                   "typename": "DATA_TYPE_BREP2_EDGE2",
                   "v0i": -1,
                   "v1i": -1,
                   "curvei": 0,
+                  "curve": null,
                   "u": {
                     "type": -1,
                     "typename": "MATH_VECTOR2",
                     "x": 5.003559277612979,
                     "y": 6.283185307179586
                   },
-                  "curve": null,
                   "v0": {
                     "uuid": "717f336c-dcd0-478e-85b5-b90b9061cc6b",
                     "type": 295,

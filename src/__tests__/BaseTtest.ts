@@ -8,6 +8,8 @@ import { describe, expect, test } from 'vitest';
 import { Vector2, Vector3 } from '../math/Math';
 import { Edge2, Face2 } from '../geometry/data/brep/Brep2';
 import { Point2Data } from '../geometry/data/base/Point2Data';
+import { Bool2 } from '../geometry/algorithm/relation/bool/Bool2';
+import { v4 as uuidv4 } from 'uuid';
 
 function IsCloseTo(received: any, expected: any, tol0: number = 1e-4, tol1: number = 1e-8): boolean {
   return isEqualWith(received, expected, (objVal, othVal, key, des, src) => {
@@ -72,6 +74,11 @@ function LoadScene(filename: string) {
     }
   }
   return datas as any;
+}
+
+function SaveScene(filename: string, datas: any) {
+  const filePath = filename;
+  fs.writeFileSync(filePath, JSON.stringify(datas, null, 2), 'utf-8');
 }
 
 function LoadJSON(filename: string) {
@@ -184,10 +191,60 @@ function ExecuteDescribeBool2(typeName: string, typeDir: string, process: (a: Fa
           let c = testCases[i];
           test(c.name, () => {
             const input = LoadScene(c.inputFile);
-            const expected = LoadScene(c.expectedFile);
-            let expected2: any;
+            const expected = LoadScene(c.expectedFile) as any[];
+            let expected2: any[];
             if (fs.existsSync(c.expectedFile2)) {
               expected2 = LoadScene(c.expectedFile2);
+            }
+            for (let i = 0; i < expected.length; i++) {
+              if (expected[i].userData.original instanceof Face2) {
+                let f = expected[i].userData.original as Face2;
+                Bool2.FaceIndexRelation(f);
+                Bool2.FaceObjectReference(f);
+                Bool2.FaceFreeIndexRelation(f);
+              }
+              if (expected[i].userData.original instanceof Array) {
+                let fs = expected[i].userData.original as Array<Face2>;
+                fs.forEach((f) => {
+                  Bool2.FaceIndexRelation(f);
+                  Bool2.FaceObjectReference(f);
+                  Bool2.FaceFreeIndexRelation(f);
+                });
+              }
+            }
+            if (expected2) {
+              for (let i = 0; i < expected2.length; i++) {
+                if (expected2[i].userData.original instanceof Face2) {
+                  let f = expected2[i].userData.original as Face2;
+                  Bool2.FaceIndexRelation(f);
+                  Bool2.FaceObjectReference(f);
+                  Bool2.FaceFreeIndexRelation(f);
+                }
+                if (expected2[i].userData.original instanceof Array) {
+                  let fs = expected2[i].userData.original as Array<Face2>;
+                  fs.forEach((f) => {
+                    Bool2.FaceIndexRelation(f);
+                    Bool2.FaceObjectReference(f);
+                    Bool2.FaceFreeIndexRelation(f);
+                  });
+                }
+              }
+            }
+            for (let i = 0; i < expected.length; i++) {
+              if (expected[i].userData.original instanceof Face2) {
+                let f = expected[i].userData.original as Face2;
+                Bool2.FaceIndexRelation(f);
+                Bool2.FaceObjectReference(f);
+                Bool2.FaceFreeIndexRelation(f);
+              }
+              if (expected[i].userData.original instanceof Array) {
+                let fs = expected[i].userData.original as Array<Face2>;
+                fs.forEach((f) => {
+                  Bool2.FaceIndexRelation(f);
+                  Bool2.FaceObjectReference(f);
+                  Bool2.FaceFreeIndexRelation(f);
+                });
+              }
             }
 
             let a: Face2[] = [];
@@ -214,9 +271,42 @@ function ExecuteDescribeBool2(typeName: string, typeDir: string, process: (a: Fa
                 })
               }
             }
-            const result0 = process(a, b);
-            expect(IsCloseTo(result0, expected, 1e-4, 1e-8)).toBe(true);
+            const result0 = process(a, b) as any[];
             const result1 = process(b, a);
+            for (let i = 0; i < result0.length; i++) {
+              if (result0[i].userData.original instanceof Face2) {
+                let f = result0[i].userData.original as Face2;
+                Bool2.FaceIndexRelation(f);
+                Bool2.FaceObjectReference(f);
+                Bool2.FaceFreeIndexRelation(f);
+              }
+              if (result0[i].userData.original instanceof Array) {
+                let fs = result0[i].userData.original as Array<Face2>;
+                fs.forEach((f) => {
+                  Bool2.FaceIndexRelation(f);
+                  Bool2.FaceObjectReference(f);
+                  Bool2.FaceFreeIndexRelation(f);
+                });
+              }
+            }
+            for (let i = 0; i < result1.length; i++) {
+              if (result1[i].userData.original instanceof Face2) {
+                let f = result1[i].userData.original as Face2;
+                Bool2.FaceIndexRelation(f);
+                Bool2.FaceObjectReference(f);
+                Bool2.FaceFreeIndexRelation(f);
+              }
+              if (result1[i].userData.original instanceof Array) {
+                let fs = result1[i].userData.original as Array<Face2>;
+                fs.forEach((f) => {
+                  Bool2.FaceIndexRelation(f);
+                  Bool2.FaceObjectReference(f);
+                  Bool2.FaceFreeIndexRelation(f);
+                });
+              }
+            }
+
+            expect(IsCloseTo(result0, expected, 1e-4, 1e-8)).toBe(true);
             if (!expected2) {
               expect(IsCloseTo(result1, expected, 1e-4, 1e-8)).toBe(true);
             } else {
@@ -438,6 +528,122 @@ function ExecuteDescribeBools(typeName: string, typeDir: string, process: (input
   });
 }
 
+
+function uuids(expected: any[]) {
+
+  for (let i = 0; i < expected.length; i++) {
+    if (expected[i].userData.original instanceof Face2) {
+      let f = expected[i].userData.original as Face2;
+      for (let j = 0; j < f.border.coedges.length - 1; j++) {
+        let uuid = f.border.coedges[j].uuid;
+        let euuid = f.border.coedges[j].e.uuid;
+        for (let k = j + 1; k < f.border.coedges.length; k++) {
+          if (f.border.coedges[k].uuid === uuid) {
+            f.border.coedges[k].uuid = uuidv4();
+          }
+          if (f.border.coedges[k].e.uuid === euuid) {
+            f.border.coedges[k].e.uuid = uuidv4();
+          }
+        }
+      }
+
+      for (let j = 0; j < f.holes.length - 1; j++) {
+        let hole = f.holes[j];
+        for (let k = 0; k < hole.coedges.length - 1; k++) {
+          let uuid = hole.coedges[k].uuid;
+          let euuid = hole.coedges[k].e.uuid;
+          for (let l = k + 1; l < hole.coedges.length; l++) {
+            if (hole.coedges[l].uuid === uuid) {
+              hole.coedges[l].uuid = uuidv4();
+            }
+            if (hole.coedges[l].e.uuid === euuid) {
+              hole.coedges[l].e.uuid = uuidv4();
+            }
+          }
+        }
+      }
+    }
+
+    if (expected[i].userData.original instanceof Array) {
+      let arr = expected[i].userData.original as Array<Face2>;
+      arr.forEach((f) => {
+        for (let j = 0; j < f.border.coedges.length - 1; j++) {
+          for (let k = 0; k < f.border.coedges.length - 1; k++) {
+            let uuid = f.border.coedges[k].uuid;
+            let euuid = f.border.coedges[k].e.uuid;
+            for (let l = k + 1; l < f.border.coedges.length; l++) {
+              if (f.border.coedges[l].uuid === uuid) {
+                f.border.coedges[l].uuid = uuidv4();
+              }
+              if (f.border.coedges[l].e.uuid === euuid) {
+                f.border.coedges[l].e.uuid = uuidv4();
+              }
+            }
+          }
+        }
+
+        for (let j = 0; j < f.holes.length - 1; j++) {
+          let hole = f.holes[j];
+          for (let k = 0; k < hole.coedges.length - 1; k++) {
+            let uuid = hole.coedges[k].uuid;
+            let euuid = hole.coedges[k].e.uuid;
+            for (let l = k + 1; l < hole.coedges.length; l++) {
+              if (hole.coedges[l].uuid === uuid) {
+                hole.coedges[l].uuid = uuidv4();
+              }
+              if (hole.coedges[l].e.uuid === euuid) {
+                hole.coedges[l].e.uuid = uuidv4();
+              }
+            }
+          }
+        }
+      });
+    }
+  }
+}
+
+// 修改重复的UUID，保证每个测试用例的UUID都是唯一的
+function ExecuteUUIDS(typeName: string, typeDir: string) {
+  let dir = __dirname;
+  dir = dir.replace(/\\/g, '/').replace(/\/src/, '');
+  describe(typeName, () => {
+    const dataDir = path.join(dir, 'data', typeDir);
+    const files = fs.readdirSync(dataDir);
+    files.forEach(file => {
+      const testCases = DiscoverTestCases(typeDir + '/' + file);
+      // 如果没有找到测试用例，给出提示
+      if (testCases.length === 0) {
+        console.warn('⚠️ 未找到测试数据文件，请检查 data/ 目录');
+      }
+      describe(file, () => {
+        const testCases = DiscoverTestCases(typeDir + '/' + file);
+        // 如果没有找到测试用例，给出提示
+        if (testCases.length === 0) {
+          console.warn('⚠️ 未找到测试数据文件，请检查 data/ 目录');
+        }
+        for (let i = 0; i < testCases.length; i++) {
+          let c = testCases[i];
+          test(c.name, () => {
+            const input = LoadScene(c.inputFile) as any[];
+            const expected = LoadScene(c.expectedFile) as any[];
+            uuids(input);
+            SaveScene(c.inputFile, input);
+            uuids(expected);
+            SaveScene(c.expectedFile, expected);
+            let expected2: any[];
+            if (fs.existsSync(c.expectedFile2)) {
+              expected2 = LoadScene(c.expectedFile2);
+              uuids(expected2);
+              SaveScene(c.expectedFile2, expected2);
+            }
+            expect(IsCloseTo([], [], 1e-4, 1e-8)).toBe(true);
+          });
+        }
+      });
+    });
+  });
+}
+
 export {
   IsCloseTo,
   LoadScene,
@@ -447,5 +653,6 @@ export {
   ExecuteDescribeInsertPoint2,
   ExecuteDescribeInsertPoint3,
   ExecuteDescribeBool2,
+  ExecuteUUIDS,
 };
 export type { TestCase };

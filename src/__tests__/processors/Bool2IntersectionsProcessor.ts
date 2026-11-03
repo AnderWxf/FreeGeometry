@@ -11,6 +11,10 @@ export function process(a: Face2[], b: Face2[]): any[] {
   } else {
     fs = Bool2.Intersections(a, b, 1e-4, 1e-10);
   }
+  for (let i = 0; i < fs.length; i++) {
+    Bool2.FaceObjectReference(fs[i]);
+    Bool2.FaceFreeIndexRelation(fs[i]);
+  }
   let userData = {
     type: GeomType.DRAW_SURFACE_SEC,
     typename: GeomType[GeomType.DRAW_SURFACE_SEC],

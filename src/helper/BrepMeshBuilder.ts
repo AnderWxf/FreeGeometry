@@ -9,6 +9,7 @@ import { Line3Data } from '../geometry/data/base/curve3/Line3Data';
 import { Brep3Builder } from '../geometry/algorithm/builder/Brep3Builder';
 import { Global } from '../core/Global';
 import type { UserData } from './UserData';
+import { Face2Algo } from '../geometry/algorithm/brep/Brep2Algo';
 
 /**
  * brep mesh builder.
@@ -51,7 +52,8 @@ class BrepMeshBuilder {
       BrepMeshBuilder.BuildEdge2Mesh(original, userData.color, null, 0, mesh as THREE.Line);
     }
     else if (original instanceof Face2) {
-      let curves = original.curves;
+      let algo = new Face2Algo(original);
+      let curves = algo.curves;
       let isLines = true;
       for (let i = 0; i < curves.length; i++) {
         if (curves[i] instanceof Line2Data) {
@@ -83,7 +85,8 @@ class BrepMeshBuilder {
         let faces = original as Face2[];
         let isLines = true;
         for (let i = 0; i < faces.length; i++) {
-          let curves = faces[i].curves;
+          let algo = new Face2Algo(faces[i]);
+          let curves = algo.curves;
           for (let j = 0; j < curves.length; j++) {
             if (curves[j] instanceof Line2Data) {
             } else {
@@ -409,9 +412,9 @@ class BrepMeshBuilder {
     face.border.coedges.forEach(coedge => {
       let edge = coedge.e;
       let curve = edge.curve;
-      if (curve == null) {
-        curve = face.curves[edge.curvei];
-      }
+      // if (curve == null) {
+      //   curve = face.curves[edge.curvei];
+      // }
       let edgeSegment = segment;
       if (edgeSegment == undefined) {
         if (curve instanceof Line2Data) {
@@ -439,9 +442,9 @@ class BrepMeshBuilder {
       hole.coedges.forEach(coedge => {
         let edge = coedge.e;
         let curve = edge.curve;
-        if (curve == null) {
-          curve = face.curves[edge.curvei];
-        }
+        // if (curve == null) {
+        //   curve = face.curves[edge.curvei];
+        // }
         let edgeSegment = segment;
         if (edgeSegment == undefined) {
           if (curve instanceof Line2Data) {
@@ -535,9 +538,9 @@ class BrepMeshBuilder {
       face.border.coedges.forEach(coedge => {
         let edge = coedge.e;
         let curve = edge.curve;
-        if (curve == null) {
-          curve = face.curves[edge.curvei];
-        }
+        // if (curve == null) {
+        //   curve = face.curves[edge.curvei];
+        // }
         let edgeSegment = segment;
         if (edgeSegment == undefined) {
           if (curve instanceof Line2Data) {
@@ -565,9 +568,9 @@ class BrepMeshBuilder {
         hole.coedges.forEach(coedge => {
           let edge = coedge.e;
           let curve = edge.curve;
-          if (curve == null) {
-            curve = face.curves[edge.curvei];
-          }
+          // if (curve == null) {
+          //   curve = face.curves[edge.curvei];
+          // }
           let edgeSegment = segment;
           if (edgeSegment == undefined) {
             if (curve instanceof Line2Data) {
