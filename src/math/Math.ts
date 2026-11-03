@@ -1,7 +1,7 @@
 import { GeomType } from "../core/Constents";
 import { clamp } from "./MathUtils"
 
-import { detMatrix3, detMatrix4, invertMatrix3, invertMatrix4 } from '../../wasm/assembly/asm.asc';
+// import { detMatrix3, detMatrix4, invertMatrix3, invertMatrix4 } from '../../wasm/assembly/asm.asc';
 import { Global } from "../core/Global";
 
 /**
@@ -5225,9 +5225,9 @@ class Matrix3 {
    * @return {number} The determinant.
    */
   determinant() {
-    if (Global.isUseWasm) {
-      return detMatrix3(new Float64Array(this.elements));
-    }
+    // if (Global.isUseWasm) {
+    //   return detMatrix3(new Float64Array(this.elements));
+    // }
     const te = this.elements;
     const a = te[0], b = te[1], c = te[2],
       d = te[3], e = te[4], f = te[5],
@@ -5244,22 +5244,22 @@ class Matrix3 {
    * @return {Matrix3} A reference to this matrix.
    */
   invert() {
-    if (Global.isUseWasm) {
-      const te = this.elements;
-      let ret = invertMatrix3(new Float64Array(te));
-      te[0] = ret[0];
-      te[1] = ret[1];
-      te[2] = ret[2];
+    // if (Global.isUseWasm) {
+    //   const te = this.elements;
+    //   let ret = invertMatrix3(new Float64Array(te));
+    //   te[0] = ret[0];
+    //   te[1] = ret[1];
+    //   te[2] = ret[2];
 
-      te[3] = ret[3];
-      te[4] = ret[4];
-      te[5] = ret[5];
+    //   te[3] = ret[3];
+    //   te[4] = ret[4];
+    //   te[5] = ret[5];
 
-      te[6] = ret[6];
-      te[7] = ret[7];
-      te[8] = ret[8];
-      return this;
-    }
+    //   te[6] = ret[6];
+    //   te[7] = ret[7];
+    //   te[8] = ret[8];
+    //   return this;
+    // }
 
     const te = this.elements,
 
@@ -6299,9 +6299,9 @@ class Matrix4 {
    * @return {number} The determinant.
    */
   determinant() {
-    if (Global.isUseWasm) {
-      return detMatrix4(new Float64Array(this.elements));
-    }
+    // if (Global.isUseWasm) {
+    //   return detMatrix4(new Float64Array(this.elements));
+    // }
     const te = this.elements;
 
     const n11 = te[0], n12 = te[4], n13 = te[8], n14 = te[12];
@@ -6411,31 +6411,31 @@ class Matrix4 {
    * @return {Matrix4} A reference to this matrix.
    */
   invert() {
-    if (Global.isUseWasm) { 
+    // if (Global.isUseWasm) { 
 
-      const te = this.elements;
-      let ret = invertMatrix4(new Float64Array(te));
-      te[0] = ret[0];
-      te[1] = ret[1];
-      te[2] = ret[2];
-      te[3] = ret[3];
+    //   const te = this.elements;
+    //   let ret = invertMatrix4(new Float64Array(te));
+    //   te[0] = ret[0];
+    //   te[1] = ret[1];
+    //   te[2] = ret[2];
+    //   te[3] = ret[3];
 
-      te[4] = ret[4];
-      te[5] = ret[5];
-      te[6] = ret[6];
-      te[7] = ret[7];
+    //   te[4] = ret[4];
+    //   te[5] = ret[5];
+    //   te[6] = ret[6];
+    //   te[7] = ret[7];
 
-      te[8] = ret[8];
-      te[9] = ret[9];
-      te[10] = ret[10];
-      te[11] = ret[11];
+    //   te[8] = ret[8];
+    //   te[9] = ret[9];
+    //   te[10] = ret[10];
+    //   te[11] = ret[11];
 
-      te[12] = ret[12];
-      te[13] = ret[13];
-      te[14] = ret[14];
-      te[15] = ret[15];
-      return this;
-    }
+    //   te[12] = ret[12];
+    //   te[13] = ret[13];
+    //   te[14] = ret[14];
+    //   te[15] = ret[15];
+    //   return this;
+    // }
     // based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm
     const te = this.elements,
 
