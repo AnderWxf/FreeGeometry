@@ -37,11 +37,13 @@ class SceneSaveasCom extends Command {
         if (userData.original.length > 0 && userData.original[0] instanceof Face2) {
           for (let j = 0; j < userData.original.length; j++) {
             let face = userData.original[j] as Face2;
+            Bool2.FaceIndexRelation(face);
             Bool2.FaceClearReference(face);
           }
         }
       }
       if (userData.original instanceof Face2) {
+        Bool2.FaceIndexRelation(userData.original as Face2);
         Bool2.FaceClearReference(userData.original as Face2);
       }
       data.push({ userData: o.userData as UserData });

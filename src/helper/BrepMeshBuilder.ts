@@ -483,6 +483,14 @@ class BrepMeshBuilder {
 
     // 绘制边界线
     if (drawOutLine) {
+      let lines: THREE.Line[] = [];
+      for (let i = 0; i < ret.children.length; i++) {
+        if (ret.children[i] instanceof THREE.Line) {
+          let line = ret.children[i] as THREE.Line;
+          lines.push(line);
+        }
+      }
+      let lineIndex = 0;
       let vertices = new Array<number>;
       for (let i = 0; i < points.length; i++) {
         let p = points[i];
@@ -497,9 +505,17 @@ class BrepMeshBuilder {
       let borderbuff = new THREE.BufferGeometry()
       borderbuff.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
       const materialline = new THREE.MeshBasicMaterial({ color: color });
-      let borderMesh = new THREE.Line(borderbuff, materialline);
-      borderMesh.frustumCulled = false;
-      ret.children.push(borderMesh);
+      if (lineIndex < lines.length) {
+        let borderMesh = lines[lineIndex];
+        borderMesh.geometry = borderbuff;
+        borderMesh.frustumCulled = false;
+        lineIndex++;
+      } else {
+        let borderMesh = new THREE.Line(borderbuff, materialline);
+        borderMesh.frustumCulled = false;
+        ret.children.push(borderMesh);
+      }
+
       holes.forEach(hole => {
         let holeVertices = new Array<number>;
         let holePoints = hole.getPoints();
@@ -514,9 +530,15 @@ class BrepMeshBuilder {
         holeVertices.push(0);
         let holeBuff = new THREE.BufferGeometry()
         holeBuff.setAttribute('position', new THREE.Float32BufferAttribute(holeVertices, 3));
-        let holeMesh = new THREE.Line(holeBuff, materialline);
-        holeMesh.frustumCulled = false;
-        ret.children.push(holeMesh);
+        if (lineIndex < lines.length) {
+          let holeMesh = lines[lineIndex];
+          holeMesh.geometry = holeBuff;
+          holeMesh.frustumCulled = false;
+        } else {
+          let holeMesh = new THREE.Line(holeBuff, materialline);
+          holeMesh.frustumCulled = false;
+          ret.children.push(holeMesh);
+        }
       });
     }
     return ret;
@@ -614,6 +636,14 @@ class BrepMeshBuilder {
 
     // 绘制边界线
     if (drawOutLine) {
+      let lines: THREE.Line[] = [];
+      for (let i = 0; i < ret.children.length; i++) {
+        if (ret.children[i] instanceof THREE.Line) {
+          let line = ret.children[i] as THREE.Line;
+          lines.push(line);
+        }
+      }
+      let lineIndex = 0;
       for (let i = 0; i < faces.length; i++) {
         let points = pointss[i];
         let holes = holess[i];
@@ -631,9 +661,16 @@ class BrepMeshBuilder {
         let borderbuff = new THREE.BufferGeometry()
         borderbuff.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
         const materialline = new THREE.MeshBasicMaterial({ color: color });
-        let borderMesh = new THREE.Line(borderbuff, materialline);
-        borderMesh.frustumCulled = false;
-        ret.children.push(borderMesh);
+        if (lineIndex < lines.length) {
+          let borderMesh = lines[lineIndex];
+          borderMesh.geometry = borderbuff;
+          borderMesh.frustumCulled = false;
+          lineIndex++;
+        } else {
+          let borderMesh = new THREE.Line(borderbuff, materialline);
+          borderMesh.frustumCulled = false;
+          ret.children.push(borderMesh);
+        }
         holes.forEach(hole => {
           let holeVertices = new Array<number>;
           let holePoints = hole.getPoints();
@@ -648,9 +685,15 @@ class BrepMeshBuilder {
           holeVertices.push(0);
           let holeBuff = new THREE.BufferGeometry()
           holeBuff.setAttribute('position', new THREE.Float32BufferAttribute(holeVertices, 3));
-          let holeMesh = new THREE.Line(holeBuff, materialline);
-          holeMesh.frustumCulled = false;
-          ret.children.push(holeMesh);
+          if (lineIndex < lines.length) {
+            let holeMesh = lines[lineIndex];
+            holeMesh.geometry = holeBuff;
+            holeMesh.frustumCulled = false;
+          } else {
+            let holeMesh = new THREE.Line(holeBuff, materialline);
+            holeMesh.frustumCulled = false;
+            ret.children.push(holeMesh);
+          }
         });
       }
 

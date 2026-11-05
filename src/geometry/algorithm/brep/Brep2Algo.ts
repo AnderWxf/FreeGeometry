@@ -8,6 +8,7 @@ import { Coedge2, Loop2, Vertice2, type Digraph2, type Edge2, type Face2 } from 
 import type { Curve2Algo } from "../base/Curve2Algo";
 import { CurveBuilder } from "../builder/CurveBuilder";
 import { Curve2Inter } from "../relation/intersection/Curve2Inter";
+import type { InterOfFace2 } from "../relation/intersection/Brep2Inter";
 
 class Edge2Algo {
   private _e: Edge2;
@@ -240,7 +241,6 @@ class Coedge2Algo {
   isSpacePoint(p: Vector2, tol0: number, tol1: number): boolean {
     let u = this._curve.u(p);
     let p_ = this._curve.p(u);
-
     return p.distanceTo(p_) <= tol0;
   }
 
@@ -767,6 +767,29 @@ class Face2Algo {
 
     return false;
   }
+  /**
+   * point at face inner?(inner boder and not inner holes)
+   *
+   * @param {Vector2} [p] - The eoint.
+   * @param {number} [tol0] - The tolerance of geometric.
+   * @param {number} [tol1] - The tolerance of algebraic.
+   */
+  isPointAtOuter(p: Vector2, tol0: number, tol1: number): boolean {
+    if (this.isPointAtBoder(p, tol0, tol1)) {
+      return false;
+    }
+    if (this._balgo.isPointAtInner(p, tol0, tol1)) {
+      let count = this._halgos.length;
+      for (let i = 0; i < count; i++) {
+        if (this._halgos[i].isPointAtInner(p, tol0, tol1)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    return true;
+  }
 
   /**
    * point on face? (at boder or at inner)
@@ -794,9 +817,23 @@ class Face2Algo {
 
   get curves(): Curve2Data[] {
     let result: Curve2Data[] = [];
-    this._balgo.loop.coedges.forEach(coedge => result.push(coedge.e.curve));
-    this._halgos.forEach(hole => {
-      hole.loop.coedges.forEach(coedge => result.push(coedge.e.curve));
+    this._balgo.loop.coedges.forEach((coedge) => {
+      for (let i = 0; i < result.length; i++) {
+        if (result[i].uuid == coedge.e.curve.uuid) {
+          return;
+        }
+      }
+      result.push(coedge.e.curve);
+    });
+    this._halgos.forEach((hole) => {
+      hole.loop.coedges.forEach((coedge) => {
+        for (let i = 0; i < result.length; i++) {
+          if (result[i].uuid == coedge.e.curve.uuid) {
+            return;
+          }
+        }
+        result.push(coedge.e.curve);
+      });
     });
     return result;
   }
@@ -1148,6 +1185,7 @@ class Digraph2Algo {
       algo.outSort();
     });
   }
+  // 删除面积为0的环
   removeZeroAreaEdges(tol0: number): Boolean {
     // 剔除重复的边。
     let isZeroAreaEdges = false;
@@ -1166,15 +1204,12 @@ class Digraph2Algo {
     return isZeroAreaEdges;
   }
 
-  getAllLoops(): Loop2Algo[] {
+  getAllLoops(tol0: number): Loop2Algo[] {
     let loops: Loop2Algo[] = [];
     let algos = this._algos;
     let visited: Coedge2Algo[] = [];
 
     this.resort();
-
-
-
     for (let i = 0; i < algos.length; i++) {
       let curr = algos[i];
       if (visited.includes(curr)) {
@@ -1192,6 +1227,16 @@ class Digraph2Algo {
         loopAlgo.coedges.push(curr);
         visited.push(curr);
         next = curr.getNext(visited);
+      }
+      // // 跳过不闭合的环
+      // let bp = loopAlgo.coedges[0].getBeginPoint();
+      // let ep = loopAlgo.coedges[loopAlgo.coedges.length - 1].getEndPoint();
+      // if (bp.distanceTo(ep) > tol0) {
+      //   continue;
+      // }
+      // 跳过面积为0的环
+      if (Math.abs(loopAlgo.area()) <= tol0) {
+        continue;
       }
       loops.push(loopAlgo);
     }

@@ -342,7 +342,7 @@ class Brep2Builder {
     // 构建全新的有向图
     let galgo = new Digraph2Algo(new Digraph2());
     galgo.addEdges(edges, tol0);
-    let alloops = galgo.getAllLoops();
+    let alloops = galgo.getAllLoops(tol0);
     // 删除面积为0或者反向的环
     let count = alloops.length;
     for (let i = count - 1; i > -1; i--) {

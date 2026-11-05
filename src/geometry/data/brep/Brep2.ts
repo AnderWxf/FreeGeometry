@@ -377,6 +377,14 @@ class Coedge2 extends DataBase {
     return this.isForward ? this.e.isPositive() : !this.e.isPositive();
   }
 
+  get v0(): Vertice2 {
+    return this.isForward ? this.e.v0 : this.e.v1;
+  }
+
+  get v1(): Vertice2 {
+    return this.isForward ? this.e.v1 : this.e.v0;
+  }
+
   /**
    * u parameter range of curve of Edge.
    * [a,b]. 
@@ -648,7 +656,7 @@ class Face2 extends DataBase {
     }
     ret.uuid = data.uuid;
     Bool2.FaceObjectReference(ret);
-    Bool2.FaceFreeIndexRelation(ret);
+    Bool2.FaceClearIndexRelation(ret);
     return ret;
   }
 }

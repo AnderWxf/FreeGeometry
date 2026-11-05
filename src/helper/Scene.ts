@@ -28,12 +28,20 @@ class Scene {
       for (const value of this._objects.values()) {
         let userData = value.userData as UserData;
         if (userData.isAssist) {
-          value.scale.setScalar(1 / zoom);
+          value.scale.setScalar(2 / zoom);
         } else {
           if ((value instanceof THREE.Mesh || value instanceof THREE.Line)
             && (userData.detail == undefined || userData.detail < detail)) {
             BrepMeshBuilder.ReDetialBuildEdge2sMesh(userData, value);
             userData.detail = detail;
+          }
+        }
+        if (value.children.length > 0) {
+          for (let i = 0; i < value.children.length; i++) {
+            let m = value.children[i];
+            if (m.name == 'assist') {
+              m.scale.setScalar(2 / zoom);
+            }
           }
         }
       }

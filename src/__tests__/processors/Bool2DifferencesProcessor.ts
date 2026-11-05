@@ -13,7 +13,7 @@ export function process(a: Face2[], b: Face2[]): any[] {
   }
   for (let i = 0; i < fs.length; i++) {
     Bool2.FaceObjectReference(fs[i]);
-    Bool2.FaceFreeIndexRelation(fs[i]);
+    Bool2.FaceClearIndexRelation(fs[i]);
   }
   let userData = {
     type: GeomType.DRAW_SURFACE_SEC,

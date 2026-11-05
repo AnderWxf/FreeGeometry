@@ -7,6 +7,7 @@ import { Coedge2Algo, Digraph2Algo, Face2Algo, Face2Algos, Loop2Algo } from "../
 import { Brep2Builder } from "../../builder/Brep2Builder";
 import { Brep2Inter, type InterOfFace2 } from "../intersection/Brep2Inter";
 import { v4 as uuidv4 } from 'uuid';
+import type { InterOfCurve2 } from "../intersection/Curve2Inter";
 
 class Bool2 {
 
@@ -425,14 +426,14 @@ class Bool2 {
     // 根据轮廓交点对面轮廓进行切割
     Bool2.Cutting(algo.loops, blgo.loops, inters, tol0, tol1);
     let isChanged = false;
-    // 删除a中不在b的原始形状内部的边。
+    // 删除a中在b的原始形状外部的边。
     algo.loops.forEach((loop) => {
       let count = loop.coedges.length;
       for (let i = count - 1; i > -1; i--) {
         let coedge = loop.coedges[i];
         let u = coedge.u;
         let mp = coedge.p((u.x + u.y) * 0.5);
-        if (!blgorigin.isPointAtInner(mp, tol0, tol1)) {
+        if (blgorigin.isPointAtOuter(mp, tol0, tol1)) {
           loop.coedges.splice(i, 1);
           isChanged = true;
         }
@@ -583,12 +584,152 @@ class Bool2 {
   * 
   */
   static Cutting(a: Loop2Algo[], b: Loop2Algo[], inters: Array<InterOfFace2>, tol0: number, tol1: number) {
+
+    for (let k = 0; k < a.length; k++) {
+      let loopAlgo = a[k];
+      for (let l = loopAlgo.coedges.length - 1; l > -1; l--) {
+        let coedgeAlgo = loopAlgo.coedges[l];
+        let cuts: Array<InterOfCurve2> = [];
+        // 寻找边上的所有分割点
+
+        for (let i = 0; i < inters.length; i++) {
+          let inter = inters[i];
+          let c0 = inter.c0;
+          let is = inter.is;
+          for (let j = 0; j < is.length; j++) {
+            let ip = is[j];
+            if (coedgeAlgo.curve.dat.uuid == c0.uuid) {
+              if (coedgeAlgo.curve.dat instanceof Arc2Data) {
+                if (!coedgeAlgo.isOnUBoder(ip.u0, tol1) && coedgeAlgo.isInURangePeriod(ip.u0, PI2, tol1)) {
+                  cuts.push(ip);
+                }
+              } else {
+                if (!coedgeAlgo.isOnUBoder(ip.u0, tol1) && coedgeAlgo.isInURange(ip.u0)) {
+                  cuts.push(ip);
+                }
+              }
+              cuts.push();
+            }
+          }
+        }
+        cuts.sort((a: InterOfCurve2, b: InterOfCurve2) => {
+          if (a.u0 < b.u0) {
+            return -1;
+          }
+          if (a.u0 > b.u0) {
+            return 1;
+          }
+          return 0;
+        });
+
+        // 根据分割点对面轮廓进行切割
+        let off = 0;
+        for (let i = 0; i < cuts.length; i++) {
+          let ip = cuts[i];
+          let ur = coedgeAlgo.ur;
+          // 闭环上的第一个分割点只做端点偏移，并记录偏移量
+          if (i == 0 && coedgeAlgo.curve.dat instanceof Arc2Data && ur.x == 0 && ur.y == PI2) {
+            coedgeAlgo.c.e.umin = ip.u0;
+            coedgeAlgo.c.e.umax = PI2 + ip.u0;
+            continue;
+          }
+          // 对coedge进行切割
+          let afterCoedge = coedgeAlgo.c.clone();
+          afterCoedge.uuid = uuidv4();
+          afterCoedge.e.uuid = uuidv4();
+          afterCoedge.e.umin = ip.u0;
+          coedgeAlgo.c.e.umax = ip.u0;
+
+          let v = new Vertice2();
+          afterCoedge.e.v0 = v;
+          coedgeAlgo.c.e.v1 = v;
+
+          let afterCoedgeAlgo = new Coedge2Algo(afterCoedge, coedgeAlgo.f);
+          loopAlgo.coedges.splice(l + off + 1, 0, afterCoedgeAlgo);
+          loopAlgo.loop.coedges.splice(l + off + 1, 0, afterCoedge);
+          off++;
+          coedgeAlgo = afterCoedgeAlgo;
+        }
+      }
+    }
+
+    // 用c1对b中的所有loop进行切割
+    for (let k = 0; k < b.length; k++) {
+      let loopAlgo = b[k];
+      for (let l = loopAlgo.coedges.length - 1; l > -1; l--) {
+        let coedgeAlgo = loopAlgo.coedges[l];
+        let cuts: Array<InterOfCurve2> = [];
+        // 寻找边上的所有分割点
+        for (let i = 0; i < inters.length; i++) {
+          let inter = inters[i];
+          let c1 = inter.c1;
+          let is = inter.is;
+          for (let j = 0; j < is.length; j++) {
+            let ip = is[j];
+            if (coedgeAlgo.curve.dat.uuid == c1.uuid) {
+              if (coedgeAlgo.curve.dat instanceof Arc2Data) {
+                if (!coedgeAlgo.isOnUBoder(ip.u1, tol1) && coedgeAlgo.isInURangePeriod(ip.u1, PI2, tol1)) {
+                  cuts.push(ip);
+                }
+              } else {
+                if (!coedgeAlgo.isOnUBoder(ip.u1, tol1) && coedgeAlgo.isInURange(ip.u1)) {
+                  cuts.push(ip);
+                }
+              }
+              cuts.push();
+            }
+          }
+        }
+        cuts.sort((a: InterOfCurve2, b: InterOfCurve2) => {
+          if (a.u1 < b.u1) {
+            return -1;
+          }
+          if (a.u1 > b.u1) {
+            return 1;
+          }
+          return 0;
+        });
+        // 根据分割点对面轮廓进行切割
+        let off = 0;
+        for (let i = 0; i < cuts.length; i++) {
+          let ip = cuts[i];
+          let ur = coedgeAlgo.ur;
+          // 闭环上的第一个分割点只做端点偏移，并记录偏移量
+          if (i == 0 && coedgeAlgo.curve.dat instanceof Arc2Data && ur.x == 0 && ur.y == PI2) {
+            coedgeAlgo.c.e.umin = ip.u1;
+            coedgeAlgo.c.e.umax = PI2 + ip.u1;
+            continue;
+          }
+          // 对coedge进行切割
+          let afterCoedge = coedgeAlgo.c.clone();
+          afterCoedge.uuid = uuidv4();
+          afterCoedge.e.uuid = uuidv4();
+          afterCoedge.e.umin = ip.u1;
+          coedgeAlgo.c.e.umax = ip.u1;
+
+          let v = new Vertice2();
+          afterCoedge.e.v0 = v;
+          coedgeAlgo.c.e.v1 = v;
+
+          let afterCoedgeAlgo = new Coedge2Algo(afterCoedge, coedgeAlgo.f);
+          loopAlgo.coedges.splice(l + off + 1, 0, afterCoedgeAlgo);
+          loopAlgo.loop.coedges.splice(l + off + 1, 0, afterCoedge);
+          off++;
+          coedgeAlgo = afterCoedgeAlgo;
+        }
+
+      }
+    }
+  }
+  static Cutting0(a: Loop2Algo[], b: Loop2Algo[], inters: Array<InterOfFace2>, tol0: number, tol1: number) {
     // 根据轮廓交点对面轮廓进行切割
     for (let i = 0; i < inters.length; i++) {
       let inter = inters[i];
       let c0 = inter.c0;
       let c1 = inter.c1;
       let is = inter.is;
+
+      let offsets = {};
       for (let j = 0; j < is.length; j++) {
         let ip = is[j];
         // 用c0对a中的所有loop进行切割
@@ -598,6 +739,21 @@ class Bool2 {
             let coedgeAlgo = loopAlgo.coedges[l];
             if (coedgeAlgo.curve.dat.uuid == c0.uuid) {
               if (coedgeAlgo.curve.dat instanceof Arc2Data) {
+                // // 是唯一原始环,修改端点的参数，不需要分割。
+                // if (loopAlgo.coedges.length == 1) {
+                //   let ur = coedgeAlgo.ur;
+                //   if (ur.x == 0 && ur.y == PI2) {
+                //     coedgeAlgo.c.e.umin = ip.u0;
+                //     coedgeAlgo.c.e.umax = PI2 + ip.u0;
+                //     // // 如果修改端点的参数后依然是初始状态，则加一个微小的偏移。
+                //     // if (coedgeAlgo.c.e.umin == 0 && coedgeAlgo.c.e.umax == PI2) {
+                //     //   coedgeAlgo.c.e.umin += 1e-14;
+                //     //   coedgeAlgo.c.e.umax += 1e-14;
+                //     // }                     
+                //     continue;
+                //   }
+                // }
+
                 if (!coedgeAlgo.isOnUBoder(ip.u0, tol1) && coedgeAlgo.isInURangePeriod(ip.u0, PI2, tol1)) {
                   // 对coedge进行切割
                   let afterCoedge = coedgeAlgo.c.clone();
@@ -643,6 +799,20 @@ class Bool2 {
             let coedgeAlgo = loopAlgo.coedges[l];
             if (coedgeAlgo.curve.dat.uuid == c1.uuid) {
               if (coedgeAlgo.curve.dat instanceof Arc2Data) {
+                // // 是唯一原始环,修改端点的参数，不需要分割。
+                // if (loopAlgo.coedges.length == 1) {
+                //   let ur = coedgeAlgo.ur;
+                //   if (ur.x == 0 && ur.y == PI2) {
+                //     coedgeAlgo.c.e.umin = ip.u1;
+                //     coedgeAlgo.c.e.umax = PI2 + ip.u1;
+                //     // // 如果修改端点的参数后依然是初始状态，则加一个微小的偏移。
+                //     // if (coedgeAlgo.c.e.umin == 0 && coedgeAlgo.c.e.umax == PI2) {
+                //     //   coedgeAlgo.c.e.umin += 1e-14;
+                //     //   coedgeAlgo.c.e.umax += 1e-14;
+                //     // }                    
+                //     continue;
+                //   }
+                // }
                 if (!coedgeAlgo.isOnUBoder(ip.u1, tol1) && coedgeAlgo.isInURangePeriod(ip.u1, PI2, tol1)) {
                   // 对coedge进行切割
                   let afterCoedge = coedgeAlgo.c.clone();
@@ -683,13 +853,12 @@ class Bool2 {
       }
     }
   }
-
   /*
   * 面重构
   * 
   */
   static FaceRebuild(galgo: Digraph2Algo, tol0: number, tol1: number): Face2[] {
-    let alloops = galgo.getAllLoops();
+    let alloops = galgo.getAllLoops(tol0);
     let result: Face2[] = [];
     while (alloops.length) {
       let f = new Face2();
@@ -758,10 +927,13 @@ class Bool2 {
 
 
   /*
-  * 面索引重关联
+  * 面构建索引关联
   * 
   */
   static FaceIndexRelation(face: Face2): void {
+    face.curves = [];
+    face.vertices = [];
+    face.edges = [];
     // 根据对象重新建立顶点和边间的索引关系
     // Coedge2.e -- Coedge2.ei -- Face2.edges
     for (let i = 0; i < face.border.coedges.length; i++) {
@@ -859,10 +1031,10 @@ class Bool2 {
   }
 
   /*
-  * 面释放索引重关联
+  * 面清空索引关联
   * 
   */
-  static FaceFreeIndexRelation(face: Face2): void {
+  static FaceClearIndexRelation(face: Face2): void {
     // 根据对象重新建立顶点和边间的索引关系
     // Coedge2.e -- Coedge2.ei -- Face2.edges
     for (let i = 0; i < face.border.coedges.length; i++) {
@@ -892,7 +1064,7 @@ class Bool2 {
   }
 
   /*
-  * 面对象重引用
+  * 面构建对象引用
   * 
   */
   static FaceObjectReference(face: Face2): void {
@@ -937,11 +1109,11 @@ class Bool2 {
   }
 
   /*
-  * 面对象清空引用
+  * 面清空对象引用
   * 
   */
   static FaceClearReference(face: Face2): void {
-    Bool2.FaceIndexRelation(face);
+
     // 清空引用
     // Coedge2.e -- Coedge2.ei -- Face2.edges
     for (let i = 0; i < face.border.coedges.length; i++) {

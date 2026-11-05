@@ -33,16 +33,18 @@ class SceneSaveCom extends Command {
       // 使用string 保存type，便于直接阅读。
       (userData as any).typename = GeomType[userData.type];
       // 清除对象,可以缩小存储需求。
-      if (userData.original instanceof Array) { 
+      if (userData.original instanceof Array) {
         if (userData.original.length > 0 && userData.original[0] instanceof Face2) {
           for (let j = 0; j < userData.original.length; j++) {
             let face = userData.original[j] as Face2;
+            Bool2.FaceIndexRelation(face);
             Bool2.FaceClearReference(face);
           }
         }
       }
       if (userData.original instanceof Face2) {
-        Bool2.FaceClearReference(userData.original as Face2);  
+        Bool2.FaceIndexRelation(userData.original as Face2);
+        Bool2.FaceClearReference(userData.original as Face2);
       }
       data.push({ userData: userData });
     }
@@ -59,13 +61,15 @@ class SceneSaveCom extends Command {
           for (let j = 0; j < userData.original.length; j++) {
             let face = userData.original[j] as Face2;
             Bool2.FaceObjectReference(face);
+            Bool2.FaceClearIndexRelation(face);
           }
         }
       }
       if (userData.original instanceof Face2) {
         Bool2.FaceObjectReference(userData.original as Face2);
+        Bool2.FaceClearIndexRelation(userData.original as Face2);
       }
-    }    
+    }
     let filename = 'Scene_' + new Date().toLocaleString() + '.json';
     filename = filename.replace(/[\/\\ :*?"<>|]/g, '_'); // 替换非法字符
     if (Global.filename) {

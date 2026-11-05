@@ -201,14 +201,14 @@ function ExecuteDescribeBool2(typeName: string, typeDir: string, process: (a: Fa
                 let f = expected[i].userData.original as Face2;
                 Bool2.FaceIndexRelation(f);
                 Bool2.FaceObjectReference(f);
-                Bool2.FaceFreeIndexRelation(f);
+                Bool2.FaceClearIndexRelation(f);
               }
               if (expected[i].userData.original instanceof Array) {
                 let fs = expected[i].userData.original as Array<Face2>;
                 fs.forEach((f) => {
                   Bool2.FaceIndexRelation(f);
                   Bool2.FaceObjectReference(f);
-                  Bool2.FaceFreeIndexRelation(f);
+                  Bool2.FaceClearIndexRelation(f);
                 });
               }
             }
@@ -218,14 +218,14 @@ function ExecuteDescribeBool2(typeName: string, typeDir: string, process: (a: Fa
                   let f = expected2[i].userData.original as Face2;
                   Bool2.FaceIndexRelation(f);
                   Bool2.FaceObjectReference(f);
-                  Bool2.FaceFreeIndexRelation(f);
+                  Bool2.FaceClearIndexRelation(f);
                 }
                 if (expected2[i].userData.original instanceof Array) {
                   let fs = expected2[i].userData.original as Array<Face2>;
                   fs.forEach((f) => {
                     Bool2.FaceIndexRelation(f);
                     Bool2.FaceObjectReference(f);
-                    Bool2.FaceFreeIndexRelation(f);
+                    Bool2.FaceClearIndexRelation(f);
                   });
                 }
               }
@@ -235,14 +235,14 @@ function ExecuteDescribeBool2(typeName: string, typeDir: string, process: (a: Fa
                 let f = expected[i].userData.original as Face2;
                 Bool2.FaceIndexRelation(f);
                 Bool2.FaceObjectReference(f);
-                Bool2.FaceFreeIndexRelation(f);
+                Bool2.FaceClearIndexRelation(f);
               }
               if (expected[i].userData.original instanceof Array) {
                 let fs = expected[i].userData.original as Array<Face2>;
                 fs.forEach((f) => {
                   Bool2.FaceIndexRelation(f);
                   Bool2.FaceObjectReference(f);
-                  Bool2.FaceFreeIndexRelation(f);
+                  Bool2.FaceClearIndexRelation(f);
                 });
               }
             }
@@ -278,14 +278,14 @@ function ExecuteDescribeBool2(typeName: string, typeDir: string, process: (a: Fa
                 let f = result0[i].userData.original as Face2;
                 Bool2.FaceIndexRelation(f);
                 Bool2.FaceObjectReference(f);
-                Bool2.FaceFreeIndexRelation(f);
+                Bool2.FaceClearIndexRelation(f);
               }
               if (result0[i].userData.original instanceof Array) {
                 let fs = result0[i].userData.original as Array<Face2>;
                 fs.forEach((f) => {
                   Bool2.FaceIndexRelation(f);
                   Bool2.FaceObjectReference(f);
-                  Bool2.FaceFreeIndexRelation(f);
+                  Bool2.FaceClearIndexRelation(f);
                 });
               }
             }
@@ -294,14 +294,14 @@ function ExecuteDescribeBool2(typeName: string, typeDir: string, process: (a: Fa
                 let f = result1[i].userData.original as Face2;
                 Bool2.FaceIndexRelation(f);
                 Bool2.FaceObjectReference(f);
-                Bool2.FaceFreeIndexRelation(f);
+                Bool2.FaceClearIndexRelation(f);
               }
               if (result1[i].userData.original instanceof Array) {
                 let fs = result1[i].userData.original as Array<Face2>;
                 fs.forEach((f) => {
                   Bool2.FaceIndexRelation(f);
                   Bool2.FaceObjectReference(f);
-                  Bool2.FaceFreeIndexRelation(f);
+                  Bool2.FaceClearIndexRelation(f);
                 });
               }
             }
@@ -644,6 +644,95 @@ function ExecuteUUIDS(typeName: string, typeDir: string) {
   });
 }
 
+// 2d布尔测试数据创建
+function Bool2DataCreate(typeName: string, typeDir: string, process: (a: Face2[], b: Face2[]) => any, isDoubleResult = false) {
+  let dir = __dirname;
+  dir = dir.replace(/\\/g, '/').replace(/\/src/, '');
+  describe(typeName, () => {
+    const dataDir = path.join(dir, 'data', typeDir);
+    const files = fs.readdirSync(dataDir);
+    files.forEach(file => {
+      const testCases = DiscoverTestCases(typeDir + '/' + file);
+      // 如果没有找到测试用例，给出提示
+      if (testCases.length === 0) {
+        console.warn('⚠️ 未找到测试数据文件，请检查 data/ 目录');
+      }
+      describe(file, () => {
+        const testCases = DiscoverTestCases(typeDir + '/' + file);
+        // 如果没有找到测试用例，给出提示
+        if (testCases.length === 0) {
+          console.warn('⚠️ 未找到测试数据文件，请检查 data/ 目录');
+        }
+        for (let i = 0; i < testCases.length; i++) {
+          let c = testCases[i];
+          test(c.name, () => {
+            const input = LoadScene(c.inputFile);
+            let a: Face2[] = [];
+            let b: Face2[] = [];
+            for (let i = 0; i < input.length; i++) {
+              if (input[i].userData.original instanceof Face2) {
+                let f = input[i].userData.original as Face2;
+                if (i < input.length / 2) {
+                  a.push(f);
+                } else {
+                  b.push(f);
+                }
+              }
+              if (input[i].userData.original instanceof Array) {
+                let arr = input[i].userData.original as Array<Face2>;
+                arr.forEach((f) => {
+                  if (f instanceof Face2) {
+                    if (i < input.length / 2) {
+                      a.push(f);
+                    } else {
+                      b.push(f);
+                    }
+                  }
+                })
+              }
+            }
+            const result0 = process(a, b) as any[];
+            const result1 = process(b, a);
+            for (let i = 0; i < result0.length; i++) {
+              if (result0[i].userData.original instanceof Face2) {
+                let f = result0[i].userData.original as Face2;
+                Bool2.FaceIndexRelation(f);
+                Bool2.FaceClearReference(f);
+              }
+              if (result0[i].userData.original instanceof Array) {
+                let fs = result0[i].userData.original as Array<Face2>;
+                fs.forEach((f) => {
+                  Bool2.FaceIndexRelation(f);
+                  Bool2.FaceClearReference(f);
+                });
+              }
+            }
+            for (let i = 0; i < result1.length; i++) {
+              if (result1[i].userData.original instanceof Face2) {
+                let f = result1[i].userData.original as Face2;
+                Bool2.FaceIndexRelation(f);
+                Bool2.FaceClearReference(f);
+              }
+              if (result1[i].userData.original instanceof Array) {
+                let fs = result1[i].userData.original as Array<Face2>;
+                fs.forEach((f) => {
+                  Bool2.FaceIndexRelation(f);
+                  Bool2.FaceClearReference(f);
+                });
+              }
+            }
+            SaveScene(c.expectedFile, result0);
+            if (isDoubleResult) {
+              SaveScene(c.expectedFile2, result1);
+            }
+          });
+        }
+      });
+    });
+  });
+
+}
+
 export {
   IsCloseTo,
   LoadScene,
@@ -654,5 +743,6 @@ export {
   ExecuteDescribeInsertPoint3,
   ExecuteDescribeBool2,
   ExecuteUUIDS,
+  Bool2DataCreate,
 };
 export type { TestCase };
