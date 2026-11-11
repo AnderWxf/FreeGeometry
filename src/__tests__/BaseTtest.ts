@@ -645,7 +645,7 @@ function ExecuteUUIDS(typeName: string, typeDir: string) {
 }
 
 // 2d布尔测试数据创建
-function Bool2DataCreate(typeName: string, typeDir: string, process: (a: Face2[], b: Face2[]) => any, isDoubleResult = false) {
+function Bool2DataCreate(typeName: string, typeDir: string, process: (a: Face2[], b: Face2[]) => any, isDoubleResult = false, isForce = false) {
   let dir = __dirname;
   dir = dir.replace(/\\/g, '/').replace(/\/src/, '');
   describe(typeName, () => {
@@ -721,9 +721,22 @@ function Bool2DataCreate(typeName: string, typeDir: string, process: (a: Face2[]
                 });
               }
             }
-            SaveScene(c.expectedFile, result0);
+            if (isForce) {
+              SaveScene(c.expectedFile, result0);
+            } else {
+              if (!fs.existsSync(c.expectedFile)) {
+                SaveScene(c.expectedFile, result0);
+              }
+            }
+
             if (isDoubleResult) {
-              SaveScene(c.expectedFile2, result1);
+              if (isForce) {
+                SaveScene(c.expectedFile2, result1);
+              } else {
+                if (!fs.existsSync(c.expectedFile2)) {
+                  SaveScene(c.expectedFile2, result1);
+                }
+              }
             }
           });
         }
