@@ -59,7 +59,8 @@
     // "src/ui/**/*",
     // "src/main.ts",
     // "src/verb-nurbs.d.ts",
-    "*.d.ts"
+    "*.d.ts",
+    "src/__tests__/100_Bool2TestDataCreate.test.ts"  
   ],
   "exclude": [
     // "src/asm/**/*",
