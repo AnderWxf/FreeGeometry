@@ -1087,21 +1087,21 @@ class Digraph2Algo {
       }
     }
   }
-  resort() {
+  resort(tol0: number) {
     let algos = this._algos;
     let vertices = this._g.vertice2s;
     // 对顶点进行排序。
     vertices.sort((a, b) => {
-      if (a.p.pos.x > b.p.pos.x) {
+      if (a.p.pos.x - b.p.pos.x > tol0) {
         return -1;
       }
-      if (a.p.pos.x < b.p.pos.x) {
+      if (b.p.pos.x - a.p.pos.x > tol0) {
         return 1;
       }
-      if (a.p.pos.y > b.p.pos.y) {
+      if (a.p.pos.y - b.p.pos.y > tol0) {
         return -1;
       }
-      if (a.p.pos.y < b.p.pos.y) {
+      if (b.p.pos.y - a.p.pos.y > tol0) {
         return 1;
       }
       return 0;
@@ -1209,7 +1209,7 @@ class Digraph2Algo {
     let algos = this._algos;
     let visited: Coedge2Algo[] = [];
 
-    this.resort();
+    this.resort(tol0);
     for (let i = 0; i < algos.length; i++) {
       let curr = algos[i];
       if (visited.includes(curr)) {
