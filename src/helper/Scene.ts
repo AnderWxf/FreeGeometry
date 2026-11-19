@@ -62,6 +62,15 @@ class Scene {
     });
     this._scene.remove(...object);
   }
+  reflush() {
+    for (const value of this._objects.values()) {
+      let userData = value.userData as UserData;
+      if (value instanceof THREE.Mesh || value instanceof THREE.Line) {
+        BrepMeshBuilder.ReDetialBuildEdge2sMesh(userData, value);
+      }
+    }
+  }
+
   clear() {
     if (this._objects.size == 0) return;
     this._scene.remove(...this._objects.values());

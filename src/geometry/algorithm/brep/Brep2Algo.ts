@@ -1234,6 +1234,13 @@ class Digraph2Algo {
       // if (bp.distanceTo(ep) > tol0) {
       //   continue;
       // }
+      // 跳过不闭合的环
+      let bp = loopAlgo.coedges[0].v0;
+      let ep = loopAlgo.coedges[loopAlgo.coedges.length - 1].v1;
+      if (bp.uuid != ep.uuid) {
+        continue;
+      }
+
       // 跳过面积为0的环
       if (Math.abs(loopAlgo.area()) <= tol0) {
         continue;

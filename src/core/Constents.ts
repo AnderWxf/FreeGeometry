@@ -266,6 +266,7 @@ enum CommandType {
   SCENE_CLEAR = 'CLEAR',                // 清空
   SCENE_CLEAR_POINT = 'CLEAR_POINT',    // 清空点
   SCENE_SHOW_ASSISTS = 'SHOW_ASSISTS',  // 显示/隐藏辅助对象
+  SCENE_SHOW_COEDGE_DIRETION = 'SHOW_COEDGE_DIRETION',  // 显示/隐藏边方向
   SCENE_STRICP_SAVE = 'STRICP_SAVE',    // 脚本保存
   SCENE_STRICP_EXEC = 'STRICP_EXEC',    // 脚本执行
 

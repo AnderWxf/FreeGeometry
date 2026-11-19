@@ -23,6 +23,7 @@ export class Global {
   static canvas: HTMLCanvasElement;
 
   static isShowAssists: boolean = true;// 在选中或者鼠标悬浮的时候显示辅助物体
+  static isShowCoedgeDirection: boolean = true;// 绘制有向边的时候显示边的方向
   static comExector: CommandExecuter;// 全局命令执行器
 
   static filename: string = '';// 当前保存、导入、加载、执行的文件名

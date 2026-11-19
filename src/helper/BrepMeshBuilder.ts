@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { Edge2, Face2 } from '../geometry/data/brep/Brep2';
 import type { Edge3, Face3 } from '../geometry/data/brep/Brep3';
 import { CurveBuilder } from '../geometry/algorithm/builder/CurveBuilder';
-import { MathUtils } from '..//math/MathUtils';
+import { MathUtils, PI_2 } from '..//math/MathUtils';
 import { Brep2Builder } from '../geometry/algorithm/builder/Brep2Builder';
 import { Line2Data } from '../geometry/data/base/curve2/Line2Data';
 import { Line3Data } from '../geometry/data/base/curve3/Line3Data';
@@ -10,6 +10,8 @@ import { Brep3Builder } from '../geometry/algorithm/builder/Brep3Builder';
 import { Global } from '../core/Global';
 import type { UserData } from './UserData';
 import { Face2Algo } from '../geometry/algorithm/brep/Brep2Algo';
+import { Vector2 } from '../math/Math';
+import type { Curve2Algo } from '../geometry/algorithm/base/Curve2Algo';
 
 /**
  * brep mesh builder.
@@ -37,6 +39,46 @@ class BrepMeshBuilder {
     }
     return segment;
   }
+
+  /**
+   * build mesh vertices.
+   *
+   * @param {Curve2Algo} [algor] - The segment of edge2 object.
+   * @param {Vector2} [ur] - u range.
+   * @param {number} [segment] - The segment of edge2 object.
+   * @param {Array<number>} [vertices] - The vertices of out.
+   *  
+   */
+  private static BuildVertices(algor: Curve2Algo, ur: Vector2, segment: number, vertices: Array<number>): void {
+    let step = (ur.y - ur.x) / segment;
+    let m = Math.floor(segment / 2);
+    for (let u = ur.x, i = 0; i <= segment; u += step, i++) {
+      let p = algor.p(u);
+      vertices.push(p.x);
+      vertices.push(p.y);
+      vertices.push(0);
+      if (i == m && Global.isShowCoedgeDirection) {
+        let ub = u - (Math.abs(step) > 0.1 ? step / Math.abs(step) * 0.1 : step);
+        let lb = algor.p(ub);
+        let l = lb.distanceTo(p);
+        l = l > 0.1 ? 0.1 : l;
+        let lt = algor.t(ub);
+        lt.normalize().multiplyScalar(l);
+        lt.rotateAround(new Vector2, PI_2);
+        vertices.push(lb.x + lt.x);
+        vertices.push(lb.y + lt.y);
+        vertices.push(0);
+        lt.multiplyScalar(-1);
+        vertices.push(lb.x + lt.x);
+        vertices.push(lb.y + lt.y);
+        vertices.push(0);
+        vertices.push(p.x);
+        vertices.push(p.y);
+        vertices.push(0);
+      }
+    }
+  }
+
   /**
    * re build mesh WireframeGeometry.
    *
@@ -46,61 +88,61 @@ class BrepMeshBuilder {
   static ReDetialBuildEdge2sMesh(userData: UserData, mesh: THREE.Mesh | THREE.Line): void {
     let original = userData.original;
     if (original instanceof Edge2) {
-      if (original.curve instanceof Line2Data) {
-        return;
-      }
+      // if (original.curve instanceof Line2Data) {
+      //   return;
+      // }
       BrepMeshBuilder.BuildEdge2Mesh(original, userData.color, null, 0, mesh as THREE.Line);
     }
     else if (original instanceof Face2) {
-      let algo = new Face2Algo(original);
-      let curves = algo.curves;
-      let isLines = true;
-      for (let i = 0; i < curves.length; i++) {
-        if (curves[i] instanceof Line2Data) {
-        } else {
-          isLines = false;
-          break;
-        }
-      }
-      if (!isLines) {
+      // let algo = new Face2Algo(original);
+      // let curves = algo.curves;
+      // let isLines = true;
+      // for (let i = 0; i < curves.length; i++) {
+      //   if (curves[i] instanceof Line2Data) {
+      //   } else {
+      //     isLines = false;
+      //     break;
+      //   }
+      // }
+      // if (!isLines) {
         BrepMeshBuilder.BuildFace2Mesh(original, userData.color, null, true, mesh as THREE.Mesh);
-      }
+      // }
     }
     else if (original instanceof Array) {
       if (original[0] instanceof Edge2) {
         let edges = original as Edge2[];
-        let isLines = true;
-        for (let i = 0; i < edges.length; i++) {
-          if (edges[i].curve instanceof Line2Data) {
-          } else {
-            isLines = false;
-            break;
-          }
-        }
-        if (!isLines) {
+        // let isLines = true;
+        // for (let i = 0; i < edges.length; i++) {
+        //   if (edges[i].curve instanceof Line2Data) {
+        //   } else {
+        //     isLines = false;
+        //     break;
+        //   }
+        // }
+        // if (!isLines) {
           BrepMeshBuilder.BuildEdge2sMesh(edges, userData.color, null, 0, mesh as THREE.Line);
-        }
+        // }
       }
       else if (original[0] instanceof Face2) {
         let faces = original as Face2[];
-        let isLines = true;
-        for (let i = 0; i < faces.length; i++) {
-          let algo = new Face2Algo(faces[i]);
-          let curves = algo.curves;
-          for (let j = 0; j < curves.length; j++) {
-            if (curves[j] instanceof Line2Data) {
-            } else {
-              isLines = false;
-              break;
-            }
-          }
-          if (!isLines) {
-            break;
-          }
-        }
-        if (!isLines) {
+        // let isLines = true;
+        // for (let i = 0; i < faces.length; i++) {
+        //   let algo = new Face2Algo(faces[i]);
+        //   let curves = algo.curves;
+        //   for (let j = 0; j < curves.length; j++) {
+        //     if (curves[j] instanceof Line2Data) {
+        //     } else {
+        //       isLines = false;
+        //       break;
+        //     }
+        //   }
+        //   if (!isLines) {
+        //     break;
+        //   }
+        // }
+        // if (!isLines) {
           BrepMeshBuilder.BuildFace2sMesh(faces, userData.color, null, true, mesh as THREE.Mesh);
-        }
+        // }
       }
     }
   }
@@ -118,7 +160,7 @@ class BrepMeshBuilder {
       let edge = edges[i];
       if (segment == undefined) {
         if (edge.curve instanceof Line2Data) {
-          segment = 1;
+          segment = Global.isShowCoedgeDirection ? 2 : 1;
         } else {
           segment = Math.ceil(MathUtils.clamp(Brep2Builder.Length(edge.curve, edge.u, 1, 512), 64, 512));
         }
@@ -126,16 +168,7 @@ class BrepMeshBuilder {
       segment = BrepMeshBuilder.SegmentDetail(segment);
 
       let algor = CurveBuilder.Algorithm2ByData(edge.curve, sub);
-      let step = (edge.u.y - edge.u.x) / segment;
-
-      // let indices = Array<number>();
-      for (let u = edge.u.x, i = 0; i <= segment; u += step, i++) {
-        let p = algor.p(u);
-        vertices.push(p.x);
-        vertices.push(p.y);
-        vertices.push(0);
-        // indices.push(i);
-      }
+      BrepMeshBuilder.BuildVertices(algor, edge.u, segment, vertices);
     }
 
     if (mesh) {
@@ -163,7 +196,7 @@ class BrepMeshBuilder {
   static BuildEdge2Mesh(edge: Edge2, color: number, segment?: number, sub: number = 0, mesh: THREE.Line = null): THREE.Line {
     if (segment == undefined) {
       if (edge.curve instanceof Line2Data) {
-        segment = 1;
+        segment = Global.isShowCoedgeDirection ? 2 : 1;
       } else {
         let l = Brep2Builder.Length(edge.curve, edge.u, 1, 1024);
         segment = Math.ceil(MathUtils.clamp(l, 64, 1024));
@@ -172,16 +205,38 @@ class BrepMeshBuilder {
     segment = BrepMeshBuilder.SegmentDetail(segment);
 
     let algor = CurveBuilder.Algorithm2ByData(edge.curve, sub);
-    let step = (edge.u.y - edge.u.x) / segment;
+    // let step = (edge.u.y - edge.u.x) / segment;
+    // let m = Math.floor(segment / 2);
     let vertices = new Array<number>;
-    // let indices = Array<number>();
-    for (let u = edge.u.x, i = 0; i <= segment; u += step, i++) {
-      let p = algor.p(u);
-      vertices.push(p.x);
-      vertices.push(p.y);
-      vertices.push(0);
-      // indices.push(i);
-    }
+    BrepMeshBuilder.BuildVertices(algor, edge.u, segment, vertices);
+    // // let indices = Array<number>();
+    // for (let u = edge.u.x, i = 0; i <= segment; u += step, i++) {
+    //   let p = algor.p(u);
+    //   vertices.push(p.x);
+    //   vertices.push(p.y);
+    //   vertices.push(0);
+    //   // indices.push(i);
+
+    //   if (i == m && Global.isShowCoedgeDirection) {
+    //     let ub = u - (step > 0.1 ? 0.1 : step);
+    //     let lb = algor.p(ub);
+    //     let l = lb.distanceTo(p);
+    //     l = l > 0.1 ? 0.1 : l;
+    //     let lt = algor.t(ub);
+    //     lt.normalize().multiplyScalar(l);
+    //     lt.rotateAround(new Vector2, PI_2);
+    //     vertices.push(lb.x + lt.x);
+    //     vertices.push(lb.y + lt.y);
+    //     vertices.push(0);
+    //     lt.multiplyScalar(-1);
+    //     vertices.push(lb.x + lt.x);
+    //     vertices.push(lb.y + lt.y);
+    //     vertices.push(0);
+    //     vertices.push(p.x);
+    //     vertices.push(p.y);
+    //     vertices.push(0);
+    //   }
+    // }
     if (mesh) {
       let buff = mesh.geometry;
       buff.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
@@ -409,16 +464,14 @@ class BrepMeshBuilder {
 
     let points = new Array<THREE.Vector2>();
     let holes = new Array<THREE.Path>();
+    let vertices = new Array<number>;
     face.border.coedges.forEach(coedge => {
       let edge = coedge.e;
       let curve = edge.curve;
-      // if (curve == null) {
-      //   curve = face.curves[edge.curvei];
-      // }
       let edgeSegment = segment;
       if (edgeSegment == undefined) {
         if (curve instanceof Line2Data) {
-          edgeSegment = 1;
+          edgeSegment = Global.isShowCoedgeDirection ? 2 : 1;
         } else {
           edgeSegment = Math.ceil(MathUtils.clamp(Brep2Builder.Length(curve, edge.u, 1, 512), 64, 512));
         }
@@ -436,19 +489,19 @@ class BrepMeshBuilder {
         let p = algor.p(u);
         points.push(new THREE.Vector2(p.x, p.y));
       }
+      if (drawOutLine) {
+        BrepMeshBuilder.BuildVertices(algor, new Vector2(ub, ue), edgeSegment, vertices);
+      }
     });
     face.holes.forEach(hole => {
       let holePoints = new Array<THREE.Vector2>();
       hole.coedges.forEach(coedge => {
         let edge = coedge.e;
         let curve = edge.curve;
-        // if (curve == null) {
-        //   curve = face.curves[edge.curvei];
-        // }
         let edgeSegment = segment;
         if (edgeSegment == undefined) {
           if (curve instanceof Line2Data) {
-            edgeSegment = 1;
+            edgeSegment = Global.isShowCoedgeDirection ? 2 : 1;
           } else {
             edgeSegment = Math.ceil(MathUtils.clamp(Brep2Builder.Length(curve, edge.u, 1, 512), 64, 512));
           }
@@ -464,6 +517,9 @@ class BrepMeshBuilder {
         for (let u = ub, i = 0; i <= edgeSegment; u += step, i++) {
           let p = algor.p(u);
           holePoints.push(new THREE.Vector2(p.x, p.y));
+        }
+        if (drawOutLine) {
+          BrepMeshBuilder.BuildVertices(algor, new Vector2(ub, ue), edgeSegment, vertices);
         }
       });
       holes.push(new THREE.Path(holePoints));
@@ -491,17 +547,6 @@ class BrepMeshBuilder {
         }
       }
       let lineIndex = 0;
-      let vertices = new Array<number>;
-      for (let i = 0; i < points.length; i++) {
-        let p = points[i];
-        vertices.push(p.x);
-        vertices.push(p.y);
-        vertices.push(0);
-      }
-      let p = points[0];
-      vertices.push(p.x);
-      vertices.push(p.y);
-      vertices.push(0);
       let borderbuff = new THREE.BufferGeometry()
       borderbuff.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
       const materialline = new THREE.MeshBasicMaterial({ color: color });
@@ -515,31 +560,6 @@ class BrepMeshBuilder {
         borderMesh.frustumCulled = false;
         ret.children.push(borderMesh);
       }
-
-      holes.forEach(hole => {
-        let holeVertices = new Array<number>;
-        let holePoints = hole.getPoints();
-        holePoints.forEach(p => {
-          holeVertices.push(p.x);
-          holeVertices.push(p.y);
-          holeVertices.push(0);
-        });
-        let p = holePoints[0];
-        holeVertices.push(p.x);
-        holeVertices.push(p.y);
-        holeVertices.push(0);
-        let holeBuff = new THREE.BufferGeometry()
-        holeBuff.setAttribute('position', new THREE.Float32BufferAttribute(holeVertices, 3));
-        if (lineIndex < lines.length) {
-          let holeMesh = lines[lineIndex];
-          holeMesh.geometry = holeBuff;
-          holeMesh.frustumCulled = false;
-        } else {
-          let holeMesh = new THREE.Line(holeBuff, materialline);
-          holeMesh.frustumCulled = false;
-          ret.children.push(holeMesh);
-        }
-      });
     }
     return ret;
   }
@@ -552,6 +572,7 @@ class BrepMeshBuilder {
   static BuildFace2sMesh(faces: Face2[], color: number, segment?: number, drawOutLine: boolean = true, mesh: THREE.Mesh = null): THREE.Mesh {
     let pointss = new Array<Array<THREE.Vector2>>();
     let holess = new Array<Array<THREE.Path>>();
+    let vertices = new Array<number>;
     let shapes: THREE.Shape[] = [];
     for (let i = 0; i < faces.length; i++) {
       let points = new Array<THREE.Vector2>();
@@ -560,13 +581,10 @@ class BrepMeshBuilder {
       face.border.coedges.forEach(coedge => {
         let edge = coedge.e;
         let curve = edge.curve;
-        // if (curve == null) {
-        //   curve = face.curves[edge.curvei];
-        // }
         let edgeSegment = segment;
         if (edgeSegment == undefined) {
           if (curve instanceof Line2Data) {
-            edgeSegment = 1;
+            edgeSegment = Global.isShowCoedgeDirection ? 2 : 1;
           } else {
             edgeSegment = Math.ceil(MathUtils.clamp(Brep2Builder.Length(curve, edge.u, 1, 512), 64, 512));
           }
@@ -584,19 +602,19 @@ class BrepMeshBuilder {
           let p = algor.p(u);
           points.push(new THREE.Vector2(p.x, p.y));
         }
+        if (drawOutLine) {
+          BrepMeshBuilder.BuildVertices(algor, new Vector2(ub, ue), edgeSegment, vertices);
+        }
       });
       face.holes.forEach(hole => {
         let holePoints = new Array<THREE.Vector2>();
         hole.coedges.forEach(coedge => {
           let edge = coedge.e;
           let curve = edge.curve;
-          // if (curve == null) {
-          //   curve = face.curves[edge.curvei];
-          // }
           let edgeSegment = segment;
           if (edgeSegment == undefined) {
             if (curve instanceof Line2Data) {
-              edgeSegment = 1;
+              edgeSegment = Global.isShowCoedgeDirection ? 2 : 1;
             } else {
               edgeSegment = Math.ceil(MathUtils.clamp(Brep2Builder.Length(curve, edge.u, 1, 512), 64, 512));
             }
@@ -612,6 +630,9 @@ class BrepMeshBuilder {
           for (let u = ub, i = 0; i <= edgeSegment; u += step, i++) {
             let p = algor.p(u);
             holePoints.push(new THREE.Vector2(p.x, p.y));
+          }
+          if (drawOutLine) {
+            BrepMeshBuilder.BuildVertices(algor, new Vector2(ub, ue), edgeSegment, vertices);
           }
         });
         holes.push(new THREE.Path(holePoints));
@@ -644,59 +665,19 @@ class BrepMeshBuilder {
         }
       }
       let lineIndex = 0;
-      for (let i = 0; i < faces.length; i++) {
-        let points = pointss[i];
-        let holes = holess[i];
-        let vertices = new Array<number>;
-        for (let j = 0; j < points.length; j++) {
-          let p = points[j];
-          vertices.push(p.x);
-          vertices.push(p.y);
-          vertices.push(0);
-        }
-        let p = points[0];
-        vertices.push(p.x);
-        vertices.push(p.y);
-        vertices.push(0);
-        let borderbuff = new THREE.BufferGeometry()
-        borderbuff.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-        const materialline = new THREE.MeshBasicMaterial({ color: color });
-        if (lineIndex < lines.length) {
-          let borderMesh = lines[lineIndex];
-          borderMesh.geometry = borderbuff;
-          borderMesh.frustumCulled = false;
-          lineIndex++;
-        } else {
-          let borderMesh = new THREE.Line(borderbuff, materialline);
-          borderMesh.frustumCulled = false;
-          ret.children.push(borderMesh);
-        }
-        holes.forEach(hole => {
-          let holeVertices = new Array<number>;
-          let holePoints = hole.getPoints();
-          holePoints.forEach(p => {
-            holeVertices.push(p.x);
-            holeVertices.push(p.y);
-            holeVertices.push(0);
-          });
-          let p = holePoints[0];
-          holeVertices.push(p.x);
-          holeVertices.push(p.y);
-          holeVertices.push(0);
-          let holeBuff = new THREE.BufferGeometry()
-          holeBuff.setAttribute('position', new THREE.Float32BufferAttribute(holeVertices, 3));
-          if (lineIndex < lines.length) {
-            let holeMesh = lines[lineIndex];
-            holeMesh.geometry = holeBuff;
-            holeMesh.frustumCulled = false;
-          } else {
-            let holeMesh = new THREE.Line(holeBuff, materialline);
-            holeMesh.frustumCulled = false;
-            ret.children.push(holeMesh);
-          }
-        });
+      let borderbuff = new THREE.BufferGeometry()
+      borderbuff.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+      const materialline = new THREE.MeshBasicMaterial({ color: color });
+      if (lineIndex < lines.length) {
+        let borderMesh = lines[lineIndex];
+        borderMesh.geometry = borderbuff;
+        borderMesh.frustumCulled = false;
+        lineIndex++;
+      } else {
+        let borderMesh = new THREE.Line(borderbuff, materialline);
+        borderMesh.frustumCulled = false;
+        ret.children.push(borderMesh);
       }
-
     }
     return ret;
   }

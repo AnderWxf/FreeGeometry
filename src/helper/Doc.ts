@@ -65,7 +65,7 @@ function ImportJson(json: string): THREE.Object3D[] {
         results.push(geo);
       }
       if (original instanceof Face2) {
-        let geo = BrepMeshBuilder.BuildFace2Mesh(original, userData.color, null, null);
+        let geo = BrepMeshBuilder.BuildFace2Mesh(original, userData.color, null, true);
         userData.original = original;
         geo.userData = userData;
         for (let j = 0; j < userData.assistPoints.length; j++) {
@@ -90,7 +90,7 @@ function ImportJson(json: string): THREE.Object3D[] {
         results.push(geo);
       }
       if (originals[0] instanceof Face2) {
-        let geo = BrepMeshBuilder.BuildFace2sMesh(originals as Face2[], userData.color, null, null);
+        let geo = BrepMeshBuilder.BuildFace2sMesh(originals as Face2[], userData.color, null, true);
         userData.original = originals;
         geo.userData = userData;
         for (let j = 0; j < userData.assistPoints.length; j++) {

@@ -151,7 +151,15 @@ const ComOptionBar: React.FC = () => (
         Global.comExector.isRecord = e.target.checked;
       }}
     >录制</Checkbox>
-    <div id='states' style={{ width: 300, position: 'fixed', fontSize: 14, top: 10, right: 360, color: '#00AA00', zIndex: 1000 }}> 光标位置 </div>
+    <Checkbox
+      style={{ width: 80, position: 'fixed', top: 10, right: 360, zIndex: 1000 }}
+      defaultChecked={Global.comExector.isRecord}
+      onChange={(e) => {
+        Global.isShowCoedgeDirection = e.target.checked;
+        Global.scene.reflush();
+      }}
+    >方向</Checkbox>
+    <div id='states' style={{ width: 300, position: 'fixed', fontSize: 14, top: 10, right: 460, color: '#00AA00', zIndex: 1000 }}> 光标位置 </div>
     {/* <Checkbox
       style={{ width: 100, position: 'fixed', top: 10, right: 300, zIndex: 1000 }}
       onChange={(e) => {
