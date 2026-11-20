@@ -1,6 +1,6 @@
 import { GeomType } from "../../../../core/Constents";
 import { Global } from "../../../../core/Global";
-import { Face2 } from "../../../../geometry/data/brep/Brep2";
+import { Digraph2, Face2 } from "../../../../geometry/data/brep/Brep2";
 import { BrepMeshBuilder } from "../../../BrepMeshBuilder";
 import { CreateGeomUserData, type UserData } from "../../../UserData";
 import { ActionContext3D } from "../../Active";
@@ -8,6 +8,7 @@ import { ActPickObjects } from "../../acts/ActPickObjects";
 import type { CommandExecuter } from "../../CommandExecuter";
 import * as THREE from "three";
 import { BoolCom } from "./BoolCom";
+import type { Digraph2Algo } from "../../../../geometry/algorithm/brep/Brep2Algo";
 
 /**
  * Bool command class.
@@ -101,6 +102,12 @@ class Bool2Com extends BoolCom {
         this.cancel();
         return;
       }
+      if (0) {
+        let digraph = this.executeDigraph2();
+        let digraphgeo = BrepMeshBuilder.BuildDigraph2Mesh(digraph, THREE.Color.NAMES.blue);
+        if (digraphgeo) Global.scene.add(digraphgeo);
+      }
+
       let faces: Face2[] = this.execute();
       if (n1) {
         for (let i = 0; i < faces.length; i++) {
@@ -136,5 +143,11 @@ class Bool2Com extends BoolCom {
   execute(): Face2[] {
     return [];
   }
+
+  // 测试用，执行到有向图后，构件面之前终止，并返回。
+  executeDigraph2(): Digraph2Algo {
+    return null;
+  }
+
 }
 export { Bool2Com };

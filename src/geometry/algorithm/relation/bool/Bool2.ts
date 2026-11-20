@@ -291,6 +291,99 @@ class Bool2 {
       return result;
     }
   }
+  static UnionsGraph(a: Face2[], b: Face2[], tol0: number, tol1: number): Digraph2Algo {
+    let algorigin = new Face2Algos(a);
+    let blgorigin = new Face2Algos(b);
+    let a_: Face2[] = [];
+    let b_: Face2[] = [];
+    for (let i = 0; i < a.length; i++) {
+      a_.push(a[i].clone());
+    }
+    for (let i = 0; i < b.length; i++) {
+      b_.push(b[i].clone());
+    }
+    // 计算面与面的轮廓交点
+    let algo = new Face2Algos(a_);
+    let blgo = new Face2Algos(b_);
+    let inters = Brep2Inter.FaceXFace(algo, blgo, tol0, tol1);
+    if (inters.length == 0) {
+      // 剔除相互包含的部分
+      let afsa = algo.fsa;
+      let afs = algo.fs;
+      for (let i = afsa.length - 1; i > -1; i--) {
+        let pa = afsa[i].getInnerPoint();
+        // a在b内
+        if (blgorigin.isPointAtInner(pa, tol0, tol1)) {
+          afsa.slice(i, 1);
+          afs.slice(i, 1);
+        }
+      }
+      let bfsa = blgo.fsa;
+      let bfs = blgo.fs;
+      for (let i = bfsa.length - 1; i > -1; i--) {
+        let pb = bfsa[i].getInnerPoint();
+        // b在a内
+        if (algorigin.isPointAtInner(pb, tol0, tol1)) {
+          bfsa.slice(i, 1);
+          bfs.slice(i, 1);
+        }
+      }
+      // 合并结果
+      let result: Face2[] = [];
+      result.push(...afs);
+      result.push(...bfs);
+      result.sort((fa, fb) => {
+        if (fa.uuid < fb.uuid) {
+          return -1;
+        }
+        if (fa.uuid > fb.uuid) {
+          return 1;
+        }
+        return 0;
+      });
+      return null;
+    }
+    if (inters.length) {
+      // 根据轮廓交点对面轮廓进行切割
+      Bool2.Cutting(algo.loops, blgo.loops, inters, tol0, tol1);
+    }
+    let isChanged = false;
+    // 删除a中在b的原始形状内部的边。
+    algo.loops.forEach((loop) => {
+      let count = loop.coedges.length;
+      for (let i = count - 1; i > -1; i--) {
+        let coedge = loop.coedges[i];
+        let u = coedge.u;
+        let mp = coedge.p((u.x + u.y) * 0.5);
+        if (blgorigin.isPointAtInner(mp, tol0, tol1)) {
+          loop.coedges.splice(i, 1);
+          isChanged = true;
+        }
+      }
+    });
+    // 删除b中在a的原始形状内部的边。
+    blgo.loops.forEach((loop) => {
+      let count = loop.coedges.length;
+      for (let i = count - 1; i > -1; i--) {
+        let coedge = loop.coedges[i];
+        let u = coedge.u;
+        let mp = coedge.p((u.x + u.y) * 0.5);
+        if (algorigin.isPointAtInner(mp, tol0, tol1)) {
+          loop.coedges.splice(i, 1);
+          isChanged = true;
+        }
+      }
+    });
+    // 面重构
+    // 构建全新的有向图
+    let galgo = new Digraph2Algo(new Digraph2());
+    let loops: Loop2Algo[] = [];
+    loops.push(...algo.loops);
+    loops.push(...blgo.loops);
+    galgo.addLoops(loops, tol0);
+
+    return galgo;
+  }
 
   /*
   * 一对一布尔运算，差。
@@ -459,6 +552,7 @@ class Bool2 {
     loops.push(...algo.loops);
     loops.push(...blgo.loops);
     galgo.addLoops(loops, tol0);
+
     if (galgo.removeZeroAreaEdges(tol0)) {
       isChanged = true;
     }
@@ -556,6 +650,7 @@ class Bool2 {
     loops.push(...algo.loops);
     loops.push(...blgo.loops);
     galgo.addLoops(loops, tol0);
+
     if (galgo.removeZeroAreaEdges(tol0)) {
       isChanged = true;
     }
@@ -580,18 +675,93 @@ class Bool2 {
   }
 
   /*
+* 一对一布尔运算，并。
+* a,b都是单面片，返回单面片组。
+*/
+  static UnionGraph(a: Face2, b: Face2, tol0: number, tol1: number): Digraph2Algo {
+    let algorigin = new Face2Algo(a);
+    let blgorigin = new Face2Algo(b);
+    let a_ = a.clone();
+    let b_ = b.clone();
+    // 计算面与面的轮廓交点
+    let algo = new Face2Algo(a_);
+    let blgo = new Face2Algo(b_);
+    let inters = Brep2Inter.FaceXFace(algo, blgo, tol0, tol1);
+    if (inters.length == 0 /*&& a_.holes.length == 0 && b_.holes.length == 0*/) {
+      let pa = algo.getInnerPoint();
+      let pb = blgo.getInnerPoint();
+      // a在b内
+      if (blgo.isPointAtInner(pa, tol0, tol1)) {
+        return null;
+      }
+      // b在a内
+      else if (algo.isPointAtInner(pb, tol0, tol1)) {
+        return null;
+      } else {
+        // a,b相离
+        let result = [a_, b_];
+        result.sort((fa, fb) => {
+          if (fa.uuid < fb.uuid) {
+            return -1;
+          }
+          if (fa.uuid > fb.uuid) {
+            return 1;
+          }
+          return 0;
+        });
+        return null;
+      }
+    }
+    // 根据轮廓交点对面轮廓进行切割
+    Bool2.Cutting(algo.loops, blgo.loops, inters, tol0, tol1);
+    let isChanged = false;
+    // 删除a中在b的原始形状内部的边。
+    algo.loops.forEach((loop) => {
+      let count = loop.coedges.length;
+      for (let i = count - 1; i > -1; i--) {
+        let coedge = loop.coedges[i];
+        let u = coedge.u;
+        let mp = coedge.p((u.x + u.y) * 0.5);
+        if (blgorigin.isPointAtInner(mp, tol0, tol1)) {
+          loop.coedges.splice(i, 1);
+          isChanged = true;
+        }
+      }
+    });
+    // 删除b中在a的原始形状内部的边。
+    blgo.loops.forEach((loop) => {
+      let count = loop.coedges.length;
+      for (let i = count - 1; i > -1; i--) {
+        let coedge = loop.coedges[i];
+        let u = coedge.u;
+        let mp = coedge.p((u.x + u.y) * 0.5);
+        if (algorigin.isPointAtInner(mp, tol0, tol1)) {
+          loop.coedges.splice(i, 1);
+          isChanged = true;
+        }
+      }
+    });
+
+    // 构建全新的有向图
+    let galgo = new Digraph2Algo(new Digraph2());
+    let loops: Loop2Algo[] = [];
+    loops.push(...algo.loops);
+    loops.push(...blgo.loops);
+    galgo.addLoops(loops, tol0);
+    return galgo;
+  }
+
+  /*
   * 根据交点对面的边进行切割。
   * 
   */
   static Cutting(a: Loop2Algo[], b: Loop2Algo[], inters: Array<InterOfFace2>, tol0: number, tol1: number) {
-
     for (let k = 0; k < a.length; k++) {
       let loopAlgo = a[k];
       for (let l = loopAlgo.coedges.length - 1; l > -1; l--) {
         let coedgeAlgo = loopAlgo.coedges[l];
         let cuts: Array<InterOfCurve2> = [];
         // 寻找边上的所有分割点
-
         for (let i = 0; i < inters.length; i++) {
           let inter = inters[i];
           let c0 = inter.c0;
@@ -600,7 +770,7 @@ class Bool2 {
             let ip = is[j];
             if (coedgeAlgo.curve.dat.uuid == c0.uuid) {
               if (coedgeAlgo.curve.dat instanceof Arc2Data) {
-                if (!coedgeAlgo.isOnUBoder(ip.u0, tol1) && coedgeAlgo.isInURangePeriod(ip.u0, PI2, tol1)) {
+                if (coedgeAlgo.isOnUBoder(ip.u0, tol1) || coedgeAlgo.isInURangePeriod(ip.u0, PI2, tol1)) {
                   cuts.push(ip);
                 }
               } else {
@@ -608,7 +778,6 @@ class Bool2 {
                   cuts.push(ip);
                 }
               }
-              cuts.push();
             }
           }
         }
@@ -668,7 +837,7 @@ class Bool2 {
             let ip = is[j];
             if (coedgeAlgo.curve.dat.uuid == c1.uuid) {
               if (coedgeAlgo.curve.dat instanceof Arc2Data) {
-                if (!coedgeAlgo.isOnUBoder(ip.u1, tol1) && coedgeAlgo.isInURangePeriod(ip.u1, PI2, tol1)) {
+                if (coedgeAlgo.isOnUBoder(ip.u1, tol1) || coedgeAlgo.isInURangePeriod(ip.u1, PI2, tol1)) {
                   cuts.push(ip);
                 }
               } else {
@@ -676,7 +845,6 @@ class Bool2 {
                   cuts.push(ip);
                 }
               }
-              cuts.push();
             }
           }
         }

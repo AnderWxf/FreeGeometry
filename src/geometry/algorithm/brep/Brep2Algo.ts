@@ -1053,6 +1053,9 @@ class Digraph2Algo {
     }
     this.reflush();
   }
+  get coedges(): Coedge2Algo[] {
+    return this._algos;
+  }
   // reflush ins and outs of Coedge2Algo;
   reflush() {
     let g = this._g;
@@ -1262,6 +1265,9 @@ class Digraph2Algo {
   addLoops(loops: Loop2Algo[], tol0: number) {
     loops.forEach((l: Loop2Algo) => {
       l.coedges.forEach((coedge: Coedge2Algo) => {
+        if (coedge.c.e.u.x == coedge.c.e.u.y) {
+          return;
+        }
         this._algos.push(coedge);
         let v0p = coedge.getBeginPoint();
         let v0 = this.findVerticeByPoint(v0p, tol0);

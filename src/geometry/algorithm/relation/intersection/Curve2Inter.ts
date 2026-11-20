@@ -180,9 +180,9 @@ class Curve2Inter {
     // A1x² + B1xy + C1y² + D1x + E1y + F1 = 0 (2)
     let { A: A1, B: B1, C: C1, D: D1, E: E1, F: F1 } = c1;
 
-    console.log('=== LineXConic 调试 ===');
-    console.log('直线:', `A0=${A0.toNumber()}, B0=${B0.toNumber()}, C0=${C0.toNumber()}`);
-    console.log('二次曲线:', `A1=${A1.toNumber()}, B1=${B1.toNumber()}, C1=${C1.toNumber()}, D1=${D1.toNumber()}, E1=${E1.toNumber()}, F1=${F1.toNumber()}`);
+    //  console.log('=== LineXConic 调试 ===');
+    //  console.log('直线:', `A0=${A0.toNumber()}, B0=${B0.toNumber()}, C0=${C0.toNumber()}`);
+    //  console.log('二次曲线:', `A1=${A1.toNumber()}, B1=${B1.toNumber()}, C1=${C1.toNumber()}, D1=${D1.toNumber()}, E1=${E1.toNumber()}, F1=${F1.toNumber()}`);
 
     const ZERO = big(0);
     // 求解方程组
@@ -211,9 +211,9 @@ class Curve2Inter {
         mul(F1, B0, B0)
       ) as BigNumber;
 
-      console.log('二次方程系数:', `A=${A.toNumber()}, B=${B.toNumber()}, C=${C.toNumber()}`);
+      //  console.log('二次方程系数:', `A=${A.toNumber()}, B=${B.toNumber()}, C=${C.toNumber()}`);
       let xs = SolveEquation.SolveQuadraticEquation(A, B, C);
-      console.log(`解出的 x : ${xs}`);
+      //  console.log(`解出的 x : ${xs}`);
       for (let i = 0; i < xs.length; i++) {
         let xi = xs[i];
         let x: BigNumber;
@@ -251,9 +251,9 @@ class Curve2Inter {
         mul(A1, x, x),
         mul(D1, x),
         F1) as BigNumber;
-      console.log('二次方程系数:', `A=${A.toNumber()}, B=${B.toNumber()}, C=${C.toNumber()}`);
+      //  console.log('二次方程系数:', `A=${A.toNumber()}, B=${B.toNumber()}, C=${C.toNumber()}`);
       let ys = SolveEquation.SolveQuadraticEquation(A, B, C);
-      console.log(`解出的 y : ${ys}`);
+      //  console.log(`解出的 y : ${ys}`);
       for (let i = 0; i < ys.length; i++) {
         let yi = ys[i];
         let y: BigNumber;
@@ -288,9 +288,9 @@ class Curve2Inter {
         mul(C1, y, y),
         mul(E1, y),
         F1) as BigNumber;
-      console.log('二次方程系数:', `A=${A.toNumber()}, B=${B.toNumber()}, C=${C.toNumber()}`);
+      //  console.log('二次方程系数:', `A=${A.toNumber()}, B=${B.toNumber()}, C=${C.toNumber()}`);
       let xs = SolveEquation.SolveQuadraticEquation(A, B, C);
-      console.log(`解出的 x : ${xs}`);
+      //  console.log(`解出的 x : ${xs}`);
       for (let i = 0; i < xs.length; i++) {
         let xi = xs[i];
         let x: BigNumber;
@@ -502,8 +502,8 @@ class Curve2Inter {
     // 1. 构造对称矩阵 ( A1, A2 ) 表示两条二次曲线。
     let a_1 = c0.A, b_1 = c0.B, c_1 = c0.C, d_1 = c0.D, e_1 = c0.E, f_1 = c0.F;
     let a_2 = c1.A, b_2 = c1.B, c_2 = c1.C, d_2 = c1.D, e_2 = c1.E, f_2 = c1.F;
-    console.log(`曲线参数 c0 a_1:${a_1.toNumber()}, b_1:${b_1.toNumber()}, c_1:${c_1.toNumber()}, d_1:${d_1.toNumber()}, e_1:${e_1.toNumber()}, f_1:${f_1.toNumber()}`);
-    console.log(`曲线参数 c1 a_2:${a_2.toNumber()}, b_2:${b_2.toNumber()}, c_2:${c_2.toNumber()}, d_2:${d_2.toNumber()}, e_2:${e_2.toNumber()}, f_2:${f_2.toNumber()}`);
+    //  console.log(`曲线参数 c0 a_1:${a_1.toNumber()}, b_1:${b_1.toNumber()}, c_1:${c_1.toNumber()}, d_1:${d_1.toNumber()}, e_1:${e_1.toNumber()}, f_1:${f_1.toNumber()}`);
+    //  console.log(`曲线参数 c1 a_2:${a_2.toNumber()}, b_2:${b_2.toNumber()}, c_2:${c_2.toNumber()}, d_2:${d_2.toNumber()}, e_2:${e_2.toNumber()}, f_2:${f_2.toNumber()}`);
     // 计算中间变量
     // const ΔD = a_1 * c_2 - a_2 * c_1;
     // const ΔE = a_1 * e_2 - a_2 * e_1;
@@ -539,12 +539,12 @@ class Curve2Inter {
     const R0 = sub(mul(ΔF, ΔF), mul(βE, δF)) as BigNumber;
 
     // 解四次方程
-    console.log(`四次方程 R4 y^4 + R3 y^3 + R2 y^2 + R1 y + R0 => R4:${R4.toNumber()}, R3:${R3.toNumber()}, R2:${R2.toNumber()}, R1:${R1.toNumber()}, R0:${R0.toNumber()}`);
+    //  console.log(`四次方程 R4 y^4 + R3 y^3 + R2 y^2 + R1 y + R0 => R4:${R4.toNumber()}, R3:${R3.toNumber()}, R2:${R2.toNumber()}, R1:${R1.toNumber()}, R0:${R0.toNumber()}`);
     let begin = new Date();
     const Rs = SolveEquation.SolveQuarticNumberical(R4, R3, R2, R1, R0, big(tol1 * 0.01));
-    console.log(`四次方程根 Rs: ${Rs[0]}, ${Rs[1]}, ${Rs[2]}, ${Rs[3]}`);
+    //  console.log(`四次方程根 Rs: ${Rs[0]}, ${Rs[1]}, ${Rs[2]}, ${Rs[3]}`);
     let end0 = new Date();
-    console.log(`Time Rs: ${end0.getTime() - begin.getTime()}`);
+    //  console.log(`Time Rs: ${end0.getTime() - begin.getTime()}`);
     // const Rs1 = SolveEquation.SolveQuarticNerdamer(R4, R3, R2, R1, R0);
     // let end1 = new Date();
     // console.log(`四次方程根 Rs1: ${Rs1[0]}, ${Rs1[1]}, ${Rs1[2]}, ${Rs1[3]}`);
@@ -576,9 +576,9 @@ class Curve2Inter {
       const A1 = a_1;
       const B1 = add(mul(b_1, y), d_1) as BigNumber;
       const C1 = add(mul(c_1, y, y), mul(e_1, y), f_1) as BigNumber;
-      console.log(`二次方程 A1*x² + B1*x + C1 = 0 => A1:${A1.toNumber()}, B1:${B1.toNumber()}, C1:${C1.toNumber()}`);
+      //  console.log(`二次方程 A1*x² + B1*x + C1 = 0 => A1:${A1.toNumber()}, B1:${B1.toNumber()}, C1:${C1.toNumber()}`);
       const Xs1 = SolveEquation.SolveQuadraticEquation(A1, B1, C1);
-      console.log(`二次方程根 Xs1: ${Xs1[0]}, ${Xs1[1]}`);
+      //  console.log(`二次方程根 Xs1: ${Xs1[0]}, ${Xs1[1]}`);
       let inters = new Array<InterOfCurve2>();
       let intersX1 = new Array<Vector2>();
       let intersX2 = new Array<Vector2>();
@@ -607,9 +607,9 @@ class Curve2Inter {
       const A2 = a_2;
       const B2 = add(mul(b_2, y), d_2) as BigNumber;
       const C2 = add(mul(c_2, y, y), mul(e_2, y), f_2) as BigNumber;
-      console.log(`二次方程 A2*x² + B2*x + C2 = 0 => A2:${A2.toNumber()}, B2:${B1.toNumber()}, C2:${C2.toNumber()}`);
+      //  console.log(`二次方程 A2*x² + B2*x + C2 = 0 => A2:${A2.toNumber()}, B2:${B1.toNumber()}, C2:${C2.toNumber()}`);
       const Xs2 = SolveEquation.SolveQuadraticEquation(A2, B2, C2);
-      console.log(`二次方程根 Xs2: ${Xs2[0]}, ${Xs2[1]}`);
+      //  console.log(`二次方程根 Xs2: ${Xs2[0]}, ${Xs2[1]}`);
       for (let j = 0; j < Xs2.length; j++) {
         let x: BigNumber = null;
         let X = Xs2[j];
@@ -653,9 +653,9 @@ class Curve2Inter {
         let p2 = intersX2[j];
         inters.push({ p: p2, u0: null, u1: null });
       }
-      console.log(`结式多项式计算的未验证交点 :`);
+      //  console.log(`结式多项式计算的未验证交点 :`);
       for (let j = 0; j < inters.length; j++) {
-        console.log(`Point${j} , x:${inters[j].p.x} ,y:${inters[j].p.y} , u0:${inters[j].u0},u1:${inters[j].u1}`);
+        //  console.log(`Point${j} , x:${inters[j].p.x} ,y:${inters[j].p.y} , u0:${inters[j].u0},u1:${inters[j].u1}`);
       }
       checkAndPush(inters);
       if (ret.length >= n) {
@@ -663,9 +663,9 @@ class Curve2Inter {
       }
     }
 
-    console.log(`结式多项式计算的已验证交点 :`);
+    //  console.log(`结式多项式计算的已验证交点 :`);
     for (let i = 0; i < ret.length; i++) {
-      console.log(`Point${i} , x:${ret[i].p.x} ,y:${ret[i].p.y} , u0:${ret[i].u0},u1:${ret[i].u1}`);
+      //  console.log(`Point${i} , x:${ret[i].p.x} ,y:${ret[i].p.y} , u0:${ret[i].u0},u1:${ret[i].u1}`);
     }
     return ret;
   }
@@ -808,13 +808,13 @@ class Curve2Inter {
     // const C1 = div(C_1, C_3) as BigNumber;
     // const C0 = div(C_0, C_3) as BigNumber;
 
-    console.log(`曲线c0参数：a_1:${a_1.toNumber()}, b_1:${b_1.toNumber()}, c_1:${c_1.toNumber()}, d_1:${d_1.toNumber()}, e_1:${e_1.toNumber()}, f_1:${f_1.toNumber()}`);
-    console.log(`曲线c1参数：a_2:${a_2.toNumber()}, b_2:${b_2.toNumber()}, c_2:${c_2.toNumber()}, d_2:${d_2.toNumber()}, e_2:${e_2.toNumber()}, f_2:${f_2.toNumber()}`);
+    //  console.log(`曲线c0参数：a_1:${a_1.toNumber()}, b_1:${b_1.toNumber()}, c_1:${c_1.toNumber()}, d_1:${d_1.toNumber()}, e_1:${e_1.toNumber()}, f_1:${f_1.toNumber()}`);
+    //  console.log(`曲线c1参数：a_2:${a_2.toNumber()}, b_2:${b_2.toNumber()}, c_2:${c_2.toNumber()}, d_2:${d_2.toNumber()}, e_2:${e_2.toNumber()}, f_2:${f_2.toNumber()}`);
 
     //3. 对每个 λ 构造 ( B = A1 + λ A2 )。
-    console.log(`C_3 λ^3 + C_2 λ^2 + C_1 λ + C_0=> C_3:${C_3.toNumber()}, C_2:${C_2.toNumber()}, C_1:${C_1.toNumber()}, C_0:${C_0.toNumber()}`);
+    //  console.log(`C_3 λ^3 + C_2 λ^2 + C_1 λ + C_0=> C_3:${C_3.toNumber()}, C_2:${C_2.toNumber()}, C_1:${C_1.toNumber()}, C_0:${C_0.toNumber()}`);
     const λs = SolveEquation.SolveCubicNumberical(C_3, C_2, C_1, C_0);
-    console.log(`特征值 λs: ${λs[0]}, ${λs[1]}, ${λs[2]}`);
+    //  console.log(`特征值 λs: ${λs[0]}, ${λs[1]}, ${λs[2]}`);
     for (let i = 0; i < λs.length; i++) {
       if (ret.length >= n) {
         break;
@@ -868,8 +868,8 @@ class Curve2Inter {
         rank += MATHJS.abs(λ1).toNumber() > tol0 ? 1 : 0;
         rank += MATHJS.abs(λ2).toNumber() > tol0 ? 1 : 0;
 
-        console.log(`特征值 λ0 λ1 λ2: ${λ0.toNumber()}, ${λ1.toNumber()}, ${λ2.toNumber()}`);
-        console.log(`矩阵的秩 rank: ${rank}`);
+        //  console.log(`特征值 λ0 λ1 λ2: ${λ0.toNumber()}, ${λ1.toNumber()}, ${λ2.toNumber()}`);
+        //  console.log(`矩阵的秩 rank: ${rank}`);
 
         // // 🔥 检查是否为零特征值（用于零空间向量法）
         // const zeroIdx = eigenvectors.reduce((min, ev, idx) => {
@@ -883,7 +883,7 @@ class Curve2Inter {
         // if (MATHJS.abs(W).toNumber() > 1e-10) {
         //   const x = div(nullVec[0], W) as BigNumber;
         //   const y = div(nullVec[1], W) as BigNumber;
-        //   console.log(`零空间交点: (${x}, ${y})`);
+        //   //  console.log(`零空间交点: (${x}, ${y})`);
 
         //   let inters = new Array<InterOfCurve2>();
         //   inters.push({ p: new Vector2(x.toNumber(), y.toNumber()), u0: 0, u1: 0 });
@@ -895,9 +895,9 @@ class Curve2Inter {
         let u = eigenvectors[0].vector as Array<BigNumber>;
         let v = eigenvectors[1].vector as Array<BigNumber>;
         let w = eigenvectors[1].vector as Array<BigNumber>;
-        console.log(`特征值向量 v0: ${u}`);
-        console.log(`特征值向量 v1: ${v}`);
-        console.log(`特征值向量 v2: ${w}`);
+        //  console.log(`特征值向量 v0: ${u}`);
+        //  console.log(`特征值向量 v1: ${v}`);
+        //  console.log(`特征值向量 v2: ${w}`);
 
         // 虚数特征值跳过
         if (MATHJS.typeOf(λ0) === 'Complex' || MATHJS.typeOf(λ1) === 'Complex') {
@@ -917,39 +917,39 @@ class Curve2Inter {
           let l1 = sub(p, q) as BigNumber[];
 
           // 5. 每条直线与原二次曲线之一求交（解二次方程），得到候选交点。
-          console.log(`l0: ${l0[0].toNumber()} ${l0[1].toNumber()} ${l0[2].toNumber()}`);
+          //  console.log(`l0: ${l0[0].toNumber()} ${l0[1].toNumber()} ${l0[2].toNumber()}`);
           let l = l0;
           let inters = Curve2Inter.LineXConic({ A: l[0], B: l[1], C: l[2] }, c0, null, c0a, tol0, tol1, 2);
-          console.log(`inters.length : ${inters.length}`);
-          if (inters.length > 0) console.log(`inters: ${inters[0].p.x} ${inters[0].p.y}`);
-          if (inters.length > 1) console.log(`inters: ${inters[1].p.x} ${inters[1].p.y}`);
-          checkAndPush(inters);
+          //  console.log(`inters.length : ${inters.length}`);
+          if (inters.length > 0) //  console.log(`inters: ${inters[0].p.x} ${inters[0].p.y}`);
+            if (inters.length > 1) //  console.log(`inters: ${inters[1].p.x} ${inters[1].p.y}`);
+              checkAndPush(inters);
           if (ret.length >= n) {
             break;
           }
           inters = Curve2Inter.LineXConic({ A: l[0], B: l[1], C: l[2] }, c1, null, c1a, tol0, tol1, 2);
-          console.log(`inters.length : ${inters.length}`);
-          if (inters.length > 0) console.log(`inters: ${inters[0].p.x} ${inters[0].p.y}`);
-          if (inters.length > 1) console.log(`inters: ${inters[1].p.x} ${inters[1].p.y}`);
-          checkAndPush(inters);
+          //  console.log(`inters.length : ${inters.length}`);
+          if (inters.length > 0) //  console.log(`inters: ${inters[0].p.x} ${inters[0].p.y}`);
+            if (inters.length > 1) //  console.log(`inters: ${inters[1].p.x} ${inters[1].p.y}`);
+              checkAndPush(inters);
           if (ret.length >= n) {
             break;
           }
-          console.log(`l1: ${l1[0].toNumber()} ${l1[1].toNumber()} {${l1[2].toNumber()}`);
+          //  console.log(`l1: ${l1[0].toNumber()} ${l1[1].toNumber()} {${l1[2].toNumber()}`);
           l = l1;
           inters = Curve2Inter.LineXConic({ A: l[0], B: l[1], C: l[2] }, c0, null, c0a, tol0, tol1, 2);
-          console.log(`inters.length : ${inters.length}`);
-          if (inters.length > 0) console.log(`inters: ${inters[0].p.x} ${inters[0].p.y}`);
-          if (inters.length > 1) console.log(`inters: ${inters[1].p.x} ${inters[1].p.y}`);
-          checkAndPush(inters);
+          //  console.log(`inters.length : ${inters.length}`);
+          if (inters.length > 0) //  console.log(`inters: ${inters[0].p.x} ${inters[0].p.y}`);
+            if (inters.length > 1) //  console.log(`inters: ${inters[1].p.x} ${inters[1].p.y}`);
+              checkAndPush(inters);
           if (ret.length >= n) {
             break;
           }
           inters = Curve2Inter.LineXConic({ A: l[0], B: l[1], C: l[2] }, c1, null, c1a, tol0, tol1, 2);
-          console.log(`inters.length : ${inters.length}`);
-          if (inters.length > 0) console.log(`inters: ${inters[0].p.x} ${inters[0].p.y}`);
-          if (inters.length > 1) console.log(`inters: ${inters[1].p.x} ${inters[1].p.y}`);
-          checkAndPush(inters);
+          //  console.log(`inters.length : ${inters.length}`);
+          if (inters.length > 0) //  console.log(`inters: ${inters[0].p.x} ${inters[0].p.y}`);
+            if (inters.length > 1) //  console.log(`inters: ${inters[1].p.x} ${inters[1].p.y}`);
+              checkAndPush(inters);
           if (ret.length >= n) {
             break;
           }
@@ -1179,7 +1179,7 @@ class Curve2Inter {
     if (times > 100) {
       console.warn("times :" + times);
     } else {
-      console.log("times :" + times);
+      //  console.log("times :" + times);
     }
     // 数量超出理论上限，曲线是重合的
     if (n != -1 && ret.length > n) {

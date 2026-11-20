@@ -76,7 +76,7 @@ class SolveEquation {
     let a = div(b_, a_) as BigNumber;
     let b = div(c_, a_) as BigNumber;
     let c = div(d_, a_) as BigNumber;
-    console.log(`归一化方程: λ^3 + aλ^2 + bλ + c = 0 => a:${a.toNumber()}, b:${b.toNumber()}, c:${c.toNumber()}`);
+    // console.log(`归一化方程: λ^3 + aλ^2 + bλ + c = 0 => a:${a.toNumber()}, b:${b.toNumber()}, c:${c.toNumber()}`);
 
     // 输入验证,c不是0，其他是0。
 
@@ -106,7 +106,7 @@ class SolveEquation {
     }
 
     let rs = MATHJS.polynomialRoot(c.toNumber(), b.toNumber(), a.toNumber(), 1);
-    console.log(`MATHJS.polynomialRoot rs:${rs}`);
+    // console.log(`MATHJS.polynomialRoot rs:${rs}`);
     rs.forEach(root => {
       if (MATHJS.typeOf(root) === 'Complex') {
         roots.push(root as MATHJS.Complex);
@@ -125,7 +125,7 @@ class SolveEquation {
       mul(b, b, b, -4),
       mul(c, c, -27),
     )
-    console.log(`Δ = 18abc − 4a^3c + a^2b^2 − 4b^3 − 27c^2 => Δ:${Δ0.toString()}`);
+    // console.log(`Δ = 18abc − 4a^3c + a^2b^2 − 4b^3 − 27c^2 => Δ:${Δ0.toString()}`);
 
     // 令λ = x − a/3​ ，方程变为：x^3 + px + q = 0 
     // p = b − a^2/3
@@ -136,18 +136,18 @@ class SolveEquation {
       div(mul(a, b), -3),
       c
     ) as BigNumber;
-    console.log(`p = b − a^2/3 => p:${p.toNumber()}`);
-    console.log(`q = 2a^3/27 ​− ab/3 + c => q:${q.toNumber()}`);
+    // console.log(`p = b − a^2/3 => p:${p.toNumber()}`);
+    // console.log(`q = 2a^3/27 ​− ab/3 + c => q:${q.toNumber()}`);
     // 判别式简化公式
     // Δ = − 4p^3 − 27q^2
     let Δ = add(
       mul(p, p, p, -4),
       mul(q, q, -27),
     ) as BigNumber;
-    console.log(`Δ = − 4p^3 − 27q^2 => Δ:${Δ.toNumber()}`);
+    // console.log(`Δ = − 4p^3 − 27q^2 => Δ:${Δ.toNumber()}`);
 
     const shift = div(a, 3) as BigNumber;
-    console.log(`λ = x − a/3 => shift:${shift.toNumber()}`);
+    // console.log(`λ = x − a/3 => shift:${shift.toNumber()}`);
 
 
     // Δ = 0：有重根(abs(Δ) < 1e-5)
@@ -159,8 +159,8 @@ class SolveEquation {
       let x2 = mul(MATHJS.cbrt(mul(q, -0.25) as BigNumber), -3) as BigNumber;
       let x3 = mul(MATHJS.cbrt(mul(q, -0.25) as BigNumber), -3) as BigNumber;
 
-      console.log(`x1​ = 3 (−q/2) ^ 1/3 => x1:${x1.toNumber()}`);
-      console.log(`x2​ = x3​ = −3 (−q/4) ^ 1/3 => x2:${x2.toNumber()}`);
+      // console.log(`x1​ = 3 (−q/2) ^ 1/3 => x1:${x1.toNumber()}`);
+      // console.log(`x2​ = x3​ = −3 (−q/4) ^ 1/3 => x2:${x2.toNumber()}`);
 
       let λ1 = sub(x1, shift) as BigNumber;
       let λ2 = sub(x2, shift) as BigNumber;
@@ -173,17 +173,17 @@ class SolveEquation {
       // θ = arccos(−q/2R)
       let R = MATHJS.sqrt(div(mul(p, p, p), -27) as BigNumber);
       let θ = MATHJS.acos(div(mul(-q, -0.5), R) as BigNumber);
-      console.log(`R = sqrt(−p^3/27) => R:${R.toNumber()}`);
-      console.log(`θ = arccos(−q/2R) => θ:${θ.toNumber()}`);
+      // console.log(`R = sqrt(−p^3/27) => R:${R.toNumber()}`);
+      // console.log(`θ = arccos(−q/2R) => θ:${θ.toNumber()}`);
       // x1​ =2R^1/3​ cos(θ / 3)
       // x2 =2R^1/3 cos⁡(θ+2π / 3)
       // x3 =2R^1/3 cos⁡(θ+4π / 3)
       let x1 = mul(MATHJS.cbrt(R), MATHJS.cos(div(θ, 3) as BigNumber), 2) as BigNumber;
       let x2 = mul(MATHJS.cbrt(R), MATHJS.cos(div(add(θ, PI2), 3) as BigNumber), 2) as BigNumber;
       let x3 = mul(MATHJS.cbrt(R), MATHJS.cos(div(add(θ, PI4), 3) as BigNumber), 2) as BigNumber;
-      console.log(`x1​ =2R^1/3​ cos(θ / 3) => x1​:${x1.toNumber()}`);
-      console.log(`x2 =2R^1/3 cos⁡(θ+2π / 3) => x2:${x2.toNumber()}`);
-      console.log(`x3 =2R^1/3 cos⁡(θ+4π / 3) => x3​:${x3.toNumber()}`);
+      // console.log(`x1​ =2R^1/3​ cos(θ / 3) => x1​:${x1.toNumber()}`);
+      // console.log(`x2 =2R^1/3 cos⁡(θ+2π / 3) => x2:${x2.toNumber()}`);
+      // console.log(`x3 =2R^1/3 cos⁡(θ+4π / 3) => x3​:${x3.toNumber()}`);
       let λ1 = sub(x1, shift) as BigNumber;
       let λ2 = sub(x2, shift) as BigNumber;
       let λ3 = sub(x3, shift) as BigNumber;
@@ -199,8 +199,8 @@ class SolveEquation {
       // x3 = -x1/2 - isqrt(3)/2(A - B)
       let A = MATHJS.cbrt(add(mul(q, -0.5), MATHJS.sqrt(div(Δ, -108) as BigNumber)) as BigNumber);
       let B = MATHJS.cbrt(add(mul(q, -0.5), un(MATHJS.sqrt(div(Δ, -108) as BigNumber))) as BigNumber);
-      console.log(`A = (-q/2 + (-Δ/108)^1/2)^1/3 => A:${A.toNumber()}`);
-      console.log(`B = (-q/2 - (-Δ/108)^1/2)^1/3 => B:${B.toNumber()}`);
+      // console.log(`A = (-q/2 + (-Δ/108)^1/2)^1/3 => A:${A.toNumber()}`);
+      // console.log(`B = (-q/2 - (-Δ/108)^1/2)^1/3 => B:${B.toNumber()}`);
 
       let x1 = add(A, B) as BigNumber;
       let x2_r = mul(x1, -0.5) as BigNumber;
@@ -208,9 +208,9 @@ class SolveEquation {
       let x3_r = mul(x1, -0.5) as BigNumber;
       const x3_i = mul(MATHJS.sqrt(big(3)), add(A, un(B)), -0.5) as BigNumber;
 
-      console.log(`x1 = A + B => x1:${x1.toNumber()}`);
-      console.log(`x2 = -x1/2 + isqrt(3)/2(A - B) => x2_r:${x2_r.toNumber()},x2_i:${x2_i.toNumber()}`);
-      console.log(`x3 = -x1/2 - isqrt(3)/2(A - B) => x3_r:${x2_r.toNumber()},x3_i:${x3_i.toNumber()}`);
+      // console.log(`x1 = A + B => x1:${x1.toNumber()}`);
+      // console.log(`x2 = -x1/2 + isqrt(3)/2(A - B) => x2_r:${x2_r.toNumber()},x2_i:${x2_i.toNumber()}`);
+      // console.log(`x3 = -x1/2 - isqrt(3)/2(A - B) => x3_r:${x2_r.toNumber()},x3_i:${x3_i.toNumber()}`);
 
       let λ1 = sub(x1, shift) as BigNumber;
       let λ2_r = sub(x2_r, shift) as BigNumber;
@@ -304,7 +304,7 @@ class SolveEquation {
     let q = div(c, a) as BigNumber;
     let r = div(d, a) as BigNumber;
     let s = div(e, a) as BigNumber;
-    console.log(`方程化为归一化形式 x⁴ + px³ + qx² + rx + s = 0 p:${p.toNumber()} q :${q.toNumber()}, r:${r.toNumber()}, s:${s.toNumber()}`);
+    // console.log(`方程化为归一化形式 x⁴ + px³ + qx² + rx + s = 0 p:${p.toNumber()} q :${q.toNumber()}, r:${r.toNumber()}, s:${s.toNumber()}`);
 
     // 输入验证,s为不是0，其他系数都为0。
     if (abs(p).lessThanOrEqualTo(tol1)
@@ -394,7 +394,7 @@ class SolveEquation {
       MATHJS.pow(r_abs, 1 / 3) as BigNumber,
       MATHJS.pow(s_abs, 1 / 4) as BigNumber
     );
-    console.log(`缩放参数t:${t.toNumber()}`);
+    // console.log(`缩放参数t:${t.toNumber()}`);
 
     // 缩放后的系数
     const p_scaled = div(p, t) as BigNumber;
@@ -407,10 +407,10 @@ class SolveEquation {
     r = r_scaled;
     s = s_scaled;
 
-    console.log(`缩放形式 x⁴ + px³ + qx² + rx + s = 0 p:${p.toNumber()} q :${q.toNumber()}, r:${r.toNumber()}, s:${s.toNumber()}`);
+    // console.log(`缩放形式 x⁴ + px³ + qx² + rx + s = 0 p:${p.toNumber()} q :${q.toNumber()}, r:${r.toNumber()}, s:${s.toNumber()}`);
 
     const p_4 = div(p, 4) as BigNumber;
-    console.log(`p_4:${p_4.toNumber()} `);
+    // console.log(`p_4:${p_4.toNumber()} `);
 
     // 转换为缺项四次方程: y⁴ + Ay² + By + C = 0 (通过代换 x = y - p/4)
     // const A = q - (3 * p * p) / 8;
@@ -421,7 +421,7 @@ class SolveEquation {
     const B = sub(add(r, div(MATHJS.pow(p, 3), 8)), div(mul(p, q), 2)) as BigNumber;
     const C = sub(add(sub(s, div(mul(MATHJS.pow(p, 4), 3), 256)), div(mul(MATHJS.pow(p, 2), q), 16)), div(mul(p, r), 4)) as BigNumber;
 
-    console.log(`缺项方程 y⁴ + Ay² + By + C = 0: A :${A.toNumber()}, B:${B.toNumber()}, C:${C.toNumber()}`);
+    // console.log(`缺项方程 y⁴ + Ay² + By + C = 0: A :${A.toNumber()}, B:${B.toNumber()}, C:${C.toNumber()}`);
     let roots = new Array<MATHJS.Complex | BigNumber>();
 
     if (abs(B).lessThanOrEqualTo(tol1)) {
@@ -459,9 +459,9 @@ class SolveEquation {
 
     // 使用三次方程求解器
     // const mRoots = SolveEquation.SolveCubicEquation(cubicA, cubicB.toNumber(), cubicC.toNumber(), cubicD.toNumber());
-    console.log(`求解三次预解方程 C_3 m^3 + C_2 m^2 + C_1 m + C_0=> C_3:${cubicA}, C_2:${cubicB.toNumber()}, C_1:${cubicC.toNumber()}, C_0:${cubicD.toNumber()}`);
+    // console.log(`求解三次预解方程 C_3 m^3 + C_2 m^2 + C_1 m + C_0=> C_3:${cubicA}, C_2:${cubicB.toNumber()}, C_1:${cubicC.toNumber()}, C_0:${cubicD.toNumber()}`);
     const ms = SolveEquation.SolveCubicNumberical(cubicA, cubicB, cubicC, cubicD);
-    console.log(`三次预解方程 ms: ${ms[0]}, ${ms[1]}, ${ms[2]}`);
+    // console.log(`三次预解方程 ms: ${ms[0]}, ${ms[1]}, ${ms[2]}`);
 
     // 选择绝对值最小的实数根作为m
     let m: BigNumber = undefined;
@@ -497,7 +497,7 @@ class SolveEquation {
     setm(r2);
 
     let m_ = big(m);
-    console.log(`m: ${m.toNumber()}`);
+    // console.log(`m: ${m.toNumber()}`);
     // 构建二次方程参数
     // const sqrt2mMinusA = MATHJS.sqrt(2 * m - A);
     // const sqrtM2MinusC = MATHJS.sqrt(m * m - C);
@@ -515,21 +515,21 @@ class SolveEquation {
       beta = un(beta);
     }
 
-    console.log(`alpha: ${alpha} beta: ${beta}`);
+    // console.log(`alpha: ${alpha} beta: ${beta}`);
 
     // 解第一个二次方程: y² - αy + (m + β) = 0
     // const Δ1 = alpha * alpha - 4 * (m + beta);
     const Δ1 = sub(mul(alpha, alpha), mul(add(m_, beta), 4));
-    console.log(`Δ1: ${Δ1}`);
+    // console.log(`Δ1: ${Δ1}`);
     // 检查 Δ1 是否为复数
     if (MATHJS.typeOf(Δ1) === 'Complex') {
       let Δ = Δ1 as MATHJS.Complex;
       // 复数判别式，使用复数公式
       const sqrtDisc = MATHJS.sqrt(Δ);
-      console.log(`sqrtDisc: ${sqrtDisc}`);
+      // console.log(`sqrtDisc: ${sqrtDisc}`);
       const root1 = div(add(alpha, sqrtDisc), 2);
       const root2 = div(sub(alpha, sqrtDisc), 2);
-      console.log(`root1:${root1.toString()} root2:${root2.toString()} `);
+      // console.log(`root1:${root1.toString()} root2:${root2.toString()} `);
       roots.push(sub(root1, p_4) as any);
       roots.push(sub(root2, p_4) as any);
     }
@@ -539,11 +539,11 @@ class SolveEquation {
       // const root2 = (alpha - MATHJS.sqrt(Δ1)) / 2;
       const root1 = div(add(alpha, MATHJS.sqrt(Δ)), 2);
       const root2 = div(sub(alpha, MATHJS.sqrt(Δ)), 2);
-      console.log(`缺项方程根： root1:${root1.toString()} root2:${root2.toString()} `);
+      // console.log(`缺项方程根： root1:${root1.toString()} root2:${root2.toString()} `);
       // roots.push(root1 - p / 4, root2 - p / 4);
       const r1 = sub(root1, p_4) as any;
       const r2 = sub(root2, p_4) as any;
-      console.log(`缩放方程根： r1:${r1.toString()} r2:${r2.toString()} `);
+      // console.log(`缩放方程根： r1:${r1.toString()} r2:${r2.toString()} `);
       roots.push(r1);
       roots.push(r2);
     } else {
@@ -554,10 +554,10 @@ class SolveEquation {
         const sqrtDisc = MATHJS.sqrt(un(Δ));
         const root1 = div(add(alpha, sqrtDisc), 2);
         const root2 = div(sub(alpha, sqrtDisc), 2);
-        console.log(`缺项方程根： root1:${root1.toString()} root2:${root2.toString()} `);
+        // console.log(`缺项方程根： root1:${root1.toString()} root2:${root2.toString()} `);
         const r1 = sub(root1, p_4) as any;
         const r2 = sub(root2, p_4) as any;
-        console.log(`缩放方程根： r1:${r1.toString()} r2:${r2.toString()} `);
+        // console.log(`缩放方程根： r1:${r1.toString()} r2:${r2.toString()} `);
         roots.push(r1, r2);
       } else {
         // const realPart = alpha / 2;
@@ -568,13 +568,13 @@ class SolveEquation {
         // );
         const realPart = div(alpha, 2) as BigNumber;
         const imagPart = div(MATHJS.sqrt(un(Δ)), 2) as BigNumber;
-        console.log(`realPart:${realPart.toNumber()} imagPart:${imagPart.toNumber()} `);
+        // console.log(`realPart:${realPart.toNumber()} imagPart:${imagPart.toNumber()} `);
         const root1 = MATHJS.complex(realPart.toNumber(), imagPart.toNumber());
         const root2 = MATHJS.complex(realPart.toNumber(), -imagPart.toNumber());
-        console.log(`缺项方程根：root1:${root1.toString()} root2:${root2.toString()} `);
+        // console.log(`缺项方程根：root1:${root1.toString()} root2:${root2.toString()} `);
         const r1 = sub(root1, p_4) as any;
         const r2 = sub(root2, p_4) as any;
-        console.log(`缩放方程根： r1:${r1.toString()} r2:${r2.toString()} `);
+        // console.log(`缩放方程根： r1:${r1.toString()} r2:${r2.toString()} `);
 
         roots.push(r1, r2);
       }
@@ -583,19 +583,19 @@ class SolveEquation {
     // 解第二个二次方程: y² + αy + (m - β) = 0
     // const Δ2 = alpha * alpha - 4 * (m - beta);
     const Δ2 = sub(mul(alpha, alpha), mul(sub(m_, beta), 4));
-    console.log(`Δ2: ${Δ2}`);
+    // console.log(`Δ2: ${Δ2}`);
     // 检查 Δ2 是否为复数
     if (MATHJS.typeOf(Δ2) === 'Complex') {
       let Δ = Δ2 as MATHJS.Complex;
       // 复数判别式，使用复数公式
       const sqrtDisc = MATHJS.sqrt(Δ);
-      console.log(`sqrtDisc: ${sqrtDisc}`);
+      // console.log(`sqrtDisc: ${sqrtDisc}`);
       const root3 = div(add(alpha, sqrtDisc), 2);
       const root4 = div(sub(alpha, sqrtDisc), 2);
-      console.log(`缺项方程根：root3:${root3.toString()} root4:${root4.toString()} `);
+      // console.log(`缺项方程根：root3:${root3.toString()} root4:${root4.toString()} `);
       const r3 = sub(root3, p_4) as any;
       const r4 = sub(root4, p_4) as any;
-      console.log(`缩放方程根： r3:${r3.toString()} r4:${r4.toString()} `);
+      // console.log(`缩放方程根： r3:${r3.toString()} r4:${r4.toString()} `);
       roots.push(r3, r4);
     }
     else if (largerEq(Δ2, ZERO)) {
@@ -605,10 +605,10 @@ class SolveEquation {
       // roots.push(root3 - p / 4, root4 - p / 4);
       const root3 = div(add(un(alpha), MATHJS.sqrt(Δ)), 2);
       const root4 = div(sub(un(alpha), MATHJS.sqrt(Δ)), 2);
-      console.log(`缺项方程根：root3:${root3.toString()} root4:${root4.toString()} `);
+      // console.log(`缺项方程根：root3:${root3.toString()} root4:${root4.toString()} `);
       const r3 = sub(root3, p_4) as any;
       const r4 = sub(root4, p_4) as any;
-      console.log(`缩放方程根： r3:${r3.toString()} r4:${r4.toString()} `);
+      // console.log(`缩放方程根： r3:${r3.toString()} r4:${r4.toString()} `);
       roots.push(r3, r4);
     } else {
       let Δ = Δ2 as BigNumber;
@@ -618,10 +618,10 @@ class SolveEquation {
         const sqrtDisc = MATHJS.sqrt(un(Δ));
         const root3 = div(add(alpha, sqrtDisc), 2);
         const root4 = div(sub(alpha, sqrtDisc), 2);
-        console.log(`缺项方程根：root3:${root3.toString()} root4:${root4.toString()} `);
+        // console.log(`缺项方程根：root3:${root3.toString()} root4:${root4.toString()} `);
         const r3 = sub(root3, p_4) as any;
         const r4 = sub(root4, p_4) as any;
-        console.log(`缩放方程根： r3:${r3.toString()} r4:${r4.toString()} `);
+        // console.log(`缩放方程根： r3:${r3.toString()} r4:${r4.toString()} `);
         roots.push(r3, r4);
       } else {
         // const realPart = -alpha / 2;
@@ -632,21 +632,21 @@ class SolveEquation {
         // );
         const realPart = div(alpha, -2) as BigNumber;
         const imagPart = div(MATHJS.sqrt(un(Δ)), 2) as BigNumber;
-        console.log(`realPart:${realPart.toNumber()} imagPart:${imagPart.toNumber()}`);
+        // console.log(`realPart:${realPart.toNumber()} imagPart:${imagPart.toNumber()}`);
         const root3 = MATHJS.complex(realPart.toNumber(), imagPart.toNumber());
         const root4 = MATHJS.complex(realPart.toNumber(), -imagPart.toNumber());
-        console.log(`缺项方程根：root3:${root3.toString()} root4:${root4.toString()}`);
+        // console.log(`缺项方程根：root3:${root3.toString()} root4:${root4.toString()}`);
         const r3 = sub(root3, p_4) as any;
         const r4 = sub(root4, p_4) as any;
-        console.log(`缩放方程根：r3:${r3.toString()} r4:${r4.toString()} `);
+        // console.log(`缩放方程根：r3:${r3.toString()} r4:${r4.toString()} `);
         roots.push(r3, r4);
       }
     }
     // 乘以缩放系数后的结果
-    console.log(`乘以缩放系数后的原方程根：`);
+    // console.log(`乘以缩放系数后的原方程根：`);
     for (let i = 0; i < roots.length; i++) {
       roots[i] = mul(roots[i], t) as (BigNumber | MATHJS.Complex);
-      console.log(`Root[${i}]：${roots[i]}`);
+      // console.log(`Root[${i}]：${roots[i]}`);
     }
     return roots;
   }
@@ -703,19 +703,19 @@ class SolveEquation {
     let e = big(e_);
 
     let expr = a + '*x^4 + ' + b + '*x^3 + ' + c + '*x^2 + ' + d + '*x + ' + e + ' = 0';
-    console.log(`方程表达式：${expr}`);
+    // console.log(`方程表达式：${expr}`);
     let begin = new Date();
     let ret = nerdamer.solve(expr, 'x');
     let end = new Date();
-    console.log(`方程的根表达式：  ${ret}`);
-    console.log(`Nerdamer.solve Time ：  ${end.getTime() - begin.getTime()}`);
+    // console.log(`方程的根表达式：  ${ret}`);
+    // console.log(`Nerdamer.solve Time ：  ${end.getTime() - begin.getTime()}`);
     let result = new Array<MATHJS.Complex | BigNumber>();
     let begin0 = new Date();
     ret.each((r) => {
       result.push(SolveEquation.Expression2BigNumber(r.toString()));
     });
     let end0 = new Date();
-    console.log(`Expression2BigNumber Time ：  ${end0.getTime() - begin0.getTime()}`);
+    // console.log(`Expression2BigNumber Time ：  ${end0.getTime() - begin0.getTime()}`);
     return result;
   }
 
@@ -734,19 +734,19 @@ class SolveEquation {
     for (let i = 0; i < cs.length; i++) {
       expr = cs[i] + '*x^' + i + ' + ' + expr;
     }
-    console.log(`方程表达式：${expr}`);
+    // console.log(`方程表达式：${expr}`);
     let begin = new Date();
     let ret = nerdamer.solve(expr, 'x');
     let end = new Date();
-    console.log(`方程的根表达式：  ${ret}`);
-    console.log(`Nerdamer.solve Time ：  ${end.getTime() - begin.getTime()}`);
+    // console.log(`方程的根表达式：  ${ret}`);
+    // console.log(`Nerdamer.solve Time ：  ${end.getTime() - begin.getTime()}`);
     let result = new Array<MATHJS.Complex | BigNumber>();
     let begin0 = new Date();
     ret.each((r) => {
       result.push(SolveEquation.Expression2BigNumber(r.toString()));
     });
     let end0 = new Date();
-    console.log(`Expression2BigNumber Time ：  ${end0.getTime() - begin0.getTime()}`);
+    // console.log(`Expression2BigNumber Time ：  ${end0.getTime() - begin0.getTime()}`);
     return result;
   }
 
